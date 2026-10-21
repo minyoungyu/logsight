@@ -42,6 +42,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "events_by_source": by_source,
         "n_flagged": sum(1 for e in events if e.findings),
         "n_findings": len(findings),
+        "rule_counts": _rule_counts(findings),
         "n_incidents": len(incidents),
         "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "stages",
                                                "src_ips", "n_events")} for i in incidents[:50]],
@@ -50,6 +51,17 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
                    "total_s": round(time.time() - t0, 2)},
         "has_environment": bool(env),
     }
+
+
+def _rule_counts(findings) -> dict:
+    """규칙별 (탐지 수, 표시된 이벤트 수) — 어떤 규칙이 시끄러운지 보는 용도."""
+    out: dict[str, list[int]] = {}
+    for f in findings:
+        c = out.setdefault(f.rule, [0, 0])
+        c[0] += 1
+        c[1] += len(f.events)
+    return {k: {"findings": v[0], "events": v[1]}
+            for k, v in sorted(out.items(), key=lambda kv: -kv[1][1])}
 
 
 def run_paths(paths: list[str], env_path: str | None = None, **kw) -> dict:

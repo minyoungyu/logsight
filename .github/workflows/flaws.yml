@@ -23,14 +23,15 @@ jobs:
           curl -sSfL -o data/flaws.tar https://summitroute.com/downloads/flaws_cloudtrail_logs.tar
           tar -xf data/flaws.tar -C data
           rm data/flaws.tar
-          find data -type f | sort | head -n "${{ inputs.files }}" > data/files.txt
-          wc -l data/files.txt; du -sh data
+          # 목록 파일은 data 밖에 만든다(같은 폴더에 쓰면 find 결과에 섞일 수 있음)
+          find data -type f -name "*.json.gz" | sort | head -n "${{ inputs.files }}" > files.txt
+          wc -l files.txt; du -sh data
       - name: Analyze
         run: |
-          /usr/bin/time -v python -m logsight analyze $(cat data/files.txt) --top 10 --no-ai --out reports/flaws 2> time.txt
+          /usr/bin/time -v python -m logsight analyze $(cat files.txt) --top 10 --no-ai --out reports/flaws 2> time.txt
           grep -E "Elapsed|Maximum resident|건너뜀|Error|Traceback" time.txt || true
           python scripts/flaws_summary.py reports/flaws/report.json | tee reports/flaws/summary.md
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: flaws-report
           path: reports/flaws
