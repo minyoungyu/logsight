@@ -8,9 +8,10 @@ MITRE ATT&CK(Enterprise, Cloud) 기법 ID에 대응한다. 이 표시가 있는 
 """
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from datetime import timedelta
 from urllib.parse import unquote_plus
 
@@ -100,6 +101,7 @@ class Finding:
                 "evidence": [e.raw_ref for e in self.events[:20]]}
 
 
+@lru_cache(maxsize=65536)
 def _is_private(ip: str | None) -> bool:
     if not ip:
         return True
@@ -108,6 +110,7 @@ def _is_private(ip: str | None) -> bool:
         and 16 <= int(ip.split(".")[1]) <= 31)
 
 
+@lru_cache(maxsize=65536)
 def _is_ip(s: str | None) -> bool:
     if not s:
         return False
@@ -116,17 +119,22 @@ def _is_ip(s: str | None) -> bool:
 
 
 def _bursts(evs: list[Event], window: timedelta, min_count: int, key=lambda e: e.action):
-    """시간창 안에서 (서로 다른 key 값 기준) min_count 이상 모인 구간을 돌려준다."""
+    """시간창 안에서 (서로 다른 key 값 기준) min_count 이상 모인 구간을 돌려준다.
+    창 안의 key 개수를 Counter로 증감시켜 O(n)으로 계산한다(대용량 로그 대응)."""
     evs = sorted(evs, key=lambda e: e.ts)
-    out, start = [], 0
-    for end in range(len(evs)):
-        while evs[end].ts - evs[start].ts > window:
+    out: list[tuple[int, int]] = []
+    counts: Counter = Counter()
+    start = 0
+    for end, e in enumerate(evs):
+        counts[key(e)] += 1
+        while e.ts - evs[start].ts > window:
+            k = key(evs[start])
+            counts[k] -= 1
+            if not counts[k]:
+                del counts[k]
             start += 1
-        seg = evs[start:end + 1]
-        if len({key(e) for e in seg}) >= min_count:
-            if out and out[-1][0] == start:
-                out[-1] = (start, end)
-            elif out and start <= out[-1][1]:
+        if len(counts) >= min_count:
+            if out and start <= out[-1][1] + 1:
                 out[-1] = (out[-1][0], end)
             else:
                 out.append((start, end))

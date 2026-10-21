@@ -22,7 +22,9 @@ NAMES = [("s3", "GetObject"), ("s3", "PutObject"), ("ec2", "DescribeInstances"),
          ("logs", "PutLogEvents"), ("sts", "AssumeRole"), ("kms", "Decrypt")]
 
 
-def make(n: int, d: Path, per_file: int = 50000) -> None:
+def make(n: int, d: Path, per_file: int = 50000, dense: bool = False) -> None:
+    """dense=True면 절반을 한 IP가 몇 시간 동안 쏟아내는 권한 거부 호출로 채운다
+    (flaws.cloud처럼 같은 출발지에서 대량 호출이 몰리는 경우의 처리 시간 측정용)."""
     rnd = random.Random(1)
     t = datetime(2026, 10, 1, tzinfo=timezone.utc)
     for f in range(0, n, per_file):
@@ -30,6 +32,13 @@ def make(n: int, d: Path, per_file: int = 50000) -> None:
         for i in range(f, min(n, f + per_file)):
             src, name = rnd.choice(NAMES)
             u = rnd.randint(1, 20)
+            if dense and i % 2:
+                recs.append({"eventTime": (t + timedelta(seconds=i * 0.05)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                             "eventSource": f"{src}.amazonaws.com", "eventName": name,
+                             "errorCode": "AccessDenied", "sourceIPAddress": "203.0.113.200",
+                             "userIdentity": {"type": "IAMUser",
+                                              "arn": "arn:aws:iam::111122223333:user/ci"}})
+                continue
             recs.append({"eventTime": (t + timedelta(seconds=i * 3)).strftime("%Y-%m-%dT%H:%M:%SZ"),
                          "eventSource": f"{src}.amazonaws.com", "eventName": name,
                          "sourceIPAddress": f"198.51.100.{u}", "awsRegion": "ap-northeast-2",
@@ -41,8 +50,9 @@ def make(n: int, d: Path, per_file: int = 50000) -> None:
 
 if __name__ == "__main__":
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 100000
+    dense = "--dense" in sys.argv
     with tempfile.TemporaryDirectory() as d:
-        make(n, Path(d))
+        make(n, Path(d), dense=dense)
         tracemalloc.start()
         t = time.time()
         res = run_paths([d], use_ai=False)

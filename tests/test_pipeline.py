@@ -173,6 +173,32 @@ class DetectionTests(unittest.TestCase):
         self.assertEqual(self._run(recs)["n_incidents"], 0)
 
 
+class ScaleTests(unittest.TestCase):
+    def test_bursts_linear_matches_naive(self):
+        from datetime import datetime, timedelta, timezone
+        from logsight.detect import _bursts
+        from logsight.normalize import Event
+        t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evs = [Event(ts=t + timedelta(seconds=37 * i), source="cloudtrail", action=f"a{i % 7}",
+                     raw_ref=f"x:{i}") for i in range(400)]
+        evs += [Event(ts=t + timedelta(hours=5, seconds=i), source="cloudtrail", action="a1",
+                      raw_ref=f"y:{i}") for i in range(50)]
+        segs = _bursts(evs, timedelta(minutes=10), 5)
+        self.assertEqual(len(segs), 1)                 # 5시간 뒤 단일 API 반복은 해당 없음
+        self.assertEqual(len(segs[0]), 400)
+
+    def test_long_activity_is_split(self):
+        recs = [ct(n, src="iam.amazonaws.com", ip="203.0.113.50", errorCode="AccessDenied",
+                   ts=f"2026-10-14T{h:02d}:{m:02d}:00Z")
+                for h in range(10, 16) for m in range(0, 60, 2)
+                for n in ("ListUsers", "ListRoles", "GetUser", "ListPolicies", "ListGroups")]
+        res = run(parse_cloudtrail(json.dumps({"Records": recs})), use_ai=False, top=10)
+        self.assertGreaterEqual(res["n_incidents"], 3)  # 6시간 활동 → 2시간 단위로 나뉨
+        for r in res["results"]:
+            f = r["incident"]["findings"][0]
+            self.assertLessEqual(f["n_events"], r["incident"]["n_events"])
+
+
 class ClaudePathTests(unittest.TestCase):
     """실제 API를 부르지 않고, 응답 처리·근거 검증 코드를 검사한다."""
 

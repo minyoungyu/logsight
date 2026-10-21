@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+from bisect import bisect_left, bisect_right
 from collections import Counter, defaultdict
 from datetime import timedelta
 
@@ -29,15 +30,28 @@ def _keys(e: Event):
         yield ("actor", e.actor)
 
 
+def _split_long(evs: list[Event], max_span: timedelta) -> list[list[Event]]:
+    """몇 시간씩 끊임없이 이어지는 활동은 max_span 단위 사건으로 나눈다(보고서 가독성)."""
+    chunks, cur = [], []
+    for e in evs:
+        if cur and e.ts - cur[0].ts > max_span:
+            chunks.append(cur)
+            cur = []
+        cur.append(e)
+    return chunks + ([cur] if cur else [])
+
+
 def build_incidents(events: list[Event], findings: list[Finding],
-                    window_min: int = 30, max_events: int = 60) -> list[dict]:
-    """탐지 이벤트를 사건으로 묶는다. max_events: 사건 하나에 상세로 남길 이벤트 수 상한."""
+                    window_min: int = 30, max_events: int = 60,
+                    max_span_min: int = 120) -> list[dict]:
+    """탐지 이벤트를 사건으로 묶는다. max_events: 사건 하나에 상세로 남길 이벤트 수 상한,
+    max_span_min: 사건 하나의 최대 길이(분)."""
     flagged = sorted({id(e): e for f in findings for e in f.events}.values(), key=lambda e: e.ts)
     if not flagged:
         return []
     win = timedelta(minutes=window_min)
-    g = nx.Graph()
-    g.add_nodes_from(range(len(flagged)))
+    # 연결 요소 계산: 노드가 수백만 개여도 가볍도록 networkx의 UnionFind 사용
+    uf = nx.utils.UnionFind(range(len(flagged)))
     idx_by_key: dict[tuple, list[int]] = defaultdict(list)
     for i, e in enumerate(flagged):
         for k in _keys(e):
@@ -45,7 +59,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
     for idxs in idx_by_key.values():
         for a, b in zip(idxs, idxs[1:]):
             if flagged[b].ts - flagged[a].ts <= win:
-                g.add_edge(a, b)
+                uf.union(a, b)
 
     # 맥락 이벤트(표시 없음)를 키로 색인
     ctx_by_key: dict[tuple, list[Event]] = defaultdict(list)
@@ -53,6 +67,10 @@ def build_incidents(events: list[Event], findings: list[Finding],
         if not e.findings:
             for k in _keys(e):
                 ctx_by_key[k].append(e)
+    ctx_ts: dict[tuple, list] = {}
+    for k, lst in ctx_by_key.items():
+        lst.sort(key=lambda e: e.ts)
+        ctx_ts[k] = [e.ts for e in lst]
 
     finding_by_event: dict[int, list[Finding]] = defaultdict(list)
     for f in findings:
@@ -60,8 +78,8 @@ def build_incidents(events: list[Event], findings: list[Finding],
             finding_by_event[id(e)].append(f)
 
     incidents = []
-    for comp in nx.connected_components(g):
-        evs = [flagged[i] for i in sorted(comp, key=lambda i: flagged[i].ts)]
+    comps = [[flagged[i] for i in sorted(c)] for c in uf.to_sets()]  # flagged는 시간순
+    for evs in (ch for c in comps for ch in _split_long(c, timedelta(minutes=max_span_min))):
         fset = {id(f): f for e in evs for f in finding_by_event[id(e)]}
         fl = sorted(fset.values(), key=lambda f: f.events[0].ts)
         start, end = evs[0].ts, evs[-1].ts
@@ -69,8 +87,13 @@ def build_incidents(events: list[Event], findings: list[Finding],
         ctx = []
         seen = {id(e) for e in evs}
         for k in keys:
-            for e in ctx_by_key.get(k, []):
-                if start - win <= e.ts <= end + win and id(e) not in seen:
+            lst = ctx_by_key.get(k)
+            if not lst:
+                continue
+            lo = bisect_left(ctx_ts[k], start - win)
+            hi = bisect_right(ctx_ts[k], end + win)
+            for e in lst[lo:hi]:
+                if id(e) not in seen:
                     seen.add(id(e))
                     ctx.append(e)
         sev = max((SEV_RANK[f.severity] for f in fl), default=1)
@@ -99,7 +122,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
             "actors": sorted({e.actor for e in evs if e.actor}),
             "sources": sorted({e.source for e in evs}),
             "n_events": len(evs),
-            "findings": [f.to_dict() for f in fl],
+            "findings": [_finding_in(f, evs) for f in fl],
             "events": [_compact(e) for e in detail],
             "omitted_events": omitted,
             "context": {
@@ -112,6 +135,16 @@ def build_incidents(events: list[Event], findings: list[Finding],
     for n, inc in enumerate(incidents, 1):
         inc["id"] = f"INC-{n:03d}"
     return incidents
+
+
+def _finding_in(f: Finding, evs: list[Event]) -> dict:
+    """사건(나뉜 조각) 안에 든 이벤트만 기준으로 Finding을 요약한다."""
+    ids = {id(e) for e in evs}
+    mine = [e for e in f.events if id(e) in ids] or f.events
+    d = f.to_dict()
+    d.update(first=mine[0].ts.isoformat(), last=mine[-1].ts.isoformat(), n_events=len(mine),
+             evidence=[e.raw_ref for e in mine[:20]])
+    return d
 
 
 def _compact(e: Event) -> dict:

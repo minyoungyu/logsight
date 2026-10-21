@@ -9,6 +9,7 @@ import gzip
 import io
 import json
 import re
+import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -232,23 +233,27 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
         arn = f"arn:aws:iam::{ident.get('accountId', '')}:root"
     m = _INST.search(arn) if "assumed-role" in arn else None
     params = r.get("requestParameters")
-    extra = {k: r[k] for k in ("errorCode", "errorMessage", "awsRegion", "userAgent",
-                               "eventType", "recipientAccountId") if r.get(k)}
+    # 수백만 건을 메모리에 올리므로 판단에 필요한 필드만, 반복 문자열은 intern으로 공유
+    extra = {k: sys.intern(str(r[k])[:120]) for k in ("errorCode", "awsRegion", "userAgent",
+                                                       "eventType") if r.get(k)}
     extra["identity_type"] = ident.get("type")
     aed = r.get("additionalEventData")
     if isinstance(aed, dict) and aed.get("MFAUsed"):
         extra["mfa"] = aed["MFAUsed"]
     if isinstance(params, dict) and params:
         # 근거 확인에 필요한 대표 파라미터만 남긴다(전체는 원본에 있음)
-        extra["params"] = {k: params[k] for k in list(params)[:8]}
+        extra["params"] = json.dumps({k: params[k] for k in list(params)[:8]},
+                                     ensure_ascii=False, default=str)[:400]
     src = r.get("sourceIPAddress")
+    actor = arn or ident.get("type") or ident.get("invokedBy")
+    key = ident.get("accessKeyId")
     return Event(
         ts=ts, source="cloudtrail",
-        src_ip=src,
-        actor=arn or ident.get("type") or ident.get("invokedBy"),
+        src_ip=sys.intern(src) if isinstance(src, str) else None,
+        actor=sys.intern(actor) if isinstance(actor, str) else None,
         instance_id=m.group(1) if m else None,
-        access_key=ident.get("accessKeyId"),
-        action=f'{str(r.get("eventSource", "")).split(".")[0]}:{r.get("eventName", "")}',
+        access_key=sys.intern(key) if isinstance(key, str) else None,
+        action=sys.intern(f'{str(r.get("eventSource", "")).split(".")[0]}:{r.get("eventName", "")}'),
         outcome="failure" if r.get("errorCode") else "success",
         raw_ref=ref,
         extra=extra,
