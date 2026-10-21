@@ -232,7 +232,8 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         gets = [e for e in evs if e.action == "s3:GetObject" and e.outcome == "success"]
         for seg in _bursts(gets, timedelta(minutes=10), 20, key=lambda e: e.raw_ref):
             findings.append(Finding("CT_S3_BULK_READ", seg, f"10분 안에 GetObject {len(seg)}건", ip))
-        runs = [e for e in evs if e.action == "ec2:RunInstances"]
+        # 실패한 생성 시도는 권한 거부 규칙이 맡고, 여기서는 실제로 만들어진 것만 센다
+        runs = [e for e in evs if e.action == "ec2:RunInstances" and e.outcome == "success"]
         for seg in _bursts(runs, timedelta(minutes=30), 5, key=lambda e: e.raw_ref):
             findings.append(Finding("CT_RUN_INSTANCES_BURST", seg, f"30분 안에 {len(seg)}회", ip))
 

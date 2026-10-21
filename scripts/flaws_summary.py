@@ -19,3 +19,7 @@ for i in r["incident_index"][:20]:
 print("\n| 규칙(상위 10개 사건 기준) | 이벤트 |\n| --- | --- |")
 for k, v in rules.most_common():
     print(f"| {k} | {v:,} |")
+
+print("\n| 파일 | 종류 | 이벤트 | 오류 |\n| --- | --- | --- | --- |")
+for f in r["files"]:
+    print(f"| {f['file'].split('/')[-1]} | {f.get('kind')} | {f['events']:,} | {f.get('error', '')} |")

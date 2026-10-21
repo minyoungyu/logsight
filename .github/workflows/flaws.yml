@@ -28,7 +28,7 @@ jobs:
       - name: Analyze
         run: |
           /usr/bin/time -v python -m logsight analyze $(cat data/files.txt) --top 10 --no-ai --out reports/flaws 2> time.txt
-          grep -E "Elapsed|Maximum resident" time.txt
+          grep -E "Elapsed|Maximum resident|건너뜀|Error|Traceback" time.txt || true
           python scripts/flaws_summary.py reports/flaws/report.json | tee reports/flaws/summary.md
       - uses: actions/upload-artifact@v5
         with:

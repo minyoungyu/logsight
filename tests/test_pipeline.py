@@ -167,6 +167,13 @@ class DetectionTests(unittest.TestCase):
         rules = {f["rule"] for r in self._run(recs)["results"] for f in r["incident"]["findings"]}
         self.assertIn("CT_ACCESS_DENIED_BURST", rules)
 
+    def test_failed_run_instances_is_not_hijack(self):
+        recs = [ct("RunInstances", src="ec2.amazonaws.com", ts=f"2026-10-14T10:00:{i:02d}Z",
+                   errorCode="Client.UnauthorizedOperation") for i in range(10)]
+        rules = {f["rule"] for r in self._run(recs)["results"] for f in r["incident"]["findings"]}
+        self.assertNotIn("CT_RUN_INSTANCES_BURST", rules)
+        self.assertIn("CT_ACCESS_DENIED_BURST", rules)
+
     def test_service_principal_ip_is_ignored(self):
         recs = [ct(n, src="iam.amazonaws.com", ip="ec2.amazonaws.com", errorCode="AccessDenied",
                    ts=f"2026-10-14T10:00:{i:02d}Z") for i, n in enumerate(["A", "B", "C", "D", "E", "F"])]
