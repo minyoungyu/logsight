@@ -1,0 +1,36 @@
+name: flaws-dataset
+# flaws.cloud 공개 CloudTrail 데이터셋(약 194만 건)으로 LogSight 전체 파이프라인을 돌리고
+# 보고서를 아티팩트로 남긴다. Actions 탭에서 수동 실행(workflow_dispatch).
+on:
+  workflow_dispatch:
+    inputs:
+      files:
+        description: "분석할 파일 수(1~20, 20이면 전체)"
+        default: "20"
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: Download dataset
+        run: |
+          mkdir -p data
+          curl -sSfL -o data/flaws.tar https://summitroute.com/downloads/flaws_cloudtrail_logs.tar
+          tar -xf data/flaws.tar -C data
+          rm data/flaws.tar
+          find data -type f | sort | head -n "${{ inputs.files }}" > data/files.txt
+          wc -l data/files.txt; du -sh data
+      - name: Analyze
+        run: |
+          /usr/bin/time -v python -m logsight analyze $(cat data/files.txt) --top 10 --no-ai --out reports/flaws 2> time.txt
+          grep -E "Elapsed|Maximum resident" time.txt
+          python scripts/flaws_summary.py reports/flaws/report.json | tee reports/flaws/summary.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flaws-report
+          path: reports/flaws
