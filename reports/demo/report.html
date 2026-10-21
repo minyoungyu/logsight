@@ -1,0 +1,96 @@
+<!doctype html><html lang=ko><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>LogSight 분석 보고서</title><style>
+:root{--bg:#f7f7f5;--card:#fff;--fg:#1d1d1f;--muted:#6b6b70;--line:#e3e3e0;--accent:#2457c5;
+--high:#c0362c;--medium:#b7791f;--low:#3b7d4f;--code:#f1f1ee}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--card:#1d1d20;--fg:#ececec;--muted:#a0a0a6;
+--line:#333338;--accent:#7aa2ff;--high:#ff6b5e;--medium:#e3a94a;--low:#6cc287;--code:#26262a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:15px/1.6 -apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+main{max-width:1040px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:28px 0 10px}h3{font-size:16px;margin:0 0 6px}
+.muted{color:var(--muted)}.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+padding:16px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat b{display:block;font-size:22px}.sev{display:inline-block;padding:1px 8px;border-radius:99px;
+font-size:12px;font-weight:600;color:#fff}.sev.high{background:var(--high)}.sev.medium{background:var(--medium)}
+.sev.low{background:var(--low)}.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;
+padding:0 8px;font-size:12px;margin:2px 4px 2px 0}ol.flow{list-style:none;padding:0;margin:0;
+border-left:2px solid var(--line)}ol.flow li{position:relative;padding:4px 0 12px 18px}
+ol.flow li:before{content:"";position:absolute;left:-7px;top:10px;width:12px;height:12px;border-radius:50%;
+background:var(--accent)}code,pre{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+pre{background:var(--code);padding:10px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+a.ref{color:var(--accent);text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;margin-right:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--line);
+padding:6px;text-align:left;vertical-align:top}tr:target{background:rgba(122,162,255,.18)}
+.tablewrap{overflow-x:auto}.warn{color:var(--high)}.ok{color:var(--low)}details summary{cursor:pointer}
+</style><main><h1>LogSight 분석 보고서</h1><div class=muted>생성 2026-10-20T15:19:16Z · 원본 로그 4개 파일</div><div class='grid' style='margin-top:14px'><div class='card stat'><span class=muted>읽은 이벤트</span><b>11</b></div><div class='card stat'><span class=muted>의심 표시 이벤트</span><b>8</b></div><div class='card stat'><span class=muted>탐지 결과</span><b>5</b></div><div class='card stat'><span class=muted>사건</span><b>1</b></div><div class='card stat'><span class=muted>처리 시간</span><b>0.0초</b></div></div><div class=muted>로그 종류별: alb 2, cloudtrail 3, sshauth 3, vpcflow 3</div><h2 id='INC-001'>INC-001 <span class="sev high">높음</span></h2><div class=card><p style='margin-top:0'>2026-01-13 04:20부터 04:27(UTC)까지 203.0.113.9의 활동 8건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취 → 지속성 확보.</p><div class=muted><span class=chip>초기 침투</span> <span class=chip>자격증명 탈취</span> <span class=chip>지속성 확보</span> · 기간 2026-01-13T04:20:00 ~ 04:27:00 UTC · 출발지 203.0.113.9</div><div class=muted>분석: 규칙 기반(키 없음) · 확신도 중간 · <span class=ok>근거 검증 통과</span> · AI 입력 6,506자(상세 이벤트 8건 + 맥락 3건 집계)</div></div><h3>공격 흐름</h3><div class=card><ol class=flow><li><b>초기 침투</b> <span class=chip>T1133</span><span class=muted>2026-01-13T04:20:00</span><br>외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (대상: 203.0.113.9)<br><a class="ref" href="#INC-001-vpcflow.log:1">vpcflow.log:1</a></li><li><b>초기 침투</b> <span class=chip>T1190</span><span class=muted>2026-01-13T04:20:30</span><br>웹 요청에 SQL 인젝션 패턴 — 1건(성공 0, 실패·거부 1) (대상: 203.0.113.9)<br><a class="ref" href="#INC-001-alb.log:2">alb.log:2</a></li><li><b>초기 침투</b> <span class=chip>T1078</span><span class=muted>2026-01-13T04:21:05</span><br>연속 실패 뒤 SSH 로그인 성공 — 직전 30분 실패 2건 뒤 &#x27;ubuntu&#x27; 성공 (대상: 203.0.113.9)<br><a class="ref" href="#INC-001-auth.log:1">auth.log:1</a><a class="ref" href="#INC-001-auth.log:2">auth.log:2</a><a class="ref" href="#INC-001-auth.log:3">auth.log:3</a></li><li><b>자격증명 탈취</b> <span class=chip>T1552.005</span><span class=muted>2026-01-13T04:25:00</span><br>인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — 3건(성공 2, 실패·거부 1) (대상: i-0abc123def456)<br><a class="ref" href="#INC-001-cloudtrail.json:1">cloudtrail.json:1</a><a class="ref" href="#INC-001-cloudtrail.json:2">cloudtrail.json:2</a><a class="ref" href="#INC-001-cloudtrail.json:3">cloudtrail.json:3</a></li><li><b>지속성 확보</b> <span class=chip>T1098</span><span class=muted>2026-01-13T04:27:00</span><br>IAM 사용자·키·권한 생성/변경 — 1건(성공 0, 실패·거부 1) (대상: arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456)<br><a class="ref" href="#INC-001-cloudtrail.json:3">cloudtrail.json:3</a></li></ol></div><h3>원인으로 보이는 설정</h3><div class=card><b>보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용</b><br>외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.<br><a class="ref" href="#INC-001-vpcflow.log:1">vpcflow.log:1</a><a class="ref" href="#INC-001-auth.log:1">auth.log:1</a><a class="ref" href="#INC-001-auth.log:2">auth.log:2</a><a class="ref" href="#INC-001-auth.log:3">auth.log:3</a></div><div class=card><b>WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드</b><br>SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.<br><a class="ref" href="#INC-001-alb.log:2">alb.log:2</a></div><div class=card><b>인스턴스 i-0abc123def456가 IMDSv1을 허용</b><br>토큰 없이 메타데이터에서 역할 자격증명을 꺼낼 수 있어 탈취 위험이 크다.<br><a class="ref" href="#INC-001-cloudtrail.json:1">cloudtrail.json:1</a><a class="ref" href="#INC-001-cloudtrail.json:2">cloudtrail.json:2</a><a class="ref" href="#INC-001-cloudtrail.json:3">cloudtrail.json:3</a></div><div class=card><b>역할 ec2-app-role의 권한이 과도(와일드카드)</b><br>탈취된 자격증명으로 필요 이상의 자원 조회·변경이 가능했다.<br><a class="ref" href="#INC-001-cloudtrail.json:1">cloudtrail.json:1</a><a class="ref" href="#INC-001-cloudtrail.json:2">cloudtrail.json:2</a><a class="ref" href="#INC-001-cloudtrail.json:3">cloudtrail.json:3</a></div><div class=card><b>서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가</b><br>보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.<br><a class="ref" href="#INC-001-vpcflow.log:1">vpcflow.log:1</a><a class="ref" href="#INC-001-alb.log:2">alb.log:2</a><a class="ref" href="#INC-001-auth.log:1">auth.log:1</a><a class="ref" href="#INC-001-auth.log:2">auth.log:2</a><a class="ref" href="#INC-001-auth.log:3">auth.log:3</a><a class="ref" href="#INC-001-cloudtrail.json:1">cloudtrail.json:1</a></div><h3>방화벽·권한 수정안 <span class=muted style='font-weight:400'>(자동 적용하지 않음 — 검토 후 직접 적용)</span></h3><div class=card><b>[즉시] 보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용</b><div class=muted>security_group · sg-0web000000000001</div><details><summary>현재 → 제안, 적용 명령</summary><pre>현재: {
+ &quot;protocol&quot;: &quot;tcp&quot;,
+ &quot;from_port&quot;: 22,
+ &quot;to_port&quot;: 22,
+ &quot;cidr&quot;: &quot;0.0.0.0/0&quot;,
+ &quot;description&quot;: &quot;ssh&quot;
+}
+제안: {
+ &quot;protocol&quot;: &quot;tcp&quot;,
+ &quot;from_port&quot;: 22,
+ &quot;to_port&quot;: 22,
+ &quot;cidr&quot;: &quot;192.0.2.10/32&quot;,
+ &quot;description&quot;: &quot;관리자 IP만 허용(또는 SSM Session Manager로 대체)&quot;
+}</pre><pre>aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32</pre><div class=muted>주의: 관리자 IP가 바뀌면 접속이 끊긴다. 적용 전 현재 관리자 IP와 SSM 접속 경로를 확인한다.</div></details></div><div class=card><b>[즉시] WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드</b><div class=muted>waf · logsight-demo-acl</div><details><summary>현재 → 제안, 적용 명령</summary><pre>현재: {
+ &quot;Name&quot;: &quot;AWS-AWSManagedRulesSQLiRuleSet&quot;,
+ &quot;OverrideAction&quot;: {
+  &quot;Count&quot;: {}
+ }
+}
+제안: {
+ &quot;Name&quot;: &quot;AWS-AWSManagedRulesSQLiRuleSet&quot;,
+ &quot;OverrideAction&quot;: {
+  &quot;None&quot;: {}
+ }
+}</pre><pre>aws wafv2 get-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 &gt; acl.json
+# acl.json의 Rules에서 위 규칙의 OverrideAction을 {&quot;None&quot;: {}}로 바꾼 뒤
+aws wafv2 update-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 --lock-token &lt;LockToken&gt; --default-action Allow={} --rules file://rules.json --visibility-config &lt;기존 값&gt;</pre><div class=muted>주의: 정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.</div></details></div><div class=card><b>[즉시] 인스턴스 i-0abc123def456가 IMDSv1을 허용</b><div class=muted>ec2 · i-0abc123def456</div><details><summary>현재 → 제안, 적용 명령</summary><pre>현재: {
+ &quot;HttpTokens&quot;: &quot;optional&quot;
+}
+제안: {
+ &quot;HttpTokens&quot;: &quot;required&quot;
+}</pre><pre>aws ec2 modify-instance-metadata-options --instance-id i-0abc123def456 --http-tokens required --http-endpoint enabled</pre><div class=muted>주의: 오래된 SDK를 쓰는 앱은 IMDSv2를 지원하는지 먼저 확인한다.</div></details></div><div class=card><b>[즉시] 역할 ec2-app-role의 권한이 과도(와일드카드)</b><div class=muted>iam · ec2-app-role</div><details><summary>현재 → 제안, 적용 명령</summary><pre>현재: [
+ {
+  &quot;policy&quot;: &quot;app-s3-full&quot;,
+  &quot;statement&quot;: {
+   &quot;Effect&quot;: &quot;Allow&quot;,
+   &quot;Action&quot;: &quot;s3:*&quot;,
+   &quot;Resource&quot;: &quot;*&quot;
+  }
+ },
+ {
+  &quot;policy&quot;: &quot;app-s3-full&quot;,
+  &quot;statement&quot;: {
+   &quot;Effect&quot;: &quot;Allow&quot;,
+   &quot;Action&quot;: &quot;iam:*&quot;,
+   &quot;Resource&quot;: &quot;*&quot;
+  }
+ }
+]
+제안: {
+ &quot;Version&quot;: &quot;2012-10-17&quot;,
+ &quot;Statement&quot;: [
+  {
+   &quot;Effect&quot;: &quot;Allow&quot;,
+   &quot;Action&quot;: [
+    &quot;s3:GetObject&quot;,
+    &quot;s3:PutObject&quot;
+   ],
+   &quot;Resource&quot;: [
+    &quot;arn:aws:s3:::app-assets-bucket/*&quot;
+   ]
+  }
+ ]
+}</pre><pre>aws iam put-role-policy --role-name ec2-app-role --policy-name least-privilege --policy-document file://policy.json
+# 이후 와일드카드 정책 분리(detach/delete)</pre><div class=muted>주의: 실제로 쓰는 API는 IAM Access Analyzer의 &#x27;마지막 사용&#x27; 정보로 확인한다.</div></details></div><div class=card><b>[이번 주] 서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가</b><div class=muted>nacl · acl-0default00000001</div><details><summary>현재 → 제안, 적용 명령</summary><pre>현재: {
+ &quot;entries&quot;: 1
+}
+제안: {
+ &quot;deny&quot;: [
+  &quot;203.0.113.9/32&quot;
+ ]
+}</pre><pre>aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.9/32</pre><div class=muted>주의: NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다.</div></details></div><h3>로그만으로 확인할 수 없는 것</h3><div class=card><ul><li>규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다.</li></ul></div><h3>근거 이벤트 (8건)</h3><div class='card tablewrap'><table><tr><th>근거</th><th>시각(UTC)</th><th>로그</th><th>행위</th><th>결과</th><th>출발지</th><th>탐지 규칙</th></tr><tr id='INC-001-vpcflow.log:1'><td><code>vpcflow.log:1</code></td><td>2026-01-13T04:20:00</td><td>vpcflow</td><td>tcp/22 ACCEPT</td><td>accept</td><td>203.0.113.9</td><td>VPC_REMOTE_ADMIN_EXPOSED</td></tr><tr id='INC-001-alb.log:2'><td><code>alb.log:2</code></td><td>2026-01-13T04:20:30</td><td>alb</td><td>GET http://demo/search?q=1%27</td><td>failure</td><td>203.0.113.9</td><td>WEB_SQLI_PATTERN</td></tr><tr id='INC-001-auth.log:1'><td><code>auth.log:1</code></td><td>2026-01-13T04:21:05</td><td>sshauth</td><td>ssh_login</td><td>failure</td><td>203.0.113.9</td><td>SSH_SUCCESS_AFTER_FAIL</td></tr><tr id='INC-001-auth.log:2'><td><code>auth.log:2</code></td><td>2026-01-13T04:21:09</td><td>sshauth</td><td>ssh_login</td><td>failure</td><td>203.0.113.9</td><td>SSH_SUCCESS_AFTER_FAIL</td></tr><tr id='INC-001-auth.log:3'><td><code>auth.log:3</code></td><td>2026-01-13T04:22:40</td><td>sshauth</td><td>ssh_login</td><td>success</td><td>203.0.113.9</td><td>SSH_SUCCESS_AFTER_FAIL</td></tr><tr id='INC-001-cloudtrail.json:1'><td><code>cloudtrail.json:1</code></td><td>2026-01-13T04:25:00</td><td>cloudtrail</td><td>s3:ListBuckets</td><td>success</td><td>203.0.113.9</td><td>CT_INSTANCE_CRED_OUTSIDE</td></tr><tr id='INC-001-cloudtrail.json:2'><td><code>cloudtrail.json:2</code></td><td>2026-01-13T04:26:30</td><td>cloudtrail</td><td>s3:GetObject</td><td>success</td><td>203.0.113.9</td><td>CT_INSTANCE_CRED_OUTSIDE</td></tr><tr id='INC-001-cloudtrail.json:3'><td><code>cloudtrail.json:3</code></td><td>2026-01-13T04:27:00</td><td>cloudtrail</td><td>iam:CreateUser<br><span class=muted>AccessDenied</span></td><td>failure</td><td>203.0.113.9</td><td>CT_INSTANCE_CRED_OUTSIDE, CT_IAM_PERSISTENCE</td></tr></table></div><p class=muted>LogSight · 판단마다 근거 로그 위치(파일:줄)를 붙였습니다. 수정안은 자동 적용되지 않습니다.</p></main></html>

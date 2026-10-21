@@ -1,0 +1,630 @@
+{
+ "generated_at": "2026-10-20T15:19:16Z",
+ "files": [
+  {
+   "file": "samples/demo/alb.log",
+   "kind": "alb",
+   "events": 2
+  },
+  {
+   "file": "samples/demo/auth.log",
+   "kind": "sshauth",
+   "events": 3
+  },
+  {
+   "file": "samples/demo/cloudtrail.json",
+   "kind": "cloudtrail",
+   "events": 3
+  },
+  {
+   "file": "samples/demo/vpcflow.log",
+   "kind": "vpcflow",
+   "events": 3
+  }
+ ],
+ "n_events": 11,
+ "events_by_source": {
+  "alb": 2,
+  "sshauth": 3,
+  "cloudtrail": 3,
+  "vpcflow": 3
+ },
+ "n_flagged": 8,
+ "n_findings": 5,
+ "n_incidents": 1,
+ "incident_index": [
+  {
+   "id": "INC-001",
+   "start": "2026-01-13T04:20:00+00:00",
+   "end": "2026-01-13T04:27:00+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access",
+    "credential-access",
+    "persistence"
+   ],
+   "src_ips": [
+    "203.0.113.9"
+   ],
+   "n_events": 8
+  }
+ ],
+ "results": [
+  {
+   "incident": {
+    "start": "2026-01-13T04:20:00+00:00",
+    "end": "2026-01-13T04:27:00+00:00",
+    "severity": "high",
+    "score": 358,
+    "stages": [
+     "initial-access",
+     "credential-access",
+     "persistence"
+    ],
+    "src_ips": [
+     "203.0.113.9"
+    ],
+    "instances": [
+     "i-0abc123def456"
+    ],
+    "actors": [
+     "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+     "root",
+     "ubuntu"
+    ],
+    "sources": [
+     "alb",
+     "cloudtrail",
+     "sshauth",
+     "vpcflow"
+    ],
+    "n_events": 8,
+    "findings": [
+     {
+      "rule": "VPC_REMOTE_ADMIN_EXPOSED",
+      "technique": "T1133",
+      "stage": "initial-access",
+      "title": "외부에서 관리 포트(22/3389) 접속 허용",
+      "severity": "medium",
+      "detail": "포트 [22] 허용 1건",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:20:00+00:00",
+      "last": "2026-01-13T04:20:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "vpcflow.log:1"
+      ]
+     },
+     {
+      "rule": "WEB_SQLI_PATTERN",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "웹 요청에 SQL 인젝션 패턴",
+      "severity": "medium",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:20:30.100000+00:00",
+      "last": "2026-01-13T04:20:30.100000+00:00",
+      "n_events": 1,
+      "evidence": [
+       "alb.log:2"
+      ]
+     },
+     {
+      "rule": "SSH_SUCCESS_AFTER_FAIL",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "연속 실패 뒤 SSH 로그인 성공",
+      "severity": "high",
+      "detail": "직전 30분 실패 2건 뒤 'ubuntu' 성공",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:21:05+00:00",
+      "last": "2026-01-13T04:22:40+00:00",
+      "n_events": 3,
+      "evidence": [
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
+      "rule": "CT_INSTANCE_CRED_OUTSIDE",
+      "technique": "T1552.005",
+      "stage": "credential-access",
+      "title": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용",
+      "severity": "high",
+      "detail": "3건(성공 2, 실패·거부 1)",
+      "key": "i-0abc123def456",
+      "first": "2026-01-13T04:25:00+00:00",
+      "last": "2026-01-13T04:27:00+00:00",
+      "n_events": 3,
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "rule": "CT_IAM_PERSISTENCE",
+      "technique": "T1098",
+      "stage": "persistence",
+      "title": "IAM 사용자·키·권한 생성/변경",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "first": "2026-01-13T04:27:00+00:00",
+      "last": "2026-01-13T04:27:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "cloudtrail.json:3"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "vpcflow.log:1",
+      "ts": "2026-01-13T04:20:00+00:00",
+      "source": "vpcflow",
+      "action": "tcp/22 ACCEPT",
+      "outcome": "accept",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "VPC_REMOTE_ADMIN_EXPOSED"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 22
+     },
+     {
+      "ref": "alb.log:2",
+      "ts": "2026-01-13T04:20:30.100000+00:00",
+      "source": "alb",
+      "action": "GET http://demo/search?q=1%27",
+      "outcome": "failure",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "WEB_SQLI_PATTERN"
+      ],
+      "ua": "curl/8.0"
+     },
+     {
+      "ref": "auth.log:1",
+      "ts": "2026-01-13T04:21:05+00:00",
+      "source": "sshauth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "auth.log:2",
+      "ts": "2026-01-13T04:21:09+00:00",
+      "source": "sshauth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "auth.log:3",
+      "ts": "2026-01-13T04:22:40+00:00",
+      "source": "sshauth",
+      "action": "ssh_login",
+      "outcome": "success",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "ubuntu"
+     },
+     {
+      "ref": "cloudtrail.json:1",
+      "ts": "2026-01-13T04:25:00+00:00",
+      "source": "cloudtrail",
+      "action": "s3:ListBuckets",
+      "outcome": "success",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "CT_INSTANCE_CRED_OUTSIDE"
+      ],
+      "actor": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "instance_id": "i-0abc123def456",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:2",
+      "ts": "2026-01-13T04:26:30+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetObject",
+      "outcome": "success",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "CT_INSTANCE_CRED_OUTSIDE"
+      ],
+      "actor": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "instance_id": "i-0abc123def456",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:3",
+      "ts": "2026-01-13T04:27:00+00:00",
+      "source": "cloudtrail",
+      "action": "iam:CreateUser",
+      "outcome": "failure",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "CT_INSTANCE_CRED_OUTSIDE",
+       "CT_IAM_PERSISTENCE"
+      ],
+      "actor": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "instance_id": "i-0abc123def456",
+      "errorCode": "AccessDenied",
+      "awsRegion": "ap-northeast-2"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 3,
+     "top_actions": [
+      [
+       "GET http://demo/login",
+       1
+      ],
+      [
+       "tcp/8080 REJECT",
+       1
+      ],
+      [
+       "tcp/3306 REJECT",
+       1
+      ]
+     ],
+     "sources": {
+      "alb": 1,
+      "vpcflow": 2
+     }
+    },
+    "id": "INC-001"
+   },
+   "checks": [
+    {
+     "id": "SG_ADMIN_PORT_OPEN",
+     "target": "security_group",
+     "resource": "sg-0web000000000001",
+     "severity": "high",
+     "title": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+     "why": "외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.",
+     "evidence": [
+      "vpcflow.log:1",
+      "auth.log:1",
+      "auth.log:2",
+      "auth.log:3"
+     ],
+     "current": {
+      "protocol": "tcp",
+      "from_port": 22,
+      "to_port": 22,
+      "cidr": "0.0.0.0/0",
+      "description": "ssh"
+     },
+     "proposed": {
+      "protocol": "tcp",
+      "from_port": 22,
+      "to_port": 22,
+      "cidr": "192.0.2.10/32",
+      "description": "관리자 IP만 허용(또는 SSM Session Manager로 대체)"
+     },
+     "cli": [
+      "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0",
+      "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32"
+     ],
+     "caution": "관리자 IP가 바뀌면 접속이 끊긴다. 적용 전 현재 관리자 IP와 SSM 접속 경로를 확인한다."
+    },
+    {
+     "id": "WAF_SQLI_COUNT",
+     "target": "waf",
+     "resource": "logsight-demo-acl",
+     "severity": "high",
+     "title": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+     "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
+     "evidence": [
+      "alb.log:2"
+     ],
+     "current": {
+      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "Count": {}
+      }
+     },
+     "proposed": {
+      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "None": {}
+      }
+     },
+     "cli": [
+      "aws wafv2 get-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 > acl.json",
+      "# acl.json의 Rules에서 위 규칙의 OverrideAction을 {\"None\": {}}로 바꾼 뒤",
+      "aws wafv2 update-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 --lock-token <LockToken> --default-action Allow={} --rules file://rules.json --visibility-config <기존 값>"
+     ],
+     "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다."
+    },
+    {
+     "id": "IMDSV1_ENABLED",
+     "target": "ec2",
+     "resource": "i-0abc123def456",
+     "severity": "high",
+     "title": "인스턴스 i-0abc123def456가 IMDSv1을 허용",
+     "why": "토큰 없이 메타데이터에서 역할 자격증명을 꺼낼 수 있어 탈취 위험이 크다.",
+     "evidence": [
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3"
+     ],
+     "current": {
+      "HttpTokens": "optional"
+     },
+     "proposed": {
+      "HttpTokens": "required"
+     },
+     "cli": [
+      "aws ec2 modify-instance-metadata-options --instance-id i-0abc123def456 --http-tokens required --http-endpoint enabled"
+     ],
+     "caution": "오래된 SDK를 쓰는 앱은 IMDSv2를 지원하는지 먼저 확인한다."
+    },
+    {
+     "id": "IAM_OVERBROAD",
+     "target": "iam",
+     "resource": "ec2-app-role",
+     "severity": "high",
+     "title": "역할 ec2-app-role의 권한이 과도(와일드카드)",
+     "why": "탈취된 자격증명으로 필요 이상의 자원 조회·변경이 가능했다.",
+     "evidence": [
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3"
+     ],
+     "current": [
+      {
+       "policy": "app-s3-full",
+       "statement": {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+       }
+      },
+      {
+       "policy": "app-s3-full",
+       "statement": {
+        "Effect": "Allow",
+        "Action": "iam:*",
+        "Resource": "*"
+       }
+      }
+     ],
+     "proposed": {
+      "Version": "2012-10-17",
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Action": [
+         "s3:GetObject",
+         "s3:PutObject"
+        ],
+        "Resource": [
+         "arn:aws:s3:::app-assets-bucket/*"
+        ]
+       }
+      ]
+     },
+     "cli": [
+      "aws iam put-role-policy --role-name ec2-app-role --policy-name least-privilege --policy-document file://policy.json",
+      "# 이후 와일드카드 정책 분리(detach/delete)"
+     ],
+     "caution": "실제로 쓰는 API는 IAM Access Analyzer의 '마지막 사용' 정보로 확인한다."
+    },
+    {
+     "id": "NACL_BLOCK_ATTACKER",
+     "target": "nacl",
+     "resource": "acl-0default00000001",
+     "severity": "medium",
+     "title": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+     "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+     "evidence": [
+      "vpcflow.log:1",
+      "alb.log:2",
+      "auth.log:1",
+      "auth.log:2",
+      "auth.log:3",
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3"
+     ],
+     "current": {
+      "entries": 1
+     },
+     "proposed": {
+      "deny": [
+       "203.0.113.9/32"
+      ]
+     },
+     "cli": [
+      "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.9/32"
+     ],
+     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다."
+    }
+   ],
+   "report": {
+    "summary": "2026-01-13 04:20부터 04:27(UTC)까지 203.0.113.9의 활동 8건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취 → 지속성 확보.",
+    "severity": "high",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1133",
+      "time": "2026-01-13T04:20:00+00:00",
+      "what": "외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (대상: 203.0.113.9)",
+      "evidence": [
+       "vpcflow.log:1"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-01-13T04:20:30.100000+00:00",
+      "what": "웹 요청에 SQL 인젝션 패턴 — 1건(성공 0, 실패·거부 1) (대상: 203.0.113.9)",
+      "evidence": [
+       "alb.log:2"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-01-13T04:21:05+00:00",
+      "what": "연속 실패 뒤 SSH 로그인 성공 — 직전 30분 실패 2건 뒤 'ubuntu' 성공 (대상: 203.0.113.9)",
+      "evidence": [
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
+      "stage": "credential-access",
+      "technique": "T1552.005",
+      "time": "2026-01-13T04:25:00+00:00",
+      "what": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — 3건(성공 2, 실패·거부 1) (대상: i-0abc123def456)",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "stage": "persistence",
+      "technique": "T1098",
+      "time": "2026-01-13T04:27:00+00:00",
+      "what": "IAM 사용자·키·권한 생성/변경 — 1건(성공 0, 실패·거부 1) (대상: arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456)",
+      "evidence": [
+       "cloudtrail.json:3"
+      ]
+     }
+    ],
+    "root_causes": [
+     {
+      "setting": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+      "why": "외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.",
+      "evidence": [
+       "vpcflow.log:1",
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
+      "setting": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+      "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
+      "evidence": [
+       "alb.log:2"
+      ]
+     },
+     {
+      "setting": "인스턴스 i-0abc123def456가 IMDSv1을 허용",
+      "why": "토큰 없이 메타데이터에서 역할 자격증명을 꺼낼 수 있어 탈취 위험이 크다.",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "setting": "역할 ec2-app-role의 권한이 과도(와일드카드)",
+      "why": "탈취된 자격증명으로 필요 이상의 자원 조회·변경이 가능했다.",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "setting": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+      "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+      "evidence": [
+       "vpcflow.log:1",
+       "alb.log:2",
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3",
+       "cloudtrail.json:1"
+      ]
+     }
+    ],
+    "firewall_changes": [
+     {
+      "check_id": "SG_ADMIN_PORT_OPEN",
+      "target": "security_group",
+      "resource": "sg-0web000000000001",
+      "change": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+      "priority": "now"
+     },
+     {
+      "check_id": "WAF_SQLI_COUNT",
+      "target": "waf",
+      "resource": "logsight-demo-acl",
+      "change": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+      "priority": "now"
+     },
+     {
+      "check_id": "IMDSV1_ENABLED",
+      "target": "ec2",
+      "resource": "i-0abc123def456",
+      "change": "인스턴스 i-0abc123def456가 IMDSv1을 허용",
+      "priority": "now"
+     },
+     {
+      "check_id": "IAM_OVERBROAD",
+      "target": "iam",
+      "resource": "ec2-app-role",
+      "change": "역할 ec2-app-role의 권한이 과도(와일드카드)",
+      "priority": "now"
+     },
+     {
+      "check_id": "NACL_BLOCK_ATTACKER",
+      "target": "nacl",
+      "resource": "acl-0default00000001",
+      "change": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+      "priority": "soon"
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 6506,
+    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
+    "validation": {
+     "evidence_total": 26,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "passed": true
+    }
+   }
+  }
+ ],
+ "timing": {
+  "detect_correlate_s": 0.0,
+  "total_s": 0.0
+ },
+ "has_environment": true
+}
