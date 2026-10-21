@@ -1,0 +1,1994 @@
+{
+ "generated_at": "2026-10-21T17:40:02Z",
+ "site": {
+  "name": "샘플몰 (shopmall) — 데모",
+  "stack": "nginx + php-fpm + sqlite",
+  "webroot": "samples/web/webroot"
+ },
+ "overall_verdict": "breached",
+ "overall_verdict_ko": "침해 확인",
+ "files": [
+  {
+   "file": "samples/web/logs/shopmall_access.log",
+   "kind": "access",
+   "events": 63
+  },
+  {
+   "file": "samples/web/logs/shopmall_error.log",
+   "kind": "weberror",
+   "events": 87
+  },
+  {
+   "file": "samples/web/logs/shopmall_auth.log",
+   "kind": "auth",
+   "events": 10
+  }
+ ],
+ "n_events": 161,
+ "events_by_source": {
+  "access": 63,
+  "weberror": 87,
+  "auth": 10,
+  "file": 1
+ },
+ "n_flagged": 60,
+ "n_findings": 14,
+ "rule_counts": {
+  "WEBLOG_SCANNER": {
+   "findings": 1,
+   "events": 20,
+   "title": "취약점 스캐너·자동 도구 탐지"
+  },
+  "WEBLOG_ENUM_404": {
+   "findings": 1,
+   "events": 20,
+   "title": "존재하지 않는 경로 연속 탐색(열거)"
+  },
+  "WEBLOG_AUTH_BRUTE": {
+   "findings": 1,
+   "events": 16,
+   "title": "웹 로그인 무차별 대입"
+  },
+  "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": {
+   "findings": 1,
+   "events": 16,
+   "title": "로그인 연속 실패 뒤 성공"
+  },
+  "SSH_SUCCESS_AFTER_FAIL": {
+   "findings": 1,
+   "events": 9,
+   "title": "연속 실패 뒤 SSH 로그인 성공"
+  },
+  "SSH_BRUTE_FORCE": {
+   "findings": 1,
+   "events": 8,
+   "title": "SSH 비밀번호 연속 실패(무차별 대입)"
+  },
+  "WEBLOG_SENSITIVE_FILE": {
+   "findings": 2,
+   "events": 5,
+   "title": "설정·비밀 파일 접근 시도(.env 등)"
+  },
+  "WEBLOG_SQLI": {
+   "findings": 1,
+   "events": 4,
+   "title": "웹 요청에 SQL 인젝션 패턴"
+  },
+  "WEBLOG_TRAVERSAL": {
+   "findings": 2,
+   "events": 4,
+   "title": "경로 조작·파일 열람(../, 민감 파일) 시도"
+  },
+  "WEBLOG_WEBSHELL_ACCESS": {
+   "findings": 1,
+   "events": 3,
+   "title": "웹셸로 보이는 경로에 접근"
+  },
+  "WEBLOG_UPLOAD_EXEC": {
+   "findings": 1,
+   "events": 3,
+   "title": "업로드 폴더의 스크립트 실행"
+  },
+  "FILE_WEBSHELL": {
+   "findings": 1,
+   "events": 1,
+   "title": "웹 루트에서 웹셸 의심 파일 발견"
+  }
+ },
+ "n_incidents": 6,
+ "incident_index": [
+  {
+   "id": "INC-001",
+   "start": "2026-10-21T17:31:40+00:00",
+   "end": "2026-10-21T17:39:54.663914+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access",
+    "credential-access",
+    "persistence"
+   ],
+   "src_ips": [
+    "198.51.100.27"
+   ],
+   "n_events": 13
+  },
+  {
+   "id": "INC-002",
+   "start": "2026-10-21T17:31:39+00:00",
+   "end": "2026-10-21T17:31:39+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access",
+    "credential-access"
+   ],
+   "src_ips": [
+    "198.51.100.26"
+   ],
+   "n_events": 16
+  },
+  {
+   "id": "INC-003",
+   "start": "2026-10-21T17:31:39+00:00",
+   "end": "2026-10-21T17:31:39+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "198.51.100.23"
+   ],
+   "n_events": 4
+  },
+  {
+   "id": "INC-004",
+   "start": "2026-10-21T17:31:39+00:00",
+   "end": "2026-10-21T17:31:39+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "198.51.100.24"
+   ],
+   "n_events": 3
+  },
+  {
+   "id": "INC-005",
+   "start": "2026-10-21T17:31:39+00:00",
+   "end": "2026-10-21T17:31:39+00:00",
+   "severity": "medium",
+   "stages": [
+    "discovery"
+   ],
+   "src_ips": [
+    "198.51.100.50"
+   ],
+   "n_events": 20
+  },
+  {
+   "id": "INC-006",
+   "start": "2026-10-21T17:31:39+00:00",
+   "end": "2026-10-21T17:31:39+00:00",
+   "severity": "medium",
+   "stages": [
+    "discovery"
+   ],
+   "src_ips": [
+    "198.51.100.25"
+   ],
+   "n_events": 4
+  }
+ ],
+ "results": [
+  {
+   "incident": {
+    "start": "2026-10-21T17:31:40+00:00",
+    "end": "2026-10-21T17:39:54.663914+00:00",
+    "severity": "high",
+    "score": 369,
+    "stages": [
+     "initial-access",
+     "credential-access",
+     "persistence"
+    ],
+    "src_ips": [
+     "198.51.100.27"
+    ],
+    "instances": [],
+    "actors": [
+     "root"
+    ],
+    "sources": [
+     "access",
+     "auth",
+     "file"
+    ],
+    "n_events": 13,
+    "findings": [
+     {
+      "rule": "WEBLOG_TRAVERSAL",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "경로 조작·파일 열람(../, 민감 파일) 시도",
+      "severity": "high",
+      "detail": "1건(성공 1, 실패·거부 0)",
+      "key": "198.51.100.27",
+      "first": "2026-10-21T17:31:40+00:00",
+      "last": "2026-10-21T17:31:40+00:00",
+      "n_events": 1,
+      "evidence": [
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "rule": "WEBLOG_WEBSHELL_ACCESS",
+      "technique": "T1505.003",
+      "stage": "persistence",
+      "title": "웹셸로 보이는 경로에 접근",
+      "severity": "high",
+      "detail": "3건(성공 3, 실패·거부 0)",
+      "key": "198.51.100.27",
+      "first": "2026-10-21T17:31:40+00:00",
+      "last": "2026-10-21T17:31:40+00:00",
+      "n_events": 3,
+      "evidence": [
+       "shopmall_access.log:61",
+       "shopmall_access.log:62",
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "rule": "WEBLOG_UPLOAD_EXEC",
+      "technique": "T1505.003",
+      "stage": "persistence",
+      "title": "업로드 폴더의 스크립트 실행",
+      "severity": "high",
+      "detail": "3건(성공 3, 실패·거부 0)",
+      "key": "198.51.100.27",
+      "first": "2026-10-21T17:31:40+00:00",
+      "last": "2026-10-21T17:31:40+00:00",
+      "n_events": 3,
+      "evidence": [
+       "shopmall_access.log:61",
+       "shopmall_access.log:62",
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "rule": "SSH_BRUTE_FORCE",
+      "technique": "T1110",
+      "stage": "credential-access",
+      "title": "SSH 비밀번호 연속 실패(무차별 대입)",
+      "severity": "medium",
+      "detail": "10분 안에 SSH 실패 8건",
+      "key": "198.51.100.27",
+      "first": "2026-10-21T17:31:43+00:00",
+      "last": "2026-10-21T17:32:04+00:00",
+      "n_events": 8,
+      "evidence": [
+       "shopmall_auth.log:1",
+       "shopmall_auth.log:2",
+       "shopmall_auth.log:3",
+       "shopmall_auth.log:4",
+       "shopmall_auth.log:5",
+       "shopmall_auth.log:6",
+       "shopmall_auth.log:7",
+       "shopmall_auth.log:8"
+      ]
+     },
+     {
+      "rule": "SSH_SUCCESS_AFTER_FAIL",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "연속 실패 뒤 SSH 로그인 성공",
+      "severity": "high",
+      "detail": "직전 30분 SSH 실패 8건 뒤 'root' 성공",
+      "key": "198.51.100.27",
+      "first": "2026-10-21T17:31:43+00:00",
+      "last": "2026-10-21T17:32:07+00:00",
+      "n_events": 9,
+      "evidence": [
+       "shopmall_auth.log:1",
+       "shopmall_auth.log:2",
+       "shopmall_auth.log:3",
+       "shopmall_auth.log:4",
+       "shopmall_auth.log:5",
+       "shopmall_auth.log:6",
+       "shopmall_auth.log:7",
+       "shopmall_auth.log:8",
+       "shopmall_auth.log:9"
+      ]
+     },
+     {
+      "rule": "FILE_WEBSHELL",
+      "technique": "T1505.003",
+      "stage": "persistence",
+      "title": "웹 루트에서 웹셸 의심 파일 발견",
+      "severity": "high",
+      "detail": "uploads/art.php (점수 12): 업로드 폴더 안의 실행 가능한 스크립트; 외부 입력을 그대로 OS 명령으로 실행; 외부 입력 직접 사용; OS 명령 실행 함수 사용",
+      "key": "/uploads/art.php",
+      "first": "2026-10-21T17:39:54.663914+00:00",
+      "last": "2026-10-21T17:39:54.663914+00:00",
+      "n_events": 1,
+      "evidence": [
+       "file:uploads/art.php"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "shopmall_access.log:63",
+      "ts": "2026-10-21T17:31:40+00:00",
+      "source": "access",
+      "action": "GET /uploads/art.php?cmd=cat+%2fetc%2fpasswd",
+      "outcome": "success",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "WEBLOG_TRAVERSAL",
+       "WEBLOG_WEBSHELL_ACCESS",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:61",
+      "ts": "2026-10-21T17:31:40+00:00",
+      "source": "access",
+      "action": "GET /uploads/art.php?cmd=id",
+      "outcome": "success",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:62",
+      "ts": "2026-10-21T17:31:40+00:00",
+      "source": "access",
+      "action": "GET /uploads/art.php?cmd=uname+-a",
+      "outcome": "success",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_auth.log:1",
+      "ts": "2026-10-21T17:31:43+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:2",
+      "ts": "2026-10-21T17:31:46+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:3",
+      "ts": "2026-10-21T17:31:49+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:4",
+      "ts": "2026-10-21T17:31:52+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:5",
+      "ts": "2026-10-21T17:31:55+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:6",
+      "ts": "2026-10-21T17:31:58+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:7",
+      "ts": "2026-10-21T17:32:01+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:8",
+      "ts": "2026-10-21T17:32:04+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_BRUTE_FORCE",
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "shopmall_auth.log:9",
+      "ts": "2026-10-21T17:32:07+00:00",
+      "source": "auth",
+      "action": "ssh_login",
+      "outcome": "success",
+      "src_ip": "198.51.100.27",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "file:uploads/art.php",
+      "ts": "2026-10-21T17:39:54.663914+00:00",
+      "source": "file",
+      "action": "/uploads/art.php",
+      "outcome": "found",
+      "src_ip": null,
+      "rules": [
+       "FILE_WEBSHELL"
+      ]
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 1,
+     "top_actions": [
+      [
+       "POST /upload.php",
+       1
+      ]
+     ],
+     "sources": {
+      "access": 1
+     }
+    },
+    "id": "INC-001"
+   },
+   "report": {
+    "verdict": "breached",
+    "summary": "2026-10-21 17:31~17:39(UTC) 198.51.100.27의 활동 13건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취 → 지속성 확보. 웹셸 등 침해 성공의 직접 근거가 보인다.",
+    "severity": "high",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-10-21T17:31:40+00:00",
+      "what": "경로 조작·파일 열람(../, 민감 파일) 시도 — 1건(성공 1, 실패·거부 0) (대상: 198.51.100.27)",
+      "evidence": [
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "stage": "persistence",
+      "technique": "T1505.003",
+      "time": "2026-10-21T17:31:40+00:00",
+      "what": "웹셸로 보이는 경로에 접근 — 3건(성공 3, 실패·거부 0) (대상: 198.51.100.27)",
+      "evidence": [
+       "shopmall_access.log:61",
+       "shopmall_access.log:62",
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "stage": "persistence",
+      "technique": "T1505.003",
+      "time": "2026-10-21T17:31:40+00:00",
+      "what": "업로드 폴더의 스크립트 실행 — 3건(성공 3, 실패·거부 0) (대상: 198.51.100.27)",
+      "evidence": [
+       "shopmall_access.log:61",
+       "shopmall_access.log:62",
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "stage": "credential-access",
+      "technique": "T1110",
+      "time": "2026-10-21T17:31:43+00:00",
+      "what": "SSH 비밀번호 연속 실패(무차별 대입) — 10분 안에 SSH 실패 8건 (대상: 198.51.100.27)",
+      "evidence": [
+       "shopmall_auth.log:1",
+       "shopmall_auth.log:2",
+       "shopmall_auth.log:3",
+       "shopmall_auth.log:4",
+       "shopmall_auth.log:5",
+       "shopmall_auth.log:6",
+       "shopmall_auth.log:7",
+       "shopmall_auth.log:8"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-10-21T17:31:43+00:00",
+      "what": "연속 실패 뒤 SSH 로그인 성공 — 직전 30분 SSH 실패 8건 뒤 'root' 성공 (대상: 198.51.100.27)",
+      "evidence": [
+       "shopmall_auth.log:1",
+       "shopmall_auth.log:2",
+       "shopmall_auth.log:3",
+       "shopmall_auth.log:4",
+       "shopmall_auth.log:5",
+       "shopmall_auth.log:6",
+       "shopmall_auth.log:7",
+       "shopmall_auth.log:8"
+      ]
+     },
+     {
+      "stage": "persistence",
+      "technique": "T1505.003",
+      "time": "2026-10-21T17:39:54.663914+00:00",
+      "what": "웹 루트에서 웹셸 의심 파일 발견 — uploads/art.php (점수 12): 업로드 폴더 안의 실행 가능한 스크립트; 외부 입력을 그대로 OS 명령으로 실행; 외부 입력 직접 사용; OS 명령 실행 함수 사용 (대상: /uploads/art.php)",
+      "evidence": [
+       "file:uploads/art.php"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "action": "웹셸 의심 파일 격리",
+      "target": "file",
+      "priority": "now",
+      "detail": "표시된 파일을 삭제하지 말고 먼저 복사해 보관한 뒤 서비스에서 분리하고, 업로드 폴더에서 스크립트 실행을 막는다.",
+      "evidence": [
+       "file:uploads/art.php"
+      ]
+     },
+     {
+      "action": "탈취 의심 계정 잠그고 비밀번호·키 교체",
+      "target": "account",
+      "priority": "now",
+      "detail": "해당 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다. 가능하면 다중 인증을 켠다.",
+      "evidence": [
+       "shopmall_auth.log:1",
+       "shopmall_auth.log:2",
+       "shopmall_auth.log:3",
+       "shopmall_auth.log:4",
+       "shopmall_auth.log:5",
+       "shopmall_auth.log:6"
+      ]
+     },
+     {
+      "action": "입력값 검증·경로 제한 적용",
+      "target": "app",
+      "priority": "soon",
+      "detail": "파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+      "evidence": [
+       "shopmall_access.log:63"
+      ]
+     },
+     {
+      "action": "비정상 출발지 차단·요청 제한",
+      "target": "network",
+      "priority": "soon",
+      "detail": "공격 출발지 IP를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
+      "evidence": []
+     },
+     {
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다. (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 7091,
+    "validation": {
+     "evidence_total": 32,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-10-21T17:31:39+00:00",
+    "end": "2026-10-21T17:31:39+00:00",
+    "severity": "high",
+    "score": 329,
+    "stages": [
+     "initial-access",
+     "credential-access"
+    ],
+    "src_ips": [
+     "198.51.100.26"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 16,
+    "findings": [
+     {
+      "rule": "WEBLOG_AUTH_BRUTE",
+      "technique": "T1110",
+      "stage": "credential-access",
+      "title": "웹 로그인 무차별 대입",
+      "severity": "medium",
+      "detail": "10분 안에 로그인 POST 16건",
+      "key": "198.51.100.26",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 16,
+      "evidence": [
+       "shopmall_access.log:44",
+       "shopmall_access.log:45",
+       "shopmall_access.log:46",
+       "shopmall_access.log:47",
+       "shopmall_access.log:48",
+       "shopmall_access.log:49",
+       "shopmall_access.log:50",
+       "shopmall_access.log:51",
+       "shopmall_access.log:52",
+       "shopmall_access.log:53",
+       "shopmall_access.log:54",
+       "shopmall_access.log:55",
+       "shopmall_access.log:56",
+       "shopmall_access.log:57",
+       "shopmall_access.log:58",
+       "shopmall_access.log:59"
+      ]
+     },
+     {
+      "rule": "WEBLOG_AUTH_SUCCESS_AFTER_FAIL",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "로그인 연속 실패 뒤 성공",
+      "severity": "high",
+      "detail": "로그인 실패 15건 뒤 성공 추정(응답 302)",
+      "key": "198.51.100.26",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 16,
+      "evidence": [
+       "shopmall_access.log:44",
+       "shopmall_access.log:45",
+       "shopmall_access.log:46",
+       "shopmall_access.log:47",
+       "shopmall_access.log:48",
+       "shopmall_access.log:49",
+       "shopmall_access.log:50",
+       "shopmall_access.log:51",
+       "shopmall_access.log:52",
+       "shopmall_access.log:53",
+       "shopmall_access.log:54",
+       "shopmall_access.log:55",
+       "shopmall_access.log:56",
+       "shopmall_access.log:57",
+       "shopmall_access.log:58",
+       "shopmall_access.log:59"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "shopmall_access.log:44",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:45",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:46",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:47",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:48",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:49",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:50",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:51",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:52",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:53",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:54",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:55",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:56",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:57",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:58",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:59",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "POST /login.php",
+      "outcome": "success",
+      "src_ip": "198.51.100.26",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-002"
+   },
+   "report": {
+    "verdict": "likely_breached",
+    "summary": "2026-10-21 17:31~17:31(UTC) 198.51.100.26의 활동 16건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취. 공격이 성공했을 가능성이 큰 근거가 보인다.",
+    "severity": "high",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "credential-access",
+      "technique": "T1110",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "웹 로그인 무차별 대입 — 10분 안에 로그인 POST 16건 (대상: 198.51.100.26)",
+      "evidence": [
+       "shopmall_access.log:44",
+       "shopmall_access.log:45",
+       "shopmall_access.log:46",
+       "shopmall_access.log:47",
+       "shopmall_access.log:48",
+       "shopmall_access.log:49",
+       "shopmall_access.log:50",
+       "shopmall_access.log:51"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "로그인 연속 실패 뒤 성공 — 로그인 실패 15건 뒤 성공 추정(응답 302) (대상: 198.51.100.26)",
+      "evidence": [
+       "shopmall_access.log:44",
+       "shopmall_access.log:45",
+       "shopmall_access.log:46",
+       "shopmall_access.log:47",
+       "shopmall_access.log:48",
+       "shopmall_access.log:49",
+       "shopmall_access.log:50",
+       "shopmall_access.log:51"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "action": "탈취 의심 계정 잠그고 비밀번호·키 교체",
+      "target": "account",
+      "priority": "now",
+      "detail": "해당 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다. 가능하면 다중 인증을 켠다.",
+      "evidence": [
+       "shopmall_access.log:44",
+       "shopmall_access.log:45",
+       "shopmall_access.log:46",
+       "shopmall_access.log:47",
+       "shopmall_access.log:48",
+       "shopmall_access.log:49"
+      ]
+     },
+     {
+      "action": "비정상 출발지 차단·요청 제한",
+      "target": "network",
+      "priority": "soon",
+      "detail": "공격 출발지 IP를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
+      "evidence": []
+     },
+     {
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다. (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 7777,
+    "validation": {
+     "evidence_total": 22,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-10-21T17:31:39+00:00",
+    "end": "2026-10-21T17:31:39+00:00",
+    "severity": "high",
+    "score": 314,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "198.51.100.23"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 4,
+    "findings": [
+     {
+      "rule": "WEBLOG_SQLI",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "웹 요청에 SQL 인젝션 패턴",
+      "severity": "high",
+      "detail": "4건(성공 4, 실패·거부 0)",
+      "key": "198.51.100.23",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 4,
+      "evidence": [
+       "shopmall_access.log:33",
+       "shopmall_access.log:34",
+       "shopmall_access.log:35",
+       "shopmall_access.log:36"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "shopmall_access.log:33",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /search.php?q=%27+UNION+SELECT+username%2cpassword+FROM+users--+-",
+      "outcome": "success",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:34",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /search.php?q=%27+OR+%271%27%3d%271",
+      "outcome": "success",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:35",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /search.php?q=%25%27+UNION+SELECT+username%2cpassword+FROM+users--+-",
+      "outcome": "success",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:36",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /search.php?q=%27+AND+1%3d2+UNION+SELECT+username%2cpassword+FROM+users--+-",
+      "outcome": "success",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-003"
+   },
+   "report": {
+    "verdict": "suspicious",
+    "summary": "2026-10-21 17:31~17:31(UTC) 198.51.100.23의 활동 4건이 하나로 이어진다. 흐름: 초기 침투. 공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "웹 요청에 SQL 인젝션 패턴 — 4건(성공 4, 실패·거부 0) (대상: 198.51.100.23)",
+      "evidence": [
+       "shopmall_access.log:33",
+       "shopmall_access.log:34",
+       "shopmall_access.log:35",
+       "shopmall_access.log:36"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "action": "SQL 인젝션 취약 코드 수정",
+      "target": "app",
+      "priority": "soon",
+      "detail": "해당 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+      "evidence": [
+       "shopmall_access.log:33",
+       "shopmall_access.log:34",
+       "shopmall_access.log:35",
+       "shopmall_access.log:36"
+      ]
+     },
+     {
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다. (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 2343,
+    "validation": {
+     "evidence_total": 8,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-10-21T17:31:39+00:00",
+    "end": "2026-10-21T17:31:39+00:00",
+    "severity": "high",
+    "score": 313,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "198.51.100.24"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 3,
+    "findings": [
+     {
+      "rule": "WEBLOG_TRAVERSAL",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "경로 조작·파일 열람(../, 민감 파일) 시도",
+      "severity": "high",
+      "detail": "3건(성공 0, 실패·거부 3)",
+      "key": "198.51.100.24",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 3,
+      "evidence": [
+       "shopmall_access.log:37",
+       "shopmall_access.log:38",
+       "shopmall_access.log:39"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "shopmall_access.log:37",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /view.php?page=..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.24",
+      "rules": [
+       "WEBLOG_TRAVERSAL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:38",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /view.php?page=..%2f..%2f..%2f..%2fetc%2fpasswd%2500",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.24",
+      "rules": [
+       "WEBLOG_TRAVERSAL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:39",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /view.php?page=....%2f%2f....%2f%2f....%2f%2fetc%2fpasswd",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.24",
+      "rules": [
+       "WEBLOG_TRAVERSAL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-004"
+   },
+   "report": {
+    "verdict": "suspicious",
+    "summary": "2026-10-21 17:31~17:31(UTC) 198.51.100.24의 활동 3건이 하나로 이어진다. 흐름: 초기 침투. 공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "경로 조작·파일 열람(../, 민감 파일) 시도 — 3건(성공 0, 실패·거부 3) (대상: 198.51.100.24)",
+      "evidence": [
+       "shopmall_access.log:37",
+       "shopmall_access.log:38",
+       "shopmall_access.log:39"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "action": "입력값 검증·경로 제한 적용",
+      "target": "app",
+      "priority": "soon",
+      "detail": "파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+      "evidence": [
+       "shopmall_access.log:37",
+       "shopmall_access.log:38",
+       "shopmall_access.log:39"
+      ]
+     },
+     {
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다. (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 2000,
+    "validation": {
+     "evidence_total": 6,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-10-21T17:31:39+00:00",
+    "end": "2026-10-21T17:31:39+00:00",
+    "severity": "medium",
+    "score": 239,
+    "stages": [
+     "discovery"
+    ],
+    "src_ips": [
+     "198.51.100.50"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 20,
+    "findings": [
+     {
+      "rule": "WEBLOG_SCANNER",
+      "technique": "T1595.002",
+      "stage": "discovery",
+      "title": "취약점 스캐너·자동 도구 탐지",
+      "severity": "low",
+      "detail": "20건(성공 0, 실패·거부 20)",
+      "key": "198.51.100.50",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 20,
+      "evidence": [
+       "shopmall_access.log:13",
+       "shopmall_access.log:14",
+       "shopmall_access.log:15",
+       "shopmall_access.log:16",
+       "shopmall_access.log:17",
+       "shopmall_access.log:18",
+       "shopmall_access.log:19",
+       "shopmall_access.log:20",
+       "shopmall_access.log:21",
+       "shopmall_access.log:22",
+       "shopmall_access.log:23",
+       "shopmall_access.log:24",
+       "shopmall_access.log:25",
+       "shopmall_access.log:26",
+       "shopmall_access.log:27",
+       "shopmall_access.log:28",
+       "shopmall_access.log:29",
+       "shopmall_access.log:30",
+       "shopmall_access.log:31",
+       "shopmall_access.log:32"
+      ]
+     },
+     {
+      "rule": "WEBLOG_ENUM_404",
+      "technique": "T1595.003",
+      "stage": "discovery",
+      "title": "존재하지 않는 경로 연속 탐색(열거)",
+      "severity": "low",
+      "detail": "5분 안에 404 20건, 경로 20종",
+      "key": "198.51.100.50",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 20,
+      "evidence": [
+       "shopmall_access.log:13",
+       "shopmall_access.log:14",
+       "shopmall_access.log:15",
+       "shopmall_access.log:16",
+       "shopmall_access.log:17",
+       "shopmall_access.log:18",
+       "shopmall_access.log:19",
+       "shopmall_access.log:20",
+       "shopmall_access.log:21",
+       "shopmall_access.log:22",
+       "shopmall_access.log:23",
+       "shopmall_access.log:24",
+       "shopmall_access.log:25",
+       "shopmall_access.log:26",
+       "shopmall_access.log:27",
+       "shopmall_access.log:28",
+       "shopmall_access.log:29",
+       "shopmall_access.log:30",
+       "shopmall_access.log:31",
+       "shopmall_access.log:32"
+      ]
+     },
+     {
+      "rule": "WEBLOG_SENSITIVE_FILE",
+      "technique": "T1083",
+      "stage": "discovery",
+      "title": "설정·비밀 파일 접근 시도(.env 등)",
+      "severity": "medium",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "198.51.100.50",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 1,
+      "evidence": [
+       "shopmall_access.log:17"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "shopmall_access.log:13",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /wp-login.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:14",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /wp-admin/",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:15",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /administrator/",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:16",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /phpmyadmin/",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:17",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /.git/HEAD",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:18",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /backup.zip",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:19",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /old/",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:20",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /test.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:21",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /config.bak",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:22",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /admin/",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:23",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /manager/html",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:24",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /xmlrpc.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:25",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /vendor/phpunit/",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:26",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /server-status",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:27",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /.svn/entries",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:28",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /cgi-bin/test.cgi",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:29",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /shell.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:30",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /db.sql",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:31",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /info.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     },
+     {
+      "ref": "shopmall_access.log:32",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /api/v1/users",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.50",
+      "rules": [
+       "WEBLOG_SCANNER",
+       "WEBLOG_ENUM_404"
+      ],
+      "ua": "sqlmap/1.8.3#stable (https://sqlmap.org)"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 20,
+     "top_actions": [
+      [
+       "17716#17716: *41 FastCGI sent in stderr: \"Primary script unknown\" while reading response header from upstream, client: 198.51.100.50, server: , request: \"GET /wp-login.php HTTP/1.1\", upstream: \"fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *43 \"/home/claude/logsight/lab/sites/shopmall/wp-admin/index.php\" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /wp-admin/ HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *44 \"/home/claude/logsight/lab/sites/shopmall/administrator/index.php\" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /administrator/ HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *45 \"/home/claude/logsight/lab/sites/shopmall/phpmyadmin/index.php\" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /phpmyadmin/ HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *46 open() \"/home/claude/logsight/lab/sites/shopmall/.git/HEAD\" failed (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /.git/HEAD HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *47 open() \"/home/claude/logsight/lab/sites/shopmall/backup.zip\" failed (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /backup.zip HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *48 \"/home/claude/logsight/lab/sites/shopmall/old/index.php\" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /old/ HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *49 FastCGI sent in stderr: \"Primary script unknown\" while reading response header from upstream, client: 198.51.100.50, server: , request: \"GET /test.php HTTP/1.1\", upstream: \"fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *51 open() \"/home/claude/logsight/lab/sites/shopmall/config.bak\" failed (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /config.bak HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *52 \"/home/claude/logsight/lab/sites/shopmall/admin/index.php\" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: \"GET /admin/ HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ]
+     ],
+     "sources": {
+      "weberror": 20
+     }
+    },
+    "id": "INC-005"
+   },
+   "report": {
+    "verdict": "suspicious",
+    "summary": "2026-10-21 17:31~17:31(UTC) 198.51.100.50의 활동 20건이 하나로 이어진다. 흐름: 정찰·탐색. 공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "discovery",
+      "technique": "T1595.002",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "취약점 스캐너·자동 도구 탐지 — 20건(성공 0, 실패·거부 20) (대상: 198.51.100.50)",
+      "evidence": [
+       "shopmall_access.log:13",
+       "shopmall_access.log:14",
+       "shopmall_access.log:15",
+       "shopmall_access.log:16",
+       "shopmall_access.log:17",
+       "shopmall_access.log:18",
+       "shopmall_access.log:19",
+       "shopmall_access.log:20"
+      ]
+     },
+     {
+      "stage": "discovery",
+      "technique": "T1595.003",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "존재하지 않는 경로 연속 탐색(열거) — 5분 안에 404 20건, 경로 20종 (대상: 198.51.100.50)",
+      "evidence": [
+       "shopmall_access.log:13",
+       "shopmall_access.log:14",
+       "shopmall_access.log:15",
+       "shopmall_access.log:16",
+       "shopmall_access.log:17",
+       "shopmall_access.log:18",
+       "shopmall_access.log:19",
+       "shopmall_access.log:20"
+      ]
+     },
+     {
+      "stage": "discovery",
+      "technique": "T1083",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "설정·비밀 파일 접근 시도(.env 등) — 1건(성공 0, 실패·거부 1) (대상: 198.51.100.50)",
+      "evidence": [
+       "shopmall_access.log:17"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "action": "비정상 출발지 차단·요청 제한",
+      "target": "network",
+      "priority": "soon",
+      "detail": "공격 출발지 IP를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
+      "evidence": []
+     },
+     {
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다. (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 10528,
+    "validation": {
+     "evidence_total": 17,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-10-21T17:31:39+00:00",
+    "end": "2026-10-21T17:31:39+00:00",
+    "severity": "medium",
+    "score": 214,
+    "stages": [
+     "discovery"
+    ],
+    "src_ips": [
+     "198.51.100.25"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 4,
+    "findings": [
+     {
+      "rule": "WEBLOG_SENSITIVE_FILE",
+      "technique": "T1083",
+      "stage": "discovery",
+      "title": "설정·비밀 파일 접근 시도(.env 등)",
+      "severity": "medium",
+      "detail": "4건(성공 0, 실패·거부 4)",
+      "key": "198.51.100.25",
+      "first": "2026-10-21T17:31:39+00:00",
+      "last": "2026-10-21T17:31:39+00:00",
+      "n_events": 4,
+      "evidence": [
+       "shopmall_access.log:40",
+       "shopmall_access.log:41",
+       "shopmall_access.log:42",
+       "shopmall_access.log:43"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "shopmall_access.log:40",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /.env",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.25",
+      "rules": [
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:41",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /config.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.25",
+      "rules": [
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:42",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /wp-config.php",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.25",
+      "rules": [
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     },
+     {
+      "ref": "shopmall_access.log:43",
+      "ts": "2026-10-21T17:31:39+00:00",
+      "source": "access",
+      "action": "GET /.git/config",
+      "outcome": "client-error",
+      "src_ip": "198.51.100.25",
+      "rules": [
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 4,
+     "top_actions": [
+      [
+       "17716#17716: *98 open() \"/home/claude/logsight/lab/sites/shopmall/.env\" failed (2: No such file or directory), client: 198.51.100.25, server: , request: \"GET /.env HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *99 FastCGI sent in stderr: \"Primary script unknown\" while reading response header from upstream, client: 198.51.100.25, server: , request: \"GET /config.php HTTP/1.1\", upstream: \"fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *101 FastCGI sent in stderr: \"Primary script unknown\" while reading response header from upstream, client: 198.51.100.25, server: , request: \"GET /wp-config.php HTTP/1.1\", upstream: \"fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:\", host: \"127.0.0.1:8081\"",
+       1
+      ],
+      [
+       "17716#17716: *103 open() \"/home/claude/logsight/lab/sites/shopmall/.git/config\" failed (2: No such file or directory), client: 198.51.100.25, server: , request: \"GET /.git/config HTTP/1.1\", host: \"127.0.0.1:8081\"",
+       1
+      ]
+     ],
+     "sources": {
+      "weberror": 4
+     }
+    },
+    "id": "INC-006"
+   },
+   "report": {
+    "verdict": "suspicious",
+    "summary": "2026-10-21 17:31~17:31(UTC) 198.51.100.25의 활동 4건이 하나로 이어진다. 흐름: 정찰·탐색. 공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "discovery",
+      "technique": "T1083",
+      "time": "2026-10-21T17:31:39+00:00",
+      "what": "설정·비밀 파일 접근 시도(.env 등) — 4건(성공 0, 실패·거부 4) (대상: 198.51.100.25)",
+      "evidence": [
+       "shopmall_access.log:40",
+       "shopmall_access.log:41",
+       "shopmall_access.log:42",
+       "shopmall_access.log:43"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다. (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 3261,
+    "validation": {
+     "evidence_total": 4,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  }
+ ],
+ "timing": {
+  "detect_correlate_s": 0.02,
+  "total_s": 0.02
+ }
+}

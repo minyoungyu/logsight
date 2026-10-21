@@ -1,0 +1,129 @@
+{
+ "generated_at": "2026-10-21T17:31:40.189730+00:00",
+ "scenarios": [
+  {
+   "scenario": "benign",
+   "site": "both",
+   "attacker_ip": "203.0.113.*",
+   "expected_rules": [],
+   "description": "정상 사용자 트래픽",
+   "malicious": false
+  },
+  {
+   "scenario": "scanner_recon",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.50",
+   "expected_rules": [
+    "WEBLOG_SCANNER",
+    "WEBLOG_ENUM_404"
+   ],
+   "description": "스캐너 UA + 없는 경로 20개 연속 탐색",
+   "malicious": true
+  },
+  {
+   "scenario": "sqli_dump",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.23",
+   "expected_rules": [
+    "WEBLOG_SQLI"
+   ],
+   "description": "검색창 UNION 기반 계정정보 추출",
+   "malicious": true
+  },
+  {
+   "scenario": "sqli_dump",
+   "site": "board",
+   "attacker_ip": "198.51.100.63",
+   "expected_rules": [
+    "WEBLOG_SQLI"
+   ],
+   "description": "게시물 id UNION 기반 추출",
+   "malicious": true
+  },
+  {
+   "scenario": "traversal_lfi",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.24",
+   "expected_rules": [
+    "WEBLOG_TRAVERSAL"
+   ],
+   "description": "경로 조작으로 /etc/passwd 열람",
+   "malicious": true
+  },
+  {
+   "scenario": "traversal_lfi",
+   "site": "board",
+   "attacker_ip": "198.51.100.64",
+   "expected_rules": [
+    "WEBLOG_TRAVERSAL"
+   ],
+   "description": "다운로드 경로 조작",
+   "malicious": true
+  },
+  {
+   "scenario": "cmd_injection",
+   "site": "board",
+   "attacker_ip": "198.51.100.65",
+   "expected_rules": [
+    "WEBLOG_CMD_INJECTION"
+   ],
+   "description": "점검 도구 host 파라미터 명령 삽입",
+   "malicious": true
+  },
+  {
+   "scenario": "sensitive_files",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.25",
+   "expected_rules": [
+    "WEBLOG_SENSITIVE_FILE"
+   ],
+   "description": "설정·비밀 파일 접근 시도",
+   "malicious": true
+  },
+  {
+   "scenario": "brute_login",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.26",
+   "expected_rules": [
+    "WEBLOG_AUTH_BRUTE",
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+   ],
+   "description": "로그인 15회 실패 뒤 정답으로 성공",
+   "malicious": true
+  },
+  {
+   "scenario": "brute_login",
+   "site": "board",
+   "attacker_ip": "198.51.100.66",
+   "expected_rules": [
+    "WEBLOG_AUTH_BRUTE",
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+   ],
+   "description": "게시판 로그인 무차별 대입",
+   "malicious": true
+  },
+  {
+   "scenario": "webshell_chain",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.27",
+   "expected_rules": [
+    "WEBLOG_UPLOAD_EXEC",
+    "WEBLOG_WEBSHELL_ACCESS",
+    "FILE_WEBSHELL"
+   ],
+   "description": "웹셸 업로드 후 업로드 폴더의 .php 를 cmd 파라미터로 실행",
+   "malicious": true
+  },
+  {
+   "scenario": "ssh_takeover",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.27",
+   "expected_rules": [
+    "SSH_BRUTE_FORCE",
+    "SSH_SUCCESS_AFTER_FAIL"
+   ],
+   "description": "웹 침해와 같은 IP에서 SSH 무차별 대입 후 root 로그인 성공(합성 auth.log)",
+   "malicious": true
+  }
+ ]
+}

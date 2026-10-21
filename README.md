@@ -14,6 +14,19 @@ AI:ON 2026 출품작(팀 로그파인더).
 
 웹 데모: `uvicorn app:app --reload` → http://127.0.0.1:8000 (샘플 바로 보기: /demo)
 
+### 웹서버 침해 판단 (신규)
+
+"우리 웹서버, 이미 뚫렸나?"를 **서버에 쌓인 로그·파일만으로** 판단하는 기능. nginx/Apache
+접속·오류 로그, 리눅스 인증 로그, 웹 루트 파일(웹셸)을 보고 침입 흐름을 복원해 판정한다.
+
+    # 저장소에 포함된 샘플로 바로 (서버 불필요)
+    python -m logsight scan --profile samples/web/profile.json --no-ai --out reports/web_demo
+    # 실제 사이트: profile.json 하나만 바꾼다 (경로/웹루트/신뢰 IP)
+    python -m logsight scan --profile profile.json --out reports/mysite
+
+웹 화면·API: `uvicorn app:app` → http://127.0.0.1:8000/web , JSON API는 `/api/web/scan`.
+설계·검증·한계는 `docs/웹서버_침해판단_설계.md`, 로컬 검증 환경은 `lab/README.md` 참고.
+
 Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.env.example 참고, 키는 커밋 금지).
 키가 없거나 호출이 실패하면 같은 형식의 규칙 기반 보고서를 만든다. 모델은 `LOGSIGHT_MODEL`
 (기본 `claude-haiku-5-5`)로 바꾼다. Python 3.10 이상 필요.

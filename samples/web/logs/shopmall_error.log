@@ -1,0 +1,87 @@
+2026/10/21 17:31:39 [info] 17716#17716: *1 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *3 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *5 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *7 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *9 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *11 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *13 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *15 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *17 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *19 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *21 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *23 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *41 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /wp-login.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *41 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *43 "/home/claude/logsight/lab/sites/shopmall/wp-admin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /wp-admin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *43 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *44 "/home/claude/logsight/lab/sites/shopmall/administrator/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /administrator/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *44 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *45 "/home/claude/logsight/lab/sites/shopmall/phpmyadmin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /phpmyadmin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *45 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *46 open() "/home/claude/logsight/lab/sites/shopmall/.git/HEAD" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /.git/HEAD HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *46 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *47 open() "/home/claude/logsight/lab/sites/shopmall/backup.zip" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /backup.zip HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *47 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *48 "/home/claude/logsight/lab/sites/shopmall/old/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /old/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *48 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *49 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /test.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *49 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *51 open() "/home/claude/logsight/lab/sites/shopmall/config.bak" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /config.bak HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *51 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *52 "/home/claude/logsight/lab/sites/shopmall/admin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /admin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *52 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *53 open() "/home/claude/logsight/lab/sites/shopmall/manager/html" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /manager/html HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *53 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *54 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /xmlrpc.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *54 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *56 "/home/claude/logsight/lab/sites/shopmall/vendor/phpunit/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /vendor/phpunit/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *56 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *57 open() "/home/claude/logsight/lab/sites/shopmall/server-status" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /server-status HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *57 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *58 open() "/home/claude/logsight/lab/sites/shopmall/.svn/entries" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /.svn/entries HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *58 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *59 open() "/home/claude/logsight/lab/sites/shopmall/cgi-bin/test.cgi" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /cgi-bin/test.cgi HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *59 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *60 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /shell.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *60 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *62 open() "/home/claude/logsight/lab/sites/shopmall/db.sql" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /db.sql HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *62 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *63 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /info.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *63 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *65 open() "/home/claude/logsight/lab/sites/shopmall/api/v1/users" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /api/v1/users HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *65 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *66 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *68 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *70 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *72 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *82 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *84 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *86 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *98 open() "/home/claude/logsight/lab/sites/shopmall/.env" failed (2: No such file or directory), client: 198.51.100.25, server: , request: "GET /.env HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *98 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *99 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.25, server: , request: "GET /config.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *99 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *101 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.25, server: , request: "GET /wp-config.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *101 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [error] 17716#17716: *103 open() "/home/claude/logsight/lab/sites/shopmall/.git/config" failed (2: No such file or directory), client: 198.51.100.25, server: , request: "GET /.git/config HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/21 17:31:39 [info] 17716#17716: *103 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *104 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *106 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *108 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *110 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *112 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *114 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *116 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *118 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *120 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *122 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *124 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *126 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *128 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *130 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *132 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *134 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:39 [info] 17716#17716: *162 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:40 [info] 17716#17716: *164 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:40 [info] 17716#17716: *166 client 127.0.0.1 closed keepalive connection
+2026/10/21 17:31:40 [info] 17716#17716: *168 client 127.0.0.1 closed keepalive connection

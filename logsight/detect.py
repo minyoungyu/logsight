@@ -39,6 +39,23 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
     "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
+    # --- 웹서버 로그·파일 기반 규칙(logsight.web) ---
+    "WEBLOG_SQLI":        ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "high"),
+    "WEBLOG_TRAVERSAL":   ("T1190", "initial-access", "경로 조작·파일 열람(../, 민감 파일) 시도", "high"),
+    "WEBLOG_RFI":         ("T1190", "initial-access", "원격 파일 포함(RFI) 시도", "high"),
+    "WEBLOG_CMD_INJECTION": ("T1190", "initial-access", "운영체제 명령 삽입 시도", "high"),
+    "WEBLOG_XSS":         ("T1059.007", "initial-access", "교차 사이트 스크립트(XSS) 시도", "medium"),
+    "WEBLOG_SCANNER":     ("T1595.002", "discovery", "취약점 스캐너·자동 도구 탐지", "low"),
+    "WEBLOG_ENUM_404":    ("T1595.003", "discovery", "존재하지 않는 경로 연속 탐색(열거)", "low"),
+    "WEBLOG_SENSITIVE_FILE": ("T1083", "discovery", "설정·비밀 파일 접근 시도(.env 등)", "medium"),
+    "WEBLOG_WEBSHELL_ACCESS": ("T1505.003", "persistence", "웹셸로 보이는 경로에 접근", "high"),
+    "WEBLOG_UPLOAD_EXEC": ("T1505.003", "persistence", "업로드 폴더의 스크립트 실행", "high"),
+    "WEBLOG_AUTH_BRUTE":  ("T1110", "credential-access", "웹 로그인 무차별 대입", "medium"),
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "로그인 연속 실패 뒤 성공", "high"),
+    "WEBLOG_EXPLOIT_5XX": ("T1190", "initial-access", "공격 요청에 서버 오류(500) 응답 — 취약점 반응", "high"),
+    "WEBLOG_LARGE_EXFIL": ("T1030", "exfiltration", "공격 요청 뒤 비정상적으로 큰 응답(데이터 유출 의심)", "high"),
+    "FILE_WEBSHELL":      ("T1505.003", "persistence", "웹 루트에서 웹셸 의심 파일 발견", "high"),
+    "FILE_SUSPICIOUS":    ("T1105", "persistence", "웹 루트에서 의심스러운 신규·수정 파일", "medium"),
 }
 
 STAGE_ORDER = ["discovery", "initial-access", "credential-access", "persistence",

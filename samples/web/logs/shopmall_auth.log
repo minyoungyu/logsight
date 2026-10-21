@@ -1,0 +1,10 @@
+Oct 21 17:31:43 web01 sshd[22000]: Failed password for root from 198.51.100.27 port 40122 ssh2
+Oct 21 17:31:46 web01 sshd[22001]: Failed password for root from 198.51.100.27 port 41122 ssh2
+Oct 21 17:31:49 web01 sshd[22002]: Failed password for root from 198.51.100.27 port 42122 ssh2
+Oct 21 17:31:52 web01 sshd[22003]: Failed password for root from 198.51.100.27 port 43122 ssh2
+Oct 21 17:31:55 web01 sshd[22004]: Failed password for root from 198.51.100.27 port 44122 ssh2
+Oct 21 17:31:58 web01 sshd[22005]: Failed password for root from 198.51.100.27 port 45122 ssh2
+Oct 21 17:32:01 web01 sshd[22006]: Failed password for root from 198.51.100.27 port 46122 ssh2
+Oct 21 17:32:04 web01 sshd[22007]: Failed password for root from 198.51.100.27 port 47122 ssh2
+Oct 21 17:32:07 web01 sshd[22099]: Accepted password for root from 198.51.100.27 port 49999 ssh2
+Oct 21 17:32:12 web01 sudo:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/usr/sbin/useradd -m svc
