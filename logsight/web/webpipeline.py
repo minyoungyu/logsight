@@ -21,6 +21,8 @@ from .webdetect import run_web_detections
 from .webscan import scan_webroot
 from .webanalyze import analyze_web, rule_verdict, VERDICT_KO
 from .webprofile import SiteProfile
+from .expert import expert_report
+from .layman import layman_card
 
 PARSERS = {
     "access": parse_access,
@@ -103,7 +105,7 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
     by_source: dict[str, int] = {}
     for e in events:
         by_source[e.source] = by_source.get(e.source, 0) + 1
-    return {
+    out = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "site": {"name": profile.name, "stack": profile.stack, "webroot": profile.webroot},
         "overall_verdict": overall,
@@ -121,6 +123,10 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
     }
+    # 같은 결과를 두 독자용으로 나눈 뷰: 비숙련자 카드 + 숙련자 상세
+    out["simple"] = layman_card(out)
+    out["expert"] = expert_report(out, profile_dict)
+    return out
 
 
 def _rule_counts(findings) -> dict:
