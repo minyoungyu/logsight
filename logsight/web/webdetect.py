@@ -21,13 +21,30 @@ from .webprofile import SiteProfile
 
 # ------------------------------------------------------------------ 공격 패턴
 # 한 번 디코드한 "경로+쿼리" 문자열에 대해 검사한다.
-SQLI = re.compile(
-    r"(?i)(?:'\s*(?:or|and)\s+['\d]|\bunion\s+(?:all\s+)?select\b|\bselect\b.+\bfrom\b|"
-    r"\bsleep\s*\(|\bbenchmark\s*\(|\bwaitfor\s+delay\b|information_schema|\bconcat\s*\(|"
-    r"@@version|\bextractvalue\s*\(|\bupdatexml\s*\(|'\s*(?:--|#)|\b(?:or|and)\s+\d+\s*=\s*\d+)")
+# SQL 인젝션은 셋 중 하나일 때만 본다: (1) UNION SELECT, (2) 따옴표 뒤의 항상-참 조건,
+# (3) 따옴표·주석과 함께 나온 SELECT…FROM. "select color from menu"처럼 따옴표 없는
+# 일반 문장은 잡지 않는다(정상 검색어 오탐 방지).
+SQLI_UNION = re.compile(r"(?i)\bunion\s+(?:all\s+)?select\b")
+SQLI_TAUTOLOGY = re.compile(r"(?i)'\s*(?:or|and)\s+['\d(]|\b(?:or|and)\s+\d+\s*=\s*\d+\b")
+SQLI_TAIL = re.compile(r"(?i)'|--|/\*")
+SQLI_MISC = re.compile(
+    r"(?i)\bsleep\s*\(|\bbenchmark\s*\(|\bwaitfor\s+delay\b|information_schema|"
+    r"@@version|\bextractvalue\s*\(|\bupdatexml\s*\(")
+SQLI_SELECT = re.compile(r"(?i)\bselect\b.+\bfrom\b")
+
+
+def is_sqli(text: str) -> bool:
+    if SQLI_UNION.search(text) or SQLI_TAUTOLOGY.search(text) or SQLI_MISC.search(text):
+        return True
+    return bool(SQLI_SELECT.search(text) and SQLI_TAIL.search(text))
+
+
 TRAVERSAL = re.compile(
     r"(?i)(?:\.\./|\.\.%2f|%2e%2e/|\.\.\\|/etc/passwd|/proc/self/|c:\\windows|"
-    r"php://(?:filter|input)|data://|expect://|/\.ssh/|boot\.ini)")
+    r"php://(?:filter|input)|data://|expect://|/\.ssh/|boot\.ini|"
+    r"access\.log|error\.log|/var/log/)")
+# 헤더(User-Agent·Referer)에 실행 가능한 코드가 들어 있으면 로그 포이즈닝 준비일 가능성이 크다.
+CODE_IN_HEADER = re.compile(r"(?i)<\?php|<\?=|\beval\s*\(|base64_decode\s*\(|system\s*\(\s*\$_")
 RFI = re.compile(r"(?i)=\s*(?:https?|ftp)://")
 CMDI = re.compile(
     r"(?i)(?:;\s*(?:id|ls|cat|whoami|uname|wget|curl|nc|bash|sh)\b|\|\s*(?:id|ls|cat|nc|sh|bash)\b|"
@@ -72,6 +89,11 @@ def _trusted(ip: str | None, cidrs: list[str]) -> bool:
     return False
 
 
+def _is_admin_path(path: str, prefixes: tuple[str, ...]) -> bool:
+    p = path.lower()
+    return any(p == x or p.startswith(x + "/") for x in prefixes)
+
+
 def _mk(rule: str, by_ip: dict[str, list[Event]], detail_fn) -> list[Finding]:
     out = []
     for ip, evs in by_ip.items():
@@ -85,6 +107,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
     trusted = [t["cidr"] if isinstance(t, dict) else t for t in profile.trusted_ips]
     upload_dirs = tuple(profile.upload_dirs)
     sensitive = [s.lower() for s in profile.sensitive_files]
+    admin_prefixes = tuple(a.lower().rstrip("/") for a in profile.admin_paths if a.lower().startswith("/admin"))
     findings: list[Finding] = []
 
     access = [e for e in events if e.source == "access"]
@@ -103,7 +126,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
         trusted_ip = _trusted(e.src_ip, trusted)
 
         matched = False
-        if SQLI.search(target):
+        if is_sqli(target):
             buckets["WEBLOG_SQLI"][ip].append(e); matched = True
         if TRAVERSAL.search(target):
             buckets["WEBLOG_TRAVERSAL"][ip].append(e); matched = True
@@ -120,16 +143,25 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
             buckets["WEBLOG_WEBSHELL_ACCESS"][ip].append(e); matched = True
         if any(s in target.lower() for s in sensitive) or "/.git/" in path.lower():
             buckets["WEBLOG_SENSITIVE_FILE"][ip].append(e)
+        # 헤더에 실행 코드를 심는 로그 포이즈닝 준비(User-Agent·Referer)
+        if CODE_IN_HEADER.search(ua) or CODE_IN_HEADER.search(e.extra.get("referer", "")):
+            buckets["WEBLOG_CODE_IN_HEADER"][ip].append(e)
+        # 관리자 영역에 성공적으로 들어간 흔적: 2xx 응답, 또는 관리자 로그인 뒤 302(로그인 성공).
+        # 인증 없이 302로 로그인 화면에 튕긴 것은 성공으로 치지 않는다.
+        login_ok = e.extra.get("status") == "302" and path.lower().endswith("login.php")
+        if not trusted_ip and _is_admin_path(path, admin_prefixes) and (
+                (e.outcome == "success" and e.extra.get("status") != "302") or login_ok):
+            buckets["WEBLOG_ADMIN_ACCESS"][ip].append(e)
         if SCANNER_UA.search(ua) and not trusted_ip:
             buckets["WEBLOG_SCANNER"][ip].append(e)
         # 업로드 폴더 안의 스크립트가 실행(=요청)되면 매우 의심스럽다
-        if path.lower().startswith(upload_dirs) and re.search(r"\.(php|phtml|jsp|asp|aspx|cgi|pl)\b", path, re.I):
+        if path.lower().startswith(upload_dirs) and re.search(r"\.(php\d?|phtml|phar|jsp|asp|aspx|cgi|pl)\b", path, re.I):
             buckets["WEBLOG_UPLOAD_EXEC"][ip].append(e); matched = True
         # 공격 패턴 요청에 서버가 500으로 반응하면 취약점이 실제로 건드려졌을 가능성
         if matched and e.outcome == "server-error":
             buckets["WEBLOG_EXPLOIT_5XX"][ip].append(e)
         # 공격 패턴 요청이 성공(2xx)하면서 응답이 유난히 크면 데이터 유출 의심
-        if matched and e.outcome == "success":
+        if (matched or _is_admin_path(path, admin_prefixes)) and e.outcome == "success":
             try:
                 if int(e.extra.get("bytes", "0")) >= 50_000:
                     buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)

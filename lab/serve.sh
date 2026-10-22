@@ -21,6 +21,9 @@ listen = $SOCK
 listen.owner = www-data
 listen.group = www-data
 listen.mode = 0666
+; 테스트 서버 설정 실수를 일부러 재현: .phtml 실행을 허용한다(실제 소형 서버에서 흔한 설정 오류).
+; 기본값(.php만 허용)이면 업로드 우회 공격이 403으로 막혀 체인이 성립하지 않는다.
+security.limit_extensions = .php .phtml .php5
 pm = dynamic
 pm.max_children = 10
 pm.start_servers = 2
@@ -55,7 +58,7 @@ http {
     index index.php;
     access_log $LOGS/shopmall_access.log combined;
     error_log  $LOGS/shopmall_error.log info;
-    location ~ \.php\$ {
+    location ~ \.(php|phtml|php5)\$ {
       fastcgi_pass unix:$SOCK;
       fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
       fastcgi_param QUERY_STRING \$query_string;
@@ -73,7 +76,7 @@ http {
     index index.php;
     access_log $LOGS/board_access.log combined;
     error_log  $LOGS/board_error.log info;
-    location ~ \.php\$ {
+    location ~ \.(php|phtml|php5)\$ {
       fastcgi_pass unix:$SOCK;
       fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
       fastcgi_param QUERY_STRING \$query_string;

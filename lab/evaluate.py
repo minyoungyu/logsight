@@ -46,6 +46,7 @@ def main() -> int:
     rows = []
     tp = fn = 0
     benign_fp = 0
+    blind: list[str] = []
     for sc in truth["scenarios"]:
         site = sc["site"]
         exp = set(sc["expected_rules"])
@@ -56,6 +57,10 @@ def main() -> int:
                     if ip.startswith("203.0.113") and rules:
                         benign_fp += 1
                         rows.append((sc["scenario"], name, ip, "오탐!", ", ".join(sorted(rules))))
+            continue
+        if not sc.get("detectable", True):
+            rows.append((sc["scenario"], sc["attacker_ip"], "-", "-", "사각지대: 접속 로그로 볼 수 없음"))
+            blind.append(sc["scenario"])
             continue
         targets = [site] if site in detected else list(detected)
         got: set[str] = set()
@@ -77,11 +82,12 @@ def main() -> int:
     print("=" * 78)
     recall = tp / (tp + fn) if (tp + fn) else 0.0
     print(f"기대 규칙 재현율: {tp}/{tp+fn} = {recall:.0%}   정상 트래픽 오탐: {benign_fp}건")
+    print(f"사각지대(접속 로그로 볼 수 없는 공격, 재현율에서 제외): {len(blind)}건 {blind}")
     for name, r in results.items():
         print(f"  [{name}] 판정={r['overall_verdict_ko']} 사건={r['n_incidents']} "
               f"탐지={r['n_findings']} 처리={r['timing']['total_s']}초")
 
-    out = {"recall": recall, "tp": tp, "fn": fn, "benign_fp": benign_fp,
+    out = {"recall": recall, "tp": tp, "fn": fn, "benign_fp": benign_fp, "blind_spots": blind,
            "per_site": {n: {"verdict": r["overall_verdict"], "incidents": r["n_incidents"],
                             "findings": r["n_findings"]} for n, r in results.items()}}
     (LAB / "reports").mkdir(exist_ok=True)

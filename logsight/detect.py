@@ -52,6 +52,8 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WEBLOG_UPLOAD_EXEC": ("T1505.003", "persistence", "업로드 폴더의 스크립트 실행", "high"),
     "WEBLOG_AUTH_BRUTE":  ("T1110", "credential-access", "웹 로그인 무차별 대입", "medium"),
     "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "로그인 연속 실패 뒤 성공", "high"),
+    "WEBLOG_CODE_IN_HEADER": ("T1505.003", "persistence", "요청 헤더(User-Agent 등)에 실행 코드 삽입(로그 포이즈닝 준비)", "high"),
+    "WEBLOG_ADMIN_ACCESS": ("T1078", "initial-access", "관리자 영역 접근 성공(기본 계정 로그인 의심)", "high"),
     "WEBLOG_EXPLOIT_5XX": ("T1190", "initial-access", "공격 요청에 서버 오류(500) 응답 — 취약점 반응", "high"),
     "WEBLOG_LARGE_EXFIL": ("T1030", "exfiltration", "공격 요청 뒤 비정상적으로 큰 응답(데이터 유출 의심)", "high"),
     "FILE_WEBSHELL":      ("T1505.003", "persistence", "웹 루트에서 웹셸 의심 파일 발견", "high"),

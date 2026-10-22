@@ -1,21 +1,15 @@
 <?php
-// 취약점: 로그인 시도 제한 없음(무차별 대입 가능). 테스트 전용.
+// 사용자 로그인. 실패 횟수 제한이 없다(무차별 대입 가능). 테스트 전용.
 require __DIR__ . '/_init.php';
-header('Content-Type: text/html; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $u = isset($_POST['username']) ? $_POST['username'] : '';
-    $p = isset($_POST['password']) ? $_POST['password'] : '';
     $db = db();
     $st = $db->prepare("SELECT id FROM users WHERE username=? AND password=?");
-    $st->execute([$u, $p]);
-    if ($st->fetch()) {
-        header('Location: /dashboard.php', true, 302); // 성공: 리다이렉트
-        exit;
-    }
+    $st->execute([$_POST['username'] ?? '', $_POST['password'] ?? '']);
+    if ($st->fetch()) { header('Location: /', true, 302); exit; }
     http_response_code(401);
-    echo "<p>로그인 실패</p>";
-    exit;
+    header_html('로그인'); echo '<p>아이디 또는 비밀번호가 맞지 않습니다.</p>'; footer_html(); exit;
 }
-echo '<!doctype html><meta charset=utf-8><h1>로그인</h1>
-<form method=post><input name=username placeholder=아이디>
-<input name=password type=password placeholder=비밀번호><button>로그인</button></form>';
+header_html('로그인');
+echo '<form method="post" class="card" style="max-width:320px"><p><input name="username" placeholder="아이디"></p>'
+   . '<p><input name="password" type="password" placeholder="비밀번호"></p><button>로그인</button></form>';
+footer_html();

@@ -183,5 +183,49 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(res["results"][0]["report"]["verdict"], "breached")
 
 
+class NewRuleTests(unittest.TestCase):
+    def test_sqli_false_positive_plain_words(self):
+        # 따옴표·주석 없이 select…from 이 나오는 정상 검색어는 SQL 인젝션이 아니다
+        from logsight.web.webdetect import is_sqli
+        self.assertFalse(is_sqli("select color from menu"))
+        self.assertFalse(is_sqli("keyboard and mouse"))
+        self.assertFalse(is_sqli("1 or 2 people headset"))
+
+    def test_sqli_true_positives(self):
+        from logsight.web.webdetect import is_sqli
+        self.assertTrue(is_sqli("' UNION SELECT a,b FROM users-- -"))
+        self.assertTrue(is_sqli("' OR 1=1 -- "))
+        self.assertTrue(is_sqli("x' and select name from users--"))
+
+    def test_code_in_user_agent_is_log_poisoning(self):
+        line = acc(ua="<?php system($_GET['c']); ?>")
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(line))}
+        self.assertIn("WEBLOG_CODE_IN_HEADER", rules)
+
+    def test_include_of_access_log_is_traversal(self):
+        line = acc(q="f=/var/www/logs/access.log&c=id")
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(line))}
+        self.assertIn("WEBLOG_TRAVERSAL", rules)
+
+    def test_admin_redirect_to_login_is_not_access(self):
+        base = ('198.51.100.9 - - [10/Oct/2026:13:55:36 +0000] "GET /admin/members.php HTTP/1.1" '
+                '302 0 "-" "Mozilla/5.0"')
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(base), SiteProfile())}
+        self.assertNotIn("WEBLOG_ADMIN_ACCESS", rules)
+
+    def test_default_admin_login_then_export_is_access_and_exfil(self):
+        lines = ('198.51.100.9 - - [10/Oct/2026:13:55:36 +0000] "POST /admin/login.php HTTP/1.1" 302 0 "-" "x"\n'
+                 '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /admin/members.php HTTP/1.1" 200 120000 "-" "x"')
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        self.assertIn("WEBLOG_ADMIN_ACCESS", rules)
+        self.assertIn("WEBLOG_LARGE_EXFIL", rules)
+
+    def test_phtml_upload_is_exec(self):
+        line = acc(q="").replace("/search.php?q=", "/uploads/shell.phtml?cmd=")
+        p = SiteProfile(upload_dirs=["/uploads"])
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(line), p)}
+        self.assertIn("WEBLOG_UPLOAD_EXEC", rules)
+
+
 if __name__ == "__main__":
     unittest.main()

