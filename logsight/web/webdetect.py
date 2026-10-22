@@ -13,7 +13,7 @@ import ipaddress
 import re
 from collections import defaultdict
 from datetime import timedelta
-from urllib.parse import unquote_plus
+from urllib.parse import unquote_plus, urlparse
 
 from ..normalize import Event
 from ..detect import Finding, _bursts, _ok_fail
@@ -45,6 +45,16 @@ TRAVERSAL = re.compile(
     r"access\.log|error\.log|/var/log/)")
 # 헤더(User-Agent·Referer)에 실행 가능한 코드가 들어 있으면 로그 포이즈닝 준비일 가능성이 크다.
 CODE_IN_HEADER = re.compile(r"(?i)<\?php|<\?=|\beval\s*\(|base64_decode\s*\(|system\s*\(\s*\$_")
+# 알려진 취약점 공격 문자열(헤더): Log4Shell(JNDI 조회), Shellshock(빈 함수 정의)
+EXPLOIT_PROBE = re.compile(r"(?i)\$\{jndi:|\$\{(?:lower|upper|env|sys):|\(\)\s*\{\s*:\s*;\s*\}")
+# 서버가 대신 내부 주소를 요청하게 만드는 주소 인자(SSRF)
+SSRF_TARGET = re.compile(
+    r"(?i)[?&](?:url|src|dest|uri|callback|file|path)=https?://(?:127\.|localhost|0\.0\.0\.0|"
+    r"169\.254\.169\.254|10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)")
+# 외부 사이트로 보내는 리다이렉트 인자(열린 리다이렉트)
+REDIRECT_TARGET = re.compile(r"(?i)[?&](?:next|return|redirect|continue|to)=https?://")
+# 백업·덤프 파일 이름
+BACKUP_NAME = re.compile(r"(?i)(?:backup|dump|\.sql|\.bak|\.old|\.zip|\.tar\.gz|/\.git/)")
 RFI = re.compile(r"(?i)=\s*(?:https?|ftp)://")
 CMDI = re.compile(
     r"(?i)(?:;\s*(?:id|ls|cat|whoami|uname|wget|curl|nc|bash|sh)\b|\|\s*(?:id|ls|cat|nc|sh|bash)\b|"
@@ -94,6 +104,11 @@ def _is_admin_path(path: str, prefixes: tuple[str, ...]) -> bool:
     return any(p == x or p.startswith(x + "/") for x in prefixes)
 
 
+def _foreign_host(referer: str, own_hosts: list[str]) -> bool:
+    host = (urlparse(referer).hostname or "").lower()
+    return bool(host) and host not in own_hosts
+
+
 def _mk(rule: str, by_ip: dict[str, list[Event]], detail_fn) -> list[Finding]:
     out = []
     for ip, evs in by_ip.items():
@@ -108,6 +123,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
     upload_dirs = tuple(profile.upload_dirs)
     sensitive = [s.lower() for s in profile.sensitive_files]
     admin_prefixes = tuple(a.lower().rstrip("/") for a in profile.admin_paths if a.lower().startswith("/admin"))
+    own_hosts = [h.lower() for h in profile.own_hosts]
     findings: list[Finding] = []
 
     access = [e for e in events if e.source == "access"]
@@ -116,6 +132,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
 
     # 규칙별로 공격자 IP → 이벤트 목록을 모은다
     buckets: dict[str, dict[str, list[Event]]] = defaultdict(lambda: defaultdict(list))
+    admin_pages: dict[str, list[Event]] = defaultdict(list)
 
     for e in access:
         ip = e.src_ip or "?"
@@ -143,6 +160,21 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
             buckets["WEBLOG_WEBSHELL_ACCESS"][ip].append(e); matched = True
         if any(s in target.lower() for s in sensitive) or "/.git/" in path.lower():
             buckets["WEBLOG_SENSITIVE_FILE"][ip].append(e)
+        method = e.extra.get("method", "")
+        if SSRF_TARGET.search(target):
+            buckets["WEBLOG_SSRF"][ip].append(e); matched = True
+        if REDIRECT_TARGET.search(target):
+            buckets["WEBLOG_OPEN_REDIRECT"][ip].append(e)
+        if EXPLOIT_PROBE.search(ua) or EXPLOIT_PROBE.search(e.extra.get("referer", "")):
+            buckets["WEBLOG_EXPLOIT_PROBE"][ip].append(e)
+        if e.outcome == "success" and BACKUP_NAME.search(path) and not path.endswith("/"):
+            buckets["WEBLOG_BACKUP_LEAK"][ip].append(e); matched = True
+        if method == "GET" and e.outcome == "success" and path.endswith("/") \
+                and path.lower().startswith(upload_dirs):
+            buckets["WEBLOG_DIR_LISTING"][ip].append(e)
+        if method == "POST" and _is_admin_path(path, admin_prefixes) and e.extra.get("referer") \
+                and _foreign_host(e.extra["referer"], own_hosts):
+            buckets["WEBLOG_CSRF_SUSPECT"][ip].append(e); matched = True
         # 헤더에 실행 코드를 심는 로그 포이즈닝 준비(User-Agent·Referer)
         if CODE_IN_HEADER.search(ua) or CODE_IN_HEADER.search(e.extra.get("referer", "")):
             buckets["WEBLOG_CODE_IN_HEADER"][ip].append(e)
@@ -152,6 +184,8 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
         if not trusted_ip and _is_admin_path(path, admin_prefixes) and (
                 (e.outcome == "success" and e.extra.get("status") != "302") or login_ok):
             buckets["WEBLOG_ADMIN_ACCESS"][ip].append(e)
+            if not login_ok:
+                admin_pages[ip].append(e)
         if SCANNER_UA.search(ua) and not trusted_ip:
             buckets["WEBLOG_SCANNER"][ip].append(e)
         # 업로드 폴더 안의 스크립트가 실행(=요청)되면 매우 의심스럽다
@@ -170,6 +204,24 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
 
     for rule, by_ip in buckets.items():
         findings += _mk(rule, by_ip, lambda evs: _ok_fail(evs))
+
+    # --- 주문 번호 연속 열람(IDOR): 같은 IP가 서로 다른 주문 번호를 10개 이상 연속으로 열람
+    idor: dict[str, list[Event]] = defaultdict(list)
+    for e in access:
+        if e.extra.get("path") == "/order.php" and e.outcome == "success":
+            idor[e.src_ip or "?"].append(e)
+    for ip, evs in idor.items():
+        for seg in _bursts(evs, timedelta(minutes=5), 10, key=lambda e: e.extra.get("query", "")):
+            findings.append(Finding("WEBLOG_IDOR_ENUM", seg,
+                                    f"5분 안에 주문 {len({e.extra.get('query') for e in seg})}건 열람", ip))
+
+    # --- 로그인 기록 없이 관리자 페이지에 바로 들어감: 쿠키 위조 의심
+    login_ips = {e.src_ip for e in access if e.extra.get("method") == "POST"
+                 and e.extra.get("status") == "302" and e.extra.get("path", "").lower().endswith("login.php")}
+    for ip, evs in admin_pages.items():
+        if ip not in login_ips:
+            findings.append(Finding("WEBLOG_ADMIN_FORGED", evs,
+                                    f"이 IP의 로그인 기록 없이 관리자 페이지 {len(evs)}건 열람", ip))
 
     # --- 404 열거(없는 경로 연속 탐색) — 자동 스캐너의 전형
     enum: dict[str, list[Event]] = defaultdict(list)

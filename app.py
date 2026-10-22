@@ -6,6 +6,7 @@ LogSight 데모 웹앱 (FastAPI).
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, UploadFile
@@ -18,8 +19,16 @@ from logsight.web.webprofile import SiteProfile
 from logsight.web.webpipeline import assess
 from logsight.web.webreport import render as render_web
 
-app = FastAPI(title="LogSight")
 ROOT = Path(__file__).parent
+# 안전한 데모 모드: LOGSIGHT_DEMO=1 이면 로그 업로드를 받지 않고 샘플 보고서만 보여 준다.
+# 공개 배포본은 이 모드로만 띄운다(외부 사용자가 올린 로그를 서버에 받지 않기 위함).
+# 데모에서는 API 문서(/docs, /openapi.json)도 끈다(내부 경로·매개변수 구조를 주지 않기 위함).
+DEMO = os.environ.get("LOGSIGHT_DEMO") == "1"
+DEMO_MSG = "데모 모드에서는 파일 업로드를 받지 않습니다. 샘플 보고서를 확인하세요."
+app = FastAPI(title="LogSight",
+              docs_url=None if DEMO else "/docs",
+              redoc_url=None if DEMO else "/redoc",
+              openapi_url=None if DEMO else "/openapi.json")
 SAMPLES = ROOT / "samples" / "demo"
 WEB_SAMPLE = ROOT / "samples" / "web" / "profile.json"
 
@@ -62,6 +71,8 @@ async def do_analyze(
     environment: UploadFile | None = File(None),
     no_ai: str | None = Form(None),
 ):
+    if DEMO:
+        return HTMLResponse(DEMO_MSG, status_code=403)
     events, stats = [], []
     for kind, ups in (("cloudtrail", cloudtrail), ("vpcflow", vpcflow), ("waf", waf),
                       ("alb", alb), ("sshauth", sshauth)):
@@ -107,6 +118,9 @@ margin:0 auto;padding:24px 16px}label{display:block;margin:10px 0}button{padding
 
 @app.get("/web", response_class=HTMLResponse)
 def web_home():
+    if DEMO:
+        return WEB_PAGE.replace("<form action=/web/scan", "<form action=/web/scan hidden").replace(
+            "<button>점검</button>", "<p>" + DEMO_MSG + "</p>")
     return WEB_PAGE
 
 
@@ -144,6 +158,8 @@ async def web_scan(
     auth: list[UploadFile] | None = File(None),
     no_ai: str | None = Form(None),
 ):
+    if DEMO:
+        return HTMLResponse(DEMO_MSG, status_code=403)
     import tempfile
     files = {"access": await _collect(access), "weberror": await _collect(weberror),
              "auth": await _collect(auth)}
@@ -162,6 +178,8 @@ async def api_web_scan(
     no_ai: str | None = Form(None),
 ):
     """UI가 아니라 기계가 쓰는 JSON API. 결과 dict를 그대로 돌려준다."""
+    if DEMO:
+        return JSONResponse({"error": DEMO_MSG}, status_code=403)
     import tempfile
     files = {"access": await _collect(access), "weberror": await _collect(weberror),
              "auth": await _collect(auth)}

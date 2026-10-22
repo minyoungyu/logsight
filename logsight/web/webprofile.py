@@ -13,6 +13,7 @@ profile.json) 하나만 바꾸면 된다. 코드에는 경로·IP를 박아 두�
   admin_paths   관리자 로그인 경로 목록(예: /admin, /wp-login.php) — 무차별 대입 판단용
   login_paths   로그인 처리 경로(POST) — 로그인 성공/실패 판단용
   upload_dirs   업로드가 저장되는 URL 접두사(예: /uploads) — 업로드 뒤 실행 탐지용
+  own_hosts     Referer 판단에 쓰는 우리 호스트 이름(이 밖의 Referer에서 온 관리자 요청은 CSRF 의심)
   since/until   분석 시간 범위(ISO, 선택) — 큰 로그에서 사고 구간만 보고 싶을 때
   year          연도 없는 syslog 형식(auth.log)에 붙일 연도
 """
@@ -38,6 +39,7 @@ class SiteProfile:
     sensitive_files: list[str] = field(default_factory=lambda: [
         ".env", "config.php", "wp-config.php", "database.yml", "settings.py",
         "id_rsa", ".git/config", "composer.json"])
+    own_hosts: list[str] = field(default_factory=lambda: ["127.0.0.1", "localhost"])
     since: str | None = None
     until: str | None = None
     year: int = 2026

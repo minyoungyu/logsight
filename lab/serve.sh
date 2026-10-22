@@ -56,6 +56,8 @@ http {
     listen 127.0.0.1:8081;
     root $LAB/sites/shopmall;
     index index.php;
+    # 흔한 설정 실수 재현: 업로드 폴더 목록이 외부에 보인다
+    location /uploads/ { autoindex on; }
     access_log $LOGS/shopmall_access.log combined;
     error_log  $LOGS/shopmall_error.log info;
     location ~ \.(php|phtml|php5)\$ {
@@ -67,6 +69,7 @@ http {
       fastcgi_param CONTENT_LENGTH \$content_length;
       fastcgi_param REQUEST_URI \$request_uri;
       fastcgi_param DOCUMENT_ROOT \$document_root;
+      fastcgi_param REMOTE_ADDR \$remote_addr;
     }
   }
 
@@ -85,6 +88,7 @@ http {
       fastcgi_param CONTENT_LENGTH \$content_length;
       fastcgi_param REQUEST_URI \$request_uri;
       fastcgi_param DOCUMENT_ROOT \$document_root;
+      fastcgi_param REMOTE_ADDR \$remote_addr;
     }
   }
 }
@@ -98,6 +102,8 @@ start() {
   rm -rf "$LAB/sites/shopmall/uploads"/* "$LAB/sites/board/data"/*
   mkdir -p "$LAB/sites/shopmall/uploads" "$LAB/sites/board/data"
   chmod -R 0777 "$LAB/sites/shopmall" "$LAB/sites/board"
+  # 배포 실수 재현: .git 설정 파일이 웹 루트에 같이 올라가 있음(픽스처는 lab/fixtures 에 있음)
+  mkdir -p "$LAB/sites/shopmall/.git" && cp "$LAB/fixtures/shopmall-dotgit-config.txt" "$LAB/sites/shopmall/.git/config"
   php-fpm8.3 -y "$RT/php-fpm.conf" || { echo "php-fpm 시작 실패"; exit 1; }
   nginx -c "$RT/nginx.conf" || { echo "nginx 시작 실패"; exit 1; }
   sleep 1

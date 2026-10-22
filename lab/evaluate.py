@@ -40,7 +40,7 @@ def rules_by_ip(result: dict) -> dict[str, set[str]]:
 
 def main() -> int:
     truth = json.loads((LAB / "logs" / "ground_truth.json").read_text(encoding="utf-8"))
-    results = {name: assess(SiteProfile.load(p), use_ai=False) for name, p in PROFILES.items()}
+    results = {name: assess(SiteProfile.load(p), use_ai=False, top=500) for name, p in PROFILES.items()}
     detected = {name: rules_by_ip(r) for name, r in results.items()}
 
     rows = []

@@ -16,6 +16,11 @@ function db() {
         $db->exec("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT, password TEXT, email TEXT, role TEXT)");
         $db->exec("CREATE TABLE products(id INTEGER PRIMARY KEY, name TEXT, price INTEGER, category TEXT, stock INTEGER)");
         $db->exec("CREATE TABLE reviews(id INTEGER PRIMARY KEY, product_id INTEGER, author TEXT, body TEXT)");
+        $db->exec("CREATE TABLE orders(id INTEGER PRIMARY KEY, name TEXT, address TEXT, phone TEXT, item TEXT)");
+        $os = $db->prepare("INSERT INTO orders(name,address,phone,item) VALUES(?,?,?,?)");
+        for ($i = 1; $i <= 300; $i++) {
+            $os->execute(["고객" . $i, "서울시 강남구 테헤란로 " . ($i * 7), "010-" . (1000 + $i) . "-" . (2000 + $i), "마우스 모델 " . str_pad((string)$i, 4, '0', STR_PAD_LEFT)]);
+        }
         $db->exec("INSERT INTO users(username,password,email,role) VALUES
             ('admin','S3cretPass!','owner@sample-mall.kr','admin'),
             ('shopadmin','admin','ops@sample-mall.kr','admin'),
