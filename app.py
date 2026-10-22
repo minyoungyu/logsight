@@ -58,7 +58,8 @@ def home():
 
 @app.get("/demo", response_class=HTMLResponse)
 def demo():
-    return render(run_paths([str(SAMPLES)]), "LogSight 샘플 분석")
+    # 데모는 외부 AI 호출을 하지 않는다(배포 환경에 API 키를 둘 필요가 없게).
+    return render(run_paths([str(SAMPLES)], use_ai=False), "LogSight 샘플 분석")
 
 
 @app.post("/analyze", response_class=HTMLResponse)

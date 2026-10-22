@@ -1,0 +1,18 @@
+# 이미지에는 데모 실행에 필요한 것만 넣는다(allowlist 방식).
+*
+!app.py
+!requirements.txt
+!logsight/
+!samples/
+# 취약 테스트 사이트·랩·테스트·문서·CI 설정은 이미지에 넣지 않는다
+**/__pycache__
+**/*.pyc
+.env
+.env.*
+.git
+.github
+docs/
+lab/
+tests/
+reports/
+scripts/
