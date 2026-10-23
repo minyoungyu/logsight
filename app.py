@@ -51,6 +51,12 @@ margin:0 auto;padding:24px 16px}label{display:block;margin:10px 0}button{padding
 <p><a href=/demo>샘플 로그로 바로 보기</a> · <a href=/docs>API 문서</a></p></html>"""
 
 
+@app.get("/healthz")
+def healthz():
+    """배포 플랫폼(Lightsail·App Runner 등)의 상태 확인용. 외부 의존성 없이 200만 돌려준다."""
+    return {"status": "ok", "demo": DEMO}
+
+
 @app.get("/", response_class=HTMLResponse)
 def home():
     return PAGE
