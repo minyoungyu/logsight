@@ -1,6 +1,6 @@
 """비영리 데이터셋(AIT-LDS, CC BY-NC-SA)이 배포 이미지·제품 코드에 섞이지 않는지 검사한다.
 
-이유는 docs/공개데이터셋_독립측정.md 3절 "상업화를 가정한 대비"를 본다.
+원칙은 docs/공개데이터셋_독립측정.md 3절 "데이터 취급 원칙"을 본다.
 실행: python -m unittest discover -s tests -v
 """
 from __future__ import annotations
