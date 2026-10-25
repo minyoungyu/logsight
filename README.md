@@ -79,6 +79,10 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
 
 MIT 라이선스. 자세한 내용은 `LICENSE` 파일을 보세요. 변경 기록은 `CHANGELOG.md`에 있습니다.
 
+MIT 라이선스는 이 저장소의 코드에만 적용됩니다. 성능 측정에 쓴 외부 데이터셋은 저장소에 들어 있지 않고, 각 데이터셋의 라이선스를 따릅니다.
+
+This project utilizes the AIT Log Data Set V2.0 (AIT-LDSv2) provided by M. Landauer et al. (AIT Austrian Institute of Technology), licensed under CC BY-NC-SA 4.0 (https://doi.org/10.5281/zenodo.5789064), for non-commercial evaluation only. 인용과 측정 결과는 `docs/공개데이터셋_독립측정.md`를 보세요.
+
 ## CTF 로그로 탐지 성능 재기
 
 동아리 CTF 등 허가된 환경에서 나온 로그로 판정 성능을 재는 방법은 `docs/CTF_로그_수집_가이드.md`를 보세요.

@@ -246,281 +246,241 @@
       "ref": "intranet.smith.russellmitchell.com-access.log.1:225",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:28:21 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:226",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:28:56 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5533 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:227",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:28:56 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:228",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:29:17 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:229",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:29:54 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5545 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:230",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:29:54 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:233",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:34:05 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:234",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:34:37 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5505 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:235",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:34:37 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:236",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:35:32 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5673 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:237",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:11:35:32 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:497",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:47:06 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 8192 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:498",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:47:07 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:499",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:47:38 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:500",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:48:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5699 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:501",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:48:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:530",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:55:40 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5691 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:531",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:55:40 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:532",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:56:06 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1187 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:533",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:56:46 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5527 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:534",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [24/Jan/2022:16:56:46 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:583",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:22:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5783 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:584",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:22:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:585",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:23:07 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5682 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:586",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:23:07 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:587",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:24:11 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5745 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:588",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:24:11 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:592",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:31:38 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:593",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:31:45 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1238 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:594",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:32:18 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5684 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.1:595",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:19:32:18 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:285",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [22/Jan/2022:10:32:02 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 7942 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:286",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [22/Jan/2022:10:32:02 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:287",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [22/Jan/2022:10:32:34 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:288",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [22/Jan/2022:10:33:10 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5511 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:289",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [22/Jan/2022:10:33:10 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:312",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [22/Jan/2022:10:39:16 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:313",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [22/Jan/2022:10:39:22 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:315",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "172.19.131.174 - - [22/Jan/2022:10:39:55 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+      ]
      },
      {
       "ref": "intranet.smith.russellmitchell.com-access.log.3:316",
       "rules": [
        "WEBLOG_AUTH_BRUTE"
-      ],
-      "raw": "10.143.3.65 - - [22/Jan/2022:10:40:01 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5575 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+      ]
      }
     ],
     "fn_examples": [
@@ -972,282 +932,242 @@
       "ref": "cloud.smith.russellmitchell.com-access.log.1:1643",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:11:47:07 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:1645",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:11:47:07 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?c=1914e1111f0eb734a75f6a5e9baea2be&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2308 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:1659",
       "rules": [
        "WEBLOG_LARGE_EXFIL",
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:11:50:43 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?x=466&y=263&a=1&mode=cover&c=ee470805ffe46f4505ef9de31fcc4ad0&forceIcon=0&preview=1 HTTP/1.1\" 200 58451 \"-\" \"Mozilla/5.0 (X11; Ubuntu; "
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2178",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:13:02:33 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?c=c69739518e6c978f534f2c929be484bc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2758 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2196",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:13:07:38 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Portugal.jpg?c=2f1c1149ae4e255fec14843d64868878&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1732 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2197",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:13:07:38 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Teotihuacan.jpg?c=8e4a56d36dab434efacfaa24d2720d6c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2310 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2739",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:39:42 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2741",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:39:42 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?c=1914e1111f0eb734a75f6a5e9baea2be&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2308 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2774",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_mit_claim_RGB__002_.png?c=da5e352ed49e496fbf294dff402900cc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1718 \"-\" \"Mozilla/5.0 (X11; Ubuntu; L"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2775",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_ohne_claim_RGB__002_.png?c=6b0dd5740844e69212ed8d264a5cd8c9&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1348 \"-\" \"Mozilla/5.0 (X11; Ubuntu; "
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2776",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_1.jpg?c=6c658073ca342b50876441e89b3ab02e&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1587 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2777",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_2.jpg?c=e0f0cacdd785c5b73277411f2d77d76c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1612 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2778",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_1.jpg?c=96b8f09fd7e010012dceaac084f3492f&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1584 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2779",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_2.jpg?c=841c855b9a0125b8d8c536397c6c6a96&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1615 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2780",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_1.jpg?c=99472eba48af6b2774d0a0e65eaf30ef&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1588 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2781",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_2.jpg?c=78bd8faa7c6a2f665e45f13a51cfea75&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1616 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2782",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_1.jpg?c=354c3277790d7e67c2bc1d4ec8fcc0cf&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1575 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2784",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_2.jpg?c=962ff23b88754f40bb0a21bf5499fdbd&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1596 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2825",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:14:20:03 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:2840",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:14:23:43 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?x=466&y=263&a=1&mode=cover&c=1914e1111f0eb734a75f6a5e9baea2be&forceIcon=0&preview=1 HTTP/1.1\" 200 32002 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux "
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:287",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:08:09:09 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Portugal.jpg?c=2f1c1149ae4e255fec14843d64868878&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1732 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:288",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:08:09:09 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Teotihuacan.jpg?c=8e4a56d36dab434efacfaa24d2720d6c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1734 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3051",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:15:02:59 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Teotihuacan.jpg?c=8e4a56d36dab434efacfaa24d2720d6c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1734 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3069",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:15:07:41 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?c=c69739518e6c978f534f2c929be484bc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2182 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3078",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:15:08:11 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?x=75&y=75&c=c69739518e6c978f534f2c929be484bc&forceIcon=0&preview=1 HTTP/1.1\" 200 5746 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:313",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:08:15:48 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?c=c69739518e6c978f534f2c929be484bc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2182 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3317",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_mit_claim_RGB__002_.png?c=da5e352ed49e496fbf294dff402900cc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1718 \"-\" \"Mozilla/5.0 (X11; Ubuntu; L"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3318",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_ohne_claim_RGB__002_.png?c=6b0dd5740844e69212ed8d264a5cd8c9&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1348 \"-\" \"Mozilla/5.0 (X11; Ubuntu; "
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3319",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_1.jpg?c=6c658073ca342b50876441e89b3ab02e&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1587 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3320",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_2.jpg?c=e0f0cacdd785c5b73277411f2d77d76c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1612 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3321",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_2.jpg?c=78bd8faa7c6a2f665e45f13a51cfea75&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1616 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3324",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_1.jpg?c=96b8f09fd7e010012dceaac084f3492f&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2160 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3325",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_2.jpg?c=841c855b9a0125b8d8c536397c6c6a96&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2191 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3326",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_1.jpg?c=99472eba48af6b2774d0a0e65eaf30ef&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2164 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3327",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_1.jpg?c=354c3277790d7e67c2bc1d4ec8fcc0cf&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2151 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:3329",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_2.jpg?c=962ff23b88754f40bb0a21bf5499fdbd&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1596 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:5334",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:21:02:57 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:5337",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:21:02:57 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?c=1914e1111f0eb734a75f6a5e9baea2be&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2308 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:5446",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.3.65 - - [24/Jan/2022:21:07:00 +0000] \"GET /remote.php/dav/files/rblake/Documents/movie.png?c=7715df51d9f71fa099cd4fd39c5c1ee5&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1751 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+      ]
      },
      {
       "ref": "cloud.smith.russellmitchell.com-access.log.1:624",
       "rules": [
        "WEBLOG_WEBSHELL_ACCESS"
-      ],
-      "raw": "10.143.2.25 - - [24/Jan/2022:09:08:35 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Portugal.jpg?c=2f1c1149ae4e255fec14843d64868878&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1732 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+      ]
      }
     ],
     "fn_examples": []

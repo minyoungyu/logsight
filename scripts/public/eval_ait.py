@@ -110,8 +110,8 @@ def line_level(profile: SiteProfile, labels: dict[str, list[str]]) -> dict:
         "steps": steps,
         "fp_by_rule": dict(fp_rules.most_common()), "fp_by_ip": dict(fp_ips.most_common()),
         "tp_by_rule": dict(Counter(x for r in tp for x in flagged[r]).most_common()),
-        "fp_examples": [{"ref": r, "rules": sorted(flagged[r]),
-                         "raw": ev_by_ref[r].extra.get("raw", "")[:240]} for r in sorted(fp)[:40]],
+        # 원본 로그 줄은 결과에 옮기지 않는다(데이터셋 재배포 방지). 파일:줄 위치만 남긴다.
+        "fp_examples": [{"ref": r, "rules": sorted(flagged[r])} for r in sorted(fp)[:40]],
         "fn_examples": [{"ref": r, "labels": labels[r]} for r in sorted(fn)[:20]],
     }
 
