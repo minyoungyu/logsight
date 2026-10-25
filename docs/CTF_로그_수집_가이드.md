@@ -86,7 +86,16 @@ python -m logsight scan --profile data/ctf-2026-10/profile.json --no-ai --out da
 ```
 
 - `--no-ai`로 규칙만 돌려야 측정이 재현된다. AI 호출은 결과가 바뀔 수 있다.
-- 보고서의 탐지 IP를 정답의 `attacker_ip`와 맞춰 재현율과 오탐을 센다. 측정 스크립트는 `lab/evaluate.py`와 같은 방식으로 만들 예정이다.
+- 정답과 대조해 재현율·정밀도·오탐률·F1을 낸다:
+
+```bash
+python scripts/ctf_evaluate.py --profile data/ctf-2026-10/profile.json \
+    --truth data/ctf-2026-10/ground_truth.json --out data/ctf-2026-10/eval.json
+```
+
+- `detectable: false` 항목은 재현율 계산에서 뺀다(사각지대로만 표시).
+- 정답 파일 형식이 틀리면 어느 항목의 무엇을 고칠지 알려 준다.
+- 정상 트래픽은 **로그에 실제로 나오는 IP**로 적는다. 로그에 없는 IP는 아무것도 탐지하지 않아서 오탐률이 0으로 나와 버린다.
 
 ## 5. 측정 전 확인 체크리스트
 
