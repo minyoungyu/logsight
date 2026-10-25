@@ -1,0 +1,1475 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "ait",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS ait/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/ait/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/ait/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/ait/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "intranet.smith.russellmitchell.com",
+     "other_vhosts_access.log"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.1",
+      "kind": "access",
+      "events": 601
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+      "kind": "access",
+      "events": 8530
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.3",
+      "kind": "access",
+      "events": 933
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.4",
+      "kind": "access",
+      "events": 1120
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+      "kind": "weberror",
+      "events": 36
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 2
+     }
+    ],
+    "lines": 15708,
+    "parsed_lines": 11238,
+    "attack_lines": 7739,
+    "tp": 7639,
+    "fn": 100,
+    "fp": 142,
+    "tn": 7827,
+    "recall": 0.9870784339061894,
+    "precision": 0.9817504176841023,
+    "false_positive_rate": 0.01781904881415485,
+    "f1": 0.9844072164948453,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 4485,
+      "flagged": 4447,
+      "line_recall": 0.9915273132664437,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 4485
+     },
+     "wpscan": {
+      "lines": 3199,
+      "flagged": 3186,
+      "line_recall": 0.9959362300718975,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 3199
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 32,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 32
+     },
+     "attacker_change_user": {
+      "lines": 4,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 0
+     },
+     "escalated_command": {
+      "lines": 5,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 2
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_AUTH_BRUTE": 142
+    },
+    "fp_by_ip": {
+     "172.19.131.174": 109,
+     "10.143.3.65": 33
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 7619,
+     "WEBLOG_SCANNER": 3192,
+     "WEBLOG_SENSITIVE_FILE": 3
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:225",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:28:21 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:226",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:28:56 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5533 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:227",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:28:56 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:228",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:29:17 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:229",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:29:54 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5545 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:230",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:29:54 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:233",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:34:05 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:234",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:34:37 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5505 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:235",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:34:37 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:236",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:35:32 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5673 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:237",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:11:35:32 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:497",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:47:06 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 8192 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:498",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:47:07 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:499",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:47:38 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:500",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:48:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5699 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:501",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:48:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:530",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:55:40 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5691 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:531",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:55:40 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:532",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:56:06 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1187 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:533",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:56:46 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5527 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:534",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [24/Jan/2022:16:56:46 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:583",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:22:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5783 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:584",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:22:19 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:585",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:23:07 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5682 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:586",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:23:07 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:587",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:24:11 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5745 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:588",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:24:11 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:592",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:31:38 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1237 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:593",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:31:45 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1238 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:594",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:32:18 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5684 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.1:595",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:19:32:18 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:285",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [22/Jan/2022:10:32:02 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 7942 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:286",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [22/Jan/2022:10:32:02 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:287",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [22/Jan/2022:10:32:34 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:288",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [22/Jan/2022:10:33:10 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5511 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:289",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [22/Jan/2022:10:33:10 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 549 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0.4"
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:312",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [22/Jan/2022:10:39:16 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:313",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [22/Jan/2022:10:39:22 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:315",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "172.19.131.174 - - [22/Jan/2022:10:39:55 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 1239 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/97.0."
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.3:316",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ],
+      "raw": "10.143.3.65 - - [22/Jan/2022:10:40:01 +0000] \"POST /wp-admin/admin-ajax.php HTTP/1.1\" 200 5575 \"https://intranet.smith.russellmitchell.com/?p=5\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0\""
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:145",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:146",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:147",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:148",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:149",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:150",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:151",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:152",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:2811",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:2931",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:3065",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:4036",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:4318",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5182",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5192",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5198",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5262",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:832",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:835",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:840",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "service_scan"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 5,
+     "truth_attack_ips": 1,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 0
+    },
+    "recall": 1.0,
+    "precision": 0.5,
+    "false_positive_rate": 0.2,
+    "f1": 0.6666666666666666,
+    "missed": [],
+    "false_positives": [
+     "10.143.3.65"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.19.131.174",
+      "malicious": true
+     },
+     {
+      "ip": "10.143.2.25",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.2.4",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.2.91",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.3.65",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "suspicious"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS ait/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/ait/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/ait/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/ait/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.smith.russellmitchell.com",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "mail.smith.russellmitchell.com",
+     "other_vhosts_access.log"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.1",
+      "kind": "access",
+      "events": 5515
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.2",
+      "kind": "access",
+      "events": 6869
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.3",
+      "kind": "access",
+      "events": 7541
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.4",
+      "kind": "access",
+      "events": 7366
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.1",
+      "kind": "access",
+      "events": 9488
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.2",
+      "kind": "access",
+      "events": 8783
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.3",
+      "kind": "access",
+      "events": 8025
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.4",
+      "kind": "access",
+      "events": 8215
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 772
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 818
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 653
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 608
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 25
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 65290,
+    "parsed_lines": 64690,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 129,
+    "tn": 65161,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.001975800275693062,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_WEBSHELL_ACCESS": 117,
+     "WEBLOG_SCANNER": 12,
+     "WEBLOG_LARGE_EXFIL": 5
+    },
+    "fp_by_ip": {
+     "10.143.3.65": 72,
+     "10.143.2.25": 45,
+     "192.168.230.122": 6,
+     "172.19.131.174": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:1643",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:11:47:07 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:1645",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:11:47:07 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?c=1914e1111f0eb734a75f6a5e9baea2be&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2308 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:1659",
+      "rules": [
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:11:50:43 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?x=466&y=263&a=1&mode=cover&c=ee470805ffe46f4505ef9de31fcc4ad0&forceIcon=0&preview=1 HTTP/1.1\" 200 58451 \"-\" \"Mozilla/5.0 (X11; Ubuntu; "
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2178",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:13:02:33 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?c=c69739518e6c978f534f2c929be484bc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2758 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2196",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:13:07:38 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Portugal.jpg?c=2f1c1149ae4e255fec14843d64868878&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1732 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2197",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:13:07:38 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Teotihuacan.jpg?c=8e4a56d36dab434efacfaa24d2720d6c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2310 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2739",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:39:42 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2741",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:39:42 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?c=1914e1111f0eb734a75f6a5e9baea2be&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2308 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2774",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_mit_claim_RGB__002_.png?c=da5e352ed49e496fbf294dff402900cc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1718 \"-\" \"Mozilla/5.0 (X11; Ubuntu; L"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2775",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_ohne_claim_RGB__002_.png?c=6b0dd5740844e69212ed8d264a5cd8c9&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1348 \"-\" \"Mozilla/5.0 (X11; Ubuntu; "
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2776",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_1.jpg?c=6c658073ca342b50876441e89b3ab02e&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1587 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2777",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_2.jpg?c=e0f0cacdd785c5b73277411f2d77d76c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1612 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2778",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_1.jpg?c=96b8f09fd7e010012dceaac084f3492f&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1584 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2779",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_2.jpg?c=841c855b9a0125b8d8c536397c6c6a96&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1615 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2780",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_1.jpg?c=99472eba48af6b2774d0a0e65eaf30ef&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1588 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2781",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_2.jpg?c=78bd8faa7c6a2f665e45f13a51cfea75&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1616 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2782",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_1.jpg?c=354c3277790d7e67c2bc1d4ec8fcc0cf&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1575 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2784",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:13:49:25 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_2.jpg?c=962ff23b88754f40bb0a21bf5499fdbd&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1596 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2825",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:14:20:03 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:2840",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:14:23:43 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?x=466&y=263&a=1&mode=cover&c=1914e1111f0eb734a75f6a5e9baea2be&forceIcon=0&preview=1 HTTP/1.1\" 200 32002 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux "
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:287",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:08:09:09 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Portugal.jpg?c=2f1c1149ae4e255fec14843d64868878&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1732 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:288",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:08:09:09 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Teotihuacan.jpg?c=8e4a56d36dab434efacfaa24d2720d6c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1734 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3051",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:15:02:59 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Teotihuacan.jpg?c=8e4a56d36dab434efacfaa24d2720d6c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1734 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3069",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:15:07:41 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?c=c69739518e6c978f534f2c929be484bc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2182 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3078",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:15:08:11 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?x=75&y=75&c=c69739518e6c978f534f2c929be484bc&forceIcon=0&preview=1 HTTP/1.1\" 200 5746 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:313",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:08:15:48 +0000] \"GET /remote.php/dav/files/tstevenson/Documents/world.txt?c=c69739518e6c978f534f2c929be484bc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2182 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3317",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_mit_claim_RGB__002_.png?c=da5e352ed49e496fbf294dff402900cc&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1718 \"-\" \"Mozilla/5.0 (X11; Ubuntu; L"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3318",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Logo_ohne_claim_RGB__002_.png?c=6b0dd5740844e69212ed8d264a5cd8c9&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1348 \"-\" \"Mozilla/5.0 (X11; Ubuntu; "
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3319",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_1.jpg?c=6c658073ca342b50876441e89b3ab02e&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1587 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3320",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1280x720_2.jpg?c=e0f0cacdd785c5b73277411f2d77d76c&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1612 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3321",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_2.jpg?c=78bd8faa7c6a2f665e45f13a51cfea75&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1616 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3324",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_1.jpg?c=96b8f09fd7e010012dceaac084f3492f&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2160 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3325",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1600x900_2.jpg?c=841c855b9a0125b8d8c536397c6c6a96&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2191 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3326",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1080_1.jpg?c=99472eba48af6b2774d0a0e65eaf30ef&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2164 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3327",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_1.jpg?c=354c3277790d7e67c2bc1d4ec8fcc0cf&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2151 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:3329",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:15:17:59 +0000] \"GET /remote.php/dav/files/rblake/Marketing/AIT_Wallpaper_1920x1200_2.jpg?c=962ff23b88754f40bb0a21bf5499fdbd&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1596 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linu"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:5334",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:21:02:57 +0000] \"GET /remote.php/dav/files/rblake/Photos/Lake-Constance.jpg?c=ee470805ffe46f4505ef9de31fcc4ad0&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1762 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:8"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:5337",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:21:02:57 +0000] \"GET /remote.php/dav/files/rblake/Photos/Portugal.jpg?c=1914e1111f0eb734a75f6a5e9baea2be&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 2308 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:5446",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.3.65 - - [24/Jan/2022:21:07:00 +0000] \"GET /remote.php/dav/files/rblake/Documents/movie.png?c=7715df51d9f71fa099cd4fd39c5c1ee5&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1751 \"-\" \"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) G"
+     },
+     {
+      "ref": "cloud.smith.russellmitchell.com-access.log.1:624",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "raw": "10.143.2.25 - - [24/Jan/2022:09:08:35 +0000] \"GET /remote.php/dav/files/tstevenson/Photos/Portugal.jpg?c=2f1c1149ae4e255fec14843d64868878&x=32&y=32&forceIcon=0&preview=1 HTTP/1.1\" 200 1732 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53"
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 6,
+     "truth_attack_ips": 0,
+     "flagged_ips": 4,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.6666666666666666,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "10.143.2.25",
+     "10.143.3.65",
+     "172.19.131.174",
+     "192.168.230.122"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.143.2.25",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.2.91",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.3.65",
+      "malicious": false
+     },
+     {
+      "ip": "172.19.131.174",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.230.122",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS ait/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/ait/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/ait/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/ait/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "other_vhosts_access.log",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 29795,
+    "parsed_lines": 9,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "tn": 29795,
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {},
+    "fp_by_ip": {},
+    "tp_by_rule": {},
+    "fp_examples": [],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 0,
+     "truth_attack_ips": 0,
+     "flagged_ips": 0,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": null,
+    "f1": null,
+    "missed": [],
+    "false_positives": [],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [],
+    "overall_verdict": "no_evidence"
+   }
+  }
+ }
+}
