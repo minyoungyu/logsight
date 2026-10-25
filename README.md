@@ -74,3 +74,11 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
     reports/demo/    샘플 분석 결과(HTML, JSON, 화면 캡처)
     docs/            중간보고서용 구현 요약
     .github/workflows/test.yml  Windows·macOS·Linux 자동 테스트(저장소에 올리면 동작)
+
+## 라이선스
+
+MIT 라이선스. 자세한 내용은 `LICENSE` 파일을 보세요. 변경 기록은 `CHANGELOG.md`에 있습니다.
+
+## CTF 로그로 탐지 성능 재기
+
+동아리 CTF 등 허가된 환경에서 나온 로그로 판정 성능을 재는 방법은 `docs/CTF_로그_수집_가이드.md`를 보세요.

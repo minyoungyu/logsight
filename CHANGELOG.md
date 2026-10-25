@@ -2,7 +2,7 @@
 
 이 프로젝트는 [SemVer](https://semver.org/lang/ko/)를 따른다. 버전 번호는 변경 내용이 정한다.
 
-## Unreleased (제안: 0.3.0, MINOR)
+## 0.3.0
 
 ### 추가
 - 웹서버 침해 판단 엔진(`logsight scan`): nginx·Apache 접속·오류 로그와 인증 로그, 웹 루트 파일 점검.
@@ -15,9 +15,15 @@
 ### 변경
 - 없음. 기존 AWS 로그 분석(`logsight analyze`)의 출력은 웹 모듈 추가 전과 같음을 회귀 테스트로 확인했다(`tests/test_regression.py`).
 
+### 수정
+- 없음.
+
+### 제거
+- 없음.
+
 ### 호환성 주의
 - 없음. 새 명령과 새 API만 추가되었고 기존 명령·출력 형식은 그대로다.
 
-## 0.2.0
+## 0.2.0 (태그 `v0.2.0`)
 
 - AWS 로그 분석(CloudTrail, VPC Flow Logs, WAF, ALB, SSH 인증 로그), 규칙 탐지, 사건 묶기, 설정 점검, 보고서.
