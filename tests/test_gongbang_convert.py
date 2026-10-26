@@ -44,3 +44,13 @@ def test_convert_and_pseudonymize(tmp_path):
     assert ct[1].ts.isoformat() == "2026-10-11T06:36:22+00:00"  # KST → UTC
     mapping = json.loads((out / "mapping.json").read_text())
     assert mapping["ip"]["203.0.113.9"] == ct[1].src_ip
+
+
+def test_pseudonyms_keep_slash24(tmp_path):
+    from convert_gongbang import Pseudo
+    ps = Pseudo()
+    a, b, c = ps.ip_of("203.0.113.9"), ps.ip_of("198.51.100.7"), ps.ip_of("203.0.113.200")
+    assert a.rsplit(".", 1)[0] == c.rsplit(".", 1)[0] != b.rsplit(".", 1)[0]  # 같은 /24는 같은 가명 대역
+    assert a != c and ps.ip_of("203.0.113.9") == a
+    assert all(x.startswith("198.18.") for x in (a, b, c))
+    assert "113" not in a and ".9" not in a.rsplit(".", 1)[1:]  # 실제 대역·호스트 번호는 남기지 않는다

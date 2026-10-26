@@ -9,6 +9,9 @@
 
 가명 처리(같은 값은 항상 같은 가명)
   공인 IP → 198.18.0.0/15, IPv6 → 2001:db8::/32, 계정 ID → 111122223333,
+  IP는 대역 관계를 남긴다. 실제로 같은 /24(IPv6는 /64)에 있던 주소는 가명도 같은 /24에 둔다.
+  실제 대역 번호와 호스트 번호는 드러나지 않는다(나타난 순서대로 번호를 매긴다).
+  대역이 같다는 사실은 같은 공격자의 다른 IP를 잇는 근거가 되므로 지우지 않는다.
   액세스 키 → ASIA + 해시 16자. 사설 IP와 AWS 서비스 이름은 그대로 둔다.
   대응표(mapping.json)는 출력 폴더에만 쓰고 저장소에는 올리지 않는다.
 
@@ -40,6 +43,8 @@ APIGW_RE = re.compile(r"^(\S+) (\S+) · status (\d{3}) \((\d+)B\)$")
 class Pseudo:
     def __init__(self, fake_account: str = "111122223333"):
         self.ip: dict[str, str] = {}
+        self.prefix: dict = {}   # 실제 /24(/64) → 가명 대역 번호
+        self.hosts: dict = {}    # 실제 /24(/64) → 지금까지 나온 호스트 수
         self.key: dict[str, str] = {}
         self.account: dict[str, str] = {}
         self.fake_account = fake_account
@@ -52,11 +57,18 @@ class Pseudo:
         if any(addr in n for n in KEEP_NETS if n.version == addr.version):
             return s
         if s not in self.ip:
-            n = len(self.ip) + 1
             if addr.version == 4:
-                self.ip[s] = str(ipaddress.ip_address(int(ipaddress.ip_address("198.18.0.0")) + n))
+                net = ipaddress.ip_network(f"{s}/24", strict=False)
+                p = self.prefix.setdefault(net, len(self.prefix))
+                h = self.hosts[net] = self.hosts.get(net, 0) + 1
+                if p >= 512 or h > 254:
+                    raise ValueError("가명 대역(198.18.0.0/15)이 모자란다")
+                self.ip[s] = str(ipaddress.ip_address(int(ipaddress.ip_address("198.18.0.0")) + p * 256 + h))
             else:
-                self.ip[s] = f"2001:db8::{n:x}"
+                net = ipaddress.ip_network(f"{s}/64", strict=False)
+                p = self.prefix.setdefault(net, len(self.prefix))
+                h = self.hosts[net] = self.hosts.get(net, 0) + 1
+                self.ip[s] = f"2001:db8:0:{p:x}::{h:x}"
         return self.ip[s]
 
     def key_of(self, s: str) -> str:

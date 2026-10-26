@@ -89,3 +89,41 @@ def test_pipeline_uses_triage_order(monkeypatch):
     assert [i["id"] for i in out["incident_index"]] == [ids[1], ids[0]]
     assert out["incident_index"][0]["ai_verdict"] == "attack"
     assert out["results"][0]["incident"]["id"] == ids[1]
+
+
+def _alb(ip, path, status, sec):
+    t0 = datetime(2026, 10, 11, 5, 40, tzinfo=timezone.utc)
+    return Event(ts=t0 + timedelta(seconds=sec), source="alb", src_ip=ip,
+                 action=f"GET https://api:443{path}", outcome="failure",
+                 raw_ref=f"alb:{sec}", extra={"elb_status": status})
+
+
+def test_object_enum_on_api_logs():
+    from logsight.detect import run_detections
+    probe = [_alb("198.18.7.2", f"/api/jobs/job-{n}/download", s, i * 20)
+             for i, (n, s) in enumerate([(58152, "403"), (58143, "403"), (0, "404"),
+                                          (1, "404"), (5000, "404")])]
+    # 같은 번호를 다시 여는 것, 객체 번호 없는 경로의 404는 세지 않는다
+    normal = [_alb("198.18.9.9", "/api/jobs/job-7/download", "404", i * 20) for i in range(6)]
+    normal += [_alb("198.18.9.8", f"/static/x{i}.js", "404", i * 20) for i in range(6)]
+    fs = run_detections(probe + normal)
+    hits = [f for f in fs if f.rule == "WEB_OBJECT_ENUM"]
+    assert len(hits) == 1 and hits[0].key == "198.18.7.2" and len(hits[0].events) == 5
+
+
+def test_coverage_summary_lists_suspected_key_calls():
+    t0 = datetime(2026, 10, 11, 6, 0, tzinfo=timezone.utc)
+    ct = [Event(ts=t0 + timedelta(minutes=i), source="cloudtrail", src_ip=ip, actor="r",
+                access_key="ASIAKEY", action="states:StartExecution", outcome="success",
+                raw_ref=f"ct:{i}", findings=["CT_INSTANCE_CRED_MULTI_IP"] if i else [])
+          for i, ip in enumerate(["198.18.0.1", "198.18.7.1", "198.18.7.1"])]
+    ct.append(Event(ts=t0, source="cloudtrail", src_ip="198.18.0.2", actor="b", access_key="ASIAOTHER",
+                    action="s3:GetObject", outcome="success", raw_ref="ct:9",
+                    findings=["CT_DISCOVERY_BURST"]))
+    c = T.coverage_summary(ct)
+    assert c["missing_sources"] == ["vpcflow", "waf", "alb", "sshauth"]
+    assert c["cloudtrail_s3_object_calls"] == 1
+    assert [k["access_key"] for k in c["suspected_keys"]] == ["ASIAKEY"]  # 자격증명 규칙에 걸린 키만
+    k = c["suspected_keys"][0]
+    assert k["n_calls"] == 3 and k["src_ips"] == ["198.18.0.1", "198.18.7.1"]  # 사건 밖 호출까지 센다
+    assert T.build_triage_payload([_inc("INC-001", ["ct:1"])], coverage=c)["coverage"] is c

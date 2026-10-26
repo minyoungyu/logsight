@@ -29,7 +29,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     incidents = build_incidents(events, findings, window_min=window_min)
     t_detect = time.time() - t0
     # AI 재검토: 공격으로 보이는 사건을 위로 올린다(키가 없으면 규칙 순서 그대로)
-    tri = triage(incidents, model=model, use_ai=use_ai)
+    tri = triage(incidents, model=model, use_ai=use_ai, events=events)
     incidents = reorder(incidents, tri)
     results = []
     for inc in incidents[:top]:

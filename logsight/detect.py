@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass
 from functools import lru_cache
 from datetime import timedelta
-from urllib.parse import unquote_plus
+from urllib.parse import unquote_plus, urlsplit
 
 from .normalize import Event
 
@@ -39,6 +39,7 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
     "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
+    "WEB_OBJECT_ENUM":    ("T1530", "collection", "남의 객체 번호를 바꿔 가며 접근 시도(IDOR 탐색)", "medium"),
     # --- 웹서버 로그·파일 기반 규칙(logsight.web) ---
     "WEBLOG_SQLI":        ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "high"),
     "WEBLOG_TRAVERSAL":   ("T1190", "initial-access", "경로 조작·파일 열람(../, 민감 파일) 시도", "high"),
@@ -166,6 +167,20 @@ def _bursts(evs: list[Event], window: timedelta, min_count: int, key=lambda e: e
             else:
                 out.append((start, end))
     return [evs[a:b + 1] for a, b in out]
+
+
+_HAS_DIGIT = re.compile(r"\d")
+
+
+def _route(action: str) -> str | None:
+    """"GET https://host/api/jobs/job-58152/download" → "GET /api/jobs/{id}/download".
+    숫자가 든 경로 조각을 객체 번호로 본다. 확장자가 있는 조각(app.v2.js 같은 정적 파일)은 빼고,
+    객체 번호가 없는 경로는 None."""
+    method, _, url = action.partition(" ")
+    path = urlsplit(url).path if "://" in url else url.split("?", 1)[0]
+    segs = path.split("/")
+    route = ["{id}" if _HAS_DIGIT.search(s) and "." not in s else s for s in segs]
+    return f"{method} {'/'.join(route)}" if route != segs else None
 
 
 def _ip_in(ip: str, cidrs: list[str]) -> bool:
@@ -314,6 +329,21 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                 if len(prior) >= 2:
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
+
+    # --- ALB·API Gateway: 같은 IP가 같은 API에서 객체 번호만 바꿔 가며 403/404를 연달아 받음.
+    # 남의 객체(작업·주문·파일)를 열어 보려는 IDOR 탐색이다. 웹서버 로그의 WEBLOG_IDOR_ENUM과 달리
+    # 경로 이름에 기대지 않고, 권한 거부·없음 응답이 서로 다른 번호에 몰리는지만 본다.
+    probes: dict[tuple[str, str], list[Event]] = defaultdict(list)
+    for e in events:
+        if e.source == "alb" and e.action and e.extra.get("elb_status") in ("403", "404"):
+            r = _route(e.action)
+            if r:
+                probes[(e.src_ip or "?", r)].append(e)
+    for (ip, r), evs in probes.items():
+        for seg in _bursts(evs, timedelta(minutes=10), 5, key=lambda e: e.action):
+            findings.append(Finding("WEB_OBJECT_ENUM", seg,
+                                    f"10분 안에 {r} 객체 {len({e.action for e in seg})}개에 "
+                                    f"403/404 {len(seg)}건", ip))
 
     # --- 웹 요청(WAF·ALB)의 SQL 인젝션 패턴 — WAF가 놓친 경우에도 잡기 위한 보조 규칙
     web: dict[str, list[Event]] = defaultdict(list)

@@ -12,18 +12,18 @@
   "n_benign_events": 10211
  },
  "event_level": {
-  "attacker_flagged": 100,
-  "attacker_missed": 466,
-  "recall": 0.177,
+  "attacker_flagged": 116,
+  "attacker_missed": 450,
+  "recall": 0.205,
   "benign_flagged": 600,
-  "attacker_flagged_unique": 97,
+  "attacker_flagged_unique": 113,
   "benign_flagged_unique": 561,
   "benign_flagged_unique_by_category": {
    "블루팀 대응 작업": 420,
    "서비스 역할(정상 운영)": 13,
    "루트 계정 사용": 128
   },
-  "precision": 0.143,
+  "precision": 0.162,
   "benign_flagged_by_category": {
    "블루팀 대응 작업": 434,
    "서비스 역할(정상 운영)": 13,
@@ -36,6 +36,7 @@
    "CT_LOGGING_TAMPER": 3
   },
   "attacker_flagged_by_rule": {
+   "WEB_OBJECT_ENUM": 16,
    "CT_INSTANCE_CRED_MULTI_IP": 13,
    "WAF_BLOCKED": 87
   }
@@ -257,18 +258,21 @@
    },
    {
     "id": "INC-007",
-    "severity": "low",
+    "severity": "medium",
     "stages": [
-     "initial-access"
+     "initial-access",
+     "collection"
     ],
-    "start": "2026-10-11T06:14:24+00:00",
+    "start": "2026-10-11T05:40:24+00:00",
     "end": "2026-10-11T06:24:51+00:00",
-    "n_events": 26,
-    "n_attacker_events": 26,
+    "n_events": 42,
+    "n_attacker_events": 42,
     "rules": [
-     "WAF_BLOCKED"
+     "WAF_BLOCKED",
+     "WEB_OBJECT_ENUM"
     ],
     "sources": [
+     "alb",
      "waf"
     ]
    }
@@ -383,18 +387,21 @@
    },
    {
     "id": "INC-007",
-    "severity": "low",
+    "severity": "medium",
     "stages": [
-     "initial-access"
+     "initial-access",
+     "collection"
     ],
-    "start": "2026-10-11T06:14:24+00:00",
+    "start": "2026-10-11T05:40:24+00:00",
     "end": "2026-10-11T06:24:51+00:00",
-    "n_events": 26,
-    "n_attacker_events": 26,
+    "n_events": 42,
+    "n_attacker_events": 42,
     "rules": [
-     "WAF_BLOCKED"
+     "WAF_BLOCKED",
+     "WEB_OBJECT_ENUM"
     ],
     "sources": [
+     "alb",
      "waf"
     ]
    }
@@ -405,6 +412,7 @@
   "CT_ROOT_USAGE": 6,
   "CT_LOGGING_TAMPER": 2,
   "CT_DISCOVERY_BURST": 7,
+  "WEB_OBJECT_ENUM": 2,
   "WAF_BLOCKED": 2
  }
 }

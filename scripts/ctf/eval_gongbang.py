@@ -160,7 +160,7 @@ def evaluate(data: Path, gt: dict, use_ai: bool = False, model: str | None = Non
                          "rules": sorted({f["rule"] for f in inc["findings"]}),
                          "sources": inc["sources"]})
     att_incs = [r for r in inc_rows if r["n_attacker_events"]]
-    tri = triage(incidents, model=model) if use_ai else None
+    tri = triage(incidents, model=model, events=events) if use_ai else None
 
     return {
         "data": {"n_events": len(events), "n_events_unique": uniq(events),

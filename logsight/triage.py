@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from collections import Counter, defaultdict
 
 TRIAGE_MODEL = os.environ.get("LOGSIGHT_TRIAGE_MODEL", "claude-opus-5-5")
 FALLBACK_MODELS = {"claude-opus-5-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5-5"}
@@ -79,7 +80,9 @@ SYSTEM = (
     "적는다(같은 IP, 같은 키, 같은 인스턴스, 같은 대역과 시간 연속성 등). 공격 사건이 하나뿐이면 "
     "그 하나로 campaign을 만든다. 정상 활동 사건은 넣지 않는다.\n"
     "3. 이 로그만으로는 알 수 없는 것(예: 키가 어떻게 유출됐는지, 로그가 끊긴 뒤의 일)을 "
-    "cannot_tell에 적는다.\n"
+    "cannot_tell에 적는다. coverage에는 입력 로그의 종류·기간과, 탈취가 의심되는 키의 전체 사용 "
+    "내역이 있다. 공격 흐름상 있을 법한 단계(공격자의 정찰, 데이터 읽기·반출 등)가 이 로그에 "
+    "남을 수 없거나 남아 있지 않으면, 없었다고 단정하지 말고 무엇이 왜 보이지 않는지 적는다.\n"
     "규칙: 입력에 없는 사실을 만들지 않는다. evidence에는 입력 events의 ref만 그대로 쓴다. "
     "IP 대역의 소유자는 입력에 적혀 있을 때만 근거로 쓰고, 그 밖에는 입력에 적힌 사실(주체 이름, "
     "호출 종류, 성공·실패, 시간)로 판단한다. 짧고 쉬운 한국어로 쓴다."
@@ -94,8 +97,42 @@ def _sample(events: list[dict], n: int) -> list[dict]:
     return [events[round(i * step)] for i in range(n)]
 
 
+EXPECTED_SOURCES = ("cloudtrail", "vpcflow", "waf", "alb", "sshauth")
+S3_OBJECT_CALLS = {"s3:GetObject", "s3:PutObject", "s3:CopyObject", "s3:DeleteObject",
+                   "s3:HeadObject"}
+
+
+def coverage_summary(events: list, max_keys: int = 10) -> dict:
+    """입력 로그가 무엇을 담고 무엇을 못 담는지 요약한다. AI가 '로그에 없음'과 '일어나지 않음'을
+    구별하게 하려는 것이다. 탈취가 의심되는 키(자격증명 규칙에 걸린 키)는 사건 밖의 호출까지
+    모두 센다. 규칙이 사건에 넣지 않은 정찰·조회 호출이 있는지 AI가 직접 보게 한다."""
+    by_src: dict[str, list] = defaultdict(list)
+    for e in events:
+        by_src[e.source].append(e.ts)
+    ct = [e for e in events if e.source == "cloudtrail"]
+    sus = Counter(e.access_key for e in ct if e.access_key and any(
+        r.startswith(("CT_INSTANCE_CRED", "CT_UNTRUSTED_IP")) for r in e.findings))
+    keys = []
+    for k, _ in sus.most_common(max_keys):
+        evs = [e for e in ct if e.access_key == k]
+        acts = Counter((e.action, e.outcome) for e in evs)
+        keys.append({
+            "access_key": k, "n_calls": len(evs),
+            "first": min(e.ts for e in evs).isoformat(), "last": max(e.ts for e in evs).isoformat(),
+            "src_ips": sorted({e.src_ip or "?" for e in evs})[:10],
+            "calls": [{"action": a, "outcome": o, "n": n} for (a, o), n in acts.most_common(20)],
+        })
+    return {
+        "sources": {s: {"n_events": len(ts), "first": min(ts).isoformat(), "last": max(ts).isoformat()}
+                    for s, ts in sorted(by_src.items())},
+        "missing_sources": [s for s in EXPECTED_SOURCES if s not in by_src],
+        "cloudtrail_s3_object_calls": sum(1 for e in ct if e.action in S3_OBJECT_CALLS),
+        "suspected_keys": keys,
+    }
+
+
 def build_triage_payload(incidents: list[dict], max_incidents: int = 30,
-                         events_per_incident: int = 12) -> dict:
+                         events_per_incident: int = 12, coverage: dict | None = None) -> dict:
     out = []
     for inc in incidents[:max_incidents]:
         out.append({
@@ -108,14 +145,19 @@ def build_triage_payload(incidents: list[dict], max_incidents: int = 30,
             "top_actions_nearby": inc.get("context", {}).get("top_actions", []),
             "events": _sample(inc["events"], events_per_incident),
         })
-    return {"incidents": out, "n_incidents_total": len(incidents)}
+    payload = {"incidents": out, "n_incidents_total": len(incidents)}
+    if coverage:
+        payload["coverage"] = coverage
+    return payload
 
 
-def triage(incidents: list[dict], model: str | None = None, use_ai: bool = True) -> dict | None:
-    """키가 없거나 AI를 끄면 None(규칙 순서 그대로). 실패해도 None과 오류를 돌려준다."""
+def triage(incidents: list[dict], model: str | None = None, use_ai: bool = True,
+           events: list | None = None) -> dict | None:
+    """키가 없거나 AI를 끄면 None(규칙 순서 그대로). 실패해도 None과 오류를 돌려준다.
+    events를 주면 로그 범위 요약(coverage)을 함께 보낸다."""
     if not incidents or not use_ai or not os.environ.get("ANTHROPIC_API_KEY"):
         return None
-    payload = build_triage_payload(incidents)
+    payload = build_triage_payload(incidents, coverage=coverage_summary(events) if events else None)
     model = model or TRIAGE_MODEL
     t = time.time()
     try:
