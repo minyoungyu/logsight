@@ -10,6 +10,7 @@ from .config_audit import audit
 from .correlate import build_incidents
 from .detect import run_detections
 from .normalize import Event, load_paths
+from .triage import reorder, triage
 
 
 def load_env(path: str | Path | None) -> dict:
@@ -27,6 +28,9 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     findings = run_detections(events, env)
     incidents = build_incidents(events, findings, window_min=window_min)
     t_detect = time.time() - t0
+    # AI 재검토: 공격으로 보이는 사건을 위로 올린다(키가 없으면 규칙 순서 그대로)
+    tri = triage(incidents, model=model, use_ai=use_ai)
+    incidents = reorder(incidents, tri)
     results = []
     for inc in incidents[:top]:
         checks = audit(inc, env)
@@ -45,7 +49,10 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "rule_counts": _rule_counts(findings),
         "n_incidents": len(incidents),
         "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "stages",
-                                               "src_ips", "n_events")} for i in incidents[:50]],
+                                               "src_ips", "n_events")}
+                           | ({"ai_verdict": i["ai_verdict"]} if "ai_verdict" in i else {})
+                           for i in incidents[:50]],
+        "triage": tri,
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},

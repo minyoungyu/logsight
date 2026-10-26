@@ -29,7 +29,10 @@ AI:ON 2026 출품작(팀 로그파인더).
 
 Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.env.example 참고, 키는 커밋 금지).
 키가 없거나 호출이 실패하면 같은 형식의 규칙 기반 보고서를 만든다. 모델은 `LOGSIGHT_MODEL`
-(기본 `claude-haiku-5-5`)로 바꾼다. Python 3.10 이상 필요.
+(기본 `claude-haiku-5-5`)로 바꾼다. 키가 있으면 상세 분석 전에 사건 전체를 한 번 재검토해
+공격으로 보이는 사건을 위로 올리고 같은 공격의 사건들을 묶는다(`logsight/triage.py`, 모델은
+`LOGSIGHT_TRIAGE_MODEL`, 기본 `claude-opus-5-5`). 재검토는 순서만 바꾸고 사건을 지우지 않는다.
+Python 3.10 이상 필요.
 
 ## 처리 흐름
 

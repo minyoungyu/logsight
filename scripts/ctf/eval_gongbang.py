@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from logsight.correlate import build_incidents  # noqa: E402
 from logsight.detect import run_detections  # noqa: E402
 from logsight.normalize import load_paths  # noqa: E402
+from logsight.triage import reorder, triage  # noqa: E402
 
 
 KST = timezone(timedelta(hours=9))
@@ -75,7 +76,39 @@ def category(e) -> str:
     return "기타"
 
 
-def evaluate(data: Path, gt: dict) -> dict:
+def score_triage(inc_rows: list[dict], tri: dict | None, incidents: list[dict]) -> dict:
+    """AI 재검토 채점. 공격자 이벤트가 절반 이상인 사건은 attack이 정답, 나머지는
+    benign_activity 또는 risky_not_attack이 정답이다. unclear는 틀린 것으로 센다."""
+    if not tri or "incidents" not in tri:
+        return {"ran": False, "error": (tri or {}).get("error")}
+    truth = {r["id"]: r["n_attacker_events"] * 2 >= r["n_events"] and r["n_attacker_events"] > 0
+             for r in inc_rows}
+    verdict = {v["id"]: v["verdict"] for v in tri["incidents"]}
+    rows, correct = [], 0
+    for r in inc_rows:
+        v = verdict.get(r["id"], "unclear")
+        ok = v == "attack" if truth[r["id"]] else v in ("benign_activity", "risky_not_attack")
+        correct += ok
+        rows.append({"id": r["id"], "is_attack": truth[r["id"]], "verdict": v, "correct": ok})
+    attack_ids = {i for i, t in truth.items() if t}
+    camps = [set(c["incident_ids"]) for c in tri.get("campaigns", [])]
+    best = max(camps, key=lambda c: len(c & attack_ids), default=set())
+    ordered = reorder([dict(i) for i in incidents], tri)
+    return {
+        "ran": True, "model": tri["meta"]["model"], "usage": tri["meta"]["usage"],
+        "validation": tri["validation"],
+        "verdict_accuracy": f"{correct}/{len(inc_rows)}", "verdicts": rows,
+        "rank_of_first_attacker_incident_after": next(
+            (n + 1 for n, i in enumerate(ordered) if truth.get(i["id"])), None),
+        "campaign": {"attack_incidents": sorted(attack_ids),
+                     "best_campaign": sorted(best),
+                     "covers_all_attack_incidents": attack_ids <= best,
+                     "includes_non_attack": sorted(best - attack_ids)},
+        "raw": {k: tri[k] for k in ("incidents", "campaigns", "cannot_tell")},
+    }
+
+
+def evaluate(data: Path, gt: dict, use_ai: bool = False, model: str | None = None) -> dict:
     events, _ = load_paths([data])
     findings = run_detections(events)
     incidents = build_incidents(events, findings, max_events=10**9)
@@ -127,6 +160,7 @@ def evaluate(data: Path, gt: dict) -> dict:
                          "rules": sorted({f["rule"] for f in inc["findings"]}),
                          "sources": inc["sources"]})
     att_incs = [r for r in inc_rows if r["n_attacker_events"]]
+    tri = triage(incidents, model=model) if use_ai else None
 
     return {
         "data": {"n_events": len(events), "n_events_unique": uniq(events),
@@ -157,6 +191,7 @@ def evaluate(data: Path, gt: dict) -> dict:
             "top10": inc_rows[:10],
         },
         "rules_fired": {f.rule: sum(1 for x in findings if x.rule == f.rule) for f in findings},
+        **({"ai_triage": score_triage(inc_rows, tri, incidents)} if use_ai else {}),
     }
 
 
@@ -165,9 +200,11 @@ def main() -> None:
     ap.add_argument("--data", default="data/gongbang")
     ap.add_argument("--gt", default="reports/ctf/gongbang_ground_truth.json")
     ap.add_argument("--out")
+    ap.add_argument("--ai", action="store_true", help="AI 재검토까지 돌려 채점(ANTHROPIC_API_KEY 필요)")
+    ap.add_argument("--model", help="재검토 모델(기본 logsight.triage.TRIAGE_MODEL)")
     a = ap.parse_args()
     gt = json.loads(Path(a.gt).read_text(encoding="utf-8"))
-    res = evaluate(Path(a.data), gt)
+    res = evaluate(Path(a.data), gt, use_ai=a.ai, model=a.model)
     text = json.dumps(res, ensure_ascii=False, indent=1)
     if a.out:
         Path(a.out).parent.mkdir(parents=True, exist_ok=True)
