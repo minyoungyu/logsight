@@ -1,12 +1,14 @@
 {
  "data": {
   "n_events": 10777,
+  "n_events_unique": 7179,
   "by_source": {
    "alb": 122,
    "cloudtrail": 10223,
    "waf": 432
   },
   "n_attacker_events": 566,
+  "n_attacker_events_unique": 540,
   "n_benign_events": 10211
  },
  "event_level": {
@@ -14,12 +16,18 @@
   "attacker_missed": 466,
   "recall": 0.177,
   "benign_flagged": 600,
+  "attacker_flagged_unique": 97,
+  "benign_flagged_unique": 561,
+  "benign_flagged_unique_by_category": {
+   "블루팀 대응 작업": 420,
+   "서비스 역할(정상 운영)": 13,
+   "루트 계정 사용": 128
+  },
   "precision": 0.143,
   "benign_flagged_by_category": {
    "블루팀 대응 작업": 434,
    "서비스 역할(정상 운영)": 13,
-   "루트 계정(운영측)": 149,
-   "AWS 서비스 자체 호출": 4
+   "루트 계정 사용": 153
   },
   "benign_flagged_by_rule": {
    "CT_DISCOVERY_BURST": 431,
@@ -38,7 +46,9 @@
    "title": "웹앱에 내부 주소(메타데이터) 조회 요청 — WAF 차단(14:10~)",
    "in_data": true,
    "n_events": 71,
+   "n_events_unique": 69,
    "n_flagged": 71,
+   "n_flagged_unique": 69,
    "detected": true,
    "rules": [
     "WAF_BLOCKED"
@@ -65,7 +75,9 @@
    "title": "서명 없는 토큰으로 EKS 지원 API 접근",
    "in_data": true,
    "n_events": 29,
+   "n_events_unique": 28,
    "n_flagged": 6,
+   "n_flagged_unique": 5,
    "detected": true,
    "rules": [
     "WAF_BLOCKED"
@@ -88,22 +100,16 @@
   },
   {
    "id": "G3",
-   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54)",
+   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54, 보고서 표의 2건)",
    "in_data": true,
-   "n_events": 10,
+   "n_events": 2,
+   "n_events_unique": 2,
    "n_flagged": 0,
+   "n_flagged_unique": 0,
    "detected": false,
    "rules": [],
    "incidents": [],
    "evidence_md_lines": [
-    1771,
-    1841,
-    2548,
-    2766,
-    2795,
-    2799,
-    3142,
-    3728,
     8912,
     9055
    ]
@@ -113,7 +119,9 @@
    "title": "EC2 역할 임시 키를 외부 IP에서 사용",
    "in_data": true,
    "n_events": 13,
+   "n_events_unique": 13,
    "n_flagged": 13,
+   "n_flagged_unique": 13,
    "detected": true,
    "rules": [
     "CT_INSTANCE_CRED_MULTI_IP"
@@ -140,7 +148,9 @@
    "title": "외부에서 그 키로 워크플로 실행 성공(15:36~16:08)",
    "in_data": true,
    "n_events": 9,
+   "n_events_unique": 9,
    "n_flagged": 9,
+   "n_flagged_unique": 9,
    "detected": true,
    "rules": [
     "CT_INSTANCE_CRED_MULTI_IP"
@@ -165,7 +175,9 @@
    "title": "외부에서 그 키로 SSM 원격 명령·세션 시도(거부)",
    "in_data": true,
    "n_events": 4,
+   "n_events_unique": 4,
    "n_flagged": 4,
+   "n_flagged_unique": 4,
    "detected": true,
    "rules": [
     "CT_INSTANCE_CRED_MULTI_IP"
@@ -185,7 +197,7 @@
    "id": "G7",
    "title": "신원·권한 정찰(GetCallerIdentity, GetPolicy 등, 15:17~15:25)",
    "in_data": false,
-   "why_missing": "IAM·STS 호출이 us-east-1 등에 기록돼 통합로그의 event_history에 없고, 블루팀 CLI 조회 결과에만 있다"
+   "why_missing": "통합로그의 event_history에 없다. 블루팀 CLI 조회 결과에만 있다(이유는 로그만으로 확인할 수 없다: 일부는 us-east-1 기록이지만 15:17:28 us-west-1 호출도 빠져 있다)"
   },
   {
    "id": "G8",

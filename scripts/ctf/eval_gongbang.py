@@ -13,6 +13,7 @@ import argparse
 import json
 import sys
 from collections import Counter
+from datetime import timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -20,6 +21,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from logsight.correlate import build_incidents  # noqa: E402
 from logsight.detect import run_detections  # noqa: E402
 from logsight.normalize import load_paths  # noqa: E402
+
+
+KST = timezone(timedelta(hours=9))
+
+
+def fingerprint(e) -> tuple:
+    """통합로그에는 같은 행이 여러 번 들어 있다. 원본 이벤트 ID가 없어 같은 초에 실제로 두 번 일어난
+    호출과 복사된 행을 구별할 수 없으므로, 행 기준과 이 지문 기준을 함께 보고한다."""
+    return (e.source, e.ts, e.action, e.src_ip, e.actor, e.access_key, e.outcome,
+            e.extra.get("params"), e.extra.get("errorCode"), e.extra.get("elb_status"))
+
+
+def uniq(evs) -> int:
+    return len({fingerprint(e) for e in evs})
 
 
 def is_attacker(e, gt) -> bool:
@@ -39,6 +54,11 @@ def match(e, m: dict, gt) -> bool:
         return False
     if "action_contains" in m and m["action_contains"] not in (e.action or ""):
         return False
+    t = e.ts.astimezone(KST).strftime("%H:%M:%S")
+    if "from_kst" in m and t < m["from_kst"]:
+        return False
+    if "to_kst" in m and t > m["to_kst"]:
+        return False
     return True
 
 
@@ -46,10 +66,10 @@ def category(e) -> str:
     a = e.actor or ""
     if "blue-team" in a:
         return "블루팀 대응 작업"
+    if ":root" in a:
+        return "루트 계정 사용"
     if e.extra.get("identity_type") in ("AWSService",) or (e.src_ip or "").endswith("amazonaws.com"):
         return "AWS 서비스 자체 호출"
-    if ":root" in a:
-        return "루트 계정(운영측)"
     if "assumed-role" in a:
         return "서비스 역할(정상 운영)"
     return "기타"
@@ -89,7 +109,8 @@ def evaluate(data: Path, gt: dict) -> dict:
         flagged = [e for e in hits if e.findings]
         stages.append({
             "id": st["id"], "title": st["title"], "in_data": bool(hits), "n_events": len(hits),
-            "n_flagged": len(flagged), "detected": bool(flagged),
+            "n_events_unique": uniq(hits), "n_flagged": len(flagged),
+            "n_flagged_unique": uniq(flagged), "detected": bool(flagged),
             "rules": sorted({r for e in flagged for r in e.findings}),
             "incidents": sorted({inc_of[e.raw_ref] for e in flagged if e.raw_ref in inc_of}),
             "evidence_md_lines": [md_line(e.raw_ref) for e in hits[:10]],
@@ -108,12 +129,18 @@ def evaluate(data: Path, gt: dict) -> dict:
     att_incs = [r for r in inc_rows if r["n_attacker_events"]]
 
     return {
-        "data": {"n_events": len(events), "by_source": dict(Counter(e.source for e in events)),
-                 "n_attacker_events": len(att), "n_benign_events": len(ben)},
+        "data": {"n_events": len(events), "n_events_unique": uniq(events),
+                 "by_source": dict(Counter(e.source for e in events)),
+                 "n_attacker_events": len(att), "n_attacker_events_unique": uniq(att),
+                 "n_benign_events": len(ben)},
         "event_level": {
             "attacker_flagged": tp, "attacker_missed": len(att) - tp,
             "recall": round(tp / len(att), 3) if att else None,
             "benign_flagged": len(fp_events),
+            "attacker_flagged_unique": uniq([e for e in att if e.findings]),
+            "benign_flagged_unique": uniq(fp_events),
+            "benign_flagged_unique_by_category": dict(Counter(
+                category(e) for e in {fingerprint(e): e for e in fp_events}.values())),
             "precision": round(tp / (tp + len(fp_events)), 3) if tp + len(fp_events) else None,
             "benign_flagged_by_category": dict(Counter(category(e) for e in fp_events)),
             "benign_flagged_by_rule": dict(Counter(r for e in fp_events for r in e.findings)),

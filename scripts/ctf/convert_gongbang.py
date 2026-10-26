@@ -128,7 +128,6 @@ def convert(md: Path, out: Path) -> dict:
             name, service, rest = parts[0], parts[1], " · ".join(parts[2:])
             status, _, param = rest.partition(" ")
             rec = {"eventTime": _iso(ts), "eventSource": service, "eventName": name,
-                   "awsRegion": "us-west-1",
                    "sourceIPAddress": ps.ip_of(ip) if ip else service,
                    "userIdentity": _identity(actor, key, ps)}
             if status != "OK":

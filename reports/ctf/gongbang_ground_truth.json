@@ -11,7 +11,8 @@
  ],
  "notes": [
   "공격자 IP는 보고서가 외부 사용 출처로 적은 IP다. 네 번째 외부 IP는 16:42 사용이라 입력 데이터(16:25까지)에 없다.",
-  "공격자 IP의 Cognito 가입·로그인은 보고서에 공격으로 적혀 있지 않아 단계에는 넣지 않았지만, 공격자 IP의 이벤트로는 센다."
+  "공격자 IP의 Cognito 가입·로그인은 보고서에 공격으로 적혀 있지 않아 단계에는 넣지 않았지만, 공격자 IP의 이벤트로는 센다.",
+  "event_history는 원본 이벤트 ID가 없는 요약 표라 중복 행(약 3,579행)을 확실히 제거할 수 없다. 채점은 행 기준과 지문 기준을 함께 낸다."
  ],
  "stages": [
   {
@@ -37,13 +38,15 @@
   },
   {
    "id": "G3",
-   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54)",
+   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54, 보고서 표의 2건)",
    "report": "7장",
    "match": {
     "source": "alb",
     "attacker_ip": true,
     "action_contains": "/download",
-    "outcome": "success"
+    "outcome": "success",
+    "from_kst": "14:52:00",
+    "to_kst": "14:55:00"
    }
   },
   {
@@ -85,7 +88,7 @@
    "id": "G7",
    "title": "신원·권한 정찰(GetCallerIdentity, GetPolicy 등, 15:17~15:25)",
    "report": "2·5장",
-   "why_missing": "IAM·STS 호출이 us-east-1 등에 기록돼 통합로그의 event_history에 없고, 블루팀 CLI 조회 결과에만 있다"
+   "why_missing": "통합로그의 event_history에 없다. 블루팀 CLI 조회 결과에만 있다(이유는 로그만으로 확인할 수 없다: 일부는 us-east-1 기록이지만 15:17:28 us-west-1 호출도 빠져 있다)"
   },
   {
    "id": "G8",
