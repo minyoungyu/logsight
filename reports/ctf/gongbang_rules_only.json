@@ -1,0 +1,398 @@
+{
+ "data": {
+  "n_events": 10777,
+  "by_source": {
+   "alb": 122,
+   "cloudtrail": 10223,
+   "waf": 432
+  },
+  "n_attacker_events": 566,
+  "n_benign_events": 10211
+ },
+ "event_level": {
+  "attacker_flagged": 100,
+  "attacker_missed": 466,
+  "recall": 0.177,
+  "benign_flagged": 600,
+  "precision": 0.143,
+  "benign_flagged_by_category": {
+   "블루팀 대응 작업": 434,
+   "서비스 역할(정상 운영)": 13,
+   "루트 계정(운영측)": 149,
+   "AWS 서비스 자체 호출": 4
+  },
+  "benign_flagged_by_rule": {
+   "CT_DISCOVERY_BURST": 431,
+   "CT_INSTANCE_CRED_MULTI_IP": 13,
+   "CT_ROOT_USAGE": 153,
+   "CT_LOGGING_TAMPER": 3
+  },
+  "attacker_flagged_by_rule": {
+   "CT_INSTANCE_CRED_MULTI_IP": 13,
+   "WAF_BLOCKED": 87
+  }
+ },
+ "stages": [
+  {
+   "id": "G1",
+   "title": "웹앱에 내부 주소(메타데이터) 조회 요청 — WAF 차단(14:10~)",
+   "in_data": true,
+   "n_events": 71,
+   "n_flagged": 71,
+   "detected": true,
+   "rules": [
+    "WAF_BLOCKED"
+   ],
+   "incidents": [
+    "INC-002",
+    "INC-007"
+   ],
+   "evidence_md_lines": [
+    3762,
+    3798,
+    3982,
+    3991,
+    4097,
+    4107,
+    4128,
+    4148,
+    4155,
+    4168
+   ]
+  },
+  {
+   "id": "G2",
+   "title": "서명 없는 토큰으로 EKS 지원 API 접근",
+   "in_data": true,
+   "n_events": 29,
+   "n_flagged": 6,
+   "detected": true,
+   "rules": [
+    "WAF_BLOCKED"
+   ],
+   "incidents": [
+    "INC-002"
+   ],
+   "evidence_md_lines": [
+    2296,
+    2411,
+    2767,
+    2792,
+    3279,
+    3353,
+    3380,
+    3442,
+    3656,
+    3887
+   ]
+  },
+  {
+   "id": "G3",
+   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54)",
+   "in_data": true,
+   "n_events": 10,
+   "n_flagged": 0,
+   "detected": false,
+   "rules": [],
+   "incidents": [],
+   "evidence_md_lines": [
+    1771,
+    1841,
+    2548,
+    2766,
+    2795,
+    2799,
+    3142,
+    3728,
+    8912,
+    9055
+   ]
+  },
+  {
+   "id": "G4",
+   "title": "EC2 역할 임시 키를 외부 IP에서 사용",
+   "in_data": true,
+   "n_events": 13,
+   "n_flagged": 13,
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ],
+   "incidents": [
+    "INC-002",
+    "INC-006"
+   ],
+   "evidence_md_lines": [
+    10953,
+    10976,
+    10999,
+    11025,
+    11105,
+    11171,
+    11182,
+    11209,
+    11227,
+    11246
+   ]
+  },
+  {
+   "id": "G5",
+   "title": "외부에서 그 키로 워크플로 실행 성공(15:36~16:08)",
+   "in_data": true,
+   "n_events": 9,
+   "n_flagged": 9,
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ],
+   "incidents": [
+    "INC-002"
+   ],
+   "evidence_md_lines": [
+    10953,
+    10999,
+    11025,
+    11105,
+    11182,
+    11209,
+    11227,
+    11246,
+    11265
+   ]
+  },
+  {
+   "id": "G6",
+   "title": "외부에서 그 키로 SSM 원격 명령·세션 시도(거부)",
+   "in_data": true,
+   "n_events": 4,
+   "n_flagged": 4,
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ],
+   "incidents": [
+    "INC-002",
+    "INC-006"
+   ],
+   "evidence_md_lines": [
+    10976,
+    11171,
+    11276,
+    11280
+   ]
+  },
+  {
+   "id": "G7",
+   "title": "신원·권한 정찰(GetCallerIdentity, GetPolicy 등, 15:17~15:25)",
+   "in_data": false,
+   "why_missing": "IAM·STS 호출이 us-east-1 등에 기록돼 통합로그의 event_history에 없고, 블루팀 CLI 조회 결과에만 있다"
+  },
+  {
+   "id": "G8",
+   "title": "Recovery 역할 키 외부 사용과 recovery.zip 전송(14:58)",
+   "in_data": false,
+   "why_missing": "S3 객체 읽기(데이터 이벤트)는 event_history에 남지 않아 블루팀 CLI 조회 결과에만 있다"
+  },
+  {
+   "id": "G9",
+   "title": "다른 키로 워크플로 실행(16:42)",
+   "in_data": false,
+   "why_missing": "통합로그의 event_history가 16:25:01에서 끝난다"
+  }
+ ],
+ "incidents": {
+  "n_total": 7,
+  "n_with_attacker": 3,
+  "n_attacker_only_or_mostly": 3,
+  "rank_of_first_attacker_incident": 2,
+  "attacker_incidents": [
+   {
+    "id": "INC-002",
+    "severity": "high",
+    "stages": [
+     "initial-access",
+     "credential-access"
+    ],
+    "start": "2026-10-11T05:10:45+00:00",
+    "end": "2026-10-11T07:08:11+00:00",
+    "n_events": 72,
+    "n_attacker_events": 72,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP",
+     "WAF_BLOCKED"
+    ],
+    "sources": [
+     "cloudtrail",
+     "waf"
+    ]
+   },
+   {
+    "id": "INC-006",
+    "severity": "high",
+    "stages": [
+     "credential-access"
+    ],
+    "start": "2026-10-11T07:11:37+00:00",
+    "end": "2026-10-11T07:12:16+00:00",
+    "n_events": 2,
+    "n_attacker_events": 2,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-007",
+    "severity": "low",
+    "stages": [
+     "initial-access"
+    ],
+    "start": "2026-10-11T06:14:24+00:00",
+    "end": "2026-10-11T06:24:51+00:00",
+    "n_events": 26,
+    "n_attacker_events": 26,
+    "rules": [
+     "WAF_BLOCKED"
+    ],
+    "sources": [
+     "waf"
+    ]
+   }
+  ],
+  "top10": [
+   {
+    "id": "INC-001",
+    "severity": "high",
+    "stages": [
+     "discovery",
+     "defense-evasion"
+    ],
+    "start": "2026-10-11T04:30:37+00:00",
+    "end": "2026-10-11T06:00:45+00:00",
+    "n_events": 432,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST",
+     "CT_LOGGING_TAMPER"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-002",
+    "severity": "high",
+    "stages": [
+     "initial-access",
+     "credential-access"
+    ],
+    "start": "2026-10-11T05:10:45+00:00",
+    "end": "2026-10-11T07:08:11+00:00",
+    "n_events": 72,
+    "n_attacker_events": 72,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP",
+     "WAF_BLOCKED"
+    ],
+    "sources": [
+     "cloudtrail",
+     "waf"
+    ]
+   },
+   {
+    "id": "INC-003",
+    "severity": "high",
+    "stages": [
+     "credential-access"
+    ],
+    "start": "2026-10-11T04:33:44+00:00",
+    "end": "2026-10-11T05:58:23+00:00",
+    "n_events": 13,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-004",
+    "severity": "high",
+    "stages": [
+     "initial-access"
+    ],
+    "start": "2026-10-11T04:42:48+00:00",
+    "end": "2026-10-11T04:48:52+00:00",
+    "n_events": 153,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_ROOT_USAGE"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-005",
+    "severity": "high",
+    "stages": [
+     "defense-evasion"
+    ],
+    "start": "2026-10-11T07:10:31+00:00",
+    "end": "2026-10-11T07:18:18+00:00",
+    "n_events": 2,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_LOGGING_TAMPER"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-006",
+    "severity": "high",
+    "stages": [
+     "credential-access"
+    ],
+    "start": "2026-10-11T07:11:37+00:00",
+    "end": "2026-10-11T07:12:16+00:00",
+    "n_events": 2,
+    "n_attacker_events": 2,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-007",
+    "severity": "low",
+    "stages": [
+     "initial-access"
+    ],
+    "start": "2026-10-11T06:14:24+00:00",
+    "end": "2026-10-11T06:24:51+00:00",
+    "n_events": 26,
+    "n_attacker_events": 26,
+    "rules": [
+     "WAF_BLOCKED"
+    ],
+    "sources": [
+     "waf"
+    ]
+   }
+  ]
+ },
+ "rules_fired": {
+  "CT_INSTANCE_CRED_MULTI_IP": 2,
+  "CT_ROOT_USAGE": 6,
+  "CT_LOGGING_TAMPER": 2,
+  "CT_DISCOVERY_BURST": 7,
+  "WAF_BLOCKED": 2
+ }
+}

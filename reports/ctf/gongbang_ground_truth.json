@@ -1,0 +1,103 @@
+{
+ "source": "블루팀 공방전 최종 보고서(2026-10-12) 2·3·5·6·7장. 가명 처리된 값이다.",
+ "fixed_before_measurement": true,
+ "attacker_ips": [
+  "198.18.0.8",
+  "198.18.0.18",
+  "198.18.0.56"
+ ],
+ "attacker_keys": [
+  "ASIA71C21DC25EA495CF"
+ ],
+ "notes": [
+  "공격자 IP는 보고서가 외부 사용 출처로 적은 IP다. 네 번째 외부 IP는 16:42 사용이라 입력 데이터(16:25까지)에 없다.",
+  "공격자 IP의 Cognito 가입·로그인은 보고서에 공격으로 적혀 있지 않아 단계에는 넣지 않았지만, 공격자 IP의 이벤트로는 센다."
+ ],
+ "stages": [
+  {
+   "id": "G1",
+   "title": "웹앱에 내부 주소(메타데이터) 조회 요청 — WAF 차단(14:10~)",
+   "report": "3장",
+   "match": {
+    "source": "waf",
+    "attacker_ip": true,
+    "outcome": "block",
+    "action_contains": "/api/subscriptions"
+   }
+  },
+  {
+   "id": "G2",
+   "title": "서명 없는 토큰으로 EKS 지원 API 접근",
+   "report": "6장",
+   "match": {
+    "source": "waf",
+    "attacker_ip": true,
+    "action_contains": "/api/support/"
+   }
+  },
+  {
+   "id": "G3",
+   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54)",
+   "report": "7장",
+   "match": {
+    "source": "alb",
+    "attacker_ip": true,
+    "action_contains": "/download",
+    "outcome": "success"
+   }
+  },
+  {
+   "id": "G4",
+   "title": "EC2 역할 임시 키를 외부 IP에서 사용",
+   "report": "5장",
+   "match": {
+    "source": "cloudtrail",
+    "attacker_key": true
+   }
+  },
+  {
+   "id": "G5",
+   "title": "외부에서 그 키로 워크플로 실행 성공(15:36~16:08)",
+   "report": "5장",
+   "match": {
+    "source": "cloudtrail",
+    "attacker_key": true,
+    "action_prefix": [
+     "states:StartExecution"
+    ],
+    "outcome": "success"
+   }
+  },
+  {
+   "id": "G6",
+   "title": "외부에서 그 키로 SSM 원격 명령·세션 시도(거부)",
+   "report": "5장",
+   "match": {
+    "source": "cloudtrail",
+    "attacker_key": true,
+    "action_prefix": [
+     "ssm:"
+    ],
+    "outcome": "failure"
+   }
+  },
+  {
+   "id": "G7",
+   "title": "신원·권한 정찰(GetCallerIdentity, GetPolicy 등, 15:17~15:25)",
+   "report": "2·5장",
+   "why_missing": "IAM·STS 호출이 us-east-1 등에 기록돼 통합로그의 event_history에 없고, 블루팀 CLI 조회 결과에만 있다"
+  },
+  {
+   "id": "G8",
+   "title": "Recovery 역할 키 외부 사용과 recovery.zip 전송(14:58)",
+   "report": "7장",
+   "why_missing": "S3 객체 읽기(데이터 이벤트)는 event_history에 남지 않아 블루팀 CLI 조회 결과에만 있다"
+  },
+  {
+   "id": "G9",
+   "title": "다른 키로 워크플로 실행(16:42)",
+   "report": "5장",
+   "why_missing": "통합로그의 event_history가 16:25:01에서 끝난다"
+  }
+ ]
+}
