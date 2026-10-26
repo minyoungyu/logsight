@@ -9,11 +9,13 @@
 """
 from __future__ import annotations
 
+import base64
+import binascii
 import ipaddress
 import re
 from collections import defaultdict
 from datetime import timedelta
-from urllib.parse import unquote_plus, urlparse
+from urllib.parse import parse_qsl, unquote_plus, urlparse
 
 from ..normalize import Event
 from ..detect import Finding, _bursts, _ok_fail
@@ -68,7 +70,18 @@ SCANNER_UA = re.compile(
 WEBSHELL_NAME = re.compile(
     r"(?i)(?:^|/)(?:c99|r57|b374k|wso|webshell|backdoor|adminer|"
     r"alfa|indoxploit|p0wny|antichat|phpspy|tryag|0byt3m1n1)\.(?:php|phtml|jsp|asp|aspx)\b")
-SHELL_PARAM = re.compile(r"(?i)[?&](?:cmd|exec|command|c|run|shell|system|passthru)\s*=")
+SHELL_PARAM = re.compile(r"(?i)[?&](?:cmd|exec|command|c|run|shell|system|passthru)\s*=([^&]*)")
+# 스크립트로 실행되는 파일 확장자(경로 끝). /remote.php/dav/a.jpg 처럼 스크립트 뒤에 경로가
+# 붙은 요청은 그 파일을 내려받는 것이라 실행으로 보지 않는다.
+SCRIPT_EXT = re.compile(r"(?i)\.(?:php\d?|phtml|phar|jsp|jspx|asp|aspx|cgi|pl)$")
+# 해시·토큰처럼 보이는 값(16자 이상 영숫자만). 명령이 아니다.
+HASH_LIKE = re.compile(r"^[A-Za-z0-9]{16,}$")
+# base64로 감춘 명령을 풀었을 때 나오는 셸 명령어
+SHELL_WORDS = re.compile(
+    r"(?i)(?:^|[\s\"'\[,;|&(])(?:whoami|uname|id|ls|cat|wget|curl|bash|sh|nc|ncat|python3?|perl|"
+    r"chmod|chown|ps|netstat|ifconfig|ip|mysql|tar|echo|rm|cp|mv|find|sudo|su|passwd|crontab)"
+    r"(?:$|[\s\"',\]])")
+BASE64_VALUE = re.compile(r"^[A-Za-z0-9+/_-]{12,}={0,2}$")
 
 
 def _dec(s: str | None) -> str:
@@ -102,6 +115,43 @@ def _trusted(ip: str | None, cidrs: list[str]) -> bool:
 def _is_admin_path(path: str, prefixes: tuple[str, ...]) -> bool:
     p = path.lower()
     return any(p == x or p.startswith(x + "/") for x in prefixes)
+
+
+def _shell_param_hit(path: str, query: str) -> bool:
+    """명령 인자(cmd=, c= 등)로 스크립트를 부른 요청인가. 해시 같은 값은 뺀다."""
+    if not SCRIPT_EXT.search(path):
+        return False
+    for m in SHELL_PARAM.finditer("?" + query):
+        value = unquote_plus(m.group(1)).strip()
+        if value and not HASH_LIKE.match(value):
+            return True
+    return False
+
+
+def _decoded_command(query: str) -> str | None:
+    """쿼리 값 중 base64로 감춘 셸 명령이 있으면 풀어서 돌려준다."""
+    for _, value in parse_qsl(query, keep_blank_values=False):
+        v = value.strip()
+        if not BASE64_VALUE.match(v):
+            continue
+        try:
+            raw = base64.b64decode(v + "=" * (-len(v) % 4), altchars=b"-_" if ("-" in v or "_" in v) else None,
+                                   validate=False)
+            text = raw.decode("utf-8")
+        except (binascii.Error, UnicodeDecodeError, ValueError):
+            continue
+        if text.isprintable() and SHELL_WORDS.search(text):
+            return text
+    return None
+
+
+def _in_upload_dir(path: str, upload_dirs: tuple[str, ...]) -> bool:
+    """업로드 폴더 안인가. 프로필 폴더는 앞부분으로, uploads/upload 폴더는 경로 어디에 있든 본다
+    (/wp-content/uploads/ 같은 CMS 기본 위치)."""
+    p = path.lower()
+    if p.startswith(upload_dirs):
+        return True
+    return "/uploads/" in p or "/upload/" in p
 
 
 def _foreign_host(referer: str, own_hosts: list[str]) -> bool:
@@ -149,13 +199,13 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
             buckets["WEBLOG_TRAVERSAL"][ip].append(e); matched = True
         if RFI.search(target):
             buckets["WEBLOG_RFI"][ip].append(e); matched = True
-        if CMDI.search(target):
+        if CMDI.search(target) or _decoded_command(e.extra.get("query", "")):
             buckets["WEBLOG_CMD_INJECTION"][ip].append(e); matched = True
         if XSS.search(target):
             buckets["WEBLOG_XSS"][ip].append(e); matched = True
         # 웹셸 접근은 "존재하는 자원"에 닿았을 때만(404 스캔 제외). cmd 류 파라미터 또는
         # 구별력 있는 웹셸 파일 이름이 있고 응답이 404가 아니면 센다.
-        if (SHELL_PARAM.search("?" + e.extra.get("query", "")) or WEBSHELL_NAME.search(path)) \
+        if (_shell_param_hit(path, e.extra.get("query", "")) or WEBSHELL_NAME.search(path)) \
                 and e.outcome != "client-error":
             buckets["WEBLOG_WEBSHELL_ACCESS"][ip].append(e); matched = True
         if any(s in target.lower() for s in sensitive) or "/.git/" in path.lower():
@@ -189,7 +239,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
         if SCANNER_UA.search(ua) and not trusted_ip:
             buckets["WEBLOG_SCANNER"][ip].append(e)
         # 업로드 폴더 안의 스크립트가 실행(=요청)되면 매우 의심스럽다
-        if path.lower().startswith(upload_dirs) and re.search(r"\.(php\d?|phtml|phar|jsp|asp|aspx|cgi|pl)\b", path, re.I):
+        if _in_upload_dir(path, upload_dirs) and re.search(r"\.(php\d?|phtml|phar|jsp|asp|aspx|cgi|pl)\b", path, re.I):
             buckets["WEBLOG_UPLOAD_EXEC"][ip].append(e); matched = True
         # 공격 패턴 요청에 서버가 500으로 반응하면 취약점이 실제로 건드려졌을 가능성
         if matched and e.outcome == "server-error":
@@ -234,11 +284,20 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
                                     f"5분 안에 404 {len(seg)}건, 경로 {len({e.extra.get('path') for e in seg})}종", ip))
 
     # --- 웹 로그인 무차별 대입: 로그인/관리자 경로로의 POST가 한 IP에서 몰릴 때
-    login_paths = [p.rstrip("/") for p in (profile.login_paths or profile.admin_paths)]
+    # 로그인 경로를 따로 적지 않았으면 관리자 경로 중 "login"이 든 것만 앞부분으로 보고, 나머지는
+    # 정확히 같을 때만 센다. /wp-admin/admin-ajax.php 같은 관리 영역 안의 일반 요청(댓글 갱신 등)을
+    # 로그인 시도로 세지 않기 위해서다.
+    if profile.login_paths:
+        prefix_paths = [p.rstrip("/") for p in profile.login_paths]
+        exact_paths: list[str] = []
+    else:
+        prefix_paths = [p.rstrip("/") for p in profile.admin_paths if "login" in p.lower()]
+        exact_paths = [p.rstrip("/") for p in profile.admin_paths if "login" not in p.lower()]
     login_hits: dict[str, list[Event]] = defaultdict(list)
     for e in access:
         p = e.extra.get("path", "").rstrip("/")
-        if e.extra.get("method") == "POST" and any(p == lp or p.startswith(lp) for lp in login_paths):
+        if e.extra.get("method") == "POST" and (any(p == lp or p.startswith(lp) for lp in prefix_paths)
+                                                or p in exact_paths):
             login_hits[e.src_ip or "?"].append(e)
     REDIRECT = {"301", "302", "303"}
     for ip, evs in login_hits.items():

@@ -33,6 +33,7 @@ SUCCESS_SIGNAL = {
     "WEBLOG_EXPLOIT_5XX", "WEBLOG_LARGE_EXFIL", "WEBLOG_ADMIN_ACCESS", "WEBLOG_CODE_IN_HEADER",
     "WEBLOG_ADMIN_FORGED", "WEBLOG_IDOR_ENUM", "WEBLOG_BACKUP_LEAK", "WEBLOG_SSRF",
 }
+WEAK_SUCCESS = {"WEBLOG_WEBSHELL_ACCESS", "WEBLOG_LARGE_EXFIL", "WEBLOG_ADMIN_ACCESS"}
 ATTEMPT_SIGNAL = {
     "WEBLOG_SQLI", "WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION",
     "WEBLOG_XSS", "WEBLOG_AUTH_BRUTE", "SSH_BRUTE_FORCE", "FILE_SUSPICIOUS",
@@ -114,8 +115,12 @@ def rule_verdict(findings: list[dict]) -> tuple[str, str]:
     hit_attempt = rules & ATTEMPT_SIGNAL
     if "FILE_WEBSHELL" in rules or "WEBLOG_UPLOAD_EXEC" in rules:
         return "breached", "high"
-    if hit_success:
+    # 약한 성공 신호 하나만으로는 "침해 가능성 높음"으로 올리지 않는다. 같은 사건에 공격 시도나
+    # 다른 성공 신호가 함께 있어야 한다(정상 앱의 요청이 패턴 하나에 걸린 오탐을 막는다).
+    if hit_success and (hit_success - WEAK_SUCCESS or hit_attempt or len(hit_success) >= 2):
         return "likely_breached", "high"
+    if hit_success:
+        return "suspicious", "medium"
     if hit_attempt:
         return "suspicious", "medium"
     return "no_evidence", "low"
