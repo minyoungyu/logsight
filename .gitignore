@@ -14,3 +14,4 @@ lab/sites/*/runtime.sqlite
 lab/sites/shopmall/uploads/
 lab/sites/board/data/
 reports/ci-web/
+*.run.log
