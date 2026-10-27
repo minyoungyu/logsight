@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# EC2 부팅 스크립트: nginx + php-fpm 으로 취약 테스트 사이트(shopmall)를 띄우고,
+# 접속/오류 로그를 남긴다. 저장소의 lab/sites/shopmall 을 그대로 쓴다.
+set -eux
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y nginx php-fpm php-sqlite3 git curl
+
+cd /opt
+git clone --depth 1 --branch ${repo_ref} ${repo_url} logsight || true
+SITE=/opt/logsight/lab/sites/shopmall
+
+# php-fpm 소켓 경로 확인
+PHP_SOCK=$(ls /run/php/php*-fpm.sock | head -1)
+
+# 설정 실수를 일부러 재현: .phtml 실행 허용(소형 서버에서 흔한 오류, 업로드 우회 체인 성립용)
+PHP_POOL=$(ls /etc/php/*/fpm/pool.d/www.conf | head -1)
+echo 'security.limit_extensions = .php .phtml .php5' >> "$PHP_POOL"
+systemctl restart php*-fpm
+
+# 업로드/쓰기 디렉터리
+mkdir -p "$SITE/uploads" && chown -R www-data:www-data "$SITE"
+
+cat > /etc/nginx/sites-available/default <<NGINX
+server {
+    listen 80 default_server;
+    root $SITE;
+    index index.php;
+    access_log /var/log/nginx/access.log combined;
+    error_log  /var/log/nginx/error.log;
+    location / { try_files \$uri \$uri/ /index.php?\$query_string; }
+    location ~ \.(php|phtml|php5)$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:$PHP_SOCK;
+    }
+}
+NGINX
+systemctl restart nginx
+
+# auth.log(SSH 로그인 시도)는 기본으로 남는다. 수집은 collect.sh / scp 로 한다.
+echo "logsight lab ready" > /var/log/logsight-lab-ready
