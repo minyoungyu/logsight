@@ -11,7 +11,7 @@ import json
 import re
 import sys
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterable, Iterator
 
@@ -301,6 +301,93 @@ def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
     return events
 
 
+# ------------------------------------------------------------------ Amazon GuardDuty 탐지 결과
+# get-findings 결과({"Findings":[...]}), S3 내보내기(JSON Lines), EventBridge 이벤트({"detail": {...}}) 모두 받는다.
+# GuardDuty가 탐지한 것을 LogSight가 쉬운 한국어 설명·수정안으로 바꾸는 용도("탐지는 AWS, 설명과 수정은 LogSight").
+GD_ALIAS = [  # 탐지 유형(부분 문자열) → 같은 의미의 LogSight 규칙(수정안 생성에 사용)
+    ("InstanceCredentialExfiltration", "CT_INSTANCE_CRED_OUTSIDE"),
+    ("SSHBruteForce", "SSH_BRUTE_FORCE"), ("RDPBruteForce", "SSH_BRUTE_FORCE"),
+    ("PortProbeUnprotectedPort", "VPC_REMOTE_ADMIN_EXPOSED"), ("Recon:EC2/Portscan", "VPC_PORT_SCAN"),
+    ("CloudTrailLoggingDisabled", "CT_LOGGING_TAMPER"), ("RootCredentialUsage", "CT_ROOT_USAGE"),
+    ("Persistence:IAMUser", "CT_IAM_PERSISTENCE"), ("PrivilegeEscalation:IAMUser", "CT_IAM_PERSISTENCE"),
+    ("Discovery:IAMUser", "CT_DISCOVERY_BURST"), ("Exfiltration:S3", "CT_S3_BULK_READ"),
+    ("UnauthorizedAccess:IAMUser/MaliciousIPCaller", "CT_UNTRUSTED_IP"),
+    ("UnauthorizedAccess:IAMUser/TorIPCaller", "CT_UNTRUSTED_IP"),
+    ("Policy:S3/BucketBlockPublicAccessDisabled", "CT_LOGGING_TAMPER"),
+]
+
+
+def _gd_ip(action: dict) -> str | None:
+    for k in ("AwsApiCallAction", "NetworkConnectionAction", "KubernetesApiCallAction", "RdsLoginAttemptAction"):
+        ip = ((action.get(k) or {}).get("RemoteIpDetails") or {}).get("IpAddressV4")
+        if ip:
+            return ip
+    for d in (action.get("PortProbeAction") or {}).get("PortProbeDetails") or []:
+        ip = (d.get("RemoteIpDetails") or {}).get("IpAddressV4")
+        if ip:
+            return ip
+    return None
+
+
+def _gd_port(action: dict) -> int | None:
+    p = ((action.get("NetworkConnectionAction") or {}).get("LocalPortDetails") or {}).get("Port")
+    if p is None:
+        for d in (action.get("PortProbeAction") or {}).get("PortProbeDetails") or []:
+            p = (d.get("LocalPortDetails") or {}).get("Port")
+            if p is not None:
+                break
+    return int(p) if isinstance(p, (int, float, str)) and str(p).isdigit() else None
+
+
+def _iter_gd(text: str):
+    t = text.lstrip()
+    try:
+        data = json.loads(t)
+        items = data.get("Findings") or data.get("findings") or [data] if isinstance(data, dict) else data
+    except json.JSONDecodeError:
+        items = []
+        for line in t.splitlines():
+            line = line.strip()
+            if line:
+                try:
+                    items.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    for it in items or []:
+        if isinstance(it, dict) and isinstance(it.get("detail"), dict):
+            it = it["detail"]  # EventBridge 형식
+        if isinstance(it, dict) and it.get("Type"):
+            yield it
+
+
+def parse_guardduty(text: str, name: str = "guardduty") -> list[Event]:
+    events = []
+    for i, f in enumerate(_iter_gd(text)):
+        svc = f.get("Service") or {}
+        action = svc.get("Action") or {}
+        res = f.get("Resource") or {}
+        try:
+            ts = _iso(svc.get("EventLastSeen") or f.get("UpdatedAt") or f.get("CreatedAt"))
+        except (TypeError, ValueError):
+            continue
+        akd = res.get("AccessKeyDetails") or {}
+        typ = str(f.get("Type"))
+        api = (action.get("AwsApiCallAction") or {}).get("Api")
+        events.append(Event(
+            ts=ts, source="guardduty", src_ip=_gd_ip(action),
+            dst_port=_gd_port(action),
+            actor=akd.get("UserName") or akd.get("PrincipalId"),
+            instance_id=(res.get("InstanceDetails") or {}).get("InstanceId"),
+            access_key=akd.get("AccessKeyId"),
+            action=typ, outcome="detected", raw_ref=f"{name}:{i+1}",
+            extra={"gd_id": f.get("Id"), "gd_type": typ, "gd_title": str(f.get("Title", ""))[:200],
+                   "gd_severity": float(f.get("Severity") or 0), "gd_count": svc.get("Count"),
+                   "gd_api": api, "gd_resource": res.get("ResourceType"),
+                   "gd_alias": sorted({r for k, r in GD_ALIAS if k in typ})},
+        ))
+    return events
+
+
 # ------------------------------------------------------------------ CloudTrail
 _INST = re.compile(r"assumed-role/[^/]+/(i-[0-9a-f]+)")
 
@@ -381,6 +468,7 @@ PARSERS = {
     "sshauth": parse_sshauth,
     "hostfw": parse_hostfw,
     "weblog": parse_weblog,
+    "guardduty": parse_guardduty,
 }
 
 
@@ -395,7 +483,7 @@ def read_text(path: Path) -> str:
 def detect_kind(name: str, text: str) -> str | None:
     """파일 이름과 내용 앞부분으로 로그 종류를 추정한다."""
     n = name.lower()
-    for kind, keys in (("cloudtrail", ("cloudtrail",)), ("vpcflow", ("vpcflow", "flow")),
+    for kind, keys in (("guardduty", ("guardduty",)), ("cloudtrail", ("cloudtrail",)), ("vpcflow", ("vpcflow", "flow")),
                        ("waf", ("waf",)), ("alb", ("alb", "elb")),
                        ("hostfw", ("hostfw", "iptables", "nftables", "ufw", "kern", "firewall")),
                        ("weblog", ("nginx", "apache", "httpd", "access", "weblog")),
@@ -403,6 +491,8 @@ def detect_kind(name: str, text: str) -> str | None:
         if any(k in n for k in keys):
             return kind
     head = text.lstrip()[:2000]
+    if '"Severity"' in head and '"Type"' in head and ('"Service"' in head or '"SchemaVersion"' in head):
+        return "guardduty"
     if '"eventTime"' in head or '"Records"' in head:
         return "cloudtrail"
     if '"httpRequest"' in head and '"terminatingRuleId"' in head:
@@ -432,13 +522,47 @@ def _walk(paths: Iterable[Path]) -> Iterator[Path]:
             yield p
 
 
-def load_paths(paths: Iterable[Path], kind: str | None = None) -> tuple[list[Event], list[dict]]:
-    """파일/폴더 목록을 읽어 이벤트로 바꾼다. 반환: (이벤트, 파일별 처리 결과)."""
+_PATH_DATE = re.compile(r"(?:^|[/\\_])(20\d\d)[/\\-]?(\d\d)[/\\-]?(\d\d)(?:[/\\T_]|$)")
+
+
+def parse_when(s: str | None, end: bool = False) -> datetime | None:
+    """'2017-02-12' 또는 ISO 시각을 UTC datetime으로. end=True면 날짜만 준 경우 그날 끝까지."""
+    if not s:
+        return None
+    if len(s) == 10:
+        d = datetime.strptime(s, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        return d + timedelta(days=1) - timedelta(microseconds=1) if end else d
+    return _iso(s)
+
+
+def _path_day(p: Path) -> datetime | None:
+    """CloudTrail S3 경로(.../2017/02/12/...)나 파일명(..._20170212T...)에서 날짜를 읽는다."""
+    m = _PATH_DATE.search(p.as_posix())
+    if not m:
+        return None
+    try:
+        return datetime(int(m[1]), int(m[2]), int(m[3]), tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def load_paths(paths: Iterable[Path], kind: str | None = None, since: datetime | None = None,
+               until: datetime | None = None) -> tuple[list[Event], list[dict]]:
+    """파일/폴더 목록을 읽어 이벤트로 바꾼다. 반환: (이벤트, 파일별 처리 결과).
+    since/until을 주면 그 기간 이벤트만 남긴다. 경로에 날짜가 있는 파일(CloudTrail S3 구조)은
+    기간 밖이면 아예 읽지 않아 시간과 메모리를 아낀다."""
     events: list[Event] = []
     stats: list[dict] = []
+    day, hour = timedelta(days=1), timedelta(hours=1)
     for p in _walk([Path(x) for x in paths]):
         if p.name in ("environment.json",):
             continue
+        if since or until:
+            d = _path_day(p)
+            # 경로 날짜는 전달된 날이라 그날 0시 직전~다음 날 0시의 이벤트가 들어 있다(1시간 여유)
+            if d and ((since and d + day + hour < since) or (until and d - hour > until)):
+                stats.append({"file": str(p), "kind": None, "events": 0, "skipped": "기간 밖"})
+                continue
         try:
             text = read_text(p)
         except (OSError, EOFError, gzip.BadGzipFile) as exc:
@@ -449,6 +573,8 @@ def load_paths(paths: Iterable[Path], kind: str | None = None) -> tuple[list[Eve
             stats.append({"file": str(p), "kind": None, "events": 0, "error": "형식 판별 실패"})
             continue
         evs = PARSERS[k](text, name=p.name)
+        if since or until:
+            evs = [e for e in evs if (not since or e.ts >= since) and (not until or e.ts <= until)]
         events.extend(evs)
         stats.append({"file": str(p), "kind": k, "events": len(evs)})
     return events, stats

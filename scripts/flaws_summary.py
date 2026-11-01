@@ -8,6 +8,7 @@ from collections import Counter
 r = json.load(open(sys.argv[1], encoding="utf-8"))
 print(f"- 이벤트 {r['n_events']:,}건 → 의심 {r['n_flagged']:,}건 → 탐지 {r['n_findings']:,}건 → "
       f"사건 {r['n_incidents']:,}건(반복을 묶으면 {r.get('n_groups', r['n_incidents']):,}건, "
+      f"공격 유형 {r.get('n_patterns', '?')}가지, "
       f"심각도 {r.get('severity_counts', {})}), 처리 {r['timing']['total_s']}초\n")
 print("| 규칙(전체) | 탐지 | 표시 이벤트 |\n| --- | --- | --- |")
 for k, v in r.get("rule_counts", {}).items():

@@ -137,7 +137,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
     return incidents
 
 
-_OK = {"success", "accept", "allow", "count"}
+_OK = {"success", "accept", "allow", "count", "detected"}
 
 
 def _score(sev: int, stages: list[str], fl: list[Finding], evs: list[Event]) -> int:
@@ -196,7 +196,8 @@ def _compact(e: Event) -> dict:
         v = getattr(e, k)
         if v is not None:
             d[k] = v
-    for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion"):
+    for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion",
+              "gd_type", "gd_title", "gd_severity", "gd_alias"):
         v = e.extra.get(k)
         if v:
             d[k] = v

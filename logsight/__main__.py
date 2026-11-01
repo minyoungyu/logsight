@@ -35,6 +35,10 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("--window", type=int, default=30, help="사건 묶기 시간창(분)")
     a.add_argument("--no-ai", action="store_true", help="Claude를 호출하지 않고 규칙 기반으로만")
     a.add_argument("--model", help="Claude 모델 ID (기본: claude-haiku-5-5)")
+    a.add_argument("--dry-run", action="store_true",
+                   help="Claude를 부르지 않고 보낼 내용(마스킹 후)을 ai_payload.json으로 저장")
+    a.add_argument("--since", help="이 시각 이후만 분석(예: 2017-02-12 또는 2017-02-12T10:00:00Z)")
+    a.add_argument("--until", help="이 시각 이전만 분석(날짜만 주면 그날 끝까지)")
     sub.add_parser("rules", help="탐지 규칙 목록 출력")
     c = sub.add_parser("check", help="AWS 로그가 켜져 있는지 점검(읽기 전용)")
     c.add_argument("--region")
@@ -81,12 +85,27 @@ def main(argv: list[str] | None = None) -> int:
     if missing:
         print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
         return 2
-    result = run_paths(args.paths, args.env, top=args.top, use_ai=not args.no_ai,
+    from .normalize import parse_when
+    try:
+        since, until = parse_when(args.since), parse_when(args.until, end=True)
+    except ValueError:
+        print("--since/--until 형식: 2017-02-12 또는 2017-02-12T10:00:00Z", file=sys.stderr)
+        return 2
+    result = run_paths(args.paths, args.env, since=since, until=until, top=args.top, use_ai=not args.no_ai, preview=args.dry_run,
                        model=args.model, window_min=args.window)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "report.html").write_text(render(result), encoding="utf-8")
+    if args.dry_run:
+        from .analyze import SYSTEM
+        payload = {"model": args.model or "claude-haiku-5-5", "system": SYSTEM,
+                   "incidents": [r.pop("ai_payload") for r in result["results"]]}
+        (out / "ai_payload.json").write_text(json.dumps(payload, ensure_ascii=False, indent=1),
+                                             encoding="utf-8")
+        n = len(json.dumps(payload, ensure_ascii=False))
+        print(f"AI에 보낼 내용: {out / 'ai_payload.json'} (약 {n:,}자, 사건 {len(payload['incidents'])}건). "
+              "Claude는 호출하지 않았습니다.")
     print(f"이벤트 {result['n_events']:,}건 → 의심 {result['n_flagged']:,}건 → "
           f"탐지 {result['n_findings']:,}건 → 사건 {result['n_incidents']:,}건 "
           f"(반복을 묶으면 {result['n_groups']:,}건, {result['timing']['total_s']}초)")

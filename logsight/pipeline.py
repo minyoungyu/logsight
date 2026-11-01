@@ -5,7 +5,7 @@ import json
 import time
 from pathlib import Path
 
-from .analyze import analyze
+from .analyze import analyze, build_payload
 from .config_audit import audit
 from .correlate import build_incidents, group_repeats
 from .detect import run_detections
@@ -21,7 +21,8 @@ def load_env(path: str | Path | None) -> dict:
 
 def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] | None = None,
         top: int = 5, use_ai: bool = True, model: str | None = None,
-        window_min: int = 30) -> dict:
+        window_min: int = 30, preview: bool = False) -> dict:
+    """preview=True면 Claude를 부르지 않고, 보낼 내용(마스킹 후)을 결과에 ai_payload로 담는다."""
     t0 = time.time()
     env = env or {}
     findings = run_detections(events, env)
@@ -31,8 +32,11 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     results = []
     for inc in groups[:top]:
         checks = audit(inc, env)
-        out = analyze(inc, checks, model=model, use_ai=use_ai)
-        results.append({"incident": inc, "checks": checks, **out})
+        out = analyze(inc, checks, model=model, use_ai=use_ai and not preview)
+        row = {"incident": inc, "checks": checks, **out}
+        if preview:
+            row["ai_payload"] = build_payload(inc, checks)
+        results.append(row)
     by_source: dict[str, int] = {}
     for e in events:
         by_source[e.source] = by_source.get(e.source, 0) + 1
@@ -46,6 +50,8 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "rule_counts": _rule_counts(findings),
         "n_incidents": len(incidents),
         "n_groups": len(groups),
+        # 같은 규칙 조합(공격 유형)끼리 센 수: "처음 보는 공격 유형이 몇 가지인가"
+        "n_patterns": len({tuple(sorted({f["rule"] for f in g["findings"]})) for g in groups}),
         "severity_counts": {s: sum(1 for g in groups if g["severity"] == s) for s in ("high", "medium", "low")},
         "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "score", "stages",
                                                "src_ips", "n_events", "repeats", "first_seen",
@@ -69,8 +75,9 @@ def _rule_counts(findings) -> dict:
             for k, v in sorted(out.items(), key=lambda kv: -kv[1][1])}
 
 
-def run_paths(paths: list[str], env_path: str | None = None, **kw) -> dict:
-    events, stats = load_paths([Path(p) for p in paths])
+def run_paths(paths: list[str], env_path: str | None = None, *, since=None, until=None,
+              **kw) -> dict:
+    events, stats = load_paths([Path(p) for p in paths], since=since, until=until)
     if env_path is None:
         # 폴더 안에 environment.json이 있으면 자동으로 쓴다
         for p in paths:

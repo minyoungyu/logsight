@@ -35,6 +35,9 @@ Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.
 ## 명령
 
     python -m logsight analyze <파일|폴더...> [--env environment.json] [--top 5] [--no-ai] [--model ID]
+    python -m logsight analyze <폴더> --since 2017-02-12 --until 2017-02-13   # 기간만(기간 밖 파일은 읽지 않음)
+    python -m logsight analyze <폴더> --dry-run   # Claude에 보낼 내용(마스킹 후)만 ai_payload.json으로 저장
+    python -m logsight analyze guardduty_findings.json <다른 로그...>   # GuardDuty 탐지 결과도 함께 분석
     python -m logsight rules              # 탐지 규칙 목록
     python -m unittest discover -s tests  # 테스트
     python scripts/bench.py 200000        # 대용량 처리 시간 측정

@@ -56,6 +56,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
                        ("탐지 결과", f"{result['n_findings']:,}"),
                        ("사건", f"{result['n_incidents']:,}"),
                        ("반복을 묶은 사건", f"{result.get('n_groups', result['n_incidents']):,}"),
+                       ("공격 유형", f"{result.get('n_patterns', 0):,}"),
                        ("처리 시간", f"{result['timing']['total_s']}초")):
         h.append(f"<div class='card stat'><span class=muted>{label}</span><b>{val}</b></div>")
     h.append(f"</div><div class=muted>로그 종류별: {escape(srcs) or '없음'}</div>")
@@ -118,6 +119,8 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
                              f"<pre>현재: {escape(json.dumps(c['current'], ensure_ascii=False, indent=1))}\n"
                              f"제안: {escape(json.dumps(c['proposed'], ensure_ascii=False, indent=1))}</pre>"
                              f"<pre>{escape(chr(10).join(c['cli']))}</pre>"
+                             + (f"<div class=muted>되돌리기</div><pre>{escape(chr(10).join(c['rollback']))}</pre>"
+                                if c.get("rollback") else "") +
                              f"<div class=muted>주의: {escape(c['caution'])}</div></details>")
                 h.append("</div>")
         if rep.get("unknowns"):

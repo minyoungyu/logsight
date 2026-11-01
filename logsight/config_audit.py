@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 ANY = ("0.0.0.0/0", "::/0")
 
@@ -20,7 +21,8 @@ def _rule_ports(r: dict) -> range:
 
 def _has_rule(inc: dict, *rules: str) -> list[str]:
     """사건 안에서 해당 규칙이 붙은 근거 ref 목록."""
-    return [e["ref"] for e in inc["events"] if set(e.get("rules", [])) & set(rules)]
+    return [e["ref"] for e in inc["events"]
+            if (set(e.get("rules", [])) | set(e.get("gd_alias", []))) & set(rules)]
 
 
 def _attacker_ips(inc: dict) -> list[str]:
@@ -35,6 +37,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
     trusted = [t["cidr"] if isinstance(t, dict) else t for t in env.get("trusted_ips", [])]
     admin_cidr = trusted[0] if trusted else "<관리자 IP>/32"
     rules_in_inc = {f["rule"] for f in incident["findings"]}
+    rules_in_inc |= {r for e in incident["events"] for r in e.get("gd_alias", [])}  # GuardDuty 결과의 대응 규칙
     inst_ids = set(incident.get("instances", []))
     attackers = _attacker_ips(incident)
 
@@ -186,7 +189,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
     for kind in ("iam_roles", "iam_users"):
         for p in env.get(kind, []):
             name = p.get("role_name") or p.get("user_name")
-            if not ev or not any(f"/{name}/" in a or a.endswith(f"/{name}") for a in actors):
+            if not ev or not any(a == name or f"/{name}/" in a or a.endswith(f"/{name}") for a in actors):
                 continue
             wild = []
             for pol in p.get("policies", []):
@@ -244,8 +247,46 @@ def audit(incident: dict, env: dict) -> list[dict]:
                     "# EventBridge 규칙: eventName in [StopLogging, DeleteTrail] → SNS 알림"],
             "caution": "조직(Organizations)을 쓰면 SCP로 중지를 막는다.",
         })
+    for c in out:
+        c["rollback"] = rollback(c["cli"])
     sev = {"high": 0, "medium": 1, "low": 2}
     out.sort(key=lambda c: sev.get(c["severity"], 3))
+    return out
+
+
+_RB = [  # (찾을 패턴, 되돌리는 명령 만들기)
+    (re.compile(r"aws ec2 revoke-security-group-ingress (.*)"),
+     lambda m: f"aws ec2 authorize-security-group-ingress {m[1]}"),
+    (re.compile(r"aws ec2 authorize-security-group-ingress (.*)"),
+     lambda m: f"aws ec2 revoke-security-group-ingress {m[1]}"),
+    (re.compile(r"aws ec2 create-network-acl-entry --network-acl-id (\S+) (--ingress|--egress) "
+                r"--rule-number (\d+)"),
+     lambda m: f"aws ec2 delete-network-acl-entry --network-acl-id {m[1]} {m[2]} --rule-number {m[3]}"),
+    (re.compile(r"aws ec2 modify-instance-metadata-options --instance-id (\S+) --http-tokens required(.*)"),
+     lambda m: f"aws ec2 modify-instance-metadata-options --instance-id {m[1]} --http-tokens optional{m[2]}"),
+    (re.compile(r"aws iam update-access-key (.*)--status Inactive"),
+     lambda m: f"aws iam update-access-key {m[1]}--status Active"),
+    (re.compile(r"aws cloudtrail update-trail --name (\S+) --is-multi-region-trail --enable-log-file-validation"),
+     lambda m: f"aws cloudtrail update-trail --name {m[1]} --no-is-multi-region-trail "
+               "--no-enable-log-file-validation"),
+    (re.compile(r"aws iam put-(role|user)-policy --(role|user)-name (\S+) --policy-name (\S+)"),
+     lambda m: f"aws iam delete-{m[1]}-policy --{m[2]}-name {m[3]} --policy-name {m[4]}"),
+    (re.compile(r"aws wafv2 update-web-acl"),
+     lambda m: "# 변경 전에 저장한 acl.json의 Rules로 update-web-acl을 다시 실행(LockToken은 새로 받기)"),
+]
+
+
+def rollback(cli: list[str]) -> list[str]:
+    """수정 명령을 되돌리는 명령(역순). 자동으로 만들 수 없는 명령은 건너뛴다."""
+    out = []
+    for cmd in reversed(cli):
+        if cmd.startswith("#"):
+            continue
+        for pat, make in _RB:
+            m = pat.search(cmd)
+            if m:
+                out.append(make(m))
+                break
     return out
 
 

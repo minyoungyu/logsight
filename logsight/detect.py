@@ -40,7 +40,17 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
     "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
     "WEB_PATH_PROBE":     ("T1595.003", "discovery", "없는 경로를 연속 요청(웹 스캐너)", "low"),
+    "GD_FINDING":         ("GuardDuty", "other", "GuardDuty 탐지 결과", "medium"),
 }
+
+# GuardDuty 탐지 유형의 앞부분(위협 목적) → 단계
+GD_STAGE = {"Recon": "discovery", "Discovery": "discovery", "UnauthorizedAccess": "initial-access",
+            "InitialAccess": "initial-access", "CredentialAccess": "credential-access",
+            "Persistence": "persistence", "PrivilegeEscalation": "privilege-escalation",
+            "DefenseEvasion": "defense-evasion", "Stealth": "defense-evasion", "Policy": "defense-evasion",
+            "Exfiltration": "exfiltration", "Impact": "impact", "CryptoCurrency": "impact",
+            "Backdoor": "impact", "Trojan": "impact", "Execution": "impact",
+            "AttackSequence": "impact"}
 
 STAGE_ORDER = ["discovery", "initial-access", "credential-access", "persistence",
                "privilege-escalation", "defense-evasion", "collection", "exfiltration",
@@ -77,22 +87,26 @@ class Finding:
     events: list[Event]
     detail: str
     key: str = ""      # 묶음 키(IP/주체 등) — 보고서 표시용
+    override: dict | None = None  # GuardDuty처럼 결과마다 단계·제목·심각도가 다른 경우
+
+    def _get(self, i: int, k: str) -> str:
+        return (self.override or {}).get(k) or RULES[self.rule][i]
 
     @property
     def technique(self) -> str:
-        return RULES[self.rule][0]
+        return self._get(0, "technique")
 
     @property
     def stage(self) -> str:
-        return RULES[self.rule][1]
+        return self._get(1, "stage")
 
     @property
     def title(self) -> str:
-        return RULES[self.rule][2]
+        return self._get(2, "title")
 
     @property
     def severity(self) -> str:
-        return RULES[self.rule][3]
+        return self._get(3, "severity")
 
     def to_dict(self) -> dict:
         return {"rule": self.rule, "technique": self.technique, "stage": self.stage,
@@ -313,6 +327,19 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         for seg in _bursts(evs, timedelta(minutes=5), 20, key=lambda e: e.action):
             findings.append(Finding("WEB_PATH_PROBE", seg,
                                     f"5분 안에 서로 다른 경로 {len({e.action for e in seg})}개 404/403", ip))
+
+    # --- GuardDuty 탐지 결과: 결과 하나가 탐지 하나. 같은 IP·인스턴스·키로 다른 로그와 엮인다
+    for e in events:
+        if e.source != "guardduty":
+            continue
+        typ = e.extra.get("gd_type", "")
+        sev_n = e.extra.get("gd_severity", 0)
+        sev = "high" if sev_n >= 7 else "medium" if sev_n >= 4 else "low"
+        stage = GD_STAGE.get(typ.split(":")[0], "other")
+        findings.append(Finding("GD_FINDING", [e], f"{typ} (심각도 {sev_n}, {e.extra.get('gd_count') or 1}회)",
+                                e.src_ip or e.instance_id or e.actor or "",
+                                override={"stage": stage, "severity": sev,
+                                          "title": f"GuardDuty: {e.extra.get('gd_title') or typ}"}))
 
     for f in findings:
         f.events.sort(key=lambda e: e.ts)
