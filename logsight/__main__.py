@@ -57,6 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     cs.add_argument("--web-requests", type=int, default=1_000_000, help="월 웹 요청 수")
     cs.add_argument("--waf-rules", type=int, default=3)
     cs.add_argument("--retention", type=int, default=3, help="보관 개월")
+    cs.add_argument("--region", default="ap-northeast-2", choices=["ap-northeast-2", "us-east-1"])
     args = ap.parse_args(argv)
 
     if args.cmd == "cost":
@@ -65,7 +66,8 @@ def main(argv: list[str] | None = None) -> int:
                                    s3_data_events_month=args.s3_data_events,
                                    flow_lines_month=args.flow_lines,
                                    web_requests_month=args.web_requests,
-                                   waf_rules=args.waf_rules, retention_months=args.retention)))
+                                   waf_rules=args.waf_rules, retention_months=args.retention,
+                                   region=args.region)))
         return 0
     if args.cmd in ("check", "collect"):
         return _aws_cmd(args)

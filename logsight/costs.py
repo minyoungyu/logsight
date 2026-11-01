@@ -16,13 +16,20 @@ PRICES = {
     "ct_mgmt_extra_per_100k": 2.00,     # 추가 사본
     "ct_data_per_100k": 0.10,           # 데이터 이벤트(S3 객체 읽기 등)
     "ct_event_history": 0.0,            # 최근 90일 이벤트 기록(LookupEvents) 무료
-    "vended_s3_per_gb": 0.25,           # VPC Flow Logs → S3 전송(첫 10TB 구간, 추정치. 요금표에서 재확인)
+    "vended_s3_per_gb": 0.25,           # VPC Flow Logs → S3 전송(us-east-1 첫 10TB, 서울은 0.38)
     "vended_cwl_per_gb": 0.50,          # VPC Flow Logs → CloudWatch Logs
     "s3_storage_per_gb_month": 0.023,   # S3 Standard
     "waf_acl_month": 5.00,
     "waf_rule_month": 1.00,
     "waf_per_million_req": 0.60,
     "guardduty_trial_days": 30,
+}
+
+# 리전별로 다른 단가(AWS Price List API에서 확인, 2026-11-01)
+REGION_OVERRIDES = {
+    "us-east-1": {},
+    "ap-northeast-2": {"vended_s3_per_gb": 0.38, "vended_cwl_per_gb": 0.76,
+                       "s3_storage_per_gb_month": 0.025},
 }
 
 # 이벤트·로그 크기 어림값(추정): CloudTrail 1건 ≈ 1.5KB(gzip 전), Flow Logs 1줄 ≈ 150B
@@ -33,9 +40,9 @@ GZIP_RATIO = 0.12
 
 def estimate(*, mgmt_events_month: int = 300_000, s3_data_events_month: int = 0,
              flow_lines_month: int = 5_000_000, web_requests_month: int = 1_000_000,
-             waf_rules: int = 3, retention_months: int = 3) -> dict:
+             waf_rules: int = 3, retention_months: int = 3, region: str = "ap-northeast-2") -> dict:
     """입력: 월간 규모. 출력: 로그별 월 비용(달러)과 무료 대안."""
-    p = PRICES
+    p = {**PRICES, **REGION_OVERRIDES.get(region, {})}
     ct_gb = mgmt_events_month * CT_EVENT_KB / 1024 / 1024 * GZIP_RATIO
     flow_gb = flow_lines_month * FLOW_LINE_B / 1024 ** 3
     rows = [
@@ -66,12 +73,12 @@ def estimate(*, mgmt_events_month: int = 300_000, s3_data_events_month: int = 0,
                        "flow_lines_month": flow_lines_month,
                        "web_requests_month": web_requests_month, "waf_rules": waf_rules,
                        "retention_months": retention_months},
-            "rows": rows, "prices_checked": p["_checked"],
+            "rows": rows, "prices_checked": p["_checked"], "region": region,
             "note": "어림셈이다. 이벤트 크기·압축률은 추정값이며 리전마다 단가가 다르다."}
 
 
 def format_text(res: dict) -> str:
-    out = [f"월 비용 어림셈 (단가 확인일 {res['prices_checked']}, us-east-1)"]
+    out = [f"월 비용 어림셈 (단가 확인일 {res['prices_checked']}, {res['region']})"]
     for r in res["rows"]:
         out.append(f"  {r['name']:<34} 약 ${r['monthly']:>7.2f}/월  ({r['basis']})")
         out.append(f"      대안: {r['free_alt']}")

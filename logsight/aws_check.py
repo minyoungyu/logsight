@@ -44,7 +44,7 @@ ITEMS: dict[str, dict[str, str]] = {
     "VPC_FLOW": {
         "title": "VPC Flow Logs",
         "why": "어느 IP가 어느 포트로 접속했는지(포트 스캔, 관리 포트 노출) 알 수 있다.",
-        "cost": "S3로 보내면 GB당 약 0.25달러(전송) + S3 저장. CloudWatch Logs로 보내면 GB당 0.50달러.",
+        "cost": "S3로 보내면 GB당 0.38달러(서울, us-east-1은 0.25) + S3 저장. CloudWatch Logs로 보내면 GB당 0.76달러(서울).",
         "alt": "서버 방화벽 로그(iptables/nftables LOG). scripts/setup_hostfw_log.sh 참고. "
                "단, 보안그룹이 막은 트래픽은 안 보인다.",
     },
