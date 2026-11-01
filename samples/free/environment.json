@@ -1,0 +1,26 @@
+{
+  "_comment": "무료 대체 로그 예시용 설정. WAF를 쓰지 않는 작은 팀 가정.",
+  "account_id": "111122223333",
+  "region": "ap-northeast-2",
+  "trusted_ips": [{"cidr": "192.0.2.10/32", "label": "관리자 사무실"}],
+  "instances": [
+    {"instance_id": "i-0free00000000001", "private_ip": "10.0.1.10", "public_ip": "198.51.100.25",
+     "security_groups": ["sg-0free0000000001"], "iam_role": "web-role", "imds": "required"}
+  ],
+  "security_groups": [
+    {"group_id": "sg-0free0000000001", "name": "web-sg", "ingress": [
+      {"protocol": "tcp", "from_port": 22, "to_port": 22, "cidr": "0.0.0.0/0", "description": "ssh"},
+      {"protocol": "tcp", "from_port": 80, "to_port": 80, "cidr": "0.0.0.0/0", "description": "http"},
+      {"protocol": "tcp", "from_port": 443, "to_port": 443, "cidr": "0.0.0.0/0", "description": "https"}
+    ]}
+  ],
+  "network_acls": [
+    {"nacl_id": "acl-0free000000001", "subnet_ids": ["subnet-0f1"], "entries": [
+      {"rule_number": 100, "egress": false, "protocol": "-1", "cidr": "0.0.0.0/0", "action": "allow"}
+    ]}
+  ],
+  "waf_web_acls": [],
+  "iam_roles": [],
+  "iam_users": [],
+  "cloudtrail": {}
+}

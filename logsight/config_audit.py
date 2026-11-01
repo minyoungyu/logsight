@@ -125,12 +125,27 @@ def audit(incident: dict, env: dict) -> list[dict]:
                             f"--id {acl.get('id', '<web-acl-id>')} > acl.json",
                             "# acl.json의 Rules에서 위 규칙의 OverrideAction을 {\"None\": {}}로 바꾼 뒤",
                             f"aws wafv2 update-web-acl --scope REGIONAL --name {acl['name']} "
-                            f"--id {acl.get('id', '<web-acl-id>')} --lock-token <LockToken> "
+                            f"--id {acl.get('id', '<web-acl-id>')} --lock-token {acl.get('lock_token') or '<LockToken>'} "
                             "--default-action Allow={} --rules file://rules.json "
                             "--visibility-config <기존 값>",
                         ],
                         "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
                     })
+        if env and not env.get("waf_web_acls"):
+            # WAF가 없는 계정: 유료 WAF와 무료 대안을 같이 제시
+            out.append({
+                "id": "WEB_NO_WAF", "target": "waf", "resource": "(웹 서버)",
+                "severity": "medium", "title": "웹 공격을 막는 장치(WAF)가 없음",
+                "why": "SQL 인젝션 요청이 걸러지지 않고 애플리케이션까지 그대로 들어왔다.",
+                "evidence": ev[:10], "current": None,
+                "proposed": {"options": [
+                    "무료: 서버에 ModSecurity + OWASP Core Rule Set 설치(nginx/apache)",
+                    "유료: AWS WAF + AWSManagedRulesSQLiRuleSet (월 약 5달러 + 규칙·요청 과금)",
+                    "공통: 애플리케이션 쿼리를 파라미터 바인딩으로 수정(근본 해결)"]},
+                "cli": ["# Ubuntu + nginx 예: sudo apt install libnginx-mod-http-modsecurity modsecurity-crs",
+                        "# 처음엔 SecRuleEngine DetectionOnly로 오탐 확인 후 On으로 전환"],
+                "caution": "WAF는 보조 수단이다. 취약한 쿼리 자체를 고쳐야 한다.",
+            })
         if not any(c["id"] == "WAF_SQLI_COUNT" for c in out) and env.get("waf_web_acls"):
             acl = env["waf_web_acls"][0]
             if not any("SQLi" in str(r.get("managed_rule_group", "")) for r in acl.get("rules", [])):

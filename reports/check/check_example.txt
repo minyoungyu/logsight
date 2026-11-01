@@ -1,0 +1,35 @@
+# 가짜 AWS 계정(moto)에서 실행한 예시. 실제 계정이 아님.
+계정 123456789012 / 리전 ap-northeast-2
+  꺼짐 3, 주의 2, 해당없음 2
+
+[꺼짐] CT_TRAIL: CloudTrail 추적(trail)으로 관리 이벤트를 S3에 저장 - 추적이 하나도 없음
+    왜: 누가 어떤 API를 불렀는지 남는 유일한 기록. 꺼져 있으면 사고 원인을 알 수 없다.
+    비용: 관리 이벤트 첫 사본은 무료. S3 저장 비용만 든다(작은 계정은 보통 월 1달러 미만, 추정).
+    대안: 켜기 전이라도 최근 90일 '이벤트 기록'은 무료로 남아 있다: python -m logsight collect cloudtrail-history
+    $ aws s3api create-bucket --bucket logsight-logs-123456789012-ap-northeast-2 --create-bucket-configuration LocationConstraint=ap-northeast-2
+    $ # 버킷 정책: cloudtrail.amazonaws.com에 s3:PutObject 허용(문서 참고)
+    $ aws cloudtrail create-trail --name logsight-trail --s3-bucket-name logsight-logs-123456789012-ap-northeast-2 --is-multi-region-trail --enable-log-file-validation
+    $ aws cloudtrail start-logging --name logsight-trail
+    → 자동으로 켜려면: python -m logsight check --apply CT_TRAIL
+[꺼짐] VPC_FLOW: VPC Flow Logs - VPC 1개 중 1개에 Flow Logs 없음
+    왜: 어느 IP가 어느 포트로 접속했는지(포트 스캔, 관리 포트 노출) 알 수 있다.
+    비용: S3로 보내면 GB당 약 0.25달러(전송) + S3 저장. CloudWatch Logs로 보내면 GB당 0.50달러.
+    대안: 무료 대안: 서버 방화벽 로그(iptables/nftables LOG). scripts/setup_hostfw_log.sh 참고. 단, 보안그룹이 막은 트래픽은 안 보인다.
+    $ aws ec2 create-flow-logs --resource-type VPC --resource-ids vpc-2fe3549e6ca5b7824 --traffic-type ALL --log-destination-type s3 --log-destination arn:aws:s3:::logsight-logs-123456789012-ap-northeast-2
+    → 자동으로 켜려면: python -m logsight check --apply VPC_FLOW
+[꺼짐] GUARDDUTY: Amazon GuardDuty - 탐지기 없음
+    왜: AWS가 직접 위협을 탐지한다. 로그를 따로 켜지 않아도 CloudTrail·VPC·DNS를 분석한다.
+    비용: 30일 무료 체험 후 사용량 과금(작은 계정은 월 몇 달러 수준, 추정). 여러 단계를 엮는 Extended Threat Detection은 추가 비용 없음.
+    대안: LogSight는 GuardDuty 결과를 한국어로 풀어 설명하는 용도로 같이 쓸 수 있다(2단계).
+    $ aws guardduty create-detector --enable
+    → 자동으로 켜려면: python -m logsight check --apply GUARDDUTY
+[주의] IMDSV2: EC2 메타데이터 IMDSv2 강제 - IMDSv1 허용 인스턴스 1개
+    왜: IMDSv1이면 SSRF 한 번으로 인스턴스 역할 자격증명이 빠져나갈 수 있다.
+    비용: 무료.
+    $ aws ec2 modify-instance-metadata-options --instance-id i-868c4d8fbf5a10052 --http-tokens required --http-endpoint enabled
+[주의] SG_ADMIN_OPEN: 관리 포트(22/3389)가 인터넷 전체에 열린 보안그룹 - 보안그룹 1개가 관리 포트를 전체 공개
+    왜: 무차별 대입 공격의 대부분이 여기서 시작한다.
+    비용: 무료. SSM Session Manager를 쓰면 22번을 아예 닫을 수 있다.
+    $ aws ec2 revoke-security-group-ingress --group-id sg-d9cdf279732181341 --protocol tcp --port 22 --cidr 0.0.0.0/0
+[해당없음] WAF_LOGGING: AWS WAF 로그 - WAF 웹 ACL이 없음(WAF 미사용)
+[해당없음] ALB_LOGS: ALB 접속 로그 - ALB가 없음

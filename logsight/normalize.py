@@ -218,6 +218,89 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int = 2026) -> list[Ev
     return events
 
 
+# ------------------------------------------------------------------ 서버 방화벽 로그(iptables/nftables/ufw)
+# VPC Flow Logs 대신 쓰는 무료 대안. 커널 LOG 줄 예:
+#   Nov  1 10:00:01 web1 kernel: [123.4] LOGSIGHT-NEW IN=eth0 OUT= SRC=203.0.113.5 DST=10.0.1.10 ... PROTO=TCP SPT=40000 DPT=22 ... SYN
+# 보안그룹을 통과해 서버까지 들어온 패킷만 보인다(보안그룹이 막은 것은 안 보임).
+_FW_KV = re.compile(r"\b(SRC|DST|PROTO|SPT|DPT|IN)=(\S*)")
+_FW_ISO = re.compile(r"^(\d{4}-\d\d-\d\dT[\d:.]+(?:Z|[+-]\d\d:?\d\d)?)")
+_FW_SYSLOG = re.compile(r"^(\w{3})\s+(\d+)\s+(\d\d):(\d\d):(\d\d)")
+_FW_PREFIX = re.compile(r"kernel:\s*(?:\[\s*[\d.]+\]\s*)?(.*?)\s*IN=")
+
+
+def _line_ts(line: str, year: int) -> datetime | None:
+    m = _FW_ISO.match(line)
+    if m:
+        s = m.group(1)
+        if re.search(r"[+-]\d{4}$", s):
+            s = s[:-2] + ":" + s[-2:]
+        try:
+            return _iso(s)
+        except ValueError:
+            return None
+    m = _FW_SYSLOG.match(line)
+    if m and m.group(1) in _MONTHS:
+        return datetime(year, _MONTHS[m.group(1)], int(m.group(2)), int(m.group(3)),
+                        int(m.group(4)), int(m.group(5)), tzinfo=timezone.utc)
+    return None
+
+
+def parse_hostfw(text: str, name: str = "hostfw", year: int = 2026) -> list[Event]:
+    events = []
+    for i, line in enumerate(text.splitlines()):
+        if "SRC=" not in line or "DPT=" not in line and "PROTO=ICMP" not in line:
+            continue
+        kv = dict(_FW_KV.findall(line))
+        ts = _line_ts(line.strip(), year)
+        if not ts or not kv.get("SRC"):
+            continue
+        pm = _FW_PREFIX.search(line)
+        prefix = (pm.group(1) if pm else "").upper()
+        # 차단 규칙 접두어면 reject, 그 외(허용·신규 연결 기록)는 서버까지 도달 = accept
+        outcome = "reject" if any(w in prefix for w in ("BLOCK", "DROP", "REJECT", "DENY")) else "accept"
+        proto = kv.get("PROTO", "").lower()
+        port = kv.get("DPT")
+        events.append(Event(
+            ts=ts, source="hostfw", src_ip=kv["SRC"], dst_ip=kv.get("DST"),
+            dst_port=int(port) if port and port.isdigit() else None,
+            action=f"{proto}/{port or '-'} {'REJECT' if outcome == 'reject' else 'ACCEPT'}",
+            outcome=outcome, raw_ref=f"{name}:{i+1}",
+            extra={"interface": kv.get("IN"), "protocol": proto, "prefix": prefix.strip()[:40],
+                   "raw": line.strip()[:300]},
+        ))
+    return events
+
+
+# ------------------------------------------------------------------ 웹 서버 접속 로그(nginx/apache combined)
+# WAF 로그 대신 쓰는 무료 대안. 예:
+#   203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET /item?id=1 HTTP/1.1" 200 512 "-" "curl/8.0"
+_WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+)\s+\S+\s+\S+\s+\[(?P<ts>[^\]]+)\]\s+'
+                  r'"(?P<req>[^"]*)"\s+(?P<status>\d{3})\s+(?P<size>\S+)'
+                  r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?')
+
+
+def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
+    events = []
+    for i, line in enumerate(text.splitlines()):
+        m = _WEB.match(line.strip())
+        if not m:
+            continue
+        try:
+            ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
+        except ValueError:
+            continue
+        req = m["req"].split(" ")
+        st = m["status"]
+        events.append(Event(
+            ts=ts, source="weblog", src_ip=m["ip"],
+            action=(f"{req[0]} {req[1]}" if len(req) > 1 else m["req"])[:300],
+            outcome="success" if st[0] in "23" else "failure",
+            raw_ref=f"{name}:{i+1}",
+            extra={"status": st, "ua": (m["ua"] or "")[:200]},
+        ))
+    return events
+
+
 # ------------------------------------------------------------------ CloudTrail
 _INST = re.compile(r"assumed-role/[^/]+/(i-[0-9a-f]+)")
 
@@ -296,6 +379,8 @@ PARSERS = {
     "waf": parse_waf,
     "alb": parse_alb,
     "sshauth": parse_sshauth,
+    "hostfw": parse_hostfw,
+    "weblog": parse_weblog,
 }
 
 
@@ -312,6 +397,8 @@ def detect_kind(name: str, text: str) -> str | None:
     n = name.lower()
     for kind, keys in (("cloudtrail", ("cloudtrail",)), ("vpcflow", ("vpcflow", "flow")),
                        ("waf", ("waf",)), ("alb", ("alb", "elb")),
+                       ("hostfw", ("hostfw", "iptables", "nftables", "ufw", "kern", "firewall")),
+                       ("weblog", ("nginx", "apache", "httpd", "access", "weblog")),
                        ("sshauth", ("auth", "secure", "ssh"))):
         if any(k in n for k in keys):
             return kind
@@ -320,8 +407,12 @@ def detect_kind(name: str, text: str) -> str | None:
         return "cloudtrail"
     if '"httpRequest"' in head and '"terminatingRuleId"' in head:
         return "waf"
+    if "kernel:" in head and "SRC=" in head and "PROTO=" in head:
+        return "hostfw"
     if "sshd[" in head:
         return "sshauth"
+    if _WEB.match(head.splitlines()[0] if head else ""):
+        return "weblog"
     first = head.splitlines()[0] if head else ""
     parts = first.split()
     if first.startswith("version account-id") or (len(parts) >= 14 and parts[0] == "2"):

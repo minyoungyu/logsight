@@ -41,6 +41,26 @@ Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.
 
 폴더 안에 environment.json이 있으면 자동으로 설정 점검에 쓴다. 없으면 로그만으로 분석한다.
 
+## 분석 전에: 로그가 켜져 있는지 점검하고 켜기
+
+작은 팀은 분석할 로그가 아예 꺼져 있는 경우가 많다(추정). `pip install boto3` 후:
+
+    python -m logsight check                          # 읽기 전용 점검: 꺼진 로그, 비용, 무료 대안, 켜는 명령
+    python -m logsight check --apply CT_TRAIL VPC_FLOW GUARDDUTY   # 확인('yes') 후 지정 항목만 켜기
+    python -m logsight collect environment --out environment.json  # 보안그룹·NACL·WAF·IAM 설정 자동 수집
+    python -m logsight collect cloudtrail-history --days 30 --out logs/ct.json  # 무료 90일 이벤트 기록
+    python -m logsight cost --web-requests 3000000    # 로그를 켰을 때 월 비용 어림셈
+
+돈이 드는 로그의 무료 대안:
+
+| 유료 | 무료 대안 | 분석 방법 |
+| --- | --- | --- |
+| CloudTrail 추적 | CloudTrail 이벤트 기록(최근 90일) | `collect cloudtrail-history` |
+| VPC Flow Logs | 서버 방화벽 로그 | 서버에서 `sudo bash scripts/setup_hostfw_log.sh` → `kern.log` 분석 |
+| AWS WAF 로그 | nginx/apache 접속 로그 | `access.log` 그대로 분석 |
+
+자세한 내용: [docs/로그_점검과_무료대체.md](docs/로그_점검과_무료대체.md), 남은 문제 해결 방안: [docs/해결방안_조사.md](docs/해결방안_조사.md)
+
 ## flaws.cloud 공개 데이터셋으로 돌리기
 
 summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:

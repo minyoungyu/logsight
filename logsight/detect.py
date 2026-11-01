@@ -39,6 +39,7 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
     "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
+    "WEB_PATH_PROBE":     ("T1595.003", "discovery", "없는 경로를 연속 요청(웹 스캐너)", "low"),
 }
 
 STAGE_ORDER = ["discovery", "initial-access", "credential-access", "persistence",
@@ -238,7 +239,8 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             findings.append(Finding("CT_RUN_INSTANCES_BURST", seg, f"30분 안에 {len(seg)}회", ip))
 
     # --- VPC Flow Logs
-    vpc = [e for e in events if e.source == "vpcflow"]
+    # 서버 방화벽 로그(hostfw)는 VPC Flow Logs의 무료 대안이라 같은 규칙을 쓴다
+    vpc = [e for e in events if e.source in ("vpcflow", "hostfw")]
     by_vsrc: dict[str, list[Event]] = defaultdict(list)
     for e in vpc:
         if not _is_private(e.src_ip):
@@ -291,7 +293,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
     # --- 웹 요청(WAF·ALB)의 SQL 인젝션 패턴 — WAF가 놓친 경우에도 잡기 위한 보조 규칙
     web: dict[str, list[Event]] = defaultdict(list)
     for e in events:
-        if e.source in ("waf", "alb") and e.action and "?" in e.action:
+        if e.source in ("waf", "alb", "weblog") and e.action and "?" in e.action:
             q = unquote_plus(e.action.split("?", 1)[1])
             if _SQLI.search(q) and "WAF_SQLI_NOT_BLOCKED" not in e.findings:
                 web[e.src_ip or ""].append(e)
@@ -299,6 +301,18 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         if any(f.rule == "WAF_SQLI_NOT_BLOCKED" and f.key == ip for f in findings):
             continue
         findings.append(Finding("WEB_SQLI_PATTERN", evs, _ok_fail(evs), ip))
+
+    # --- 웹 경로 탐색: 한 IP가 5분 안에 서로 다른 경로 20개 이상에서 404/403
+    probe: dict[str, list[Event]] = defaultdict(list)
+    for e in events:
+        if e.source in ("alb", "weblog") and e.outcome == "failure" and \
+                str(e.extra.get("status") or e.extra.get("elb_status")) in ("403", "404"):
+            probe[e.src_ip or ""].append(e)
+    for ip, evs in probe.items():
+        evs.sort(key=lambda e: e.ts)
+        for seg in _bursts(evs, timedelta(minutes=5), 20, key=lambda e: e.action):
+            findings.append(Finding("WEB_PATH_PROBE", seg,
+                                    f"5분 안에 서로 다른 경로 {len({e.action for e in seg})}개 404/403", ip))
 
     for f in findings:
         f.events.sort(key=lambda e: e.ts)
