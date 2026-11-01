@@ -1,0 +1,23 @@
+{"Findings": [
+ {"SchemaVersion": "2.0", "AccountId": "111122223333", "Region": "ap-northeast-2",
+  "Id": "a1b2c3d4e5f60000000000000000001", "Type": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+  "Title": "Credentials for instance role ec2-app-role used from external IP address.",
+  "Description": "Credentials created exclusively for an EC2 instance using instance role ec2-app-role have been used from external IP address 203.0.113.9.",
+  "Severity": 8, "CreatedAt": "2026-01-13T04:31:00.000Z", "UpdatedAt": "2026-01-13T04:41:00.000Z",
+  "Resource": {"ResourceType": "AccessKey",
+    "AccessKeyDetails": {"AccessKeyId": "ASIAEXAMPLEEXAMPLE01", "PrincipalId": "AROAEXAMPLE:i-0abc123def456", "UserName": "ec2-app-role", "UserType": "AssumedRole"},
+    "InstanceDetails": {"InstanceId": "i-0abc123def456"}},
+  "Service": {"ServiceName": "guardduty", "Count": 14,
+    "EventFirstSeen": "2026-01-13T04:30:00.000Z", "EventLastSeen": "2026-01-13T04:40:00.000Z",
+    "Action": {"ActionType": "AWS_API_CALL", "AwsApiCallAction": {"Api": "ListBuckets", "ServiceName": "s3.amazonaws.com",
+      "RemoteIpDetails": {"IpAddressV4": "203.0.113.9", "Country": {"CountryName": "Example"}}}}}},
+ {"SchemaVersion": "2.0", "AccountId": "111122223333", "Region": "ap-northeast-2",
+  "Id": "a1b2c3d4e5f60000000000000000002", "Type": "UnauthorizedAccess:EC2/SSHBruteForce",
+  "Title": "203.0.113.9 is performing SSH brute force attacks against i-0abc123def456.",
+  "Severity": 5, "CreatedAt": "2026-01-13T04:12:00.000Z", "UpdatedAt": "2026-01-13T04:20:00.000Z",
+  "Resource": {"ResourceType": "Instance", "InstanceDetails": {"InstanceId": "i-0abc123def456"}},
+  "Service": {"ServiceName": "guardduty", "Count": 60,
+    "EventFirstSeen": "2026-01-13T04:10:00.000Z", "EventLastSeen": "2026-01-13T04:19:00.000Z",
+    "Action": {"ActionType": "NETWORK_CONNECTION", "NetworkConnectionAction": {"ConnectionDirection": "INBOUND",
+      "LocalPortDetails": {"Port": 22}, "RemoteIpDetails": {"IpAddressV4": "203.0.113.9"}}}}}
+]}

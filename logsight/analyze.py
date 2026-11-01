@@ -183,7 +183,7 @@ def rule_based(incident: dict, checks: list[dict]) -> dict:
     flow = []
     for f in sorted(incident["findings"], key=lambda f: f["first"]):
         flow.append({"stage": f["stage"], "technique": f["technique"], "time": f["first"],
-                     "what": f"{f['title']} — {f['detail']}" + (f" (대상: {f['key']})" if f["key"] else ""),
+                     "what": f"{f['title']} — {f['detail']}" + (f" (기준: {f['key']})" if f["key"] else ""),
                      "evidence": f["evidence"][:8]})
     who = ", ".join(incident["src_ips"][:3]) or ", ".join(incident["actors"][:2]) or "알 수 없는 주체"
     stages = " → ".join(STAGE_KO[s] for s in incident["stages"])

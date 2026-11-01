@@ -1,0 +1,5 @@
+{"Records":[
+ {"eventTime":"2026-01-13T04:25:00Z","eventSource":"s3.amazonaws.com","eventName":"ListBuckets","sourceIPAddress":"203.0.113.9","awsRegion":"ap-northeast-2","userIdentity":{"type":"AssumedRole","arn":"arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456"}},
+ {"eventTime":"2026-01-13T04:26:30Z","eventSource":"s3.amazonaws.com","eventName":"GetObject","sourceIPAddress":"203.0.113.9","awsRegion":"ap-northeast-2","userIdentity":{"type":"AssumedRole","arn":"arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456"}},
+ {"eventTime":"2026-01-13T04:27:00Z","eventSource":"iam.amazonaws.com","eventName":"CreateUser","errorCode":"AccessDenied","sourceIPAddress":"203.0.113.9","awsRegion":"ap-northeast-2","userIdentity":{"type":"AssumedRole","arn":"arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456"}}
+]}

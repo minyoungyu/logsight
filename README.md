@@ -11,6 +11,7 @@ AI:ON 2026 출품작(팀 로그파인더).
     pip install -r requirements.txt
     python -m logsight analyze samples/demo --out reports/demo
     # reports/demo/report.html 을 브라우저로 연다
+    python -m logsight analyze samples/combined --out reports/combined   # 로그 8종을 한 폴더에 넣은 예
 
 웹 데모: `uvicorn app:app --reload` → http://127.0.0.1:8000 (샘플 바로 보기: /demo)
 
@@ -38,6 +39,7 @@ Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.
     python -m logsight analyze <폴더> --since 2017-02-12 --until 2017-02-13   # 기간만(기간 밖 파일은 읽지 않음)
     python -m logsight analyze <폴더> --dry-run   # Claude에 보낼 내용(마스킹 후)만 ai_payload.json으로 저장
     python -m logsight analyze guardduty_findings.json <다른 로그...>   # GuardDuty 탐지 결과도 함께 분석
+    python -m logsight analyze <폴더> --syslog-tz +09:00 --year 2026   # auth.log·kern.log처럼 연도·시간대 없는 줄의 해석
     python -m logsight rules              # 탐지 규칙 목록
     python -m unittest discover -s tests  # 테스트
     python scripts/bench.py 200000        # 대용량 처리 시간 측정
@@ -79,8 +81,10 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
     logsight/        분석 엔진
     app.py           FastAPI 웹 데모
     samples/demo/    작은 샘플 로그 4종 + 설정 스냅샷 예시
-    tests/           단위·통합 테스트(23개)
+    samples/combined/ 로그 8종을 한곳에 모은 합성 샘플(정규화 점검용)
+    tests/           단위·통합 테스트(58개)
     scripts/         성능 측정
     reports/demo/    샘플 분석 결과(HTML, JSON, 화면 캡처)
+    reports/combined/ 8종 통합 분석 결과
     docs/            중간보고서용 구현 요약
     .github/workflows/test.yml  Windows·macOS·Linux 자동 테스트(저장소에 올리면 동작)

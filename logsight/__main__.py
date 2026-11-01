@@ -35,6 +35,8 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("--window", type=int, default=30, help="사건 묶기 시간창(분)")
     a.add_argument("--no-ai", action="store_true", help="Claude를 호출하지 않고 규칙 기반으로만")
     a.add_argument("--model", help="Claude 모델 ID (기본: claude-haiku-5-5)")
+    a.add_argument("--year", type=int, help="연도가 없는 syslog 줄(auth.log, kern.log)의 연도(기본: 올해, 미래면 작년)")
+    a.add_argument("--syslog-tz", help="syslog 줄의 시간대(예: +09:00). 기본 UTC. 한국 서버 기본 설정이면 +09:00")
     a.add_argument("--dry-run", action="store_true",
                    help="Claude를 부르지 않고 보낼 내용(마스킹 후)을 ai_payload.json으로 저장")
     a.add_argument("--since", help="이 시각 이후만 분석(예: 2017-02-12 또는 2017-02-12T10:00:00Z)")
@@ -85,7 +87,18 @@ def main(argv: list[str] | None = None) -> int:
     if missing:
         print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
         return 2
-    from .normalize import parse_when
+    from .normalize import SYSLOG, parse_when
+    if args.year:
+        SYSLOG["year"] = args.year
+    if args.syslog_tz:
+        try:
+            sign = -1 if args.syslog_tz.startswith("-") else 1
+            hh, mm = args.syslog_tz.lstrip("+-").split(":")
+            from datetime import timedelta, timezone
+            SYSLOG["tz"] = timezone(sign * timedelta(hours=int(hh), minutes=int(mm)))
+        except ValueError:
+            print("--syslog-tz 형식: +09:00", file=sys.stderr)
+            return 2
     try:
         since, until = parse_when(args.since), parse_when(args.until, end=True)
     except ValueError:

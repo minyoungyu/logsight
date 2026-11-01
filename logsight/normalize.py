@@ -14,12 +14,13 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterable, Iterator
+from urllib.parse import urlsplit
 
 
 @dataclass(slots=True)
 class Event:
     ts: datetime                 # 발생 시각(UTC)
-    source: str                  # cloudtrail | vpcflow | waf | alb | sshauth
+    source: str                  # cloudtrail | vpcflow | waf | alb | sshauth | hostfw | weblog | guardduty
     src_ip: str | None = None    # 출발지 IP
     dst_ip: str | None = None    # 대상 IP
     dst_port: int | None = None  # 대상 포트
@@ -27,15 +28,50 @@ class Event:
     instance_id: str | None = None
     access_key: str | None = None  # 마스킹된 액세스 키 ID(연결고리용)
     action: str | None = None    # 행위 또는 API 이름
-    outcome: str | None = None   # success | failure | accept | reject | block | allow | count
+    outcome: str | None = None   # 원본 표현: success | failure | accept | reject | block | allow | count | detected
     raw_ref: str = ""            # 근거 위치(파일:줄 또는 파일:레코드 번호)
     extra: dict = field(default_factory=dict)
     findings: list[str] = field(default_factory=list)  # 이 이벤트에 붙은 탐지 규칙 ID
 
+    @property
+    def status(self) -> str:
+        """로그 종류와 무관한 공통 결과: success(요청이 처리됨) | failure(거부·실패) | unknown."""
+        return _STATUS.get((self.outcome or "").lower(), "unknown")
+
+    @property
+    def disposition(self) -> str:
+        """보안 장치의 판단: allowed | blocked | detected | none(장치 판단이 없는 로그)."""
+        o = (self.outcome or "").lower()
+        return _DISPOSITION.get(o, "none")
+
     def to_dict(self) -> dict:
         d = asdict(self)
         d["ts"] = self.ts.isoformat()
+        d["status"], d["disposition"] = self.status, self.disposition
         return d
+
+
+# 원본마다 다른 결과 표현을 공통 값으로(OCSF의 status/disposition 개념을 단순화)
+_STATUS = {"success": "success", "accept": "success", "allow": "success", "count": "success",
+           "failure": "failure", "reject": "failure", "block": "failure", "detected": "unknown"}
+_DISPOSITION = {"accept": "allowed", "allow": "allowed", "count": "allowed", "reject": "blocked",
+                "block": "blocked", "detected": "detected"}
+
+# syslog 형식(연도·시간대가 없는 줄) 해석 설정. CLI의 --year/--syslog-tz로 바꾼다.
+SYSLOG = {"year": None, "tz": timezone.utc}
+
+
+def _syslog_dt(mon: int, day: int, hh: int, mm: int, ss: int, year: int | None = None) -> datetime:
+    """연도가 없으면 올해로 보되, 미래 시각이 되면 작년으로 본다(연말에 쌓인 로그를 연초에 분석하는 경우)."""
+    tz = SYSLOG["tz"]
+    y = year or SYSLOG["year"]
+    if y:
+        return datetime(y, mon, day, hh, mm, ss, tzinfo=tz).astimezone(timezone.utc)
+    now = datetime.now(timezone.utc)
+    dt = datetime(now.year, mon, day, hh, mm, ss, tzinfo=tz)
+    if dt - now > timedelta(days=1):
+        dt = dt.replace(year=now.year - 1)
+    return dt.astimezone(timezone.utc)
 
 
 def _epoch(sec: str | int) -> datetime:
@@ -176,14 +212,19 @@ def parse_alb(text: str, name: str = "alb") -> list[Event]:
         try:
             ts = _iso(f[1])
             client = f[3].rsplit(":", 1)[0]
+            target = f[4].rsplit(":", 1)[0] if f[4] != "-" else None
             req = f[12].strip('"').split(" ")
-            url = req[1] if len(req) > 1 else ""
+            method, url = (req[0], req[1]) if len(req) > 1 else (req[0], "")
+            # 다른 웹 로그(nginx, WAF)와 같은 형식으로: 행위는 "메서드 경로?쿼리", 호스트·포트는 따로
+            u = urlsplit(url)
+            path = (u.path or "/") + (f"?{u.query}" if u.query else "")
+            port = u.port or {"http": 80, "https": 443}.get(u.scheme)
             events.append(Event(
-                ts=ts, source="alb", src_ip=client,
-                action=f"{req[0]} {url}" if req else None,
+                ts=ts, source="alb", src_ip=client, dst_ip=target, dst_port=port,
+                action=f"{method} {path}"[:300],
                 outcome="success" if f[8].startswith(("2", "3")) else "failure",
                 raw_ref=f"{name}:{i+1}",
-                extra={"elb_status": f[8], "ua": f[13].strip('"') if len(f) > 13 else ""},
+                extra={"http_status": int(f[8]) if f[8].isdigit() else None, "host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else ""},
             ))
         except (ValueError, IndexError):
             continue
@@ -200,14 +241,14 @@ _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
 
-def parse_sshauth(text: str, name: str = "sshauth", year: int = 2026) -> list[Event]:
+def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> list[Event]:
     events = []
     for i, line in enumerate(text.splitlines()):
         m = _SSH.search(line)
         if not m or m["mon"] not in _MONTHS:
             continue
         hh, mm, ss = (int(x) for x in m["time"].split(":"))
-        ts = datetime(year, _MONTHS[m["mon"]], int(m["day"]), hh, mm, ss, tzinfo=timezone.utc)
+        ts = _syslog_dt(_MONTHS[m["mon"]], int(m["day"]), hh, mm, ss, year)
         events.append(Event(
             ts=ts, source="sshauth", src_ip=m["ip"], actor=m["user"], dst_port=22,
             action="ssh_login",
@@ -228,7 +269,7 @@ _FW_SYSLOG = re.compile(r"^(\w{3})\s+(\d+)\s+(\d\d):(\d\d):(\d\d)")
 _FW_PREFIX = re.compile(r"kernel:\s*(?:\[\s*[\d.]+\]\s*)?(.*?)\s*IN=")
 
 
-def _line_ts(line: str, year: int) -> datetime | None:
+def _line_ts(line: str, year: int | None) -> datetime | None:
     m = _FW_ISO.match(line)
     if m:
         s = m.group(1)
@@ -240,12 +281,12 @@ def _line_ts(line: str, year: int) -> datetime | None:
             return None
     m = _FW_SYSLOG.match(line)
     if m and m.group(1) in _MONTHS:
-        return datetime(year, _MONTHS[m.group(1)], int(m.group(2)), int(m.group(3)),
-                        int(m.group(4)), int(m.group(5)), tzinfo=timezone.utc)
+        return _syslog_dt(_MONTHS[m.group(1)], int(m.group(2)), int(m.group(3)),
+                          int(m.group(4)), int(m.group(5)), year)
     return None
 
 
-def parse_hostfw(text: str, name: str = "hostfw", year: int = 2026) -> list[Event]:
+def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> list[Event]:
     events = []
     for i, line in enumerate(text.splitlines()):
         if "SRC=" not in line or "DPT=" not in line and "PROTO=ICMP" not in line:
@@ -296,7 +337,7 @@ def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
             action=(f"{req[0]} {req[1]}" if len(req) > 1 else m["req"])[:300],
             outcome="success" if st[0] in "23" else "failure",
             raw_ref=f"{name}:{i+1}",
-            extra={"status": st, "ua": (m["ua"] or "")[:200]},
+            extra={"http_status": int(st), "ua": (m["ua"] or "")[:200]},
         ))
     return events
 
@@ -367,7 +408,8 @@ def parse_guardduty(text: str, name: str = "guardduty") -> list[Event]:
         action = svc.get("Action") or {}
         res = f.get("Resource") or {}
         try:
-            ts = _iso(svc.get("EventLastSeen") or f.get("UpdatedAt") or f.get("CreatedAt"))
+            ts = _iso(svc.get("EventFirstSeen") or f.get("CreatedAt") or svc.get("EventLastSeen")
+                      or f.get("UpdatedAt"))
         except (TypeError, ValueError):
             continue
         akd = res.get("AccessKeyDetails") or {}
@@ -383,6 +425,7 @@ def parse_guardduty(text: str, name: str = "guardduty") -> list[Event]:
             extra={"gd_id": f.get("Id"), "gd_type": typ, "gd_title": str(f.get("Title", ""))[:200],
                    "gd_severity": float(f.get("Severity") or 0), "gd_count": svc.get("Count"),
                    "gd_api": api, "gd_resource": res.get("ResourceType"),
+                   "gd_last_seen": svc.get("EventLastSeen") or f.get("UpdatedAt"),
                    "gd_alias": sorted({r for k, r in GD_ALIAS if k in typ})},
         ))
     return events

@@ -1,0 +1,38 @@
+{
+  "_comment": "감시 대상 계정의 설정 스냅샷(예시). 실제 계정에서는 aws ec2 describe-security-groups 등의 결과를 이 형식으로 옮긴다.",
+  "account_id": "111122223333",
+  "region": "ap-northeast-2",
+  "trusted_ips": [{"cidr": "192.0.2.10/32", "label": "관리자 사무실"}],
+  "instances": [
+    {"instance_id": "i-0abc123def456", "private_ip": "10.0.1.10", "public_ip": "198.51.100.25",
+     "security_groups": ["sg-0web000000000001"], "iam_role": "ec2-app-role", "imds": "optional"}
+  ],
+  "security_groups": [
+    {"group_id": "sg-0web000000000001", "name": "web-sg", "ingress": [
+      {"protocol": "tcp", "from_port": 22, "to_port": 22, "cidr": "0.0.0.0/0", "description": "ssh"},
+      {"protocol": "tcp", "from_port": 80, "to_port": 80, "cidr": "0.0.0.0/0", "description": "http"}
+    ]}
+  ],
+  "network_acls": [
+    {"nacl_id": "acl-0default00000001", "subnet_ids": ["subnet-0a1"], "entries": [
+      {"rule_number": 100, "egress": false, "protocol": "-1", "cidr": "0.0.0.0/0", "action": "allow"}
+    ]}
+  ],
+  "waf_web_acls": [
+    {"name": "logsight-demo-acl", "id": "a1b2c3d4-5678-90ab-cdef-EXAMPLE11111", "default_action": "ALLOW",
+     "rules": [
+       {"name": "AWS-AWSManagedRulesCommonRuleSet", "priority": 0, "managed_rule_group": "AWSManagedRulesCommonRuleSet", "override_action": "none"},
+       {"name": "AWS-AWSManagedRulesSQLiRuleSet", "priority": 1, "managed_rule_group": "AWSManagedRulesSQLiRuleSet", "override_action": "count"}
+     ]}
+  ],
+  "iam_roles": [
+    {"role_name": "ec2-app-role",
+     "needed_actions": ["s3:GetObject", "s3:PutObject"],
+     "needed_resources": ["arn:aws:s3:::app-assets-bucket/*"],
+     "policies": [{"name": "app-s3-full", "document": {"Version": "2012-10-17", "Statement": [
+       {"Effect": "Allow", "Action": "s3:*", "Resource": "*"},
+       {"Effect": "Allow", "Action": "iam:*", "Resource": "*"}]}}]}
+  ],
+  "iam_users": [],
+  "cloudtrail": {"trail_name": "main-trail", "multi_region": false, "log_file_validation": false}
+}

@@ -1,0 +1,2116 @@
+{
+ "generated_at": "2026-11-01T18:06:16Z",
+ "files": [
+  {
+   "file": "samples/combined/alb.log",
+   "kind": "alb",
+   "events": 2
+  },
+  {
+   "file": "samples/combined/auth.log",
+   "kind": "sshauth",
+   "events": 3
+  },
+  {
+   "file": "samples/combined/cloudtrail.json",
+   "kind": "cloudtrail",
+   "events": 3
+  },
+  {
+   "file": "samples/combined/guardduty_findings.json",
+   "kind": "guardduty",
+   "events": 2
+  },
+  {
+   "file": "samples/combined/hostfw_kern.log",
+   "kind": "hostfw",
+   "events": 30
+  },
+  {
+   "file": "samples/combined/nginx_access.log",
+   "kind": "weblog",
+   "events": 42
+  },
+  {
+   "file": "samples/combined/vpcflow.log",
+   "kind": "vpcflow",
+   "events": 3
+  },
+  {
+   "file": "samples/combined/waf.log",
+   "kind": "waf",
+   "events": 2
+  }
+ ],
+ "n_events": 87,
+ "events_by_source": {
+  "alb": 2,
+  "sshauth": 3,
+  "cloudtrail": 3,
+  "guardduty": 2,
+  "hostfw": 30,
+  "weblog": 42,
+  "vpcflow": 3,
+  "waf": 2
+ },
+ "n_flagged": 57,
+ "n_findings": 12,
+ "rule_counts": {
+  "WEB_PATH_PROBE": {
+   "findings": 1,
+   "events": 22
+  },
+  "VPC_PORT_SCAN": {
+   "findings": 1,
+   "events": 20
+  },
+  "WEB_SQLI_PATTERN": {
+   "findings": 1,
+   "events": 4
+  },
+  "SSH_SUCCESS_AFTER_FAIL": {
+   "findings": 1,
+   "events": 3
+  },
+  "CT_INSTANCE_CRED_OUTSIDE": {
+   "findings": 1,
+   "events": 3
+  },
+  "GD_FINDING": {
+   "findings": 2,
+   "events": 2
+  },
+  "VPC_REMOTE_ADMIN_EXPOSED": {
+   "findings": 2,
+   "events": 2
+  },
+  "WAF_SQLI_NOT_BLOCKED": {
+   "findings": 1,
+   "events": 1
+  },
+  "CT_IAM_PERSISTENCE": {
+   "findings": 1,
+   "events": 1
+  },
+  "WAF_BLOCKED": {
+   "findings": 1,
+   "events": 1
+  }
+ },
+ "n_incidents": 3,
+ "n_groups": 3,
+ "n_patterns": 3,
+ "severity_counts": {
+  "high": 1,
+  "medium": 1,
+  "low": 1
+ },
+ "incident_index": [
+  {
+   "id": "INC-001",
+   "start": "2026-01-13T04:10:00+00:00",
+   "end": "2026-01-13T04:30:00+00:00",
+   "severity": "high",
+   "score": 434,
+   "stages": [
+    "initial-access",
+    "credential-access",
+    "persistence"
+   ],
+   "src_ips": [
+    "203.0.113.9"
+   ],
+   "n_events": 10,
+   "repeats": 1,
+   "first_seen": "2026-01-13T04:10:00+00:00",
+   "last_seen": "2026-01-13T04:30:00+00:00",
+   "rules": [
+    "CT_IAM_PERSISTENCE",
+    "CT_INSTANCE_CRED_OUTSIDE",
+    "GD_FINDING",
+    "SSH_SUCCESS_AFTER_FAIL",
+    "VPC_REMOTE_ADMIN_EXPOSED",
+    "WAF_SQLI_NOT_BLOCKED"
+   ]
+  },
+  {
+   "id": "INC-002",
+   "start": "2026-10-20T03:00:00+00:00",
+   "end": "2026-10-20T03:10:20+00:00",
+   "severity": "medium",
+   "score": 299,
+   "stages": [
+    "discovery",
+    "initial-access"
+   ],
+   "src_ips": [
+    "203.0.113.50"
+   ],
+   "n_events": 46,
+   "repeats": 1,
+   "first_seen": "2026-10-20T03:00:00+00:00",
+   "last_seen": "2026-10-20T03:10:20+00:00",
+   "rules": [
+    "VPC_PORT_SCAN",
+    "VPC_REMOTE_ADMIN_EXPOSED",
+    "WEB_PATH_PROBE",
+    "WEB_SQLI_PATTERN"
+   ]
+  },
+  {
+   "id": "INC-003",
+   "start": "2026-01-13T04:21:00+00:00",
+   "end": "2026-01-13T04:21:00+00:00",
+   "severity": "low",
+   "score": 96,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "198.51.100.77"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "first_seen": "2026-01-13T04:21:00+00:00",
+   "last_seen": "2026-01-13T04:21:00+00:00",
+   "rules": [
+    "WAF_BLOCKED"
+   ]
+  }
+ ],
+ "results": [
+  {
+   "incident": {
+    "start": "2026-01-13T04:10:00+00:00",
+    "end": "2026-01-13T04:30:00+00:00",
+    "severity": "high",
+    "score": 434,
+    "stages": [
+     "initial-access",
+     "credential-access",
+     "persistence"
+    ],
+    "src_ips": [
+     "203.0.113.9"
+    ],
+    "instances": [
+     "i-0abc123def456"
+    ],
+    "actors": [
+     "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+     "ec2-app-role",
+     "root",
+     "ubuntu"
+    ],
+    "sources": [
+     "cloudtrail",
+     "guardduty",
+     "sshauth",
+     "vpcflow",
+     "waf"
+    ],
+    "n_events": 10,
+    "findings": [
+     {
+      "rule": "GD_FINDING",
+      "technique": "T1110",
+      "stage": "credential-access",
+      "title": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입)",
+      "severity": "medium",
+      "detail": "UnauthorizedAccess:EC2/SSHBruteForce (심각도 5.0, 60회)",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:10:00+00:00",
+      "last": "2026-01-13T04:10:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:2"
+      ]
+     },
+     {
+      "rule": "WAF_SQLI_NOT_BLOCKED",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW)",
+      "severity": "high",
+      "detail": "1건 통과",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:20:00+00:00",
+      "last": "2026-01-13T04:20:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "waf.log:1"
+      ]
+     },
+     {
+      "rule": "VPC_REMOTE_ADMIN_EXPOSED",
+      "technique": "T1133",
+      "stage": "initial-access",
+      "title": "외부에서 관리 포트(22/3389) 접속 허용",
+      "severity": "medium",
+      "detail": "포트 [22] 허용 1건",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:20:00+00:00",
+      "last": "2026-01-13T04:20:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "vpcflow.log:1"
+      ]
+     },
+     {
+      "rule": "SSH_SUCCESS_AFTER_FAIL",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "연속 실패 뒤 SSH 로그인 성공",
+      "severity": "high",
+      "detail": "직전 30분 실패 2건 뒤 'ubuntu' 성공",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:21:05+00:00",
+      "last": "2026-01-13T04:22:40+00:00",
+      "n_events": 3,
+      "evidence": [
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
+      "rule": "CT_INSTANCE_CRED_OUTSIDE",
+      "technique": "T1552.005",
+      "stage": "credential-access",
+      "title": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용",
+      "severity": "high",
+      "detail": "3건(성공 2, 실패·거부 1)",
+      "key": "i-0abc123def456",
+      "first": "2026-01-13T04:25:00+00:00",
+      "last": "2026-01-13T04:27:00+00:00",
+      "n_events": 3,
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "rule": "CT_IAM_PERSISTENCE",
+      "technique": "T1098",
+      "stage": "persistence",
+      "title": "IAM 사용자·키·권한 생성/변경",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "first": "2026-01-13T04:27:00+00:00",
+      "last": "2026-01-13T04:27:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "rule": "GD_FINDING",
+      "technique": "T1552.005",
+      "stage": "credential-access",
+      "title": "GuardDuty: 인스턴스 역할 자격증명이 인스턴스 밖에서 사용",
+      "severity": "high",
+      "detail": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 14회)",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:30:00+00:00",
+      "last": "2026-01-13T04:30:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:1"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "guardduty_findings.json:2",
+      "ts": "2026-01-13T04:10:00+00:00",
+      "source": "guardduty",
+      "action": "UnauthorizedAccess:EC2/SSHBruteForce",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "GD_FINDING"
+      ],
+      "dst_port": 22,
+      "instance_id": "i-0abc123def456",
+      "gd_type": "UnauthorizedAccess:EC2/SSHBruteForce",
+      "gd_title": "203.0.113.9 is performing SSH brute force attacks against i-0abc123def456.",
+      "gd_severity": 5.0,
+      "gd_alias": [
+       "SSH_BRUTE_FORCE"
+      ],
+      "gd_count": 60,
+      "gd_last_seen": "2026-01-13T04:19:00.000Z"
+     },
+     {
+      "ref": "waf.log:1",
+      "ts": "2026-01-13T04:20:00+00:00",
+      "source": "waf",
+      "action": "GET /item?id=1%27%20OR%201%3D1--",
+      "outcome": "allow",
+      "status": "success",
+      "disposition": "allowed",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "WAF_SQLI_NOT_BLOCKED"
+      ],
+      "counted_rules": [
+       "SQLi_QUERYARGUMENTS"
+      ],
+      "ua": "sqlmap"
+     },
+     {
+      "ref": "vpcflow.log:1",
+      "ts": "2026-01-13T04:20:00+00:00",
+      "source": "vpcflow",
+      "action": "tcp/22 ACCEPT",
+      "outcome": "accept",
+      "status": "success",
+      "disposition": "allowed",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "VPC_REMOTE_ADMIN_EXPOSED"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 22,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "auth.log:1",
+      "ts": "2026-01-13T04:21:05+00:00",
+      "source": "sshauth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "auth.log:2",
+      "ts": "2026-01-13T04:21:09+00:00",
+      "source": "sshauth",
+      "action": "ssh_login",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "root"
+     },
+     {
+      "ref": "auth.log:3",
+      "ts": "2026-01-13T04:22:40+00:00",
+      "source": "sshauth",
+      "action": "ssh_login",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "dst_port": 22,
+      "actor": "ubuntu"
+     },
+     {
+      "ref": "cloudtrail.json:1",
+      "ts": "2026-01-13T04:25:00+00:00",
+      "source": "cloudtrail",
+      "action": "s3:ListBuckets",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "CT_INSTANCE_CRED_OUTSIDE"
+      ],
+      "actor": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "instance_id": "i-0abc123def456",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:2",
+      "ts": "2026-01-13T04:26:30+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetObject",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "CT_INSTANCE_CRED_OUTSIDE"
+      ],
+      "actor": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "instance_id": "i-0abc123def456",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:3",
+      "ts": "2026-01-13T04:27:00+00:00",
+      "source": "cloudtrail",
+      "action": "iam:CreateUser",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "CT_INSTANCE_CRED_OUTSIDE",
+       "CT_IAM_PERSISTENCE"
+      ],
+      "actor": "arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456",
+      "instance_id": "i-0abc123def456",
+      "errorCode": "AccessDenied",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "guardduty_findings.json:1",
+      "ts": "2026-01-13T04:30:00+00:00",
+      "source": "guardduty",
+      "action": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "GD_FINDING"
+      ],
+      "actor": "ec2-app-role",
+      "instance_id": "i-0abc123def456",
+      "access_key": "ASIAEXAM********LE01",
+      "gd_type": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+      "gd_title": "Credentials for instance role ec2-app-role used from external IP address.",
+      "gd_severity": 8.0,
+      "gd_alias": [
+       "CT_INSTANCE_CRED_OUTSIDE"
+      ],
+      "gd_count": 14,
+      "gd_last_seen": "2026-01-13T04:40:00.000Z"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 4,
+     "top_actions": [
+      [
+       "tcp/8080 REJECT",
+       1
+      ],
+      [
+       "tcp/3306 REJECT",
+       1
+      ],
+      [
+       "GET /login",
+       1
+      ],
+      [
+       "GET /search?q=1%27",
+       1
+      ]
+     ],
+     "sources": {
+      "vpcflow": 2,
+      "alb": 2
+     }
+    },
+    "id": "INC-001",
+    "repeats": 1,
+    "first_seen": "2026-01-13T04:10:00+00:00",
+    "last_seen": "2026-01-13T04:30:00+00:00",
+    "repeat_ids": []
+   },
+   "checks": [
+    {
+     "id": "SG_ADMIN_PORT_OPEN",
+     "target": "security_group",
+     "resource": "sg-0web000000000001",
+     "severity": "high",
+     "title": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+     "why": "외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.",
+     "evidence": [
+      "guardduty_findings.json:2",
+      "vpcflow.log:1",
+      "auth.log:1",
+      "auth.log:2",
+      "auth.log:3"
+     ],
+     "current": {
+      "protocol": "tcp",
+      "from_port": 22,
+      "to_port": 22,
+      "cidr": "0.0.0.0/0",
+      "description": "ssh"
+     },
+     "proposed": {
+      "protocol": "tcp",
+      "from_port": 22,
+      "to_port": 22,
+      "cidr": "192.0.2.10/32",
+      "description": "관리자 IP만 허용(또는 SSM Session Manager로 대체)"
+     },
+     "cli": [
+      "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0",
+      "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32"
+     ],
+     "caution": "관리자 IP가 바뀌면 접속이 끊긴다. 적용 전 현재 관리자 IP와 SSM 접속 경로를 확인한다.",
+     "rollback": [
+      "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32",
+      "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0"
+     ]
+    },
+    {
+     "id": "WAF_SQLI_COUNT",
+     "target": "waf",
+     "resource": "logsight-demo-acl",
+     "severity": "high",
+     "title": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+     "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
+     "evidence": [
+      "waf.log:1"
+     ],
+     "current": {
+      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "Count": {}
+      }
+     },
+     "proposed": {
+      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "None": {}
+      }
+     },
+     "cli": [
+      "aws wafv2 get-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 > acl.json",
+      "# acl.json의 Rules에서 위 규칙의 OverrideAction을 {\"None\": {}}로 바꾼 뒤",
+      "aws wafv2 update-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 --lock-token <LockToken> --default-action Allow={} --rules file://rules.json --visibility-config <기존 값>"
+     ],
+     "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
+     "rollback": [
+      "# 변경 전에 저장한 acl.json의 Rules로 update-web-acl을 다시 실행(LockToken은 새로 받기)"
+     ]
+    },
+    {
+     "id": "IMDSV1_ENABLED",
+     "target": "ec2",
+     "resource": "i-0abc123def456",
+     "severity": "high",
+     "title": "인스턴스 i-0abc123def456가 IMDSv1을 허용",
+     "why": "토큰 없이 메타데이터에서 역할 자격증명을 꺼낼 수 있어 탈취 위험이 크다.",
+     "evidence": [
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3",
+      "guardduty_findings.json:1"
+     ],
+     "current": {
+      "HttpTokens": "optional"
+     },
+     "proposed": {
+      "HttpTokens": "required"
+     },
+     "cli": [
+      "aws ec2 modify-instance-metadata-options --instance-id i-0abc123def456 --http-tokens required --http-endpoint enabled"
+     ],
+     "caution": "오래된 SDK를 쓰는 앱은 IMDSv2를 지원하는지 먼저 확인한다.",
+     "rollback": [
+      "aws ec2 modify-instance-metadata-options --instance-id i-0abc123def456 --http-tokens optional --http-endpoint enabled"
+     ]
+    },
+    {
+     "id": "IAM_OVERBROAD",
+     "target": "iam",
+     "resource": "ec2-app-role",
+     "severity": "high",
+     "title": "역할 ec2-app-role의 권한이 과도(와일드카드)",
+     "why": "탈취된 자격증명으로 필요 이상의 자원 조회·변경이 가능했다.",
+     "evidence": [
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3",
+      "guardduty_findings.json:1"
+     ],
+     "current": [
+      {
+       "policy": "app-s3-full",
+       "statement": {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+       }
+      },
+      {
+       "policy": "app-s3-full",
+       "statement": {
+        "Effect": "Allow",
+        "Action": "iam:*",
+        "Resource": "*"
+       }
+      }
+     ],
+     "proposed": {
+      "Version": "2012-10-17",
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Action": [
+         "s3:GetObject",
+         "s3:PutObject"
+        ],
+        "Resource": [
+         "arn:aws:s3:::app-assets-bucket/*"
+        ]
+       }
+      ]
+     },
+     "cli": [
+      "aws iam put-role-policy --role-name ec2-app-role --policy-name least-privilege --policy-document file://policy.json",
+      "# 이후 와일드카드 정책 분리(detach/delete)"
+     ],
+     "caution": "실제로 쓰는 API는 IAM Access Analyzer의 '마지막 사용' 정보로 확인한다.",
+     "rollback": [
+      "aws iam delete-role-policy --role-name ec2-app-role --policy-name least-privilege"
+     ]
+    },
+    {
+     "id": "NACL_BLOCK_ATTACKER",
+     "target": "nacl",
+     "resource": "acl-0default00000001",
+     "severity": "medium",
+     "title": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+     "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+     "evidence": [
+      "guardduty_findings.json:2",
+      "waf.log:1",
+      "vpcflow.log:1",
+      "auth.log:1",
+      "auth.log:2",
+      "auth.log:3",
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3",
+      "guardduty_findings.json:1"
+     ],
+     "current": {
+      "entries": 1
+     },
+     "proposed": {
+      "deny": [
+       "203.0.113.9/32"
+      ]
+     },
+     "cli": [
+      "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.9/32"
+     ],
+     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다.",
+     "rollback": [
+      "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
+     ]
+    }
+   ],
+   "report": {
+    "summary": "2026-01-13 04:10부터 04:30(UTC)까지 203.0.113.9의 활동 10건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취 → 지속성 확보.",
+    "severity": "high",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "credential-access",
+      "technique": "T1110",
+      "time": "2026-01-13T04:10:00+00:00",
+      "what": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입) — UnauthorizedAccess:EC2/SSHBruteForce (심각도 5.0, 60회) (기준: 203.0.113.9)",
+      "evidence": [
+       "guardduty_findings.json:2"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-01-13T04:20:00+00:00",
+      "what": "SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW) — 1건 통과 (기준: 203.0.113.9)",
+      "evidence": [
+       "waf.log:1"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1133",
+      "time": "2026-01-13T04:20:00+00:00",
+      "what": "외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (기준: 203.0.113.9)",
+      "evidence": [
+       "vpcflow.log:1"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-01-13T04:21:05+00:00",
+      "what": "연속 실패 뒤 SSH 로그인 성공 — 직전 30분 실패 2건 뒤 'ubuntu' 성공 (기준: 203.0.113.9)",
+      "evidence": [
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
+      "stage": "credential-access",
+      "technique": "T1552.005",
+      "time": "2026-01-13T04:25:00+00:00",
+      "what": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — 3건(성공 2, 실패·거부 1) (기준: i-0abc123def456)",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "stage": "persistence",
+      "technique": "T1098",
+      "time": "2026-01-13T04:27:00+00:00",
+      "what": "IAM 사용자·키·권한 생성/변경 — 1건(성공 0, 실패·거부 1) (기준: arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456)",
+      "evidence": [
+       "cloudtrail.json:3"
+      ]
+     },
+     {
+      "stage": "credential-access",
+      "technique": "T1552.005",
+      "time": "2026-01-13T04:30:00+00:00",
+      "what": "GuardDuty: 인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 14회) (기준: 203.0.113.9)",
+      "evidence": [
+       "guardduty_findings.json:1"
+      ]
+     }
+    ],
+    "root_causes": [
+     {
+      "setting": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+      "why": "외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.",
+      "evidence": [
+       "guardduty_findings.json:2",
+       "vpcflow.log:1",
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
+      "setting": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+      "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
+      "evidence": [
+       "waf.log:1"
+      ]
+     },
+     {
+      "setting": "인스턴스 i-0abc123def456가 IMDSv1을 허용",
+      "why": "토큰 없이 메타데이터에서 역할 자격증명을 꺼낼 수 있어 탈취 위험이 크다.",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3",
+       "guardduty_findings.json:1"
+      ]
+     },
+     {
+      "setting": "역할 ec2-app-role의 권한이 과도(와일드카드)",
+      "why": "탈취된 자격증명으로 필요 이상의 자원 조회·변경이 가능했다.",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3",
+       "guardduty_findings.json:1"
+      ]
+     },
+     {
+      "setting": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+      "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+      "evidence": [
+       "guardduty_findings.json:2",
+       "waf.log:1",
+       "vpcflow.log:1",
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     }
+    ],
+    "firewall_changes": [
+     {
+      "check_id": "SG_ADMIN_PORT_OPEN",
+      "target": "security_group",
+      "resource": "sg-0web000000000001",
+      "change": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+      "priority": "now"
+     },
+     {
+      "check_id": "WAF_SQLI_COUNT",
+      "target": "waf",
+      "resource": "logsight-demo-acl",
+      "change": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+      "priority": "now"
+     },
+     {
+      "check_id": "IMDSV1_ENABLED",
+      "target": "ec2",
+      "resource": "i-0abc123def456",
+      "change": "인스턴스 i-0abc123def456가 IMDSv1을 허용",
+      "priority": "now"
+     },
+     {
+      "check_id": "IAM_OVERBROAD",
+      "target": "iam",
+      "resource": "ec2-app-role",
+      "change": "역할 ec2-app-role의 권한이 과도(와일드카드)",
+      "priority": "now"
+     },
+     {
+      "check_id": "NACL_BLOCK_ATTACKER",
+      "target": "nacl",
+      "resource": "acl-0default00000001",
+      "change": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+      "priority": "soon"
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 9246,
+    "validation": {
+     "evidence_total": 31,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-10-20T03:00:00+00:00",
+    "end": "2026-10-20T03:10:20+00:00",
+    "severity": "medium",
+    "score": 299,
+    "stages": [
+     "discovery",
+     "initial-access"
+    ],
+    "src_ips": [
+     "203.0.113.50"
+    ],
+    "instances": [
+     "i-0abc123def456"
+    ],
+    "actors": [],
+    "sources": [
+     "hostfw",
+     "weblog"
+    ],
+    "n_events": 46,
+    "findings": [
+     {
+      "rule": "VPC_PORT_SCAN",
+      "technique": "T1046",
+      "stage": "discovery",
+      "title": "여러 포트에 대한 접속 시도(포트 스캔)",
+      "severity": "medium",
+      "detail": "5분 안에 포트 20개, 거부 17건",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:00:00+00:00",
+      "last": "2026-10-20T03:00:57+00:00",
+      "n_events": 20,
+      "evidence": [
+       "hostfw_kern.log:1",
+       "hostfw_kern.log:2",
+       "hostfw_kern.log:3",
+       "hostfw_kern.log:4",
+       "hostfw_kern.log:5",
+       "hostfw_kern.log:6",
+       "hostfw_kern.log:7",
+       "hostfw_kern.log:8",
+       "hostfw_kern.log:9",
+       "hostfw_kern.log:10",
+       "hostfw_kern.log:11",
+       "hostfw_kern.log:12",
+       "hostfw_kern.log:13",
+       "hostfw_kern.log:14",
+       "hostfw_kern.log:15",
+       "hostfw_kern.log:16",
+       "hostfw_kern.log:17",
+       "hostfw_kern.log:18",
+       "hostfw_kern.log:19",
+       "hostfw_kern.log:20"
+      ]
+     },
+     {
+      "rule": "VPC_REMOTE_ADMIN_EXPOSED",
+      "technique": "T1133",
+      "stage": "initial-access",
+      "title": "외부에서 관리 포트(22/3389) 접속 허용",
+      "severity": "medium",
+      "detail": "포트 [22] 허용 1건",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:00:03+00:00",
+      "last": "2026-10-20T03:00:03+00:00",
+      "n_events": 1,
+      "evidence": [
+       "hostfw_kern.log:2"
+      ]
+     },
+     {
+      "rule": "WEB_PATH_PROBE",
+      "technique": "T1595.003",
+      "stage": "discovery",
+      "title": "없는 경로를 연속 요청(웹 스캐너)",
+      "severity": "low",
+      "detail": "5분 안에 서로 다른 경로 22개 404/403",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:05:00+00:00",
+      "last": "2026-10-20T03:06:45+00:00",
+      "n_events": 22,
+      "evidence": [
+       "nginx_access.log:1",
+       "nginx_access.log:2",
+       "nginx_access.log:3",
+       "nginx_access.log:4",
+       "nginx_access.log:5",
+       "nginx_access.log:6",
+       "nginx_access.log:7",
+       "nginx_access.log:8",
+       "nginx_access.log:9",
+       "nginx_access.log:10",
+       "nginx_access.log:11",
+       "nginx_access.log:12",
+       "nginx_access.log:13",
+       "nginx_access.log:14",
+       "nginx_access.log:15",
+       "nginx_access.log:16",
+       "nginx_access.log:17",
+       "nginx_access.log:18",
+       "nginx_access.log:19",
+       "nginx_access.log:20"
+      ]
+     },
+     {
+      "rule": "WEB_SQLI_PATTERN",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "웹 요청에 SQL 인젝션 패턴",
+      "severity": "medium",
+      "detail": "4건(성공 3, 실패·거부 1)",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:09:20+00:00",
+      "last": "2026-10-20T03:10:20+00:00",
+      "n_events": 4,
+      "evidence": [
+       "nginx_access.log:24",
+       "nginx_access.log:25",
+       "nginx_access.log:26",
+       "nginx_access.log:27"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "hostfw_kern.log:1",
+      "ts": "2026-10-20T03:00:00+00:00",
+      "source": "hostfw",
+      "action": "tcp/21 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 21,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:2",
+      "ts": "2026-10-20T03:00:03+00:00",
+      "source": "hostfw",
+      "action": "tcp/22 ACCEPT",
+      "outcome": "accept",
+      "status": "success",
+      "disposition": "allowed",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN",
+       "VPC_REMOTE_ADMIN_EXPOSED"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 22,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:3",
+      "ts": "2026-10-20T03:00:06+00:00",
+      "source": "hostfw",
+      "action": "tcp/23 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 23,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:4",
+      "ts": "2026-10-20T03:00:09+00:00",
+      "source": "hostfw",
+      "action": "tcp/25 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 25,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:5",
+      "ts": "2026-10-20T03:00:12+00:00",
+      "source": "hostfw",
+      "action": "tcp/53 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 53,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:6",
+      "ts": "2026-10-20T03:00:15+00:00",
+      "source": "hostfw",
+      "action": "tcp/80 ACCEPT",
+      "outcome": "accept",
+      "status": "success",
+      "disposition": "allowed",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 80,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:7",
+      "ts": "2026-10-20T03:00:18+00:00",
+      "source": "hostfw",
+      "action": "tcp/110 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 110,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:8",
+      "ts": "2026-10-20T03:00:21+00:00",
+      "source": "hostfw",
+      "action": "tcp/135 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 135,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:9",
+      "ts": "2026-10-20T03:00:24+00:00",
+      "source": "hostfw",
+      "action": "tcp/139 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 139,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:10",
+      "ts": "2026-10-20T03:00:27+00:00",
+      "source": "hostfw",
+      "action": "tcp/143 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 143,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:11",
+      "ts": "2026-10-20T03:00:30+00:00",
+      "source": "hostfw",
+      "action": "tcp/443 ACCEPT",
+      "outcome": "accept",
+      "status": "success",
+      "disposition": "allowed",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 443,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:12",
+      "ts": "2026-10-20T03:00:33+00:00",
+      "source": "hostfw",
+      "action": "tcp/445 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 445,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:13",
+      "ts": "2026-10-20T03:00:36+00:00",
+      "source": "hostfw",
+      "action": "tcp/993 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 993,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:14",
+      "ts": "2026-10-20T03:00:39+00:00",
+      "source": "hostfw",
+      "action": "tcp/1433 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 1433,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:15",
+      "ts": "2026-10-20T03:00:42+00:00",
+      "source": "hostfw",
+      "action": "tcp/3306 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 3306,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:16",
+      "ts": "2026-10-20T03:00:45+00:00",
+      "source": "hostfw",
+      "action": "tcp/3389 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 3389,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:17",
+      "ts": "2026-10-20T03:00:48+00:00",
+      "source": "hostfw",
+      "action": "tcp/5432 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 5432,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:18",
+      "ts": "2026-10-20T03:00:51+00:00",
+      "source": "hostfw",
+      "action": "tcp/6379 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 6379,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:19",
+      "ts": "2026-10-20T03:00:54+00:00",
+      "source": "hostfw",
+      "action": "tcp/8080 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 8080,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "hostfw_kern.log:20",
+      "ts": "2026-10-20T03:00:57+00:00",
+      "source": "hostfw",
+      "action": "tcp/9200 REJECT",
+      "outcome": "reject",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "VPC_PORT_SCAN"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 9200,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "nginx_access.log:1",
+      "ts": "2026-10-20T03:05:00+00:00",
+      "source": "weblog",
+      "action": "GET /admin",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:2",
+      "ts": "2026-10-20T03:05:05+00:00",
+      "source": "weblog",
+      "action": "GET /.env",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:3",
+      "ts": "2026-10-20T03:05:10+00:00",
+      "source": "weblog",
+      "action": "GET /wp-login.php",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:4",
+      "ts": "2026-10-20T03:05:15+00:00",
+      "source": "weblog",
+      "action": "GET /phpmyadmin",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:5",
+      "ts": "2026-10-20T03:05:20+00:00",
+      "source": "weblog",
+      "action": "GET /backup.zip",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:6",
+      "ts": "2026-10-20T03:05:25+00:00",
+      "source": "weblog",
+      "action": "GET /.git/config",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:7",
+      "ts": "2026-10-20T03:05:30+00:00",
+      "source": "weblog",
+      "action": "GET /config.php",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:8",
+      "ts": "2026-10-20T03:05:35+00:00",
+      "source": "weblog",
+      "action": "GET /server-status",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:9",
+      "ts": "2026-10-20T03:05:40+00:00",
+      "source": "weblog",
+      "action": "GET /test",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:10",
+      "ts": "2026-10-20T03:05:45+00:00",
+      "source": "weblog",
+      "action": "GET /old",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:11",
+      "ts": "2026-10-20T03:05:50+00:00",
+      "source": "weblog",
+      "action": "GET /db.sql",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:12",
+      "ts": "2026-10-20T03:05:55+00:00",
+      "source": "weblog",
+      "action": "GET /api/v1/debug",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:13",
+      "ts": "2026-10-20T03:06:00+00:00",
+      "source": "weblog",
+      "action": "GET /console",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:14",
+      "ts": "2026-10-20T03:06:05+00:00",
+      "source": "weblog",
+      "action": "GET /manager/html",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:15",
+      "ts": "2026-10-20T03:06:10+00:00",
+      "source": "weblog",
+      "action": "GET /actuator",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:16",
+      "ts": "2026-10-20T03:06:15+00:00",
+      "source": "weblog",
+      "action": "GET /.aws/credentials",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:17",
+      "ts": "2026-10-20T03:06:20+00:00",
+      "source": "weblog",
+      "action": "GET /shell.php",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:18",
+      "ts": "2026-10-20T03:06:25+00:00",
+      "source": "weblog",
+      "action": "GET /install.php",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:19",
+      "ts": "2026-10-20T03:06:30+00:00",
+      "source": "weblog",
+      "action": "GET /xmlrpc.php",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:20",
+      "ts": "2026-10-20T03:06:35+00:00",
+      "source": "weblog",
+      "action": "GET /login.bak",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:21",
+      "ts": "2026-10-20T03:06:40+00:00",
+      "source": "weblog",
+      "action": "GET /web.config",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:22",
+      "ts": "2026-10-20T03:06:45+00:00",
+      "source": "weblog",
+      "action": "GET /info.php",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_PATH_PROBE"
+      ],
+      "ua": "Mozilla/5.0 (scanner)",
+      "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:24",
+      "ts": "2026-10-20T03:09:20+00:00",
+      "source": "weblog",
+      "action": "GET /item?id=1%27",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_SQLI_PATTERN"
+      ],
+      "ua": "sqlmap/1.8",
+      "http_status": 500
+     },
+     {
+      "ref": "nginx_access.log:25",
+      "ts": "2026-10-20T03:09:40+00:00",
+      "source": "weblog",
+      "action": "GET /item?id=1%27%20OR%20%271%27%3D%271",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_SQLI_PATTERN"
+      ],
+      "ua": "sqlmap/1.8",
+      "http_status": 200
+     },
+     {
+      "ref": "nginx_access.log:26",
+      "ts": "2026-10-20T03:10:00+00:00",
+      "source": "weblog",
+      "action": "GET /item?id=1%20UNION%20SELECT%20NULL--",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_SQLI_PATTERN"
+      ],
+      "ua": "sqlmap/1.8",
+      "http_status": 200
+     },
+     {
+      "ref": "nginx_access.log:27",
+      "ts": "2026-10-20T03:10:20+00:00",
+      "source": "weblog",
+      "action": "GET /item?id=1%27%20AND%20SLEEP(5)--",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEB_SQLI_PATTERN"
+      ],
+      "ua": "sqlmap/1.8",
+      "http_status": 200
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 1,
+     "top_actions": [
+      [
+       "GET /item?id=1",
+       1
+      ]
+     ],
+     "sources": {
+      "weblog": 1
+     }
+    },
+    "id": "INC-002",
+    "repeats": 1,
+    "first_seen": "2026-10-20T03:00:00+00:00",
+    "last_seen": "2026-10-20T03:10:20+00:00",
+    "repeat_ids": []
+   },
+   "checks": [
+    {
+     "id": "SG_ADMIN_PORT_OPEN",
+     "target": "security_group",
+     "resource": "sg-0web000000000001",
+     "severity": "high",
+     "title": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+     "why": "외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.",
+     "evidence": [
+      "hostfw_kern.log:1",
+      "hostfw_kern.log:2",
+      "hostfw_kern.log:3",
+      "hostfw_kern.log:4",
+      "hostfw_kern.log:5",
+      "hostfw_kern.log:6",
+      "hostfw_kern.log:7",
+      "hostfw_kern.log:8",
+      "hostfw_kern.log:9",
+      "hostfw_kern.log:10"
+     ],
+     "current": {
+      "protocol": "tcp",
+      "from_port": 22,
+      "to_port": 22,
+      "cidr": "0.0.0.0/0",
+      "description": "ssh"
+     },
+     "proposed": {
+      "protocol": "tcp",
+      "from_port": 22,
+      "to_port": 22,
+      "cidr": "192.0.2.10/32",
+      "description": "관리자 IP만 허용(또는 SSM Session Manager로 대체)"
+     },
+     "cli": [
+      "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0",
+      "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32"
+     ],
+     "caution": "관리자 IP가 바뀌면 접속이 끊긴다. 적용 전 현재 관리자 IP와 SSM 접속 경로를 확인한다.",
+     "rollback": [
+      "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32",
+      "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0"
+     ]
+    },
+    {
+     "id": "WAF_SQLI_COUNT",
+     "target": "waf",
+     "resource": "logsight-demo-acl",
+     "severity": "high",
+     "title": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+     "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
+     "evidence": [
+      "nginx_access.log:24",
+      "nginx_access.log:25",
+      "nginx_access.log:26",
+      "nginx_access.log:27"
+     ],
+     "current": {
+      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "Count": {}
+      }
+     },
+     "proposed": {
+      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "None": {}
+      }
+     },
+     "cli": [
+      "aws wafv2 get-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 > acl.json",
+      "# acl.json의 Rules에서 위 규칙의 OverrideAction을 {\"None\": {}}로 바꾼 뒤",
+      "aws wafv2 update-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 --lock-token <LockToken> --default-action Allow={} --rules file://rules.json --visibility-config <기존 값>"
+     ],
+     "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
+     "rollback": [
+      "# 변경 전에 저장한 acl.json의 Rules로 update-web-acl을 다시 실행(LockToken은 새로 받기)"
+     ]
+    },
+    {
+     "id": "NACL_BLOCK_ATTACKER",
+     "target": "nacl",
+     "resource": "acl-0default00000001",
+     "severity": "medium",
+     "title": "서브넷 NACL에 공격 IP 203.0.113.50 차단 규칙 추가",
+     "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+     "evidence": [
+      "hostfw_kern.log:1",
+      "hostfw_kern.log:2",
+      "hostfw_kern.log:3",
+      "hostfw_kern.log:4",
+      "hostfw_kern.log:5",
+      "hostfw_kern.log:6",
+      "hostfw_kern.log:7",
+      "hostfw_kern.log:8",
+      "hostfw_kern.log:9",
+      "hostfw_kern.log:10"
+     ],
+     "current": {
+      "entries": 1
+     },
+     "proposed": {
+      "deny": [
+       "203.0.113.50/32"
+      ]
+     },
+     "cli": [
+      "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.50/32"
+     ],
+     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다.",
+     "rollback": [
+      "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
+     ]
+    }
+   ],
+   "report": {
+    "summary": "2026-10-20 03:00부터 03:10(UTC)까지 203.0.113.50의 활동 46건이 하나로 이어진다. 흐름: 정찰·탐색 → 초기 침투.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "discovery",
+      "technique": "T1046",
+      "time": "2026-10-20T03:00:00+00:00",
+      "what": "여러 포트에 대한 접속 시도(포트 스캔) — 5분 안에 포트 20개, 거부 17건 (기준: 203.0.113.50)",
+      "evidence": [
+       "hostfw_kern.log:1",
+       "hostfw_kern.log:2",
+       "hostfw_kern.log:3",
+       "hostfw_kern.log:4",
+       "hostfw_kern.log:5",
+       "hostfw_kern.log:6",
+       "hostfw_kern.log:7",
+       "hostfw_kern.log:8"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1133",
+      "time": "2026-10-20T03:00:03+00:00",
+      "what": "외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (기준: 203.0.113.50)",
+      "evidence": [
+       "hostfw_kern.log:2"
+      ]
+     },
+     {
+      "stage": "discovery",
+      "technique": "T1595.003",
+      "time": "2026-10-20T03:05:00+00:00",
+      "what": "없는 경로를 연속 요청(웹 스캐너) — 5분 안에 서로 다른 경로 22개 404/403 (기준: 203.0.113.50)",
+      "evidence": [
+       "nginx_access.log:1",
+       "nginx_access.log:2",
+       "nginx_access.log:3",
+       "nginx_access.log:4",
+       "nginx_access.log:5",
+       "nginx_access.log:6",
+       "nginx_access.log:7",
+       "nginx_access.log:8"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-10-20T03:09:20+00:00",
+      "what": "웹 요청에 SQL 인젝션 패턴 — 4건(성공 3, 실패·거부 1) (기준: 203.0.113.50)",
+      "evidence": [
+       "nginx_access.log:24",
+       "nginx_access.log:25",
+       "nginx_access.log:26",
+       "nginx_access.log:27"
+      ]
+     }
+    ],
+    "root_causes": [
+     {
+      "setting": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+      "why": "외부 누구나 관리 포트에 접속할 수 있어 무차별 대입·로그인이 가능했다.",
+      "evidence": [
+       "hostfw_kern.log:1",
+       "hostfw_kern.log:2",
+       "hostfw_kern.log:3",
+       "hostfw_kern.log:4",
+       "hostfw_kern.log:5",
+       "hostfw_kern.log:6"
+      ]
+     },
+     {
+      "setting": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+      "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
+      "evidence": [
+       "nginx_access.log:24",
+       "nginx_access.log:25",
+       "nginx_access.log:26",
+       "nginx_access.log:27"
+      ]
+     },
+     {
+      "setting": "서브넷 NACL에 공격 IP 203.0.113.50 차단 규칙 추가",
+      "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+      "evidence": [
+       "hostfw_kern.log:1",
+       "hostfw_kern.log:2",
+       "hostfw_kern.log:3",
+       "hostfw_kern.log:4",
+       "hostfw_kern.log:5",
+       "hostfw_kern.log:6"
+      ]
+     }
+    ],
+    "firewall_changes": [
+     {
+      "check_id": "SG_ADMIN_PORT_OPEN",
+      "target": "security_group",
+      "resource": "sg-0web000000000001",
+      "change": "보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용",
+      "priority": "now"
+     },
+     {
+      "check_id": "WAF_SQLI_COUNT",
+      "target": "waf",
+      "resource": "logsight-demo-acl",
+      "change": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
+      "priority": "now"
+     },
+     {
+      "check_id": "NACL_BLOCK_ATTACKER",
+      "target": "nacl",
+      "resource": "acl-0default00000001",
+      "change": "서브넷 NACL에 공격 IP 203.0.113.50 차단 규칙 추가",
+      "priority": "soon"
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 18031,
+    "validation": {
+     "evidence_total": 37,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-01-13T04:21:00+00:00",
+    "end": "2026-01-13T04:21:00+00:00",
+    "severity": "low",
+    "score": 96,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "198.51.100.77"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "waf"
+    ],
+    "n_events": 1,
+    "findings": [
+     {
+      "rule": "WAF_BLOCKED",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "WAF가 공격 요청 차단",
+      "severity": "low",
+      "detail": "1건 차단",
+      "key": "198.51.100.77",
+      "first": "2026-01-13T04:21:00+00:00",
+      "last": "2026-01-13T04:21:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "waf.log:2"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "waf.log:2",
+      "ts": "2026-01-13T04:21:00+00:00",
+      "source": "waf",
+      "action": "GET /item?id=1%27%20OR%201%3D1--",
+      "outcome": "block",
+      "status": "failure",
+      "disposition": "blocked",
+      "src_ip": "198.51.100.77",
+      "rules": [
+       "WAF_BLOCKED"
+      ],
+      "ua": "sqlmap"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-003",
+    "repeats": 1,
+    "first_seen": "2026-01-13T04:21:00+00:00",
+    "last_seen": "2026-01-13T04:21:00+00:00",
+    "repeat_ids": []
+   },
+   "checks": [],
+   "report": {
+    "summary": "2026-01-13 04:21부터 04:21(UTC)까지 198.51.100.77의 활동 1건이 하나로 이어진다. 흐름: 초기 침투. 설정 스냅샷(environment.json)이 없어 원인 설정은 로그로만 추정했다.",
+    "severity": "low",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-01-13T04:21:00+00:00",
+      "what": "WAF가 공격 요청 차단 — 1건 차단 (기준: 198.51.100.77)",
+      "evidence": [
+       "waf.log:2"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "firewall_changes": [],
+    "unknowns": [
+     "규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 1005,
+    "validation": {
+     "evidence_total": 1,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "passed": true
+    }
+   }
+  }
+ ],
+ "timing": {
+  "detect_correlate_s": 0.0,
+  "total_s": 0.0
+ },
+ "has_environment": true,
+ "assumptions": [
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 --syslog-tz, --year로 지정하세요.",
+  "ALB 뒤의 nginx 로그는 출발지가 ALB 내부 IP일 수 있습니다. 실제 사용자 IP는 X-Forwarded-For를 로그 형식에 넣어야 보입니다."
+ ]
+}

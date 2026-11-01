@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-01T17:56:28Z",
+ "generated_at": "2026-11-01T18:06:16Z",
  "files": [
   {
    "file": "samples/demo/alb.log",
@@ -207,24 +207,34 @@
       "source": "vpcflow",
       "action": "tcp/22 ACCEPT",
       "outcome": "accept",
+      "status": "success",
+      "disposition": "allowed",
       "src_ip": "203.0.113.9",
       "rules": [
        "VPC_REMOTE_ADMIN_EXPOSED"
       ],
       "dst_ip": "10.0.1.10",
-      "dst_port": 22
+      "dst_port": 22,
+      "target_instance": "i-0abc123def456"
      },
      {
       "ref": "alb.log:2",
       "ts": "2026-01-13T04:20:30.100000+00:00",
       "source": "alb",
-      "action": "GET http://demo/search?q=1%27",
+      "action": "GET /search?q=1%27",
       "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "WEB_SQLI_PATTERN"
       ],
-      "ua": "curl/8.0"
+      "dst_ip": "10.0.1.10",
+      "dst_port": 80,
+      "ua": "curl/8.0",
+      "http_status": 500,
+      "host": "demo",
+      "target_instance": "i-0abc123def456"
      },
      {
       "ref": "auth.log:1",
@@ -232,6 +242,8 @@
       "source": "sshauth",
       "action": "ssh_login",
       "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "SSH_SUCCESS_AFTER_FAIL"
@@ -245,6 +257,8 @@
       "source": "sshauth",
       "action": "ssh_login",
       "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "SSH_SUCCESS_AFTER_FAIL"
@@ -258,6 +272,8 @@
       "source": "sshauth",
       "action": "ssh_login",
       "outcome": "success",
+      "status": "success",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "SSH_SUCCESS_AFTER_FAIL"
@@ -271,6 +287,8 @@
       "source": "cloudtrail",
       "action": "s3:ListBuckets",
       "outcome": "success",
+      "status": "success",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "CT_INSTANCE_CRED_OUTSIDE"
@@ -285,6 +303,8 @@
       "source": "cloudtrail",
       "action": "s3:GetObject",
       "outcome": "success",
+      "status": "success",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "CT_INSTANCE_CRED_OUTSIDE"
@@ -299,6 +319,8 @@
       "source": "cloudtrail",
       "action": "iam:CreateUser",
       "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
       "src_ip": "203.0.113.9",
       "rules": [
        "CT_INSTANCE_CRED_OUTSIDE",
@@ -323,7 +345,7 @@
        1
       ],
       [
-       "GET http://demo/login",
+       "GET /login",
        1
       ]
      ],
@@ -531,7 +553,7 @@
       "stage": "initial-access",
       "technique": "T1133",
       "time": "2026-01-13T04:20:00+00:00",
-      "what": "외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (대상: 203.0.113.9)",
+      "what": "외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (기준: 203.0.113.9)",
       "evidence": [
        "vpcflow.log:1"
       ]
@@ -540,7 +562,7 @@
       "stage": "initial-access",
       "technique": "T1190",
       "time": "2026-01-13T04:20:30.100000+00:00",
-      "what": "웹 요청에 SQL 인젝션 패턴 — 1건(성공 0, 실패·거부 1) (대상: 203.0.113.9)",
+      "what": "웹 요청에 SQL 인젝션 패턴 — 1건(성공 0, 실패·거부 1) (기준: 203.0.113.9)",
       "evidence": [
        "alb.log:2"
       ]
@@ -549,7 +571,7 @@
       "stage": "initial-access",
       "technique": "T1078",
       "time": "2026-01-13T04:21:05+00:00",
-      "what": "연속 실패 뒤 SSH 로그인 성공 — 직전 30분 실패 2건 뒤 'ubuntu' 성공 (대상: 203.0.113.9)",
+      "what": "연속 실패 뒤 SSH 로그인 성공 — 직전 30분 실패 2건 뒤 'ubuntu' 성공 (기준: 203.0.113.9)",
       "evidence": [
        "auth.log:1",
        "auth.log:2",
@@ -560,7 +582,7 @@
       "stage": "credential-access",
       "technique": "T1552.005",
       "time": "2026-01-13T04:25:00+00:00",
-      "what": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — 3건(성공 2, 실패·거부 1) (대상: i-0abc123def456)",
+      "what": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — 3건(성공 2, 실패·거부 1) (기준: i-0abc123def456)",
       "evidence": [
        "cloudtrail.json:1",
        "cloudtrail.json:2",
@@ -571,7 +593,7 @@
       "stage": "persistence",
       "technique": "T1098",
       "time": "2026-01-13T04:27:00+00:00",
-      "what": "IAM 사용자·키·권한 생성/변경 — 1건(성공 0, 실패·거부 1) (대상: arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456)",
+      "what": "IAM 사용자·키·권한 생성/변경 — 1건(성공 0, 실패·거부 1) (기준: arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456)",
       "evidence": [
        "cloudtrail.json:3"
       ]
@@ -670,7 +692,7 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 6506,
+    "payload_chars": 6990,
     "validation": {
      "evidence_total": 26,
      "evidence_invalid": 0,
@@ -685,5 +707,8 @@
   "detect_correlate_s": 0.0,
   "total_s": 0.0
  },
- "has_environment": true
+ "has_environment": true,
+ "assumptions": [
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 --syslog-tz, --year로 지정하세요."
+ ]
 }

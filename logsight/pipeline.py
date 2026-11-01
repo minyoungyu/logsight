@@ -25,6 +25,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     """preview=True면 Claude를 부르지 않고, 보낼 내용(마스킹 후)을 결과에 ai_payload로 담는다."""
     t0 = time.time()
     env = env or {}
+    enrich(events, env)
     findings = run_detections(events, env)
     incidents = build_incidents(events, findings, window_min=window_min)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
@@ -61,7 +62,28 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
         "has_environment": bool(env),
+        "assumptions": _assumptions(by_source, env),
     }
+
+
+def _assumptions(by_source: dict, env: dict) -> list[str]:
+    """결과 해석에 영향을 주는 가정을 보고서에 그대로 보여 준다."""
+    from .normalize import SYSLOG
+    out = []
+    if by_source.get("sshauth") or by_source.get("hostfw"):
+        tz = SYSLOG["tz"].utcoffset(None)
+        hours = tz.total_seconds() / 3600
+        out.append(f"auth.log·kern.log처럼 연도·시간대가 없는 줄은 "
+                   f"{'UTC' if not hours else f'UTC{hours:+g}'} 기준, 연도는 "
+                   f"{SYSLOG['year'] or '올해(미래면 작년)'}로 해석했습니다. 다르면 --syslog-tz, --year로 지정하세요.")
+    if not env:
+        out.append("설정 스냅샷(environment.json)이 없어 방화벽 수정안을 만들지 않았습니다. "
+                   "python -m logsight collect environment로 만들 수 있습니다.")
+    elif not env.get("trusted_ips"):
+        out.append("관리자 IP(trusted_ips)가 비어 있어 수정안의 허용 IP가 자리표시로 나옵니다.")
+    if by_source.get("weblog") and by_source.get("alb"):
+        out.append("ALB 뒤의 nginx 로그는 출발지가 ALB 내부 IP일 수 있습니다. 실제 사용자 IP는 X-Forwarded-For를 로그 형식에 넣어야 보입니다.")
+    return out
 
 
 def _rule_counts(findings) -> dict:
@@ -73,6 +95,22 @@ def _rule_counts(findings) -> dict:
         c[1] += len(f.events)
     return {k: {"findings": v[0], "events": v[1]}
             for k, v in sorted(out.items(), key=lambda kv: -kv[1][1])}
+
+
+def enrich(events: list[Event], env: dict) -> None:
+    """설정 스냅샷의 인스턴스 목록으로 네트워크·웹 로그의 대상 IP를 인스턴스 ID로 바꿔 적는다.
+    사건 묶기 연결고리로는 쓰지 않는다(여러 스캐너가 같은 서버를 두드리면 한 사건으로 뭉치므로).
+    보고서·수정안에서 "어느 서버가 대상이었나"를 보여 주는 용도."""
+    ip2inst = {}
+    for inst in env.get("instances", []):
+        for k in ("private_ip", "public_ip"):
+            if inst.get(k):
+                ip2inst[inst[k]] = inst["instance_id"]
+    if not ip2inst:
+        return
+    for e in events:
+        if not e.instance_id and e.dst_ip in ip2inst:
+            e.extra["target_instance"] = ip2inst[e.dst_ip]
 
 
 def run_paths(paths: list[str], env_path: str | None = None, *, since=None, until=None,

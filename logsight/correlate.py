@@ -118,7 +118,8 @@ def build_incidents(events: list[Event], findings: list[Finding],
             "score": _score(sev, stages, fl, evs),
             "stages": stages,
             "src_ips": sorted({e.src_ip for e in evs if e.src_ip and _is_ip(e.src_ip)}),
-            "instances": sorted({e.instance_id for e in evs if e.instance_id}),
+            "instances": sorted({e.instance_id for e in evs if e.instance_id}
+                                | {e.extra["target_instance"] for e in evs if e.extra.get("target_instance")}),
             "actors": sorted({e.actor for e in evs if e.actor}),
             "sources": sorted({e.source for e in evs}),
             "n_events": len(evs),
@@ -191,13 +192,15 @@ def _finding_in(f: Finding, evs: list[Event]) -> dict:
 def _compact(e: Event) -> dict:
     """AI·보고서용 축약 이벤트(원본 전체 대신 판단에 필요한 필드만)."""
     d = {"ref": e.raw_ref, "ts": e.ts.isoformat(), "source": e.source, "action": e.action,
-         "outcome": e.outcome, "src_ip": e.src_ip, "rules": list(e.findings)}
+         "outcome": e.outcome, "status": e.status, "disposition": e.disposition,
+         "src_ip": e.src_ip, "rules": list(e.findings)}
     for k in ("dst_ip", "dst_port", "actor", "instance_id", "access_key"):
         v = getattr(e, k)
         if v is not None:
             d[k] = v
     for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion",
-              "gd_type", "gd_title", "gd_severity", "gd_alias"):
+              "http_status", "host", "target_instance",
+              "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_count", "gd_last_seen"):
         v = e.extra.get(k)
         if v:
             d[k] = v

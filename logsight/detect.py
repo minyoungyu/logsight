@@ -307,7 +307,8 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
     # --- 웹 요청(WAF·ALB)의 SQL 인젝션 패턴 — WAF가 놓친 경우에도 잡기 위한 보조 규칙
     web: dict[str, list[Event]] = defaultdict(list)
     for e in events:
-        if e.source in ("waf", "alb", "weblog") and e.action and "?" in e.action:
+        if e.source in ("waf", "alb", "weblog") and e.action and "?" in e.action \
+                and e.disposition != "blocked":  # WAF가 이미 막은 요청은 제외
             q = unquote_plus(e.action.split("?", 1)[1])
             if _SQLI.search(q) and "WAF_SQLI_NOT_BLOCKED" not in e.findings:
                 web[e.src_ip or ""].append(e)
@@ -320,7 +321,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
     probe: dict[str, list[Event]] = defaultdict(list)
     for e in events:
         if e.source in ("alb", "weblog") and e.outcome == "failure" and \
-                str(e.extra.get("status") or e.extra.get("elb_status")) in ("403", "404"):
+                str(e.extra.get("http_status")) in ("403", "404"):
             probe[e.src_ip or ""].append(e)
     for ip, evs in probe.items():
         evs.sort(key=lambda e: e.ts)
@@ -335,11 +336,15 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         typ = e.extra.get("gd_type", "")
         sev_n = e.extra.get("gd_severity", 0)
         sev = "high" if sev_n >= 7 else "medium" if sev_n >= 4 else "low"
-        stage = GD_STAGE.get(typ.split(":")[0], "other")
+        alias = [r for r in e.extra.get("gd_alias") or [] if r in RULES]
+        if alias:  # 같은 의미의 LogSight 규칙이 있으면 그 단계·기법·한국어 이름을 쓴다
+            tech, stage, name, _ = RULES[alias[0]]
+        else:
+            tech, stage, name = "", GD_STAGE.get(typ.split(":")[0], "other"), e.extra.get("gd_title") or typ
         findings.append(Finding("GD_FINDING", [e], f"{typ} (심각도 {sev_n}, {e.extra.get('gd_count') or 1}회)",
                                 e.src_ip or e.instance_id or e.actor or "",
-                                override={"stage": stage, "severity": sev,
-                                          "title": f"GuardDuty: {e.extra.get('gd_title') or typ}"}))
+                                override={"stage": stage, "severity": sev, "technique": tech,
+                                          "title": f"GuardDuty: {name}"}))
 
     for f in findings:
         f.events.sort(key=lambda e: e.ts)
