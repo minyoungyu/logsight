@@ -55,6 +55,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
                        ("의심 표시 이벤트", f"{result['n_flagged']:,}"),
                        ("탐지 결과", f"{result['n_findings']:,}"),
                        ("사건", f"{result['n_incidents']:,}"),
+                       ("반복을 묶은 사건", f"{result.get('n_groups', result['n_incidents']):,}"),
                        ("처리 시간", f"{result['timing']['total_s']}초")):
         h.append(f"<div class='card stat'><span class=muted>{label}</span><b>{val}</b></div>")
     h.append(f"</div><div class=muted>로그 종류별: {escape(srcs) or '없음'}</div>")
@@ -137,14 +138,18 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
                      f"<td>{escape(', '.join(e.get('rules', [])))}</td></tr>")
         h.append("</table></div>")
 
-    if result["n_incidents"] > len(result["results"]):
+    if len(result["incident_index"]) > len(result["results"]):
         h.append(f"<h2>나머지 사건 목록</h2><div class='card tablewrap'><table>"
-                 "<tr><th>ID</th><th>심각도</th><th>시작</th><th>단계</th><th>출발지</th><th>이벤트</th></tr>")
+                 "<tr><th>ID</th><th>심각도</th><th>시작</th><th>단계</th><th>출발지</th><th>이벤트</th>"
+                 "<th>반복</th></tr>")
         for i in result["incident_index"][len(result["results"]):]:
+            rep = i.get("repeats", 1)
+            rep_txt = f"{rep}회 ({escape(str(i.get('first_seen', ''))[:10])}부터)" if rep > 1 else ""
             h.append(f"<tr><td>{escape(i['id'])}</td><td>{_sev(i['severity'])}</td>"
                      f"<td>{escape(i['start'][:19])}</td>"
                      f"<td>{escape(' → '.join(STAGE_KO.get(s, s) for s in i['stages']))}</td>"
-                     f"<td>{escape(', '.join(i['src_ips'][:3]))}</td><td>{i['n_events']}</td></tr>")
+                     f"<td>{escape(', '.join(i['src_ips'][:3]))}</td><td>{i['n_events']}</td>"
+                     f"<td>{rep_txt}</td></tr>")
         h.append("</table></div>")
     h.append("<p class=muted>LogSight · 판단마다 근거 로그 위치(파일:줄)를 붙였습니다. "
              "수정안은 자동 적용되지 않습니다.</p></main></html>")

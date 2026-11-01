@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .analyze import analyze
 from .config_audit import audit
-from .correlate import build_incidents
+from .correlate import build_incidents, group_repeats
 from .detect import run_detections
 from .normalize import Event, load_paths
 
@@ -26,9 +26,10 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     env = env or {}
     findings = run_detections(events, env)
     incidents = build_incidents(events, findings, window_min=window_min)
+    groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
     t_detect = time.time() - t0
     results = []
-    for inc in incidents[:top]:
+    for inc in groups[:top]:
         checks = audit(inc, env)
         out = analyze(inc, checks, model=model, use_ai=use_ai)
         results.append({"incident": inc, "checks": checks, **out})
@@ -44,8 +45,12 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "n_findings": len(findings),
         "rule_counts": _rule_counts(findings),
         "n_incidents": len(incidents),
-        "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "stages",
-                                               "src_ips", "n_events")} for i in incidents[:50]],
+        "n_groups": len(groups),
+        "severity_counts": {s: sum(1 for g in groups if g["severity"] == s) for s in ("high", "medium", "low")},
+        "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "score", "stages",
+                                               "src_ips", "n_events", "repeats", "first_seen",
+                                               "last_seen")}
+                           | {"rules": sorted({f["rule"] for f in i["findings"]})} for i in groups[:50]],
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},

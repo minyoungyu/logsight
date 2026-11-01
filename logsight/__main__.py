@@ -87,10 +87,11 @@ def main(argv: list[str] | None = None) -> int:
     (out / "report.html").write_text(render(result), encoding="utf-8")
     print(f"이벤트 {result['n_events']:,}건 → 의심 {result['n_flagged']:,}건 → "
           f"탐지 {result['n_findings']:,}건 → 사건 {result['n_incidents']:,}건 "
-          f"({result['timing']['total_s']}초)")
+          f"(반복을 묶으면 {result['n_groups']:,}건, {result['timing']['total_s']}초)")
     for r in result["results"]:
         inc, m = r["incident"], r["meta"]
-        print(f"  {inc['id']} [{inc['severity']}] {inc['start'][:19]} "
+        rep = f" 반복 {inc['repeats']}회" if inc.get("repeats", 1) > 1 else ""
+        print(f"  {inc['id']} [{inc['severity']}]{rep} {inc['start'][:19]} "
               f"{', '.join(inc['src_ips'][:3]) or '-'} 단계={'→'.join(inc['stages'])} "
               f"수정안 {len(r['checks'])}개 분석={m['mode']} 근거검증={'통과' if m['validation']['passed'] else '실패'}")
     for f in result["files"]:

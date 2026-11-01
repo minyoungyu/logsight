@@ -115,7 +115,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
             "start": start.isoformat(),
             "end": end.isoformat(),
             "severity": {3: "high", 2: "medium", 1: "low"}[sev],
-            "score": sev * 100 + len({f.rule for f in fl}) * 10 + min(len(evs), 9),
+            "score": _score(sev, stages, fl, evs),
             "stages": stages,
             "src_ips": sorted({e.src_ip for e in evs if e.src_ip and _is_ip(e.src_ip)}),
             "instances": sorted({e.instance_id for e in evs if e.instance_id}),
@@ -135,6 +135,47 @@ def build_incidents(events: list[Event], findings: list[Finding],
     for n, inc in enumerate(incidents, 1):
         inc["id"] = f"INC-{n:03d}"
     return incidents
+
+
+_OK = {"success", "accept", "allow", "count"}
+
+
+def _score(sev: int, stages: list[str], fl: list[Finding], evs: list[Event]) -> int:
+    """우선순위 점수. 심각도가 가장 크고, 그다음 여러 단계로 이어졌는지(공격 흐름),
+    성공한 행위가 있는지를 본다. 전부 실패(거부)로 끝난 시도는 내린다."""
+    score = sev * 100 + len(stages) * 15 + len({f.rule for f in fl}) * 10 + min(len(evs), 9)
+    if any(e.outcome in _OK for e in evs):
+        score += 20
+    else:
+        score -= 30
+    return score
+
+
+def _signature(inc: dict) -> tuple:
+    """같은 주체가 같은 규칙 조합을 반복하면 같은 서명."""
+    who = tuple(inc["src_ips"][:3]) or tuple(inc["instances"][:2]) or tuple(inc["actors"][:2])
+    return (tuple(sorted({f["rule"] for f in inc["findings"]})), who)
+
+
+def group_repeats(incidents: list[dict]) -> list[dict]:
+    """반복 사건을 묶는다. 각 묶음에서 점수가 가장 높은(같으면 최근) 사건을 대표로 남기고
+    repeats(반복 횟수), first_seen/last_seen, repeat_ids를 붙인다. 반환: 대표 사건 목록(점수순).
+    원래 사건 목록은 그대로 둔다(보고서·근거 추적용)."""
+    groups: dict[tuple, list[dict]] = defaultdict(list)
+    for inc in incidents:
+        groups[_signature(inc)].append(inc)
+    reps = []
+    for members in groups.values():
+        rep = max(members, key=lambda c: (c["score"], c["start"]))
+        rep["repeats"] = len(members)
+        rep["first_seen"] = min(c["start"] for c in members)
+        rep["last_seen"] = max(c["end"] for c in members)
+        rep["repeat_ids"] = [c["id"] for c in members if c is not rep][:20]
+        reps.append(rep)
+    # 한 번만 일어난 사건과 반복 사건을 같은 기준으로 정렬하되, 반복은 정찰 소음일 가능성이 있어
+    # 점수가 같으면 처음 보는 쪽을 앞에 둔다
+    reps.sort(key=lambda c: (-c["score"], c["repeats"], c["start"]))
+    return reps
 
 
 def _finding_in(f: Finding, evs: list[Event]) -> dict:
