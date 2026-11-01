@@ -78,8 +78,13 @@ def _epoch(sec: str | int) -> datetime:
     return datetime.fromtimestamp(int(sec), tz=timezone.utc)
 
 
+_FRAC = re.compile(r"\.(\d+)")
+
+
 def _iso(s: str) -> datetime:
-    dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+    # Python 3.10의 fromisoformat은 소수점 아래 3·6자리만 받는다. 로그마다 자릿수가 달라 6자리로 맞춘다.
+    s = _FRAC.sub(lambda m: "." + (m.group(1) + "000000")[:6], s.replace("Z", "+00:00"), count=1)
+    dt = datetime.fromisoformat(s)
     return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
