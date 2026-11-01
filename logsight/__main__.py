@@ -87,15 +87,12 @@ def main(argv: list[str] | None = None) -> int:
     if missing:
         print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
         return 2
-    from .normalize import SYSLOG, parse_when
+    from .normalize import SYSLOG, parse_tz, parse_when
     if args.year:
         SYSLOG["year"] = args.year
     if args.syslog_tz:
         try:
-            sign = -1 if args.syslog_tz.startswith("-") else 1
-            hh, mm = args.syslog_tz.lstrip("+-").split(":")
-            from datetime import timedelta, timezone
-            SYSLOG["tz"] = timezone(sign * timedelta(hours=int(hh), minutes=int(mm)))
+            SYSLOG["tz"] = parse_tz(args.syslog_tz)
         except ValueError:
             print("--syslog-tz 형식: +09:00", file=sys.stderr)
             return 2

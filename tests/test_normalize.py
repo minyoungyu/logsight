@@ -74,7 +74,7 @@ class AlbAction(unittest.TestCase):
         e = parse_alb(line)[0]
         self.assertEqual(e.action, "GET /a/b?x=1")
         self.assertEqual(e.dst_port, 8443)
-        self.assertEqual(e.extra["host"], "demo.example.com")
+        self.assertEqual(e.extra["http_host"], "demo.example.com")
         self.assertEqual(e.extra["http_status"], 404)
 
 
@@ -146,6 +146,48 @@ class CombinedRun(SyslogYear):
         self.assertIn(">차단<", html)         # 결과를 한국어로
         self.assertNotIn("(대상:", html)      # 흐름 문장의 '기준'이 대상처럼 읽히지 않게
         self.assertNotIn("원인으로 보이는 설정", html)  # 원인과 수정안이 한 카드로 합쳐짐
+
+
+class RealClientIp(unittest.TestCase):
+    """ALB 뒤 nginx: 실제 사용자 IP는 X-Forwarded-For에서, 위조할 수 있는 경우는 무시."""
+    def line(self, remote, xff):
+        return (f'{remote} - - [13/Jan/2026:04:20:10 +0000] "GET /a HTTP/1.1" 200 5 "-" "curl" "{xff}"')
+
+    def test_behind_alb_uses_xff(self):
+        e = normalize.parse_weblog(self.line("10.0.1.5", "203.0.113.9"))[0]
+        self.assertEqual(e.src_ip, "203.0.113.9")
+        self.assertEqual(e.extra["proxy_ip"], "10.0.1.5")
+
+    def test_rightmost_public_hop(self):  # 맨 왼쪽은 사용자가 마음대로 넣을 수 있음
+        e = normalize.parse_weblog(self.line("10.0.1.5", "198.18.0.1, 203.0.113.9"))[0]
+        self.assertEqual(e.src_ip, "203.0.113.9")
+
+    def test_direct_request_ignores_xff(self):
+        e = normalize.parse_weblog(self.line("203.0.113.50", "198.51.100.1"))[0]
+        self.assertEqual(e.src_ip, "203.0.113.50")
+
+    def test_behind_proxy_without_xff_is_reported(self):
+        evs = normalize.parse_weblog(self.line("10.0.1.5", "-"))
+        self.assertTrue(evs[0].extra["behind_proxy"])
+        from logsight.pipeline import run
+        res = run(evs, {}, use_ai=False)
+        self.assertTrue(any("http_x_forwarded_for" in a for a in res["assumptions"]))
+
+
+class SshHost(unittest.TestCase):
+    def test_ec2_hostname_maps_to_instance(self):
+        e = parse_sshauth("Jan 13 04:21:05 ip-10-0-1-10 sshd[1]: Failed password for root from 203.0.113.9 port 1 ssh2",
+                          year=2026)[0]
+        self.assertEqual(e.dst_ip, "10.0.1.10")
+        enrich([e], {"instances": [{"instance_id": "i-0abc", "private_ip": "10.0.1.10"}]})
+        self.assertEqual(e.extra["target_instance"], "i-0abc")
+
+    def test_name_tag_maps_to_instance(self):
+        e = parse_sshauth("Jan 13 04:21:05 web1 sshd[1]: Failed password for root from 203.0.113.9 port 1 ssh2",
+                          year=2026)[0]
+        self.assertIsNone(e.dst_ip)
+        enrich([e], {"instances": [{"instance_id": "i-0web", "name": "web1"}]})
+        self.assertEqual(e.extra["target_instance"], "i-0web")
 
 
 if __name__ == "__main__":

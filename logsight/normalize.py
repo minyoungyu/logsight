@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import gzip
 import io
+import ipaddress
 import json
 import re
 import sys
@@ -229,7 +230,7 @@ def parse_alb(text: str, name: str = "alb") -> list[Event]:
                 action=f"{method} {path}"[:300],
                 outcome="success" if f[8].startswith(("2", "3")) else "failure",
                 raw_ref=f"{name}:{i+1}",
-                extra={"http_status": int(f[8]) if f[8].isdigit() else None, "host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else ""},
+                extra={"http_status": int(f[8]) if f[8].isdigit() else None, "http_host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else ""},
             ))
         except (ValueError, IndexError):
             continue
@@ -238,12 +239,21 @@ def parse_alb(text: str, name: str = "alb") -> list[Event]:
 
 # ------------------------------------------------------------------ EC2 리눅스 인증 로그
 _SSH = re.compile(
-    r'^(?P<mon>\w{3})\s+(?P<day>\d+)\s+(?P<time>[\d:]+)\s+\S+\s+sshd\[\d+\]:\s+'
+    r'^(?P<mon>\w{3})\s+(?P<day>\d+)\s+(?P<time>[\d:]+)\s+(?P<host>\S+)\s+sshd\[\d+\]:\s+'
     r'(?P<result>Failed|Accepted)\s+(?:password|publickey)\s+for\s+(?:invalid user\s+)?'
     r'(?P<user>\S+)\s+from\s+(?P<ip>[\d.a-fA-F:]+)\s+port\s+(?P<port>\d+)'
 )
 _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+
+
+_AWS_HOST = re.compile(r"^ip-(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})(?:\.|$)")
+
+
+def _host_ip(host: str) -> str | None:
+    """EC2 기본 호스트 이름(ip-10-0-1-10)에서 사설 IP를 읽는다. 아니면 None(설정 스냅샷의 이름으로 다시 찾음)."""
+    m = _AWS_HOST.match(host or "")
+    return ".".join(m.groups()) if m else None
 
 
 def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> list[Event]:
@@ -256,10 +266,10 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
         ts = _syslog_dt(_MONTHS[m["mon"]], int(m["day"]), hh, mm, ss, year)
         events.append(Event(
             ts=ts, source="sshauth", src_ip=m["ip"], actor=m["user"], dst_port=22,
-            action="ssh_login",
+            dst_ip=_host_ip(m["host"]), action="ssh_login",
             outcome="success" if m["result"] == "Accepted" else "failure",
             raw_ref=f"{name}:{i+1}",
-            extra={"raw": line.strip()[:300]},
+            extra={"raw": line.strip()[:300], "host": m["host"]},
         ))
     return events
 
@@ -322,7 +332,39 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
 #   203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET /item?id=1 HTTP/1.1" 200 512 "-" "curl/8.0"
 _WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+)\s+\S+\s+\S+\s+\[(?P<ts>[^\]]+)\]\s+'
                   r'"(?P<req>[^"]*)"\s+(?P<status>\d{3})\s+(?P<size>\S+)'
-                  r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?')
+                  r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?'
+                  r'(?:\s+"(?P<xff>[^"]*)")?')  # nginx 기본 'main' 형식의 마지막 칸 $http_x_forwarded_for
+
+
+# 내부망 대역(RFC 1918, CGNAT, 루프백, 링크 로컬, IPv6 ULA). ipaddress의 is_private는 문서용 예약 대역까지
+# 사설로 보므로 직접 정한다.
+_INTERNAL = [ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10",
+                                               "127.0.0.0/8", "169.254.0.0/16", "::1/128", "fc00::/7", "fe80::/10")]
+
+
+def _private(ip: str) -> bool:
+    try:
+        a = ipaddress.ip_address(ip)
+    except ValueError:
+        return False
+    return any(a in n for n in _INTERNAL if n.version == a.version)
+
+
+def _client_ip(remote: str, xff: str | None) -> tuple[str, dict]:
+    """ALB·프록시 뒤 웹서버면 실제 사용자 IP를 X-Forwarded-For에서 찾는다.
+    접속해 온 쪽(remote)이 사설 IP(같은 VPC의 ALB 등)일 때만 XFF를 믿는다. 인터넷에서 바로 온 요청의 XFF는
+    사용자가 마음대로 넣을 수 있어 무시한다. XFF 안에서도 오른쪽(프록시가 덧붙인 값)부터 보며 첫 공인 IP를 쓴다."""
+    if not _private(remote):
+        return remote, {}
+    hops = [h.strip() for h in (xff or "").split(",") if h.strip() and h.strip() != "-"]
+    for h in reversed(hops):
+        try:
+            ipaddress.ip_address(h)
+        except ValueError:
+            continue
+        if not _private(h):
+            return h, {"proxy_ip": remote}
+    return remote, {"behind_proxy": True}  # 프록시 뒤인데 실제 IP를 알 수 없음
 
 
 def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
@@ -337,12 +379,14 @@ def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
             continue
         req = m["req"].split(" ")
         st = m["status"]
+        src, extra = _client_ip(m["ip"], m["xff"])
+        extra.update({"http_status": int(st), "ua": (m["ua"] or "")[:200]})
         events.append(Event(
-            ts=ts, source="weblog", src_ip=m["ip"],
+            ts=ts, source="weblog", src_ip=src,
             action=(f"{req[0]} {req[1]}" if len(req) > 1 else m["req"])[:300],
             outcome="success" if st[0] in "23" else "failure",
             raw_ref=f"{name}:{i+1}",
-            extra={"http_status": int(st), "ua": (m["ua"] or "")[:200]},
+            extra=extra,
         ))
     return events
 
@@ -571,6 +615,17 @@ def _walk(paths: Iterable[Path]) -> Iterator[Path]:
 
 
 _PATH_DATE = re.compile(r"(?:^|[/\\_])(20\d\d)[/\\-]?(\d\d)[/\\-]?(\d\d)(?:[/\\T_]|$)")
+
+
+def parse_tz(s: str) -> timezone:
+    """'+09:00', '-05:30', 'UTC' → timezone. 형식이 틀리면 ValueError."""
+    if s.strip().upper() in ("UTC", "Z", "+00:00"):
+        return timezone.utc
+    m = re.fullmatch(r"([+-])(\d{1,2}):?(\d{2})", s.strip())
+    if not m:
+        raise ValueError(s)
+    sign = -1 if m[1] == "-" else 1
+    return timezone(sign * timedelta(hours=int(m[2]), minutes=int(m[3])))
 
 
 def parse_when(s: str | None, end: bool = False) -> datetime | None:

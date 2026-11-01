@@ -199,7 +199,7 @@ def _compact(e: Event) -> dict:
         if v is not None:
             d[k] = v
     for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion",
-              "http_status", "host", "target_instance",
+              "http_status", "http_host", "host", "proxy_ip", "target_instance",
               "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_count", "gd_last_seen"):
         v = e.extra.get(k)
         if v:

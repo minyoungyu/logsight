@@ -13,7 +13,7 @@ AI:ON 2026 출품작(팀 로그파인더).
     # reports/demo/report.html 을 브라우저로 연다
     python -m logsight analyze samples/combined --out reports/combined   # 로그 8종을 한 폴더에 넣은 예
 
-웹 데모: `uvicorn app:app --reload` → http://127.0.0.1:8000 (샘플 바로 보기: /demo)
+웹 데모: `uvicorn app:app --reload` → http://127.0.0.1:8000. 로그 파일 여러 개를 한 칸에 올리면 종류를 자동으로 알아본다(environment.json도 같이). 샘플 바로 보기: /demo?sample=demo|free|combined
 
 Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.env.example 참고, 키는 커밋 금지).
 키가 없거나 호출이 실패하면 같은 형식의 규칙 기반 보고서를 만든다. 모델은 `LOGSIGHT_MODEL`
@@ -82,9 +82,9 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
     app.py           FastAPI 웹 데모
     samples/demo/    작은 샘플 로그 4종 + 설정 스냅샷 예시
     samples/combined/ 로그 8종을 한곳에 모은 합성 샘플(정규화 점검용)
-    tests/           단위·통합 테스트(58개)
+    tests/           단위·통합 테스트(65개)
     scripts/         성능 측정
     reports/demo/    샘플 분석 결과(HTML, JSON, 화면 캡처)
     reports/combined/ 8종 통합 분석 결과
-    docs/            중간보고서용 구현 요약
+    docs/            중간보고서용 구현 요약, 발표 자료(중간보고_발표자료.md)
     .github/workflows/test.yml  Windows·macOS·Linux 자동 테스트(저장소에 올리면 동작)

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-01T18:06:16Z",
+ "generated_at": "2026-11-01T22:24:05Z",
  "files": [
   {
    "file": "samples/combined/alb.log",
@@ -390,8 +390,11 @@
       "rules": [
        "SSH_SUCCESS_AFTER_FAIL"
       ],
+      "dst_ip": "10.0.1.10",
       "dst_port": 22,
-      "actor": "root"
+      "actor": "root",
+      "host": "ip-10-0-1-10",
+      "target_instance": "i-0abc123def456"
      },
      {
       "ref": "auth.log:2",
@@ -405,8 +408,11 @@
       "rules": [
        "SSH_SUCCESS_AFTER_FAIL"
       ],
+      "dst_ip": "10.0.1.10",
       "dst_port": 22,
-      "actor": "root"
+      "actor": "root",
+      "host": "ip-10-0-1-10",
+      "target_instance": "i-0abc123def456"
      },
      {
       "ref": "auth.log:3",
@@ -420,8 +426,11 @@
       "rules": [
        "SSH_SUCCESS_AFTER_FAIL"
       ],
+      "dst_ip": "10.0.1.10",
       "dst_port": 22,
-      "actor": "ubuntu"
+      "actor": "ubuntu",
+      "host": "ip-10-0-1-10",
+      "target_instance": "i-0abc123def456"
      },
      {
       "ref": "cloudtrail.json:1",
@@ -888,7 +897,7 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 9246,
+    "payload_chars": 9501,
     "validation": {
      "evidence_total": 31,
      "evidence_invalid": 0,
@@ -2106,11 +2115,10 @@
  ],
  "timing": {
   "detect_correlate_s": 0.0,
-  "total_s": 0.0
+  "total_s": 0.01
  },
  "has_environment": true,
  "assumptions": [
-  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 --syslog-tz, --year로 지정하세요.",
-  "ALB 뒤의 nginx 로그는 출발지가 ALB 내부 IP일 수 있습니다. 실제 사용자 IP는 X-Forwarded-For를 로그 형식에 넣어야 보입니다."
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
  ]
 }

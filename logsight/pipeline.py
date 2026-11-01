@@ -62,27 +62,33 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
         "has_environment": bool(env),
-        "assumptions": _assumptions(by_source, env),
+        "assumptions": _assumptions(by_source, env, file_stats or [],
+                                    sum(1 for e in events if e.extra.get("behind_proxy"))),
     }
 
 
-def _assumptions(by_source: dict, env: dict) -> list[str]:
+def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxied: int = 0) -> list[str]:
     """결과 해석에 영향을 주는 가정을 보고서에 그대로 보여 준다."""
     from .normalize import SYSLOG
     out = []
+    bad = [s["file"] for s in file_stats if not s.get("kind")]
+    if bad:
+        out.append(f"형식을 알 수 없어 건너뛴 파일 {len(bad)}개: {', '.join(map(str, bad[:5]))}"
+                   + (" 외" if len(bad) > 5 else "") + ". 파일 이름에 로그 종류(cloudtrail, vpcflow, nginx 등)를 넣으면 판별됩니다.")
     if by_source.get("sshauth") or by_source.get("hostfw"):
         tz = SYSLOG["tz"].utcoffset(None)
         hours = tz.total_seconds() / 3600
         out.append(f"auth.log·kern.log처럼 연도·시간대가 없는 줄은 "
                    f"{'UTC' if not hours else f'UTC{hours:+g}'} 기준, 연도는 "
-                   f"{SYSLOG['year'] or '올해(미래면 작년)'}로 해석했습니다. 다르면 --syslog-tz, --year로 지정하세요.")
+                   f"{SYSLOG['year'] or '올해(미래면 작년)'}로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요.")
     if not env:
         out.append("설정 스냅샷(environment.json)이 없어 방화벽 수정안을 만들지 않았습니다. "
                    "python -m logsight collect environment로 만들 수 있습니다.")
     elif not env.get("trusted_ips"):
         out.append("관리자 IP(trusted_ips)가 비어 있어 수정안의 허용 IP가 자리표시로 나옵니다.")
-    if by_source.get("weblog") and by_source.get("alb"):
-        out.append("ALB 뒤의 nginx 로그는 출발지가 ALB 내부 IP일 수 있습니다. 실제 사용자 IP는 X-Forwarded-For를 로그 형식에 넣어야 보입니다.")
+    if proxied:
+        out.append(f"웹서버 로그 {proxied:,}줄은 ALB·프록시 내부 IP에서 왔고 실제 사용자 IP가 없어 내부 IP로 분석했습니다. "
+                   "nginx 로그 형식 끝에 \"$http_x_forwarded_for\"를 넣으면(nginx 기본 main 형식) 실제 IP로 분석합니다.")
     return out
 
 
@@ -101,16 +107,22 @@ def enrich(events: list[Event], env: dict) -> None:
     """설정 스냅샷의 인스턴스 목록으로 네트워크·웹 로그의 대상 IP를 인스턴스 ID로 바꿔 적는다.
     사건 묶기 연결고리로는 쓰지 않는다(여러 스캐너가 같은 서버를 두드리면 한 사건으로 뭉치므로).
     보고서·수정안에서 "어느 서버가 대상이었나"를 보여 주는 용도."""
-    ip2inst = {}
+    ip2inst, host2inst = {}, {}
     for inst in env.get("instances", []):
         for k in ("private_ip", "public_ip"):
             if inst.get(k):
                 ip2inst[inst[k]] = inst["instance_id"]
-    if not ip2inst:
+        for k in ("name", "private_dns"):  # 서버 로그의 호스트 이름(web1, ip-10-0-1-10.ec2.internal)
+            if inst.get(k):
+                host2inst[inst[k].split(".")[0].lower()] = inst["instance_id"]
+    if not ip2inst and not host2inst:
         return
     for e in events:
-        if not e.instance_id and e.dst_ip in ip2inst:
-            e.extra["target_instance"] = ip2inst[e.dst_ip]
+        if e.instance_id:
+            continue
+        inst = ip2inst.get(e.dst_ip) or host2inst.get(str(e.extra.get("host", "")).split(".")[0].lower())
+        if inst:
+            e.extra["target_instance"] = inst
 
 
 def run_paths(paths: list[str], env_path: str | None = None, *, since=None, until=None,

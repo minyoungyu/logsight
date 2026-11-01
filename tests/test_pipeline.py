@@ -282,6 +282,36 @@ class InterfaceTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn("IMDSv1", r.text)
 
+    def test_web_app_auto_detect(self):
+        try:
+            from fastapi.testclient import TestClient
+        except ImportError:
+            self.skipTest("fastapi/httpx 없음")
+        sys.path.insert(0, str(ROOT))
+        import app as webapp
+        from logsight import normalize
+        c = TestClient(webapp.app)
+        for s in ("demo", "free", "combined"):
+            self.assertIn("INC-001", c.get(f"/demo?sample={s}").text, s)
+        comb = ROOT / "samples" / "combined"
+        # 한 칸에 8종 + 설정 스냅샷 + 알 수 없는 파일을 함께 올림
+        files = [("logs", (p.name, p.read_bytes())) for p in sorted(comb.iterdir())]
+        files.append(("logs", ("notes.txt", b"hello")))
+        saved = dict(normalize.SYSLOG)
+        r = c.post("/analyze", files=files, data={"no_ai": "1", "year": "2026", "syslog_tz": "UTC"})
+        self.assertEqual(r.status_code, 200)
+        for word in ("GuardDuty", "서버 방화벽", "웹서버 로그", "IMDSv1", "notes.txt", "먼저 할 일"):
+            self.assertIn(word, r.text)
+        self.assertEqual(normalize.SYSLOG, saved)  # 요청 설정이 다른 요청에 새지 않음
+        # 한국 시간 옵션: SSH 줄이 9시간 당겨져 다른 로그와 떨어진다(가정 문구에 표시)
+        r2 = c.post("/analyze", files=files, data={"no_ai": "1", "year": "2026", "syslog_tz": "+09:00"})
+        self.assertIn("UTC+9", r2.text)
+        # 기간 필터
+        r3 = c.post("/analyze", files=files, data={"no_ai": "1", "year": "2026", "since": "2026-10-01"})
+        self.assertNotIn("CloudTrail 3", r3.text)
+        self.assertEqual(c.post("/analyze", files=[("logs", ("x.txt", b"?"))]).status_code, 400)
+        self.assertEqual(c.post("/analyze", files=files, data={"syslog_tz": "KST"}).status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()

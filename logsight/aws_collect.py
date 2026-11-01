@@ -63,6 +63,8 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
                         "instance_id": i["InstanceId"],
                         "private_ip": i.get("PrivateIpAddress"),
                         "public_ip": i.get("PublicIpAddress"),
+                        "private_dns": i.get("PrivateDnsName"),
+                        "name": next((t["Value"] for t in i.get("Tags", []) if t.get("Key") == "Name"), None),
                         "security_groups": [g["GroupId"] for g in i.get("SecurityGroups", [])],
                         "instance_profile": prof_name,
                         "iam_role": prof_name,  # 아래 IAM 단계에서 실제 역할 이름으로 바꾼다
