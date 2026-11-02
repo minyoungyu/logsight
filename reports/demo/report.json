@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-01T22:24:05Z",
+ "generated_at": "2026-11-02T02:58:34Z",
  "files": [
   {
    "file": "samples/demo/alb.log",
@@ -86,9 +86,157 @@
     "SSH_SUCCESS_AFTER_FAIL",
     "VPC_REMOTE_ADMIN_EXPOSED",
     "WEB_SQLI_PATTERN"
-   ]
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
   }
  ],
+ "triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "vpcflow.log:1",
+     "alb.log:2",
+     "auth.log:1",
+     "auth.log:2",
+     "auth.log:3",
+     "cloudtrail.json:1"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "외부에서 관리 포트(22/3389) 접속 허용, 웹 요청에 SQL 인젝션 패턴, 연속 실패 뒤 SSH 로그인 성공. 성공·허용 4건, 실패·차단 4건."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지 알 수 없습니다.",
+   "INC-001의 활동이 로그가 끝나는 무렵(01-13 04:27 UTC(한국 13:27))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "alb": {
+     "n_events": 2,
+     "first": "2026-01-13T04:20:10.100000+00:00",
+     "last": "2026-01-13T04:20:30.100000+00:00"
+    },
+    "cloudtrail": {
+     "n_events": 3,
+     "first": "2026-01-13T04:25:00+00:00",
+     "last": "2026-01-13T04:27:00+00:00"
+    },
+    "sshauth": {
+     "n_events": 3,
+     "first": "2026-01-13T04:21:05+00:00",
+     "last": "2026-01-13T04:22:40+00:00"
+    },
+    "vpcflow": {
+     "n_events": 3,
+     "first": "2026-01-13T04:19:40+00:00",
+     "last": "2026-01-13T04:20:00+00:00"
+    }
+   },
+   "missing_sources": [
+    "waf"
+   ],
+   "cloudtrail_s3_object_calls": 1,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "rule_triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "vpcflow.log:1",
+     "alb.log:2",
+     "auth.log:1",
+     "auth.log:2",
+     "auth.log:3",
+     "cloudtrail.json:1"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "외부에서 관리 포트(22/3389) 접속 허용, 웹 요청에 SQL 인젝션 패턴, 연속 실패 뒤 SSH 로그인 성공. 성공·허용 4건, 실패·차단 4건."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지 알 수 없습니다.",
+   "INC-001의 활동이 로그가 끝나는 무렵(01-13 04:27 UTC(한국 13:27))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "alb": {
+     "n_events": 2,
+     "first": "2026-01-13T04:20:10.100000+00:00",
+     "last": "2026-01-13T04:20:30.100000+00:00"
+    },
+    "cloudtrail": {
+     "n_events": 3,
+     "first": "2026-01-13T04:25:00+00:00",
+     "last": "2026-01-13T04:27:00+00:00"
+    },
+    "sshauth": {
+     "n_events": 3,
+     "first": "2026-01-13T04:21:05+00:00",
+     "last": "2026-01-13T04:22:40+00:00"
+    },
+    "vpcflow": {
+     "n_events": 3,
+     "first": "2026-01-13T04:19:40+00:00",
+     "last": "2026-01-13T04:20:00+00:00"
+    }
+   },
+   "missing_sources": [
+    "waf"
+   ],
+   "cloudtrail_s3_object_calls": 1,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "n_known": 0,
+ "explain_mode": {
+  "report": "rules",
+  "models": [],
+  "triage": "rules",
+  "triage_model": null,
+  "ai_errors": []
+ },
  "results": [
   {
    "incident": {
@@ -119,6 +267,8 @@
      "vpcflow"
     ],
     "n_events": 8,
+    "n_known": 0,
+    "known_labels": [],
     "findings": [
      {
       "rule": "VPC_REMOTE_ADMIN_EXPOSED",
@@ -367,7 +517,9 @@
     "repeats": 1,
     "first_seen": "2026-01-13T04:20:00+00:00",
     "last_seen": "2026-01-13T04:27:00+00:00",
-    "repeat_ids": []
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
    },
    "checks": [
     {
@@ -554,15 +706,17 @@
     }
    ],
    "report": {
-    "summary": "2026-01-13 04:20부터 04:27(UTC)까지 203.0.113.9의 활동 8건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취 → 지속성 확보.",
+    "summary": "외부 공격으로 보입니다. 01-13 04:20~04:27 UTC(한국 13:20~13:27), 출발지 203.0.113.9: 외부에서 관리 포트(22/3389) 접속 허용 → 웹 요청에 SQL 인젝션 패턴 → 연속 실패 뒤 SSH 로그인 성공 → 인스턴스 역할 자격증명이 인스턴스 밖에서 사용. 성공하거나 통과된 시도가 4건 있어 실제 피해가 있었는지 확인해야 합니다. 먼저 고칠 설정: 보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용(아래 수정안).",
     "severity": "high",
-    "confidence": "medium",
+    "confidence": "high",
+    "verdict": "attack",
+    "verdict_reason": "외부에서 관리 포트(22/3389) 접속 허용, 웹 요청에 SQL 인젝션 패턴, 연속 실패 뒤 SSH 로그인 성공. 성공·허용 4건, 실패·차단 4건.",
     "attack_flow": [
      {
       "stage": "initial-access",
       "technique": "T1133",
       "time": "2026-01-13T04:20:00+00:00",
-      "what": "외부에서 관리 포트(22/3389) 접속 허용 — 포트 [22] 허용 1건 (기준: 203.0.113.9)",
+      "what": "203.0.113.9에서 관리 포트(22)로 접속한 것이 1건 허용됐습니다. 관리 포트가 인터넷에 열려 있다는 뜻입니다.",
       "evidence": [
        "vpcflow.log:1"
       ]
@@ -571,7 +725,7 @@
       "stage": "initial-access",
       "technique": "T1190",
       "time": "2026-01-13T04:20:30.100000+00:00",
-      "what": "웹 요청에 SQL 인젝션 패턴 — 1건(성공 0, 실패·거부 1) (기준: 203.0.113.9)",
+      "what": "203.0.113.9에서 보낸 웹 요청 1건에 SQL 인젝션 문자열이 있었습니다(정상 응답 0건, 오류·거부 1건).",
       "evidence": [
        "alb.log:2"
       ]
@@ -580,7 +734,7 @@
       "stage": "initial-access",
       "technique": "T1078",
       "time": "2026-01-13T04:21:05+00:00",
-      "what": "연속 실패 뒤 SSH 로그인 성공 — 직전 30분 실패 2건 뒤 'ubuntu' 성공 (기준: 203.0.113.9)",
+      "what": "203.0.113.9에서 SSH 비밀번호를 2번 틀린 뒤 로그인에 성공했습니다. 비밀번호가 뚫렸을 수 있습니다.",
       "evidence": [
        "auth.log:1",
        "auth.log:2",
@@ -591,7 +745,7 @@
       "stage": "credential-access",
       "technique": "T1552.005",
       "time": "2026-01-13T04:25:00+00:00",
-      "what": "인스턴스 역할 자격증명이 인스턴스 밖에서 사용 — 3건(성공 2, 실패·거부 1) (기준: i-0abc123def456)",
+      "what": "i-0abc123def456에 붙은 역할 키가 서버 밖(203.0.113.9)에서 3번 쓰였습니다(성공 2건, 거부 1건: s3:ListBuckets, s3:GetObject, iam:CreateUser). 키가 유출됐을 가능성이 큽니다.",
       "evidence": [
        "cloudtrail.json:1",
        "cloudtrail.json:2",
@@ -602,7 +756,7 @@
       "stage": "persistence",
       "technique": "T1098",
       "time": "2026-01-13T04:27:00+00:00",
-      "what": "IAM 사용자·키·권한 생성/변경 — 1건(성공 0, 실패·거부 1) (기준: arn:aws:sts::111122223333:assumed-role/ec2-app-role/i-0abc123def456)",
+      "what": "203.0.113.9에서 IAM 사용자·키·권한을 만들거나 바꾸려 했습니다(iam:CreateUser, 성공 0건, 거부 1건). 다시 들어올 문을 만드는 단계일 수 있습니다.",
       "evidence": [
        "cloudtrail.json:3"
       ]
@@ -695,7 +849,7 @@
      }
     ],
     "unknowns": [
-     "규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다."
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다."
     ]
    },
    "meta": {
@@ -718,6 +872,6 @@
  },
  "has_environment": true,
  "assumptions": [
-  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 올해(미래면 작년)로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
  ]
 }

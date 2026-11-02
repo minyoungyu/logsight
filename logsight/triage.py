@@ -239,11 +239,19 @@ def validate_triage(result: dict, payload: dict) -> dict:
 
 def reorder(incidents: list[dict], result: dict | None) -> list[dict]:
     """공격 → 위험 설정 → 판단 불가 → 정상 활동 순으로 정렬. 같은 판정 안에서는 규칙 순서를
-    지킨다. 판정이 없는 사건은 '판단 불가'로 둔다. 사건 자체는 지우지 않는다."""
+    지킨다. 판정이 없는 사건은 '판단 불가'로 둔다. 사건 자체는 지우지 않는다.
+    판정은 inc["verdict"]와 inc["verdict_by"]("claude" 또는 "rules")에 적는다.
+    Claude 판정이면 inc["ai_verdict"]에도 같은 값을 적는다(이전 형식 호환)."""
     if not result or "incidents" not in result:
         return incidents
+    by = "rules" if result.get("mode") == "rules" else "claude"
     v = {x["id"]: x["verdict"] for x in result["incidents"]}
     rank = {"attack": 0, "risky_not_attack": 1, "unclear": 2, "benign_activity": 3}
     for inc in incidents:
-        inc["ai_verdict"] = v.get(inc["id"], "unclear")
-    return sorted(incidents, key=lambda i: rank[i["ai_verdict"]])  # 안정 정렬
+        inc["verdict"] = v.get(inc["id"], "unclear")
+        inc["verdict_by"] = by
+        if by == "claude":
+            inc["ai_verdict"] = inc["verdict"]
+        else:
+            inc.pop("ai_verdict", None)
+    return sorted(incidents, key=lambda i: rank[i["verdict"]])  # 안정 정렬

@@ -62,6 +62,28 @@ Python 3.10 이상 필요.
 
 폴더 안에 environment.json이 있으면 자동으로 설정 점검에 쓴다. 없으면 로그만으로 분석한다.
 
+### AI 없이 쓰기(규칙 기반 모드)와 정상 작업 목록
+
+API 키가 없거나 `--no-ai`면 Claude를 부르지 않고 끝까지 동작한다. 로그는 컴퓨터 밖으로 나가지 않고, 같은 입력이면 항상 같은 결과가 나온다.
+보고서 맨 위에 "AI 사용 안 함" 또는 "Claude 사용"이 표시된다.
+
+- 사건 판정: 공격 의심 / 공격 아님·위험 설정 / 판단 불가 / 정상 활동을 규칙으로 정하고 공격 의심을 위로 올린다(`logsight/explain.py`).
+- 설명 문장: 탐지 규칙마다 "누가, 무엇을, 몇 번, 성공·거부 몇 건, 왜 중요한가"를 쓰는 문장 틀이 있다.
+- 로그 범위: 로그 종류별 기간을 막대로 보여 주고, 없는 로그·먼저 끝난 로그·S3 데이터 이벤트 0건처럼 "이 로그로는 알 수 없는 것"을 적는다.
+- 정상 작업 목록: environment.json에 운영자·배포 계정·관리 IP를 적으면 그 활동만으로 된 사건을 "정상 활동"으로 내린다. 사건을 지우지 않고 순서만 바꾼다. `trusted_ips`도 목록으로 쓴다.
+
+```json
+"known_activity": [
+  {"label": "배포 자동화(CI)", "actors": ["github-actions-deploy", "*-deploy-role"]},
+  {"label": "모니터링 서버", "ips": ["10.0.9.5/32"]},
+  {"label": "백업 키", "access_keys": ["AKIA..."]}
+]
+```
+
+`actors`는 IAM ARN 전체나 마지막 이름에 `*` 패턴으로 맞춘다. 목록의 계정이 도용되면 공격을 정상으로 볼 수 있으므로 목록은 좁게 쓴다.
+
+같은 사건을 규칙과 Claude로 나란히 보는 화면: `python scripts/compare_modes.py --col "규칙=report.json:rule_triage" --col "Claude=report.json:triage"` (웹 데모는 `/compare`).
+
 ## 분석 전에: 로그가 켜져 있는지 점검하고 켜기
 
 작은 팀은 분석할 로그가 아예 꺼져 있는 경우가 많다(추정). `pip install boto3` 후:

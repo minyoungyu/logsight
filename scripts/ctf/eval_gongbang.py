@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from logsight.correlate import build_incidents  # noqa: E402
 from logsight.detect import run_detections  # noqa: E402
 from logsight.normalize import load_paths  # noqa: E402
+from logsight.explain import mark_known, rule_triage  # noqa: E402
 from logsight.triage import reorder, triage  # noqa: E402
 
 
@@ -31,7 +32,7 @@ def fingerprint(e) -> tuple:
     """통합로그에는 같은 행이 여러 번 들어 있다. 원본 이벤트 ID가 없어 같은 초에 실제로 두 번 일어난
     호출과 복사된 행을 구별할 수 없으므로, 행 기준과 이 지문 기준을 함께 보고한다."""
     return (e.source, e.ts, e.action, e.src_ip, e.actor, e.access_key, e.outcome,
-            e.extra.get("params"), e.extra.get("errorCode"), e.extra.get("elb_status"))
+            e.extra.get("params"), e.extra.get("errorCode"), e.extra.get("http_status"))
 
 
 def uniq(evs) -> int:
@@ -108,8 +109,11 @@ def score_triage(inc_rows: list[dict], tri: dict | None, incidents: list[dict]) 
     }
 
 
-def evaluate(data: Path, gt: dict, use_ai: bool = False, model: str | None = None) -> dict:
+def evaluate(data: Path, gt: dict, use_ai: bool = False, model: str | None = None,
+             env: dict | None = None) -> dict:
+    """env: 설정 스냅샷. 여기서는 정상 작업 목록(known_activity)만 쓴다(탐지 규칙은 그대로)."""
     events, _ = load_paths([data])
+    n_known = mark_known(events, env or {})
     findings = run_detections(events)
     incidents = build_incidents(events, findings, max_events=10**9)
     lm = json.loads((data / "linemap.json").read_text())
@@ -161,6 +165,7 @@ def evaluate(data: Path, gt: dict, use_ai: bool = False, model: str | None = Non
                          "sources": inc["sources"]})
     att_incs = [r for r in inc_rows if r["n_attacker_events"]]
     tri = triage(incidents, model=model, events=events) if use_ai else None
+    rule_tri = rule_triage(incidents, events)
 
     return {
         "data": {"n_events": len(events), "n_events_unique": uniq(events),
@@ -191,6 +196,8 @@ def evaluate(data: Path, gt: dict, use_ai: bool = False, model: str | None = Non
             "top10": inc_rows[:10],
         },
         "rules_fired": {f.rule: sum(1 for x in findings if x.rule == f.rule) for f in findings},
+        "known_activity": {"entries": (env or {}).get("known_activity", []), "n_events_marked": n_known},
+        "rule_triage": score_triage(inc_rows, rule_tri, incidents),
         **({"ai_triage": score_triage(inc_rows, tri, incidents)} if use_ai else {}),
     }
 
@@ -202,9 +209,11 @@ def main() -> None:
     ap.add_argument("--out")
     ap.add_argument("--ai", action="store_true", help="AI 재검토까지 돌려 채점(ANTHROPIC_API_KEY 필요)")
     ap.add_argument("--model", help="재검토 모델(기본 logsight.triage.TRIAGE_MODEL)")
+    ap.add_argument("--env", help="정상 작업 목록(known_activity)이 든 설정 파일")
     a = ap.parse_args()
     gt = json.loads(Path(a.gt).read_text(encoding="utf-8"))
-    res = evaluate(Path(a.data), gt, use_ai=a.ai, model=a.model)
+    env = json.loads(Path(a.env).read_text(encoding="utf-8")) if a.env else None
+    res = evaluate(Path(a.data), gt, use_ai=a.ai, model=a.model, env=env)
     text = json.dumps(res, ensure_ascii=False, indent=1)
     if a.out:
         Path(a.out).parent.mkdir(parents=True, exist_ok=True)

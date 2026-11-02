@@ -130,6 +130,9 @@ def build_incidents(events: list[Event], findings: list[Finding],
             "actors": sorted({e.actor for e in evs if e.actor}),
             "sources": sorted({e.source for e in evs}),
             "n_events": len(evs),
+            # 정상 작업 목록(설정의 known_activity)과 맞는 이벤트 수. 상세 이벤트가 잘려도 전체 기준
+            "n_known": sum(1 for e in evs if e.extra.get("known")),
+            "known_labels": sorted({e.extra["known"] for e in evs if e.extra.get("known")}),
             "findings": [_finding_in(f, evs) for f in fl],
             "events": [_compact(e) for e in detail],
             "omitted_events": omitted,
@@ -207,7 +210,7 @@ def _compact(e: Event) -> dict:
             d[k] = v
     for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion",
               "http_status", "http_host", "host", "proxy_ip", "target_instance",
-              "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_count", "gd_last_seen"):
+              "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_count", "gd_last_seen", "known"):
         v = e.extra.get(k)
         if v:
             d[k] = v
