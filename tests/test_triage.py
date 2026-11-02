@@ -94,8 +94,8 @@ def test_pipeline_uses_triage_order(monkeypatch):
 def _alb(ip, path, status, sec):
     t0 = datetime(2026, 10, 11, 5, 40, tzinfo=timezone.utc)
     return Event(ts=t0 + timedelta(seconds=sec), source="alb", src_ip=ip,
-                 action=f"GET https://api:443{path}", outcome="failure",
-                 raw_ref=f"alb:{sec}", extra={"elb_status": status})
+                 action=f"GET {path}", outcome="failure",
+                 raw_ref=f"alb:{sec}", extra={"http_status": int(status)})
 
 
 def test_object_enum_on_api_logs():

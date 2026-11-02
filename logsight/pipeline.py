@@ -9,6 +9,7 @@ from .analyze import analyze, build_payload
 from .config_audit import audit
 from .correlate import build_incidents, group_repeats
 from .detect import run_detections
+from .explain import mark_known, rule_triage
 from .normalize import Event, load_paths
 from .triage import reorder, triage
 
@@ -27,18 +28,23 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     t0 = time.time()
     env = env or {}
     enrich(events, env)
+    n_known = mark_known(events, env)  # 설정의 정상 작업 목록과 맞는 이벤트 표시(지우지 않음)
     findings = run_detections(events, env)
     incidents = build_incidents(events, findings, window_min=window_min)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
     t_detect = time.time() - t0
-    # AI 재검토: 묶은 대표 사건(점수순 상위 30개)을 보고 공격으로 보이는 것을 위로 올린다.
-    # 키가 없거나 preview면 규칙 순서 그대로
-    tri = triage(groups, model=model, use_ai=use_ai and not preview, events=events)
+    # 재검토: 공격으로 보이는 사건을 위로 올린다. 규칙 판정은 항상 만들고(키 없이도, 비교용),
+    # Claude 키가 있으면 Claude 판정(점수순 상위 30개)을 쓴다. 실패하면 규칙 판정으로 계속
+    rule_tri = rule_triage(groups, events)
+    ai_tri = triage(groups, model=model, use_ai=use_ai and not preview, events=events)
+    tri = ai_tri if ai_tri and "incidents" in ai_tri else rule_tri
     groups = reorder(groups, tri)
+    rule_v = {x["id"]: x for x in rule_tri["incidents"]}
     results = []
     for inc in groups[:top]:
         checks = audit(inc, env)
-        out = analyze(inc, checks, model=model, use_ai=use_ai and not preview)
+        out = analyze(inc, checks, model=model, use_ai=use_ai and not preview,
+                      verdict=rule_v.get(inc["id"]))
         row = {"incident": inc, "checks": checks, **out}
         if preview:
             row["ai_payload"] = build_payload(inc, checks)
@@ -64,8 +70,12 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
                                                "last_seen")}
                            | {"rules": sorted({f["rule"] for f in i["findings"]})}
                            | ({"ai_verdict": i["ai_verdict"]} if "ai_verdict" in i else {})
+                           | ({"verdict": i["verdict"], "verdict_by": i["verdict_by"]} if "verdict" in i else {})
                            for i in groups[:50]],
         "triage": tri,
+        "rule_triage": rule_tri,
+        "n_known": n_known,
+        "explain_mode": _explain_mode(results, tri, ai_tri),
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
@@ -73,6 +83,18 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy"))),
     }
+
+
+def _explain_mode(results: list[dict], tri: dict, ai_tri: dict | None) -> dict:
+    """보고서 맨 위에 'AI를 썼는가'를 분명히 보여 주기 위한 요약."""
+    models = sorted({r["meta"]["model"] for r in results if r["meta"].get("mode") == "claude"})
+    errors = [r["meta"]["ai_error"] for r in results if r["meta"].get("ai_error")]
+    if ai_tri and ai_tri.get("error"):
+        errors.append(ai_tri["error"])
+    return {"report": "claude" if models else "rules", "models": models,
+            "triage": "rules" if tri.get("mode") == "rules" else "claude",
+            "triage_model": None if tri.get("mode") == "rules" else (tri.get("meta") or {}).get("model"),
+            "ai_errors": errors[:3]}
 
 
 def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxied: int = 0) -> list[str]:

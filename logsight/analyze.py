@@ -110,8 +110,9 @@ def build_payload(incident: dict, checks: list[dict]) -> dict:
 
 
 def analyze(incident: dict, checks: list[dict], model: str | None = None,
-            use_ai: bool = True) -> dict:
-    """반환: {"report": ..., "meta": {...}}"""
+            use_ai: bool = True, verdict: dict | None = None) -> dict:
+    """반환: {"report": ..., "meta": {...}}
+    verdict: 규칙 판정(explain.verdict_for). 규칙 기반 설명의 첫 문장과 확신도에 쓴다."""
     payload = build_payload(incident, checks)
     meta = {"mode": "rules", "model": None, "payload_chars": len(json.dumps(payload, ensure_ascii=False))}
     if use_ai and os.environ.get("ANTHROPIC_API_KEY"):
@@ -122,11 +123,11 @@ def analyze(incident: dict, checks: list[dict], model: str | None = None,
                         seconds=round(time.time() - t, 1))
         except Exception as exc:  # noqa: BLE001 — 시연 중 실패하면 규칙 기반으로 계속
             meta.update(mode="rules", ai_error=f"{type(exc).__name__}: {exc}"[:300])
-            report = rule_based(incident, checks)
+            report = rule_based(incident, checks, verdict)
     else:
         if use_ai:
             meta["note"] = "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성"
-        report = rule_based(incident, checks)
+        report = rule_based(incident, checks, verdict)
     meta["validation"] = validate(report, incident, checks)
     return {"report": report, "meta": meta}
 
@@ -178,29 +179,39 @@ def validate(report: dict, incident: dict, checks: list[dict]) -> dict:
             "passed": bad == 0 and no_evidence == 0 and not unknown_checks}
 
 
-def rule_based(incident: dict, checks: list[dict]) -> dict:
-    """API 키 없이 돌리는 분석기. 탐지 결과와 설정 점검을 같은 보고서 형식으로 옮긴다."""
+def rule_based(incident: dict, checks: list[dict], verdict: dict | None = None) -> dict:
+    """API 키 없이 돌리는 분석기. 사건 유형별 문장 템플릿(explain.py)으로 같은 보고서 형식을 만든다.
+    같은 입력이면 항상 같은 문장이 나온다."""
+    from .explain import describe_finding, summarize, verdict_for
+    verdict = verdict or verdict_for(incident)
     flow = []
     for f in sorted(incident["findings"], key=lambda f: f["first"]):
         flow.append({"stage": f["stage"], "technique": f["technique"], "time": f["first"],
-                     "what": f"{f['title']} — {f['detail']}" + (f" (기준: {f['key']})" if f["key"] else ""),
-                     "evidence": f["evidence"][:8]})
-    who = ", ".join(incident["src_ips"][:3]) or ", ".join(incident["actors"][:2]) or "알 수 없는 주체"
-    stages = " → ".join(STAGE_KO[s] for s in incident["stages"])
-    summary = (f"{incident['start'][:16].replace('T', ' ')}부터 {incident['end'][11:16]}(UTC)까지 "
-               f"{who}의 활동 {incident['n_events']}건이 하나로 이어진다. 흐름: {stages}.")
-    if not checks:
-        summary += " 설정 스냅샷(environment.json)이 없어 원인 설정은 로그로만 추정했다."
+                     "what": describe_finding(f, incident), "evidence": f["evidence"][:8]})
     pr = {"high": "now", "medium": "soon", "low": "later"}
+    v = verdict["verdict"]
+    unknowns = []
+    if v == "attack":
+        unknowns.append("규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.")
+        if not any(e.get("status") == "success" for e in incident["events"]):
+            unknowns.append("보이는 시도는 모두 실패·차단이지만, 로그가 없는 다른 경로로 성공했는지는 알 수 없습니다.")
+    elif v == "unclear":
+        unknowns.append(verdict["reason"])
+    elif v == "benign_activity":
+        unknowns.append("정상 작업 목록과 일치해 정상으로 보았습니다. 목록의 계정·IP가 도용됐다면 판단이 틀릴 수 있습니다.")
+    if incident.get("omitted_events"):
+        unknowns.append(f"비슷한 이벤트 {incident['omitted_events']}건은 생략하고 대표 이벤트만 보았습니다.")
     return {
-        "summary": summary,
+        "summary": summarize(incident, verdict, checks),
         "severity": incident["severity"],
-        "confidence": "medium",
+        "confidence": verdict.get("confidence", "medium"),
+        "verdict": v,
+        "verdict_reason": verdict["reason"],
         "attack_flow": flow,
         "root_causes": [{"setting": c["title"], "why": c["why"], "evidence": c["evidence"][:6]}
                         for c in checks],
         "firewall_changes": [{"check_id": c["id"], "target": c["target"], "resource": c["resource"],
                               "change": c["title"], "priority": pr.get(c["severity"], "later")}
                              for c in checks],
-        "unknowns": ["규칙 기반 분석이라 공격 의도와 실제 피해 범위는 사람이 확인해야 한다."],
+        "unknowns": unknowns,
     }

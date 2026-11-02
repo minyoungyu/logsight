@@ -351,7 +351,9 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
     # 경로 이름에 기대지 않고, 권한 거부·없음 응답이 서로 다른 번호에 몰리는지만 본다.
     probes: dict[tuple[str, str], list[Event]] = defaultdict(list)
     for e in events:
-        if e.source == "alb" and e.action and e.extra.get("elb_status") in ("403", "404"):
+        # http_status(정수)가 공통 필드다. elb_status(문자열)는 예전에 저장한 결과와 호환용
+        st = e.extra.get("http_status") or e.extra.get("elb_status")
+        if e.source == "alb" and e.action and str(st) in ("403", "404"):
             r = _route(e.action)
             if r:
                 probes[(e.src_ip or "?", r)].append(e)

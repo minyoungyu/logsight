@@ -3,6 +3,10 @@
   "account_id": "111122223333",
   "region": "ap-northeast-2",
   "trusted_ips": [{"cidr": "192.0.2.10/32", "label": "관리자 사무실"}],
+  "known_activity": [
+    {"label": "배포 자동화(CI)", "actors": ["github-actions-deploy", "*-deploy-role"]},
+    {"label": "모니터링 서버", "ips": ["10.0.9.5/32"]}
+  ],
   "instances": [
     {"instance_id": "i-0abc123def456", "private_ip": "10.0.1.10", "public_ip": "198.51.100.25",
      "security_groups": ["sg-0web000000000001"], "iam_role": "ec2-app-role", "imds": "optional"}
