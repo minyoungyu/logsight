@@ -147,6 +147,8 @@ def render(cols: list[dict], title: str, notes: list[str]) -> str:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")  # Windows 콘솔에서 한글 출력
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--col", action="append", required=True, help="'이름=파일:키' (여러 번)")
     ap.add_argument("--title", default="설명 방식 비교: 규칙 vs Claude")
