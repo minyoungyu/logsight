@@ -7,6 +7,7 @@ from html import escape
 
 from .analyze import STAGE_KO
 from .detect import RULES
+from .graph import GRAPH_CSS, figure
 
 SEV_KO = {"high": "높음", "medium": "중간", "low": "낮음"}
 PRI_KO = {"now": "즉시", "soon": "이번 주", "later": "여유 있을 때"}
@@ -26,6 +27,7 @@ font:15px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendar
 -webkit-font-smoothing:antialiased}a{color:var(--accent)}
 .shell{max-width:1200px;margin:0 auto;padding:0 16px 72px;display:grid;grid-template-columns:1fr;gap:24px}
 @media (min-width:1000px){.shell{grid-template-columns:220px minmax(0,1fr)}}
+.shell>main{min-width:0}
 header.top{max-width:1200px;margin:0 auto;padding:28px 16px 8px}
 .brand{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
 h1{font-size:26px;line-height:1.3;margin:4px 0 6px;letter-spacing:-.01em}
@@ -310,16 +312,24 @@ def _coverage_card(result: dict) -> str:
 
 
 def _campaign_card(result: dict) -> str:
+    """같은 공격으로 묶인 사건들. 상세 사건에 들어 있으면 하나의 흐름 그림으로 합쳐 그린다."""
     tri = result.get("triage") or {}
     camps = [c for c in tri.get("campaigns", []) if len(c.get("incident_ids", [])) > 1]
     if not camps:
         return ""
     who = "Claude가" if tri.get("mode") != "rules" else "규칙으로"
-    h = [f"<div class=card><b>같은 공격으로 보이는 사건</b> <span class='muted small'>({who} 연결)</span><ul>"]
+    by_id = {r["incident"]["id"]: r["incident"] for r in result["results"]}
+    h = [f"<h2 id=campaign>같은 공격으로 보이는 사건</h2><div class=card><div class='small muted'>{who} 연결했습니다.</div><ul>"]
     for c in camps[:3]:
         links = " · ".join(f"<a href='#{escape(i)}'>{escape(i)}</a>" for i in c["incident_ids"])
         h.append(f"<li><b>{links}</b> <span class=muted>{escape(c.get('link_reason', ''))}</span></li>")
-    h.append("</ul></div>")
+    h.append("</ul>")
+    incs = [by_id[i] for i in camps[0]["incident_ids"] if i in by_id]
+    if len(incs) > 1:
+        fig = figure(sorted(incs, key=lambda i: i["start"]))
+        if fig:
+            h.append("<h3 style='margin-top:14px'>합친 공격 흐름 그림 (" + ", ".join(escape(i["id"]) for i in incs) + ")</h3>" + fig)
+    h.append("</div>")
     return "".join(h)
 
 
@@ -372,7 +382,10 @@ def _incident(r: dict, verdicts: dict) -> str:
     if meta.get("ai_error"):
         h.append(f"<div class='warn small'>AI 호출 실패로 규칙 기반 결과를 표시: {escape(meta['ai_error'])}</div>")
 
-    h.append("<h3>공격 흐름</h3><ol class=flow>")
+    fig = figure([inc])
+    if fig:
+        h.append("<h3>공격 흐름 그림</h3>" + fig)
+    h.append("<h3>단계별 설명</h3><ol class=flow>")
     for st in rep.get("attack_flow", []):
         tech = st.get("technique", "")
         h.append(f"<li><div class=flowhead><b>{escape(STAGE_KO.get(st['stage'], st['stage']))}</b>"
@@ -449,7 +462,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
 
     h = [f"<!doctype html><html lang=ko><meta charset=utf-8>"
          f"<meta name=viewport content='width=device-width,initial-scale=1'>"
-         f"<title>{escape(title)}</title><style>{CSS}</style>"]
+         f"<title>{escape(title)}</title><style>{CSS}{GRAPH_CSS}</style>"]
     pill = ("<span class='pill ai'>Claude 사용</span>" if _uses_ai(mode)
             else "<span class='pill rules'>AI 사용 안 함</span>")
     h.append(f"<header class=top><div class=brand>LogSight</div><h1>{escape(title)}</h1>"
@@ -472,6 +485,8 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
                        f"<span><b>{escape(inc['id'])}</b><div class=sub>{escape(first)}</div></span></a>")
     if len(idx) > len(result["results"]):
         nav.append("<a href='#rest'>나머지 사건</a>")
+    if any(len(c.get("incident_ids", [])) > 1 for c in tri.get("campaigns", [])):
+        nav.insert(1 + bool(todo) + 1, "<a href='#campaign'>같은 공격 묶음</a>")
     nav.append("</nav>")
     h.append("<div class=shell>" + "".join(nav) + "<main>")
 

@@ -44,9 +44,13 @@ Python 3.10 이상 필요.
                        나머지 이벤트는 맥락 집계로만 요약, 내보내는 데이터 마스킹
       → config_audit.py 설정 스냅샷(environment.json)과 대조해 원인 설정·수정안·AWS CLI 생성
       → analyze.py     Claude 구조화 출력(JSON 스키마) → 근거(ref)가 실제 입력에 있는지 코드로 검증
+      → graph.py       공격 흐름 그림: 근거 이벤트로만 선을 긋고, 모든 이벤트가 그림에 들어갔는지 다시 대조
       → report.py      한 파일짜리 HTML 보고서(오프라인 시연 가능)
 
 원칙: 원본 로그를 통째로 AI에 보내지 않는다. 모든 판단에 근거 위치(파일:줄)를 붙인다.
+그림도 같다. 로그에 이어진 기록이 없으면 선으로 잇지 않는다(예: 웹 요청 로그에 대상 서버가 없으면 웹 서비스와 서버를 따로 둔다).
+
+![공격 흐름 그림 예시](docs/img/demo8_attack_flow.png)
 수정안은 자동 적용하지 않는다(사람이 검토 후 직접 적용).
 
 ## 명령
@@ -120,7 +124,7 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
     app.py           FastAPI 웹 데모
     samples/demo/    작은 샘플 로그 4종 + 설정 스냅샷 예시
     samples/combined/ 로그 8종을 한곳에 모은 합성 샘플(정규화 점검용)
-    tests/           단위·통합 테스트(65개)
+    tests/           단위·통합 테스트(171개)
     scripts/         성능 측정
     reports/demo/    샘플 분석 결과(HTML, JSON, 화면 캡처)
     reports/combined/ 8종 통합 분석 결과

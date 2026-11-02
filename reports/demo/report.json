@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T02:58:34Z",
+ "generated_at": "2026-11-02T07:34:16Z",
  "files": [
   {
    "file": "samples/demo/alb.log",
@@ -856,6 +856,7 @@
     "mode": "rules",
     "model": null,
     "payload_chars": 7250,
+    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
     "validation": {
      "evidence_total": 26,
      "evidence_invalid": 0,
