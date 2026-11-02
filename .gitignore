@@ -5,3 +5,13 @@ __pycache__/
 reports/latest/
 reports/ci/
 data/
+
+# 로컬 테스트 랩 런타임 산출물(재생성됨) — 코드/사이트/프로필만 커밋한다
+lab/logs/
+lab/runtime/
+lab/reports/
+lab/sites/*/runtime.sqlite
+lab/sites/shopmall/uploads/
+lab/sites/board/data/
+reports/ci-web/
+*.run.log

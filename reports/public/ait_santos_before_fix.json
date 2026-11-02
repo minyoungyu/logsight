@@ -1,0 +1,1247 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "santos",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS santos/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/santos/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/santos/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/santos/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "intranet.smith.santos.com",
+     "other_vhosts_access.log"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+      "kind": "access",
+      "events": 9462
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log.1",
+      "kind": "access",
+      "events": 2228
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log.2",
+      "kind": "access",
+      "events": 1706
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log.3",
+      "kind": "access",
+      "events": 2388
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/error.log",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+      "kind": "weberror",
+      "events": 44
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 3
+     },
+     {
+      "file": "data/public/santos/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 20298,
+    "parsed_lines": 15842,
+    "attack_lines": 7848,
+    "tp": 7738,
+    "fn": 110,
+    "fp": 1073,
+    "tn": 11377,
+    "recall": 0.9859836901121305,
+    "precision": 0.878220406310294,
+    "false_positive_rate": 0.08618473895582329,
+    "f1": 0.9289873341737199,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 4485,
+      "flagged": 4447,
+      "line_recall": 0.9915273132664437,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 4485
+     },
+     "wpscan": {
+      "lines": 3304,
+      "flagged": 3285,
+      "line_recall": 0.9942493946731235,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SCANNER",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 3304
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 32,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 32
+     },
+     "attacker_change_user": {
+      "lines": 5,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 0
+     },
+     "escalated_command": {
+      "lines": 8,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_AUTH_BRUTE": 998,
+     "WEBLOG_WEBSHELL_ACCESS": 55,
+     "WEBLOG_LARGE_EXFIL": 26,
+     "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": 23,
+     "WEBLOG_RFI": 13
+    },
+    "fp_by_ip": {
+     "172.21.128.119": 982,
+     "192.168.104.98": 33,
+     "192.168.104.198": 24,
+     "192.168.104.125": 22,
+     "192.168.104.4": 12
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 7714,
+     "WEBLOG_SCANNER": 3291,
+     "WEBLOG_SENSITIVE_FILE": 102
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1050",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1051",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1052",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1053",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1067",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1068",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1069",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1070",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1071",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1072",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1073",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1074",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:109",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:112",
+      "rules": [
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1218",
+      "rules": [
+       "WEBLOG_RFI"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1236",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1239",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1241",
+      "rules": [
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1244",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1273",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1282",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1283",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1284",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1291",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1292",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1293",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1294",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1295",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1296",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1297",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1298",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1299",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1300",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1301",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1302",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1303",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1304",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1305",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1306",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log.1:1307",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:185",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:186",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:187",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:188",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:189",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:190",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:191",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:192",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:193",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:194",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:195",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:196",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:2408",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:2528",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:2662",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:3633",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:3915",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:431",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:432",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.smith.santos.com-access.log:436",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "service_scan"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 10,
+     "truth_attack_ips": 1,
+     "flagged_ips": 5,
+     "unknown_flagged_ips": 0
+    },
+    "recall": 1.0,
+    "precision": 0.2,
+    "false_positive_rate": 0.4,
+    "f1": 0.33333333333333337,
+    "missed": [],
+    "false_positives": [
+     "192.168.104.125",
+     "192.168.104.198",
+     "192.168.104.4",
+     "192.168.104.98"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.21.128.119",
+      "malicious": true
+     },
+     {
+      "ip": "192.168.104.125",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.133",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.141",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.155",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.198",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.4",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.81",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.95",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.98",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS santos/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/santos/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/santos/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/santos/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.smith.santos.com",
+     "error.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "mail.smith.santos.com",
+     "other_vhosts_access.log"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/cloud.smith.santos.com-access.log",
+      "kind": "access",
+      "events": 9570
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/cloud.smith.santos.com-access.log.1",
+      "kind": "access",
+      "events": 11858
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/cloud.smith.santos.com-access.log.2",
+      "kind": "access",
+      "events": 10525
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/cloud.smith.santos.com-access.log.3",
+      "kind": "access",
+      "events": 11796
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/mail.smith.santos.com-access.log",
+      "kind": "access",
+      "events": 21901
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/mail.smith.santos.com-access.log.1",
+      "kind": "access",
+      "events": 23989
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/mail.smith.santos.com-access.log.2",
+      "kind": "access",
+      "events": 26294
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/mail.smith.santos.com-access.log.3",
+      "kind": "access",
+      "events": 23443
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-access.log",
+      "kind": "access",
+      "events": 2208
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 2815
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 3089
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 2605
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/cloud.smith.santos.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/error.log",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/mail.smith.santos.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-error.log",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "data/public/santos/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 150704,
+    "parsed_lines": 150105,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 64,
+    "tn": 150640,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.00042467353222210426,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_WEBSHELL_ACCESS": 59,
+     "WEBLOG_BACKUP_LEAK": 5,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "192.168.104.81": 18,
+     "192.168.104.98": 17,
+     "192.168.104.133": 14,
+     "192.168.104.141": 8,
+     "192.168.104.198": 7
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:11642",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:2373",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:2375",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:2376",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:2382",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:4381",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:4728",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:4729",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:4731",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:4751",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:8528",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:9124",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:9125",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:9126",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.1:9833",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:10015",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:3560",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:3561",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:3562",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:3678",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:7009",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:7011",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:7013",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:8826",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:8828",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.2:8829",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:1526",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:1527",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:1528",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2151",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2152",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2153",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2452",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2453",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2454",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:2529",
+      "rules": [
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:3151",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:3152",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:3153",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     },
+     {
+      "ref": "cloud.smith.santos.com-access.log.3:3410",
+      "rules": [
+       "WEBLOG_WEBSHELL_ACCESS"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 10,
+     "truth_attack_ips": 0,
+     "flagged_ips": 5,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.5,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "192.168.104.133",
+     "192.168.104.141",
+     "192.168.104.198",
+     "192.168.104.81",
+     "192.168.104.98"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.21.128.119",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.125",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.133",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.141",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.198",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.4",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.81",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.95",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.104.98",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  }
+ }
+}

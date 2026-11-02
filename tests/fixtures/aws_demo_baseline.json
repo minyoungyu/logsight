@@ -1,0 +1,50 @@
+{
+ "incidents": [
+  {
+   "rules": [
+    "CT_IAM_PERSISTENCE",
+    "CT_INSTANCE_CRED_OUTSIDE",
+    "SSH_SUCCESS_AFTER_FAIL",
+    "VPC_REMOTE_ADMIN_EXPOSED",
+    "WEB_SQLI_PATTERN"
+   ],
+   "severity": "high",
+   "src_ips": [
+    "203.0.113.9"
+   ],
+   "stages": [
+    "initial-access",
+    "credential-access",
+    "persistence"
+   ],
+   "start": "2026-01-13T04:20:00+00:00",
+   "verdict": null
+  }
+ ],
+ "n_events": 11,
+ "n_findings": 5,
+ "n_flagged": 8,
+ "n_incidents": 1,
+ "rule_counts": {
+  "CT_IAM_PERSISTENCE": {
+   "events": 1,
+   "findings": 1
+  },
+  "CT_INSTANCE_CRED_OUTSIDE": {
+   "events": 3,
+   "findings": 1
+  },
+  "SSH_SUCCESS_AFTER_FAIL": {
+   "events": 3,
+   "findings": 1
+  },
+  "VPC_REMOTE_ADMIN_EXPOSED": {
+   "events": 1,
+   "findings": 1
+  },
+  "WEB_SQLI_PATTERN": {
+   "events": 1,
+   "findings": 1
+  }
+ }
+}

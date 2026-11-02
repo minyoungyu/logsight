@@ -1,0 +1,829 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "ait",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS ait/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/ait/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/ait/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/ait/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "intranet.smith.russellmitchell.com",
+     "other_vhosts_access.log"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.1",
+      "kind": "access",
+      "events": 601
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+      "kind": "access",
+      "events": 8530
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.3",
+      "kind": "access",
+      "events": 933
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.4",
+      "kind": "access",
+      "events": 1120
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+      "kind": "weberror",
+      "events": 36
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 2
+     }
+    ],
+    "lines": 15708,
+    "parsed_lines": 11238,
+    "attack_lines": 7739,
+    "tp": 7671,
+    "fn": 68,
+    "fp": 1,
+    "tn": 7968,
+    "recall": 0.9912133350562088,
+    "precision": 0.9998696558915537,
+    "false_positive_rate": 0.00012548625925461163,
+    "f1": 0.9955226786061904,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 4485,
+      "flagged": 4447,
+      "line_recall": 0.9915273132664437,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 4485
+     },
+     "wpscan": {
+      "lines": 3199,
+      "flagged": 3186,
+      "line_recall": 0.9959362300718975,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_SCANNER",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 3199
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 32,
+      "flagged": 32,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 32
+     },
+     "attacker_change_user": {
+      "lines": 4,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 0
+     },
+     "escalated_command": {
+      "lines": 5,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 2
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_CMD_INJECTION": 1,
+     "WEBLOG_UPLOAD_EXEC": 1,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "172.19.131.174": 1
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 7619,
+     "WEBLOG_SCANNER": 3192,
+     "WEBLOG_UPLOAD_EXEC": 33,
+     "WEBLOG_LARGE_EXFIL": 32,
+     "WEBLOG_CMD_INJECTION": 22,
+     "WEBLOG_SENSITIVE_FILE": 3
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:8530",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:145",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:146",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:147",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:148",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:149",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:150",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:151",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:152",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:2811",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:2931",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:3065",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:4036",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:4318",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5182",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5192",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5198",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:5262",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:832",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:835",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.smith.russellmitchell.com-access.log.2:840",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "service_scan"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 5,
+     "truth_attack_ips": 1,
+     "flagged_ips": 1,
+     "unknown_flagged_ips": 0
+    },
+    "recall": 1.0,
+    "precision": 1.0,
+    "false_positive_rate": 0.0,
+    "f1": 1.0,
+    "missed": [],
+    "false_positives": [],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.19.131.174",
+      "malicious": true
+     },
+     {
+      "ip": "10.143.2.25",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.2.4",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.2.91",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.3.65",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS ait/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "data/public/ait/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "data/public/ait/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "data/public/ait/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.smith.russellmitchell.com",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "mail.smith.russellmitchell.com",
+     "other_vhosts_access.log"
+    ],
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.1",
+      "kind": "access",
+      "events": 5515
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.2",
+      "kind": "access",
+      "events": 6869
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.3",
+      "kind": "access",
+      "events": 7541
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-access.log.4",
+      "kind": "access",
+      "events": 7366
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.1",
+      "kind": "access",
+      "events": 9488
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.2",
+      "kind": "access",
+      "events": 8783
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.3",
+      "kind": "access",
+      "events": 8025
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-access.log.4",
+      "kind": "access",
+      "events": 8215
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 772
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 818
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 653
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 608
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/cloud.smith.russellmitchell.com-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/mail.smith.russellmitchell.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 25
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "data/public/ait/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 65290,
+    "parsed_lines": 64690,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 12,
+    "tn": 65278,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.00018379537448307551,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_SCANNER": 12
+    },
+    "fp_by_ip": {
+     "192.168.230.122": 6,
+     "172.19.131.174": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "proxy-access.log.2:797",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:798",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:800",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:801",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:803",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:804",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:809",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:810",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:812",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:813",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:815",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:817",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 6,
+     "truth_attack_ips": 0,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.3333333333333333,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "172.19.131.174",
+     "192.168.230.122"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.143.2.25",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.2.91",
+      "malicious": false
+     },
+     {
+      "ip": "10.143.3.65",
+      "malicious": false
+     },
+     {
+      "ip": "172.19.131.174",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.230.122",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  }
+ }
+}

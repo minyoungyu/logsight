@@ -1,0 +1,313 @@
+{
+ "generated_at": "2026-10-22T03:59:34.713444+00:00",
+ "scenarios": [
+  {
+   "scenario": "benign",
+   "site": "both",
+   "attacker_ip": "203.0.113.*",
+   "expected_rules": [],
+   "description": "정상 사용자·검색엔진 봇·함정 검색어",
+   "malicious": false,
+   "detectable": true
+  },
+  {
+   "scenario": "scanner_recon",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.50",
+   "expected_rules": [
+    "WEBLOG_SCANNER",
+    "WEBLOG_ENUM_404"
+   ],
+   "description": "스캐너 UA + 없는 경로 20개 연속 탐색",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "sensitive_files",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.25",
+   "expected_rules": [
+    "WEBLOG_SENSITIVE_FILE"
+   ],
+   "description": "설정·비밀 파일 접근 시도",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "sqli_union",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.23",
+   "expected_rules": [
+    "WEBLOG_SQLI"
+   ],
+   "description": "검색창 UNION 기반 계정정보 추출",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "sqli_union",
+   "site": "board",
+   "attacker_ip": "198.51.100.63",
+   "expected_rules": [
+    "WEBLOG_SQLI"
+   ],
+   "description": "게시물 id UNION 기반 추출",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "sqli_bulk_dump",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.28",
+   "expected_rules": [
+    "WEBLOG_SQLI",
+    "WEBLOG_LARGE_EXFIL"
+   ],
+   "description": "항상 참 조건으로 전체 목록 덤프(응답 61,927자)",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "xss_reflected",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.29",
+   "expected_rules": [
+    "WEBLOG_XSS"
+   ],
+   "description": "검색어로 쿠키 탈취 스크립트 반사",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "stored_xss_review",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.31",
+   "expected_rules": [],
+   "description": "후기 본문에 저장형 XSS 스크립트 저장(POST 본문은 접속 로그에 없음)",
+   "malicious": true,
+   "detectable": false
+  },
+  {
+   "scenario": "traversal_lfi",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.24",
+   "expected_rules": [
+    "WEBLOG_TRAVERSAL"
+   ],
+   "description": "경로 조작으로 /etc/passwd 열람",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "traversal_lfi",
+   "site": "board",
+   "attacker_ip": "198.51.100.64",
+   "expected_rules": [
+    "WEBLOG_TRAVERSAL"
+   ],
+   "description": "다운로드 경로 조작",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "log_poisoning_rce",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.32",
+   "expected_rules": [
+    "WEBLOG_CODE_IN_HEADER",
+    "WEBLOG_TRAVERSAL"
+   ],
+   "description": "UA에 PHP 코드 심기 → include로 접속 로그 실행(명령 실행 확인)",
+   "malicious": true,
+   "detectable": true,
+   "verified_executed": true
+  },
+  {
+   "scenario": "cmd_injection",
+   "site": "board",
+   "attacker_ip": "198.51.100.65",
+   "expected_rules": [
+    "WEBLOG_CMD_INJECTION"
+   ],
+   "description": "점검 도구 host 파라미터 명령 삽입",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "brute_login",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.26",
+   "expected_rules": [
+    "WEBLOG_AUTH_BRUTE",
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+   ],
+   "description": "로그인 15회 실패 뒤 정답으로 성공",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "brute_login",
+   "site": "board",
+   "attacker_ip": "198.51.100.66",
+   "expected_rules": [
+    "WEBLOG_AUTH_BRUTE",
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+   ],
+   "description": "게시판 로그인 무차별 대입",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "default_admin_takeover",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.33",
+   "expected_rules": [
+    "WEBLOG_ADMIN_ACCESS",
+    "WEBLOG_LARGE_EXFIL"
+   ],
+   "description": "기본 관리자 계정 로그인 후 회원·상품 목록 136,870자 내려받기",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "webshell_chain",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.27",
+   "expected_rules": [
+    "WEBLOG_UPLOAD_EXEC",
+    "WEBLOG_WEBSHELL_ACCESS",
+    "FILE_WEBSHELL"
+   ],
+   "description": "업로드 우회(.php 차단 → .phtml 통과) 후 cmd 파라미터로 실행",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "ssrf_internal",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.35",
+   "expected_rules": [
+    "WEBLOG_SSRF"
+   ],
+   "description": "이미지 가져오기 기능으로 내부 전용 통계 요청(SSRF)",
+   "malicious": true,
+   "detectable": true,
+   "verified_leak": true
+  },
+  {
+   "scenario": "idor_orders",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.36",
+   "expected_rules": [
+    "WEBLOG_IDOR_ENUM"
+   ],
+   "description": "주문 번호 1~25를 차례로 열람해 고객 정보 수집(IDOR)",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "forged_admin",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.34",
+   "expected_rules": [
+    "WEBLOG_ADMIN_FORGED",
+    "WEBLOG_ADMIN_ACCESS",
+    "WEBLOG_LARGE_EXFIL"
+   ],
+   "description": "로그인 없이 관리자 쿠키만 위조해 목록 136,870자 내려받기",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "open_redirect",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.37",
+   "expected_rules": [
+    "WEBLOG_OPEN_REDIRECT"
+   ],
+   "description": "로그인 뒤 외부 사이트로 보내도록 next 주소 조작",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "csrf_admin_delete",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.38",
+   "expected_rules": [
+    "WEBLOG_CSRF_SUSPECT"
+   ],
+   "description": "외부 페이지에서 관리자 상품 삭제 요청(CSRF, 피해자 브라우저)",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "backup_leak",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.39",
+   "expected_rules": [
+    "WEBLOG_BACKUP_LEAK"
+   ],
+   "description": "남아 있던 백업 파일 내려받기(388자, 계정 정보 포함)",
+   "malicious": true,
+   "detectable": true,
+   "verified_leak": true
+  },
+  {
+   "scenario": "git_exposure",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.44",
+   "expected_rules": [
+    "WEBLOG_BACKUP_LEAK"
+   ],
+   "description": "배포 때 같이 올라간 .git 설정 파일 내려받기",
+   "malicious": true,
+   "detectable": true,
+   "verified_leak": true
+  },
+  {
+   "scenario": "dir_listing",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.40",
+   "expected_rules": [
+    "WEBLOG_DIR_LISTING"
+   ],
+   "description": "업로드 폴더 목록 열람",
+   "malicious": true,
+   "detectable": true,
+   "verified_leak": true
+  },
+  {
+   "scenario": "exploit_probe",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.41",
+   "expected_rules": [
+    "WEBLOG_EXPLOIT_PROBE"
+   ],
+   "description": "Log4Shell·Shellshock 형식 문자열을 User-Agent에 넣어 시도(실행 대상 아님)",
+   "malicious": true,
+   "detectable": true
+  },
+  {
+   "scenario": "xxe_import",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.43",
+   "expected_rules": [],
+   "description": "상품 등록 XML에 외부 파일 엔티티(XXE)로 /etc/passwd 읽기 — POST 본문이라 로그에 없음",
+   "malicious": true,
+   "detectable": false,
+   "verified_leak": true
+  },
+  {
+   "scenario": "ssh_takeover",
+   "site": "shopmall",
+   "attacker_ip": "198.51.100.27",
+   "expected_rules": [
+    "SSH_BRUTE_FORCE",
+    "SSH_SUCCESS_AFTER_FAIL"
+   ],
+   "description": "웹 침해와 같은 IP에서 SSH 무차별 대입 후 root 로그인 성공(합성 auth.log)",
+   "malicious": true,
+   "detectable": true
+  }
+ ]
+}

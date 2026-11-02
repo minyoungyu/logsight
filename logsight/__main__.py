@@ -64,7 +64,24 @@ def main(argv: list[str] | None = None) -> int:
     cs.add_argument("--waf-rules", type=int, default=3)
     cs.add_argument("--retention", type=int, default=3, help="보관 개월")
     cs.add_argument("--region", default="ap-northeast-2", choices=["ap-northeast-2", "us-east-1"])
+
+    s = sub.add_parser("scan", help="웹서버 로그·파일로 침해 여부 판단")
+    s.add_argument("--profile", help="사이트 프로필 profile.json 경로")
+    s.add_argument("--access", action="append", default=[], help="접속 로그 경로(여러 번 가능, 글롭 가능)")
+    s.add_argument("--error", action="append", default=[], help="오류 로그 경로")
+    s.add_argument("--auth", action="append", default=[], help="인증 로그 경로(auth.log/secure)")
+    s.add_argument("--webroot", help="웹 루트 경로(웹셸 파일 점검)")
+    s.add_argument("--name", default="웹서버", help="사이트 이름(보고서 표시)")
+    s.add_argument("--out", default="reports/web", help="결과 폴더")
+    s.add_argument("--top", type=int, default=10, help="상세 분석할 사건 수")
+    s.add_argument("--window", type=int, default=30, help="사건 묶기 시간창(분)")
+    s.add_argument("--no-ai", action="store_true", help="Claude 호출 없이 규칙 기반으로만")
+    s.add_argument("--model", help="Claude 모델 ID")
+
     args = ap.parse_args(argv)
+
+    if args.cmd == "scan":
+        return _scan(args)
 
     if args.cmd == "cost":
         from .costs import estimate, format_text
@@ -173,6 +190,49 @@ def _aws_cmd(args) -> int:
     print(aws_check.format_text(res))
     if args.json:
         Path(args.json).write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
+    return 0
+
+
+def _scan(args) -> int:
+    from .web.webprofile import SiteProfile
+    from .web.webpipeline import assess
+    from .web.webreport import render as render_web
+
+    if args.profile:
+        profile = SiteProfile.load(args.profile)
+    else:
+        log_paths: dict[str, list[str]] = {}
+        if args.access:
+            log_paths["access"] = args.access
+        if args.error:
+            log_paths["weberror"] = args.error
+        if args.auth:
+            log_paths["auth"] = args.auth
+        if not log_paths and not args.webroot:
+            print("분석할 로그나 웹 루트를 지정하세요 (--profile 또는 --access/--auth/--webroot)",
+                  file=sys.stderr)
+            return 2
+        profile = SiteProfile(name=args.name, webroot=args.webroot, log_paths=log_paths)
+
+    result = assess(profile, top=args.top, use_ai=not args.no_ai, model=args.model,
+                    window_min=args.window)
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+    (out / "report.html").write_text(render_web(result), encoding="utf-8")
+    print(f"판정: {result['overall_verdict_ko']}  "
+          f"(이벤트 {result['n_events']:,} → 의심 {result['n_flagged']:,} → "
+          f"탐지 {result['n_findings']:,} → 사건 {result['n_incidents']:,}, "
+          f"{result['timing']['total_s']}초)")
+    for r in result["results"]:
+        inc, rep, m = r["incident"], r["report"], r["meta"]
+        print(f"  {inc['id']} [{rep.get('verdict')}] {inc['start'][:19]} "
+              f"{', '.join(inc['src_ips'][:3]) or '-'} 단계={'→'.join(inc['stages'])} "
+              f"분석={m['mode']} 근거검증={'통과' if m['validation']['passed'] else '확인필요'}")
+    for f in result["files"]:
+        if f.get("error"):
+            print(f"  [건너뜀] {f['file']}: {f['error']}", file=sys.stderr)
+    print(f"보고서: {out / 'report.html'}")
     return 0
 
 

@@ -1,0 +1,681 @@
+{
+ "data": {
+  "n_events": 10777,
+  "n_events_unique": 7179,
+  "by_source": {
+   "alb": 122,
+   "cloudtrail": 10223,
+   "waf": 432
+  },
+  "n_attacker_events": 566,
+  "n_attacker_events_unique": 540,
+  "n_benign_events": 10211
+ },
+ "event_level": {
+  "attacker_flagged": 116,
+  "attacker_missed": 450,
+  "recall": 0.205,
+  "benign_flagged": 600,
+  "attacker_flagged_unique": 113,
+  "benign_flagged_unique": 561,
+  "benign_flagged_unique_by_category": {
+   "블루팀 대응 작업": 420,
+   "서비스 역할(정상 운영)": 13,
+   "루트 계정 사용": 128
+  },
+  "precision": 0.162,
+  "benign_flagged_by_category": {
+   "블루팀 대응 작업": 434,
+   "서비스 역할(정상 운영)": 13,
+   "루트 계정 사용": 153
+  },
+  "benign_flagged_by_rule": {
+   "CT_DISCOVERY_BURST": 431,
+   "CT_INSTANCE_CRED_MULTI_IP": 13,
+   "CT_ROOT_USAGE": 153,
+   "CT_LOGGING_TAMPER": 3
+  },
+  "attacker_flagged_by_rule": {
+   "WEB_OBJECT_ENUM": 16,
+   "CT_INSTANCE_CRED_MULTI_IP": 13,
+   "WAF_BLOCKED": 87
+  }
+ },
+ "stages": [
+  {
+   "id": "G1",
+   "title": "웹앱에 내부 주소(메타데이터) 조회 요청 — WAF 차단(14:10~)",
+   "in_data": true,
+   "n_events": 71,
+   "n_events_unique": 69,
+   "n_flagged": 71,
+   "n_flagged_unique": 69,
+   "detected": true,
+   "rules": [
+    "WAF_BLOCKED"
+   ],
+   "incidents": [
+    "INC-002",
+    "INC-007"
+   ],
+   "evidence_md_lines": [
+    3762,
+    3798,
+    3982,
+    3991,
+    4097,
+    4107,
+    4128,
+    4148,
+    4155,
+    4168
+   ]
+  },
+  {
+   "id": "G2",
+   "title": "서명 없는 토큰으로 EKS 지원 API 접근",
+   "in_data": true,
+   "n_events": 29,
+   "n_events_unique": 28,
+   "n_flagged": 6,
+   "n_flagged_unique": 5,
+   "detected": true,
+   "rules": [
+    "WAF_BLOCKED"
+   ],
+   "incidents": [
+    "INC-002"
+   ],
+   "evidence_md_lines": [
+    2296,
+    2411,
+    2767,
+    2792,
+    3279,
+    3353,
+    3380,
+    3442,
+    3656,
+    3887
+   ]
+  },
+  {
+   "id": "G3",
+   "title": "PageSnap 결과 PDF 내려받기(14:52~14:54, 보고서 표의 2건)",
+   "in_data": true,
+   "n_events": 2,
+   "n_events_unique": 2,
+   "n_flagged": 0,
+   "n_flagged_unique": 0,
+   "detected": false,
+   "rules": [],
+   "incidents": [],
+   "evidence_md_lines": [
+    8912,
+    9055
+   ]
+  },
+  {
+   "id": "G4",
+   "title": "EC2 역할 임시 키를 외부 IP에서 사용",
+   "in_data": true,
+   "n_events": 13,
+   "n_events_unique": 13,
+   "n_flagged": 13,
+   "n_flagged_unique": 13,
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ],
+   "incidents": [
+    "INC-002",
+    "INC-006"
+   ],
+   "evidence_md_lines": [
+    10953,
+    10976,
+    10999,
+    11025,
+    11105,
+    11171,
+    11182,
+    11209,
+    11227,
+    11246
+   ]
+  },
+  {
+   "id": "G5",
+   "title": "외부에서 그 키로 워크플로 실행 성공(15:36~16:08)",
+   "in_data": true,
+   "n_events": 9,
+   "n_events_unique": 9,
+   "n_flagged": 9,
+   "n_flagged_unique": 9,
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ],
+   "incidents": [
+    "INC-002"
+   ],
+   "evidence_md_lines": [
+    10953,
+    10999,
+    11025,
+    11105,
+    11182,
+    11209,
+    11227,
+    11246,
+    11265
+   ]
+  },
+  {
+   "id": "G6",
+   "title": "외부에서 그 키로 SSM 원격 명령·세션 시도(거부)",
+   "in_data": true,
+   "n_events": 4,
+   "n_events_unique": 4,
+   "n_flagged": 4,
+   "n_flagged_unique": 4,
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ],
+   "incidents": [
+    "INC-002",
+    "INC-006"
+   ],
+   "evidence_md_lines": [
+    10976,
+    11171,
+    11276,
+    11280
+   ]
+  },
+  {
+   "id": "G7",
+   "title": "신원·권한 정찰(GetCallerIdentity, GetPolicy 등, 15:17~15:25)",
+   "in_data": false,
+   "why_missing": "통합로그의 event_history에 없다. 블루팀 CLI 조회 결과에만 있다(이유는 로그만으로 확인할 수 없다: 일부는 us-east-1 기록이지만 15:17:28 us-west-1 호출도 빠져 있다)"
+  },
+  {
+   "id": "G8",
+   "title": "Recovery 역할 키 외부 사용과 recovery.zip 전송(14:58)",
+   "in_data": false,
+   "why_missing": "S3 객체 읽기(데이터 이벤트)는 event_history에 남지 않아 블루팀 CLI 조회 결과에만 있다"
+  },
+  {
+   "id": "G9",
+   "title": "다른 키로 워크플로 실행(16:42)",
+   "in_data": false,
+   "why_missing": "통합로그의 event_history가 16:25:01에서 끝난다"
+  }
+ ],
+ "incidents": {
+  "n_total": 7,
+  "n_with_attacker": 3,
+  "n_attacker_only_or_mostly": 3,
+  "rank_of_first_attacker_incident": 2,
+  "attacker_incidents": [
+   {
+    "id": "INC-002",
+    "severity": "high",
+    "stages": [
+     "initial-access",
+     "credential-access"
+    ],
+    "start": "2026-10-11T05:10:45+00:00",
+    "end": "2026-10-11T07:08:11+00:00",
+    "n_events": 72,
+    "n_attacker_events": 72,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP",
+     "WAF_BLOCKED"
+    ],
+    "sources": [
+     "cloudtrail",
+     "waf"
+    ]
+   },
+   {
+    "id": "INC-006",
+    "severity": "high",
+    "stages": [
+     "credential-access"
+    ],
+    "start": "2026-10-11T07:11:37+00:00",
+    "end": "2026-10-11T07:12:16+00:00",
+    "n_events": 2,
+    "n_attacker_events": 2,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-007",
+    "severity": "medium",
+    "stages": [
+     "initial-access",
+     "collection"
+    ],
+    "start": "2026-10-11T05:40:24+00:00",
+    "end": "2026-10-11T06:24:51+00:00",
+    "n_events": 42,
+    "n_attacker_events": 42,
+    "rules": [
+     "WAF_BLOCKED",
+     "WEB_OBJECT_ENUM"
+    ],
+    "sources": [
+     "alb",
+     "waf"
+    ]
+   }
+  ],
+  "top10": [
+   {
+    "id": "INC-001",
+    "severity": "high",
+    "stages": [
+     "discovery",
+     "defense-evasion"
+    ],
+    "start": "2026-10-11T04:30:37+00:00",
+    "end": "2026-10-11T06:00:45+00:00",
+    "n_events": 432,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST",
+     "CT_LOGGING_TAMPER"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-002",
+    "severity": "high",
+    "stages": [
+     "initial-access",
+     "credential-access"
+    ],
+    "start": "2026-10-11T05:10:45+00:00",
+    "end": "2026-10-11T07:08:11+00:00",
+    "n_events": 72,
+    "n_attacker_events": 72,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP",
+     "WAF_BLOCKED"
+    ],
+    "sources": [
+     "cloudtrail",
+     "waf"
+    ]
+   },
+   {
+    "id": "INC-003",
+    "severity": "high",
+    "stages": [
+     "credential-access"
+    ],
+    "start": "2026-10-11T04:33:44+00:00",
+    "end": "2026-10-11T05:58:23+00:00",
+    "n_events": 13,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-004",
+    "severity": "high",
+    "stages": [
+     "initial-access"
+    ],
+    "start": "2026-10-11T04:42:48+00:00",
+    "end": "2026-10-11T04:48:52+00:00",
+    "n_events": 153,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_ROOT_USAGE"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-005",
+    "severity": "high",
+    "stages": [
+     "defense-evasion"
+    ],
+    "start": "2026-10-11T07:10:31+00:00",
+    "end": "2026-10-11T07:18:18+00:00",
+    "n_events": 2,
+    "n_attacker_events": 0,
+    "rules": [
+     "CT_LOGGING_TAMPER"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-006",
+    "severity": "high",
+    "stages": [
+     "credential-access"
+    ],
+    "start": "2026-10-11T07:11:37+00:00",
+    "end": "2026-10-11T07:12:16+00:00",
+    "n_events": 2,
+    "n_attacker_events": 2,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ],
+    "sources": [
+     "cloudtrail"
+    ]
+   },
+   {
+    "id": "INC-007",
+    "severity": "medium",
+    "stages": [
+     "initial-access",
+     "collection"
+    ],
+    "start": "2026-10-11T05:40:24+00:00",
+    "end": "2026-10-11T06:24:51+00:00",
+    "n_events": 42,
+    "n_attacker_events": 42,
+    "rules": [
+     "WAF_BLOCKED",
+     "WEB_OBJECT_ENUM"
+    ],
+    "sources": [
+     "alb",
+     "waf"
+    ]
+   }
+  ]
+ },
+ "rules_fired": {
+  "CT_INSTANCE_CRED_MULTI_IP": 2,
+  "CT_ROOT_USAGE": 6,
+  "CT_LOGGING_TAMPER": 2,
+  "CT_DISCOVERY_BURST": 7,
+  "WEB_OBJECT_ENUM": 2,
+  "WAF_BLOCKED": 2
+ },
+ "ai_triage": {
+  "ran": true,
+  "model": "claude-opus-5-5",
+  "usage": {
+   "input_tokens": 17140,
+   "output_tokens": 6710,
+   "served_by": "claude-opus-5-5"
+  },
+  "validation": {
+   "unknown_ids": [],
+   "evidence_total": 58,
+   "evidence_invalid": 0,
+   "incidents_without_verdict": [],
+   "passed": true
+  },
+  "verdict_accuracy": "7/7",
+  "verdicts": [
+   {
+    "id": "INC-001",
+    "is_attack": false,
+    "verdict": "benign_activity",
+    "correct": true
+   },
+   {
+    "id": "INC-002",
+    "is_attack": true,
+    "verdict": "attack",
+    "correct": true
+   },
+   {
+    "id": "INC-003",
+    "is_attack": false,
+    "verdict": "benign_activity",
+    "correct": true
+   },
+   {
+    "id": "INC-004",
+    "is_attack": false,
+    "verdict": "risky_not_attack",
+    "correct": true
+   },
+   {
+    "id": "INC-005",
+    "is_attack": false,
+    "verdict": "benign_activity",
+    "correct": true
+   },
+   {
+    "id": "INC-006",
+    "is_attack": true,
+    "verdict": "attack",
+    "correct": true
+   },
+   {
+    "id": "INC-007",
+    "is_attack": true,
+    "verdict": "attack",
+    "correct": true
+   }
+  ],
+  "rank_of_first_attacker_incident_after": 1,
+  "campaign": {
+   "attack_incidents": [
+    "INC-002",
+    "INC-006",
+    "INC-007"
+   ],
+   "best_campaign": [
+    "INC-002",
+    "INC-006",
+    "INC-007"
+   ],
+   "covers_all_attack_incidents": true,
+   "includes_non_attack": []
+  },
+  "raw": {
+   "incidents": [
+    {
+     "id": "INC-001",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "주체가 모두 blue-team-1/blue-team-2 사용자다. 호출은 조회와 대응 작업이 중심이다(LookupEvents, FilterLogEvents, DescribeAlarms, SSM 명령, GetCallerIdentity). 침해 대응팀의 조사 활동으로 보인다. 감사 로그 중지·삭제 1건(198.18.2.1, 성공)은 events 목록에 상세가 없어 무엇을 바꿨는지는 확인이 필요하다.",
+     "evidence": [
+      "cloudtrail.json:48",
+      "cloudtrail.json:424",
+      "cloudtrail.json:1058",
+      "cloudtrail.json:4671",
+      "cloudtrail.json:5465",
+      "cloudtrail.json:7125",
+      "cloudtrail.json:8260",
+      "cloudtrail.json:9634"
+     ]
+    },
+    {
+     "id": "INC-002",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "198.18.7.1이 POST /api/subscriptions와 GET /api/cases·/api/support/incidents 요청을 반복했고 WAF가 61건 막았다. 이후 portal 인스턴스 역할 키 ASIA71C2…95CF가 정상 추정 IP 198.18.10.1이 아닌 198.18.50.1에서 states:StartExecution에 성공했다. 같은 키는 곧 198.18.7.1에서도 쓰였다(INC-006). 인스턴스 역할 키가 밖으로 새어 쓰인 것으로 판단한다.",
+     "evidence": [
+      "waf.jsonl:118",
+      "waf.jsonl:147",
+      "waf.jsonl:241",
+      "waf.jsonl:356",
+      "waf.jsonl:416",
+      "waf.jsonl:427",
+      "cloudtrail.json:10094",
+      "cloudtrail.json:10142"
+     ]
+    },
+    {
+     "id": "INC-003",
+     "verdict": "benign_activity",
+     "confidence": "low",
+     "reason": "EKS 노드 역할 키가 198.18.9.1에서 쓰였지만 호출은 sts:GetCallerIdentity뿐이다. 약 7분 간격으로 규칙적이다. 키가 ASIAAD86에서 ASIAA8BD로 바뀐 뒤에도 같은 IP에서 끊김 없이 이어진다. 노드 안의 자동화 구성요소가 다른 출구 IP로 나간 것으로 보인다. 다만 9.1이 누구 IP인지는 입력에 없다.",
+     "evidence": [
+      "cloudtrail.json:573",
+      "cloudtrail.json:1677",
+      "cloudtrail.json:2434",
+      "cloudtrail.json:5439",
+      "cloudtrail.json:9296"
+     ]
+    },
+    {
+     "id": "INC-004",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "루트 계정으로 6분 동안 153건을 호출했고 모두 성공했다. 내용은 태그·보안그룹·Lambda 버전·API 조회처럼 인프라 도구가 자원 상태를 새로 읽는 패턴이다. 쓰기나 권한 변경은 보이지 않는다. lambda.amazonaws.com의 kms:Decrypt는 AWS 서비스 동작이다. 공격 근거는 없지만 루트를 일상 작업에 쓰는 것은 고쳐야 한다.",
+     "evidence": [
+      "cloudtrail.json:1331",
+      "cloudtrail.json:1362",
+      "cloudtrail.json:1384",
+      "cloudtrail.json:1408",
+      "cloudtrail.json:1773",
+      "cloudtrail.json:1821"
+     ]
+    },
+    {
+     "id": "INC-005",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "blue-team-1이 INC-001에서 쓰던 198.18.23.1에서 guardduty:UpdateDetector를 호출했다. 주변에 GuardDuty 생성, WAF IP 세트 수정, DynamoDB 백업 같은 대응 작업이 있어 대응팀의 조치로 보인다. 다만 탐지기를 켰는지 껐는지는 입력에 없다.",
+     "evidence": [
+      "cloudtrail.json:10149",
+      "cloudtrail.json:10180"
+     ]
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "WAF 공격 요청을 보내던 198.18.7.1이 portal 인스턴스 역할 키 ASIA71C2…95CF로 ssm:SendCommand를 두 번 시도했다. 두 번 모두 AccessDenied로 거부됐다. 공격자가 훔친 키로 인스턴스 명령 실행을 노린 것이다.",
+     "evidence": [
+      "cloudtrail.json:10150",
+      "cloudtrail.json:10151"
+     ]
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "198.18.7.2가 pagesnap의 /api/jobs/{id}와 /download의 번호를 바꿔 가며 남의 객체를 조회하려 했다(IDOR 탐색). 이 요청들은 403/404로 실패했다. 같은 IP가 198.18.7.1과 같은 경로(POST /api/subscriptions, GET /api/cases/…)로 공격하다 WAF에 26건 차단됐다.",
+     "evidence": [
+      "alb.log:70",
+      "alb.log:74",
+      "alb.log:78",
+      "alb.log:88",
+      "alb.log:99",
+      "waf.jsonl:380",
+      "waf.jsonl:412",
+      "waf.jsonl:421"
+     ]
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-007",
+      "INC-002",
+      "INC-006"
+     ],
+     "summary": "198.18.7.x 대역의 공격자가 웹 앱(포털, pagesnap)을 공격했다. 이어 portal 인스턴스(i-05816900800807b77)의 역할 키를 손에 넣어 AWS API를 호출했고, SSM으로 명령 실행을 시도했으나 거부됐다.",
+     "link_reason": "키 ASIA71C2…95CF가 WAF 차단을 받던 198.18.7.1에서 직접 쓰였다(INC-002와 INC-006 연결). 198.18.7.2는 같은 198.18.7.x 대역이고, 같은 요청 경로를 같은 시간대(06:15~06:26)에 썼다(INC-007 연결). 198.18.50.1은 같은 키를 쓴 점으로만 연결된다.",
+     "steps": [
+      {
+       "incident_id": "INC-002",
+       "time": "2026-10-11T05:10:45+00:00",
+       "what": "198.18.7.1이 POST /api/subscriptions 공격 요청을 반복했고 WAF가 차단했다.",
+       "evidence": [
+        "waf.jsonl:118",
+        "waf.jsonl:147",
+        "waf.jsonl:164",
+        "waf.jsonl:241"
+       ]
+      },
+      {
+       "incident_id": "INC-007",
+       "time": "2026-10-11T05:40:24+00:00",
+       "what": "198.18.7.2가 pagesnap의 작업 번호를 바꿔 가며 조회·다운로드를 시도했다. 모두 403/404로 실패했다.",
+       "evidence": [
+        "alb.log:70",
+        "alb.log:74",
+        "alb.log:78",
+        "alb.log:88",
+        "alb.log:99"
+       ]
+      },
+      {
+       "incident_id": "INC-007",
+       "time": "2026-10-11T06:15:36+00:00",
+       "what": "198.18.7.2도 POST /api/subscriptions와 GET /api/cases 요청을 보내다 WAF에 차단됐다.",
+       "evidence": [
+        "waf.jsonl:380",
+        "waf.jsonl:389",
+        "waf.jsonl:412",
+        "waf.jsonl:421"
+       ]
+      },
+      {
+       "incident_id": "INC-002",
+       "time": "2026-10-11T06:24:09+00:00",
+       "what": "198.18.7.1이 사례·지원 사건 조회 경로를 시도했고 WAF가 차단했다.",
+       "evidence": [
+        "waf.jsonl:416",
+        "waf.jsonl:427"
+       ]
+      },
+      {
+       "incident_id": "INC-002",
+       "time": "2026-10-11T06:52:08+00:00",
+       "what": "portal 역할 키가 정상 IP가 아닌 198.18.50.1에서 states:StartExecution에 성공했다. 키의 첫 사용 기록은 06:36:22다.",
+       "evidence": [
+        "cloudtrail.json:10094",
+        "cloudtrail.json:10142"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2026-10-11T07:11:37+00:00",
+       "what": "같은 키로 198.18.7.1이 ssm:SendCommand를 시도했으나 AccessDenied로 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:10150",
+        "cloudtrail.json:10151"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "portal 역할 키(ASIA71C2…95CF)가 어떻게 유출됐는지는 알 수 없다. 보이는 WAF 요청은 모두 차단됐고, WAF를 통과한 요청이나 인스턴스 내부 동작은 이 로그에 없다.",
+    "198.18.50.1이 공격자의 다른 거점인지, 정상 경로(NAT 등)인지는 입력에 소유 정보가 없어 단정할 수 없다. 이 키는 정상 추정 IP 198.18.10.1에서 쓰인 기록이 없다.",
+    "states:StartExecution 9회 성공으로 실행된 워크플로가 무엇을 했는지(입력값, 결과)는 이 로그에 없다.",
+    "키 사용 내역의 ssm:StartSession 실패 2회는 events에 ref가 없어 시간·IP를 확인할 수 없다.",
+    "CloudTrail S3 객체 호출이 0건이다. 데이터 이벤트가 기록되지 않았을 수 있어 S3 데이터 읽기·반출은 확인도 부정도 할 수 없다.",
+    "VPC Flow Logs와 SSH 인증 로그가 없다. 그래서 네트워크 반출이나 인스턴스 내부 접속은 보이지 않는다.",
+    "WAF 로그는 06:32, ALB 로그는 06:27에 끝나고 CloudTrail은 07:25에 끝난다. 이후 웹 공격이나 키 사용이 이어졌는지는 알 수 없다.",
+    "IDOR 탐색에서 실패 외에 성공한 조회·다운로드가 있었는지는 제시된 events만으로 확인할 수 없다.",
+    "INC-001의 감사 로그 중지·삭제 1건이 어떤 로그를 대상으로 했는지, 다시 켜졌는지는 입력에 상세가 없다.",
+    "INC-005의 guardduty:UpdateDetector가 탐지기를 켰는지 껐는지는 파라미터가 없어 알 수 없다.",
+    "INC-003의 198.18.9.1이 클러스터의 정상 출구 IP인지는 입력에 없다.",
+    "INC-004에서 루트를 누가 왜 썼는지, 198.18.0.3과 198.18.18.1이 누구 IP인지는 입력에 없다."
+   ]
+  }
+ }
+}

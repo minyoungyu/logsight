@@ -10,6 +10,7 @@ from .config_audit import audit
 from .correlate import build_incidents, group_repeats
 from .detect import run_detections
 from .normalize import Event, load_paths
+from .triage import reorder, triage
 
 
 def load_env(path: str | Path | None) -> dict:
@@ -30,6 +31,10 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     incidents = build_incidents(events, findings, window_min=window_min)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
     t_detect = time.time() - t0
+    # AI 재검토: 묶은 대표 사건(점수순 상위 30개)을 보고 공격으로 보이는 것을 위로 올린다.
+    # 키가 없거나 preview면 규칙 순서 그대로
+    tri = triage(groups, model=model, use_ai=use_ai and not preview, events=events)
+    groups = reorder(groups, tri)
     results = []
     for inc in groups[:top]:
         checks = audit(inc, env)
@@ -57,7 +62,10 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "score", "stages",
                                                "src_ips", "n_events", "repeats", "first_seen",
                                                "last_seen")}
-                           | {"rules": sorted({f["rule"] for f in i["findings"]})} for i in groups[:50]],
+                           | {"rules": sorted({f["rule"] for f in i["findings"]})}
+                           | ({"ai_verdict": i["ai_verdict"]} if "ai_verdict" in i else {})
+                           for i in groups[:50]],
+        "triage": tri,
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},

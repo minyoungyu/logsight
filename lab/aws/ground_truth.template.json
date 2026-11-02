@@ -1,0 +1,62 @@
+{
+  "_note": "복사해서 data/aws_lab/<stamp>/ground_truth.json 로 쓴다. 저장소에 올리지 않는다(실제 IP 포함). 공격을 재현한 순간마다 한 줄씩 적는다. 형식은 logsight/web/measure.py 참고.",
+  "entries": [
+    {
+      "scenario": "port-scan",
+      "time_utc": "2026-10-29T10:30:00Z",
+      "attacker_ip": "203.0.113.45",
+      "technique": "T1046",
+      "step_note": "nmap -sS -F 로 내 인스턴스 1대만 스캔",
+      "detectable": true,
+      "expected_rules": []
+    },
+    {
+      "scenario": "ssh-bruteforce",
+      "time_utc": "2026-10-29T10:35:00Z",
+      "attacker_ip": "203.0.113.45",
+      "technique": "T1110",
+      "step_note": "ubuntu 계정에 20~30회 암호 시도(모두 실패)",
+      "detectable": true,
+      "expected_rules": []
+    },
+    {
+      "scenario": "sqli-login-bypass",
+      "time_utc": "2026-10-29T10:38:00Z",
+      "attacker_ip": "203.0.113.45",
+      "method": "POST",
+      "path": "/login.php",
+      "technique": "T1190",
+      "step_note": "' OR 1=1 -- 로 로그인 우회 시도",
+      "detectable": true,
+      "expected_rules": ["WEBLOG_SQLI"]
+    },
+    {
+      "scenario": "webshell-upload",
+      "time_utc": "2026-10-29T10:40:00Z",
+      "attacker_ip": "203.0.113.45",
+      "method": "POST",
+      "path": "/upload.php",
+      "technique": "T1505.003",
+      "step_note": "shell.php 업로드 후 /uploads/shell.php?c=id 실행",
+      "detectable": true,
+      "expected_rules": []
+    },
+    {
+      "scenario": "stolen-role-s3-read",
+      "time_utc": "2026-10-29T10:42:10Z",
+      "attacker_ip": "203.0.113.45",
+      "technique": "T1530",
+      "step_note": "웹셸로 IMDSv1 키 탈취 후 훔친 키로 export.csv 읽기(연결 고리)",
+      "detectable": true,
+      "expected_rules": ["CT_S3_BULK_READ"]
+    },
+    {
+      "scenario": "normal-admin-browsing",
+      "time_utc": "2026-10-29T10:20:00Z",
+      "attacker_ip": "198.51.100.10",
+      "malicious": false,
+      "step_note": "배포 후 정상 점검 접속(오탐 측정용). 로그에 실제로 나오는 IP로 적을 것",
+      "detectable": true
+    }
+  ]
+}

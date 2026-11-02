@@ -1,0 +1,139 @@
+2026/10/22 03:59:33 [info] 1944#1944: *1 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *3 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *4 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *6 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *8 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *10 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *12 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *13 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *15 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *17 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *19 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *21 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *22 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *24 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *26 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *28 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *30 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *32 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *34 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *35 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *37 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *39 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *57 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /wp-login.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *57 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *59 "/home/claude/logsight/lab/sites/shopmall/wp-admin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /wp-admin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *59 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *60 "/home/claude/logsight/lab/sites/shopmall/administrator/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /administrator/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *60 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *61 "/home/claude/logsight/lab/sites/shopmall/phpmyadmin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /phpmyadmin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *61 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *62 open() "/home/claude/logsight/lab/sites/shopmall/.git/HEAD" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /.git/HEAD HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *62 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *63 open() "/home/claude/logsight/lab/sites/shopmall/backup.zip" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /backup.zip HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *63 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *64 "/home/claude/logsight/lab/sites/shopmall/old/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /old/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *64 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *65 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /test.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *65 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *67 open() "/home/claude/logsight/lab/sites/shopmall/config.bak" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /config.bak HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *67 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *68 open() "/home/claude/logsight/lab/sites/shopmall/manager/html" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /manager/html HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *68 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *69 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /xmlrpc.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *69 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *71 "/home/claude/logsight/lab/sites/shopmall/vendor/phpunit/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /vendor/phpunit/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *71 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *72 open() "/home/claude/logsight/lab/sites/shopmall/server-status" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /server-status HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *72 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *73 open() "/home/claude/logsight/lab/sites/shopmall/.svn/entries" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /.svn/entries HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *73 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *74 open() "/home/claude/logsight/lab/sites/shopmall/cgi-bin/test.cgi" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /cgi-bin/test.cgi HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *74 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *75 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /shell.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *75 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *77 open() "/home/claude/logsight/lab/sites/shopmall/db.sql" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /db.sql HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *77 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *78 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /info.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *78 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *80 open() "/home/claude/logsight/lab/sites/shopmall/api/v1/users" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /api/v1/users HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *80 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *81 open() "/home/claude/logsight/lab/sites/shopmall/.env" failed (2: No such file or directory), client: 198.51.100.25, server: , request: "GET /.env HTTP/1.1", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *81 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *82 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.25, server: , request: "GET /config.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *82 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [error] 1944#1944: *84 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.25, server: , request: "GET /wp-config.php HTTP/1.1", upstream: "fastcgi://unix:/home/claude/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/10/22 03:59:33 [info] 1944#1944: *84 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *86 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *87 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *89 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *91 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *93 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *103 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *105 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *107 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *109 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *111 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *113 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *115 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *119 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *121 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *131 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *133 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *135 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *137 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *139 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *141 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *143 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *145 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *147 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:33 [info] 1944#1944: *149 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *151 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *153 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *155 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *157 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *159 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *161 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *189 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *191 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *193 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *195 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *197 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *199 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *201 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *203 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *205 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *209 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *211 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *213 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *215 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *217 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *219 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *221 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *223 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *225 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *227 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *229 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *231 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *233 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *235 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *237 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *239 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *241 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *243 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *245 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *247 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *249 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *251 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *253 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *255 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *257 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *259 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *261 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *263 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *265 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *266 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *267 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *268 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *270 client 127.0.0.1 closed keepalive connection
+2026/10/22 03:59:34 [info] 1944#1944: *272 client 127.0.0.1 closed keepalive connection

@@ -1,0 +1,5 @@
+# 복사해서 terraform.tfvars 로 쓰고 값을 채운다. terraform.tfvars 는 커밋하지 않는다.
+# 본인 PC 공인 IP: curl -s https://checkip.amazonaws.com
+allowed_ip = "203.0.113.5/32"
+region     = "ap-northeast-2"
+# repo_ref = "claude/project-thread-ubj8wk"  # 최신 취약 사이트를 쓰려면 브랜치 지정
