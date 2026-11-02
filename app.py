@@ -10,7 +10,8 @@ import os
 from html import escape
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, File, Form, Request
+from fastapi import UploadFile as FUploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.datastructures import UploadFile
 
@@ -18,9 +19,21 @@ from logsight import normalize
 from logsight.normalize import PARSERS, load_uploads, parse_tz, parse_when
 from logsight.pipeline import run, run_paths
 from logsight.report import render
+from logsight.web.webprofile import SiteProfile
+from logsight.web.webpipeline import assess
+from logsight.web.webreport import render as render_web
 
-app = FastAPI(title="LogSight")
+# 안전한 데모 모드: LOGSIGHT_DEMO=1 이면 로그 업로드를 받지 않고 샘플 보고서만 보여 준다.
+# 공개 배포본은 이 모드로만 띄운다(외부 사용자가 올린 로그를 서버에 받지 않기 위함).
+# 데모에서는 API 문서(/docs, /openapi.json)도 끈다(내부 경로·매개변수 구조를 주지 않기 위함).
+DEMO = os.environ.get("LOGSIGHT_DEMO") == "1"
+DEMO_MSG = "데모 모드에서는 파일 업로드를 받지 않습니다. 샘플 보고서를 확인하세요."
+app = FastAPI(title="LogSight",
+              docs_url=None if DEMO else "/docs",
+              redoc_url=None if DEMO else "/redoc",
+              openapi_url=None if DEMO else "/openapi.json")
 ROOT = Path(__file__).parent / "samples"
+WEB_SAMPLE = ROOT / "web" / "profile.json"
 SAMPLES = {
     "demo": ("AWS 로그 4종(CloudTrail, VPC Flow, ALB, SSH)", ROOT / "demo"),
     "free": ("무료 대안 로그만(서버 방화벽, nginx)", ROOT / "free"),
@@ -57,7 +70,7 @@ environment.json(설정 스냅샷)을 같이 올리면 원인 설정과 수정 �
 <p><button>분석</button></p></form>
 <div class=card><h2>샘플로 먼저 보기</h2><ul>{samples}</ul>
 <div class=muted>합성 데이터입니다. IP는 문서용 예약 대역만 씁니다.</div></div>
-<p class=muted>올린 파일은 분석에만 쓰고 저장하지 않습니다. <a href=/docs>API 문서</a></p></html>"""
+<p class=muted>올린 파일은 분석에만 쓰고 저장하지 않습니다. <a href=/web>웹서버 침해 점검</a> · <a href=/docs>API 문서</a></p></html>"""
 
 
 def _page() -> str:
@@ -96,8 +109,17 @@ class _Syslog:
         normalize.SYSLOG.update(self.saved)
 
 
+@app.get("/healthz")
+def healthz():
+    """배포 플랫폼(Lightsail·App Runner 등)의 상태 확인용. 외부 의존성 없이 200만 돌려준다."""
+    return {"status": "ok", "demo": DEMO}
+
+
 @app.get("/", response_class=HTMLResponse)
 def home():
+    if DEMO:  # 업로드 칸을 숨기고 샘플만
+        p = _page()
+        return p[:p.index("<form")] + f"<p class=muted>{DEMO_MSG}</p>" + p[p.index("</form>") + 7:]
     return _page()
 
 
@@ -113,6 +135,8 @@ def demo(sample: str = "demo"):
 
 @app.post("/analyze", response_class=HTMLResponse)
 async def do_analyze(request: Request):
+    if DEMO:
+        return HTMLResponse(DEMO_MSG, status_code=403)
     form = await request.form()
     try:
         return await _analyze(form)
@@ -175,3 +199,95 @@ def api_demo(sample: str = "demo"):
         return JSONResponse({"error": "unknown sample"}, status_code=404)
     with _Syslog(year=2026):
         return JSONResponse(run_paths([str(SAMPLES[sample][1])], use_ai=False))
+
+
+# --------------------------------------------------------------- 웹서버 침해 점검
+# 미래의 일반 사용자용 UI가 그대로 붙을 수 있게, 백엔드는 assess() 하나만 부른다.
+WEB_PAGE = """<!doctype html><html lang=ko><meta charset=utf-8>
+<meta name=viewport content='width=device-width,initial-scale=1'><title>LogSight 웹서버 점검</title>
+<style>body{font:15px/1.6 -apple-system,"Malgun Gothic","Noto Sans KR",sans-serif;max-width:720px;
+margin:0 auto;padding:24px 16px}label{display:block;margin:10px 0}button{padding:8px 16px;font-size:15px}
+.muted{color:#777}</style>
+<h1>웹서버, 이미 뚫렸나요?</h1>
+<p class=muted>서버에 쌓인 로그를 올리면 공격 흔적과 침입 흐름을 분석해 판정합니다.
+비워 둔 칸은 건너뜁니다. .gz 파일도 됩니다. 로그는 분석에만 쓰고 저장하지 않습니다.</p>
+<form action=/web/scan method=post enctype=multipart/form-data>
+<label>접속 로그 (nginx/Apache access.log) <input type=file name=access multiple></label>
+<label>오류 로그 (error.log) <input type=file name=weberror multiple></label>
+<label>인증 로그 (auth.log / secure) <input type=file name=auth multiple></label>
+<button>점검</button></form>
+<p><a href=/web/demo>샘플로 바로 보기</a> · <a href=/docs>API 문서</a></p></html>"""
+
+
+@app.get("/web", response_class=HTMLResponse)
+def web_home():
+    if DEMO:
+        return WEB_PAGE.replace("<form action=/web/scan", "<form action=/web/scan hidden").replace(
+            "<button>점검</button>", "<p>" + DEMO_MSG + "</p>")
+    return WEB_PAGE
+
+
+@app.get("/web/demo", response_class=HTMLResponse)
+def web_demo():
+    return render_web(assess(SiteProfile.load(WEB_SAMPLE), use_ai=False))
+
+
+def _profile_from_uploads(tmp: Path, files: dict[str, list]) -> SiteProfile:
+    log_paths: dict[str, list[str]] = {}
+    for kind, ups in files.items():
+        paths = []
+        for i, (fname, data) in enumerate(ups):
+            p = tmp / f"{kind}_{i}_{fname or kind}"
+            p.write_bytes(data)
+            paths.append(str(p))
+        if paths:
+            log_paths[kind] = paths
+    return SiteProfile(name="업로드한 서버", log_paths=log_paths, login_paths=["/login.php"])
+
+
+async def _collect(ups):
+    out = []
+    for up in ups or []:
+        data = await up.read()
+        if data:
+            out.append((up.filename, data))
+    return out
+
+
+@app.post("/web/scan", response_class=HTMLResponse)
+async def web_scan(
+    access: list[FUploadFile] | None = File(None),
+    weberror: list[FUploadFile] | None = File(None),
+    auth: list[FUploadFile] | None = File(None),
+    no_ai: str | None = Form(None),
+):
+    if DEMO:
+        return HTMLResponse(DEMO_MSG, status_code=403)
+    import tempfile
+    files = {"access": await _collect(access), "weberror": await _collect(weberror),
+             "auth": await _collect(auth)}
+    if not any(files.values()):
+        return HTMLResponse("로그 파일을 하나 이상 올려 주세요.", status_code=400)
+    with tempfile.TemporaryDirectory() as d:
+        profile = _profile_from_uploads(Path(d), files)
+        return render_web(assess(profile, use_ai=not no_ai))
+
+
+@app.post("/api/web/scan")
+async def api_web_scan(
+    access: list[FUploadFile] | None = File(None),
+    weberror: list[FUploadFile] | None = File(None),
+    auth: list[FUploadFile] | None = File(None),
+    no_ai: str | None = Form(None),
+):
+    """UI가 아니라 기계가 쓰는 JSON API. 결과 dict를 그대로 돌려준다."""
+    if DEMO:
+        return JSONResponse({"error": DEMO_MSG}, status_code=403)
+    import tempfile
+    files = {"access": await _collect(access), "weberror": await _collect(weberror),
+             "auth": await _collect(auth)}
+    if not any(files.values()):
+        return JSONResponse({"error": "로그 파일이 필요합니다."}, status_code=400)
+    with tempfile.TemporaryDirectory() as d:
+        profile = _profile_from_uploads(Path(d), files)
+        return JSONResponse(assess(profile, use_ai=not no_ai))

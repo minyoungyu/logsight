@@ -1,0 +1,13 @@
+{
+  "name": "샘플몰 (shopmall) — 데모",
+  "stack": "nginx + php-fpm + sqlite",
+  "webroot": "samples/web/webroot",
+  "log_paths": {
+    "access": ["samples/web/logs/shopmall_access.log"],
+    "weberror": ["samples/web/logs/shopmall_error.log"],
+    "auth": ["samples/web/logs/shopmall_auth.log"]
+  },
+  "login_paths": ["/login.php"],
+  "upload_dirs": ["/uploads"],
+  "trusted_ips": []
+}

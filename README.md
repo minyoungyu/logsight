@@ -15,9 +15,25 @@ AI:ON 2026 출품작(팀 로그파인더).
 
 웹 데모: `uvicorn app:app --reload` → http://127.0.0.1:8000. 로그 파일 여러 개를 한 칸에 올리면 종류를 자동으로 알아본다(environment.json도 같이). 샘플 바로 보기: /demo?sample=demo|free|combined
 
+### 웹서버 침해 판단 (신규)
+
+"우리 웹서버, 이미 뚫렸나?"를 **서버에 쌓인 로그·파일만으로** 판단하는 기능. nginx/Apache
+접속·오류 로그, 리눅스 인증 로그, 웹 루트 파일(웹셸)을 보고 침입 흐름을 복원해 판정한다.
+
+    # 저장소에 포함된 샘플로 바로 (서버 불필요)
+    python -m logsight scan --profile samples/web/profile.json --no-ai --out reports/web_demo
+    # 실제 사이트: profile.json 하나만 바꾼다 (경로/웹루트/신뢰 IP)
+    python -m logsight scan --profile profile.json --out reports/mysite
+
+웹 화면·API: `uvicorn app:app` → http://127.0.0.1:8000/web , JSON API는 `/api/web/scan`.
+설계·검증·한계는 `docs/웹서버_침해판단_설계.md`, 로컬 검증 환경은 `lab/README.md` 참고.
+
 Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.env.example 참고, 키는 커밋 금지).
 키가 없거나 호출이 실패하면 같은 형식의 규칙 기반 보고서를 만든다. 모델은 `LOGSIGHT_MODEL`
-(기본 `claude-haiku-5-5`)로 바꾼다. Python 3.10 이상 필요.
+(기본 `claude-haiku-5-5`)로 바꾼다. 키가 있으면 상세 분석 전에 사건 전체를 한 번 재검토해
+공격으로 보이는 사건을 위로 올리고 같은 공격의 사건들을 묶는다(`logsight/triage.py`, 모델은
+`LOGSIGHT_TRIAGE_MODEL`, 기본 `claude-opus-5-5`). 재검토는 순서만 바꾸고 사건을 지우지 않는다.
+Python 3.10 이상 필요.
 
 ## 처리 흐름
 
@@ -88,3 +104,15 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
     reports/combined/ 8종 통합 분석 결과
     docs/            중간보고서용 구현 요약, 발표 자료(중간보고_발표자료.md)
     .github/workflows/test.yml  Windows·macOS·Linux 자동 테스트(저장소에 올리면 동작)
+
+## 라이선스
+
+MIT 라이선스. 자세한 내용은 `LICENSE` 파일을 보세요. 변경 기록은 `CHANGELOG.md`에 있습니다.
+
+MIT 라이선스는 이 저장소의 코드에만 적용됩니다. 성능 측정에 쓴 외부 데이터셋은 저장소에 들어 있지 않고, 각 데이터셋의 라이선스를 따릅니다.
+
+This project utilizes the AIT Log Data Set V2.0 (AIT-LDSv2) provided by M. Landauer et al. (AIT Austrian Institute of Technology), licensed under CC BY-NC-SA 4.0 (https://doi.org/10.5281/zenodo.5789064), for non-commercial evaluation only. 인용과 측정 결과는 `docs/공개데이터셋_독립측정.md`를 보세요.
+
+## CTF 로그로 탐지 성능 재기
+
+동아리 CTF 등 허가된 환경에서 나온 로그로 판정 성능을 재는 방법은 `docs/CTF_로그_수집_가이드.md`를 보세요.

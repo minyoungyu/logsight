@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass
 from functools import lru_cache
 from datetime import timedelta
-from urllib.parse import unquote_plus
+from urllib.parse import unquote_plus, urlsplit
 
 from .normalize import Event
 
@@ -41,6 +41,34 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
     "WEB_PATH_PROBE":     ("T1595.003", "discovery", "없는 경로를 연속 요청(웹 스캐너)", "low"),
     "GD_FINDING":         ("GuardDuty", "other", "GuardDuty 탐지 결과", "medium"),
+    "WEB_OBJECT_ENUM":    ("T1530", "collection", "남의 객체 번호를 바꿔 가며 접근 시도(IDOR 탐색)", "medium"),
+    # --- 웹서버 로그·파일 기반 규칙(logsight.web) ---
+    "WEBLOG_SQLI":        ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "high"),
+    "WEBLOG_TRAVERSAL":   ("T1190", "initial-access", "경로 조작·파일 열람(../, 민감 파일) 시도", "high"),
+    "WEBLOG_RFI":         ("T1190", "initial-access", "원격 파일 포함(RFI) 시도", "high"),
+    "WEBLOG_CMD_INJECTION": ("T1190", "initial-access", "운영체제 명령 삽입 시도", "high"),
+    "WEBLOG_XSS":         ("T1059.007", "initial-access", "교차 사이트 스크립트(XSS) 시도", "medium"),
+    "WEBLOG_SCANNER":     ("T1595.002", "discovery", "취약점 스캐너·자동 도구 탐지", "low"),
+    "WEBLOG_ENUM_404":    ("T1595.003", "discovery", "존재하지 않는 경로 연속 탐색(열거)", "low"),
+    "WEBLOG_SENSITIVE_FILE": ("T1083", "discovery", "설정·비밀 파일 접근 시도(.env 등)", "medium"),
+    "WEBLOG_WEBSHELL_ACCESS": ("T1505.003", "persistence", "웹셸로 보이는 경로에 접근", "high"),
+    "WEBLOG_UPLOAD_EXEC": ("T1505.003", "persistence", "업로드 폴더의 스크립트 실행", "high"),
+    "WEBLOG_AUTH_BRUTE":  ("T1110", "credential-access", "웹 로그인 무차별 대입", "medium"),
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "로그인 연속 실패 뒤 성공", "high"),
+    "WEBLOG_CODE_IN_HEADER": ("T1505.003", "persistence", "요청 헤더(User-Agent 등)에 실행 코드 삽입(로그 포이즈닝 준비)", "high"),
+    "WEBLOG_ADMIN_ACCESS": ("T1078", "initial-access", "관리자 영역 접근 성공(기본 계정 로그인 의심)", "high"),
+    "WEBLOG_SSRF":        ("T1190", "initial-access", "서버를 이용해 내부 주소를 요청(SSRF)", "high"),
+    "WEBLOG_OPEN_REDIRECT": ("T1566", "initial-access", "열린 리다이렉트(외부 사이트로 보내기) 시도", "low"),
+    "WEBLOG_IDOR_ENUM":   ("T1530", "collection", "다른 사람의 주문 번호를 차례로 열람(IDOR)", "high"),
+    "WEBLOG_ADMIN_FORGED": ("T1078", "initial-access", "로그인 없이 관리자 영역 접근(쿠키 위조 의심)", "high"),
+    "WEBLOG_CSRF_SUSPECT": ("T1190", "initial-access", "외부 사이트에서 관리자 작업 요청(CSRF 의심)", "high"),
+    "WEBLOG_BACKUP_LEAK": ("T1213", "collection", "백업·덤프·소스(.git 등) 파일이 외부에 노출됨", "high"),
+    "WEBLOG_DIR_LISTING": ("T1083", "discovery", "업로드 폴더 목록이 외부에 공개됨", "medium"),
+    "WEBLOG_EXPLOIT_PROBE": ("T1190", "initial-access", "알려진 취약점 공격 문자열(헤더) 시도 — Log4Shell·Shellshock 등", "medium"),
+    "WEBLOG_EXPLOIT_5XX": ("T1190", "initial-access", "공격 요청에 서버 오류(500) 응답 — 취약점 반응", "high"),
+    "WEBLOG_LARGE_EXFIL": ("T1030", "exfiltration", "공격 요청 뒤 비정상적으로 큰 응답(데이터 유출 의심)", "high"),
+    "FILE_WEBSHELL":      ("T1505.003", "persistence", "웹 루트에서 웹셸 의심 파일 발견", "high"),
+    "FILE_SUSPICIOUS":    ("T1105", "persistence", "웹 루트에서 의심스러운 신규·수정 파일", "medium"),
 }
 
 # GuardDuty 탐지 유형의 앞부분(위협 목적) → 단계
@@ -154,6 +182,20 @@ def _bursts(evs: list[Event], window: timedelta, min_count: int, key=lambda e: e
             else:
                 out.append((start, end))
     return [evs[a:b + 1] for a, b in out]
+
+
+_HAS_DIGIT = re.compile(r"\d")
+
+
+def _route(action: str) -> str | None:
+    """"GET https://host/api/jobs/job-58152/download" → "GET /api/jobs/{id}/download".
+    숫자가 든 경로 조각을 객체 번호로 본다. 확장자가 있는 조각(app.v2.js 같은 정적 파일)은 빼고,
+    객체 번호가 없는 경로는 None."""
+    method, _, url = action.partition(" ")
+    path = urlsplit(url).path if "://" in url else url.split("?", 1)[0]
+    segs = path.split("/")
+    route = ["{id}" if _HAS_DIGIT.search(s) and "." not in s else s for s in segs]
+    return f"{method} {'/'.join(route)}" if route != segs else None
 
 
 def _ip_in(ip: str, cidrs: list[str]) -> bool:
@@ -303,6 +345,21 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                 if len(prior) >= 2:
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
+
+    # --- ALB·API Gateway: 같은 IP가 같은 API에서 객체 번호만 바꿔 가며 403/404를 연달아 받음.
+    # 남의 객체(작업·주문·파일)를 열어 보려는 IDOR 탐색이다. 웹서버 로그의 WEBLOG_IDOR_ENUM과 달리
+    # 경로 이름에 기대지 않고, 권한 거부·없음 응답이 서로 다른 번호에 몰리는지만 본다.
+    probes: dict[tuple[str, str], list[Event]] = defaultdict(list)
+    for e in events:
+        if e.source == "alb" and e.action and e.extra.get("elb_status") in ("403", "404"):
+            r = _route(e.action)
+            if r:
+                probes[(e.src_ip or "?", r)].append(e)
+    for (ip, r), evs in probes.items():
+        for seg in _bursts(evs, timedelta(minutes=10), 5, key=lambda e: e.action):
+            findings.append(Finding("WEB_OBJECT_ENUM", seg,
+                                    f"10분 안에 {r} 객체 {len({e.action for e in seg})}개에 "
+                                    f"403/404 {len(seg)}건", ip))
 
     # --- 웹 요청(WAF·ALB)의 SQL 인젝션 패턴 — WAF가 놓친 경우에도 잡기 위한 보조 규칙
     web: dict[str, list[Event]] = defaultdict(list)

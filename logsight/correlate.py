@@ -19,9 +19,16 @@ from .normalize import Event, mask_obj
 SEV_RANK = {"high": 3, "medium": 2, "low": 1}
 
 
+WEB_SOURCES = {"access", "weberror", "auth", "sshauth", "alb", "waf", "file"}
+
+
 def _keys(e: Event):
-    if e.src_ip and _is_ip(e.src_ip) and not _is_private(e.src_ip):
+    # 웹/엣지 로그는 공격자 IP가 연결 축이다. 로컬·사내 IP(127.0.0.1 등)라도 그대로 쓴다
+    # (프록시 없는 단독 서버, 로컬 테스트, 사내 침해 모두 이 경로로 묶여야 한다).
+    if e.src_ip and _is_ip(e.src_ip) and (e.source in WEB_SOURCES or not _is_private(e.src_ip)):
         yield ("ip", e.src_ip)
+    if e.extra.get("webshell_path"):
+        yield ("path", e.extra["webshell_path"])  # 웹셸 파일 ↔ 그 경로로의 접근 요청을 잇는다
     if e.instance_id:
         yield ("inst", e.instance_id)
     if e.access_key:

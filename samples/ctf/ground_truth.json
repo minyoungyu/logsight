@@ -1,0 +1,76 @@
+[
+ {
+  "scenario": "sqli-union",
+  "attacker_ip": "198.51.100.23",
+  "malicious": true,
+  "detectable": true,
+  "expected_rules": [
+   "WEBLOG_SQLI"
+  ],
+  "time_utc": "2026-10-22T03:50:00Z",
+  "step_note": "검색창에 UNION SELECT 입력"
+ },
+ {
+  "scenario": "sqli-bulk-dump",
+  "attacker_ip": "198.51.100.28",
+  "malicious": true,
+  "detectable": true,
+  "expected_rules": [
+   "WEBLOG_SQLI",
+   "WEBLOG_LARGE_EXFIL"
+  ],
+  "time_utc": "2026-10-22T03:51:00Z",
+  "step_note": "대량 덤프"
+ },
+ {
+  "scenario": "xss-reflected",
+  "attacker_ip": "198.51.100.29",
+  "malicious": true,
+  "detectable": true,
+  "expected_rules": [
+   "WEBLOG_XSS"
+  ],
+  "time_utc": "2026-10-22T03:52:00Z",
+  "step_note": "검색어에 script 태그"
+ },
+ {
+  "scenario": "traversal",
+  "attacker_ip": "198.51.100.24",
+  "malicious": true,
+  "detectable": true,
+  "expected_rules": [
+   "WEBLOG_TRAVERSAL"
+  ],
+  "time_utc": "2026-10-22T03:53:00Z",
+  "step_note": "../ 경로 조작"
+ },
+ {
+  "scenario": "brute-login",
+  "attacker_ip": "198.51.100.26",
+  "malicious": true,
+  "detectable": true,
+  "expected_rules": [
+   "WEBLOG_AUTH_BRUTE"
+  ],
+  "time_utc": "2026-10-22T03:54:00Z",
+  "step_note": "로그인 반복 실패"
+ },
+ {
+  "scenario": "stored-xss-review",
+  "attacker_ip": "198.51.100.31",
+  "malicious": true,
+  "detectable": false,
+  "expected_rules": [],
+  "time_utc": "2026-10-22T03:55:00Z",
+  "step_note": "리뷰 본문 저장형 XSS(접속 로그에 안 남음)"
+ },
+ {
+  "scenario": "operator-check",
+  "attacker_ip": "203.0.113.10",
+  "malicious": false,
+  "detectable": true,
+  "expected_rules": [],
+  "time_utc": "2026-10-22T03:56:00Z",
+  "step_note": "운영자 점검(정상, 로그에 실제로 나오는 IP)"
+ }
+]

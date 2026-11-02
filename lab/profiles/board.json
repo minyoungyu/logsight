@@ -1,0 +1,12 @@
+{
+  "name": "테스트 게시판 (board)",
+  "stack": "nginx + php-fpm + sqlite",
+  "webroot": "lab/sites/board",
+  "log_paths": {
+    "access": ["lab/logs/board_access.log"],
+    "weberror": ["lab/logs/board_error.log"]
+  },
+  "login_paths": ["/bbs/login.php"],
+  "upload_dirs": ["/data"],
+  "trusted_ips": []
+}
