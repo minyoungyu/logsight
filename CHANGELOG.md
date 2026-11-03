@@ -5,6 +5,9 @@
 ## 미출시
 
 ### 추가
+- 처음 보는 데이터 측정: 규칙을 고정(20e4562)하고 Splunk attack_data의 AWS 표본 52개로 한 번 쟀다(맞게 탐지 16개). `scripts/public/eval_splunk_attack_data.py`, 결과 `docs/처음보는데이터_측정.md`.
+- 규칙 명세(`logsight/rulespec.py` → `docs/규칙_명세.md`): 규칙 50개마다 조건·사각지대·오탐·먼저 할 일. 모든 규칙의 양성·음성 검증 예(`tests/test_rule_validation.py`)와 명세 누락·문서 갱신 검사.
+- 사용자 평가 설계(`docs/사용자평가/`)와 집계 스크립트(`scripts/study_score.py`), 고객 인터뷰 가이드(`docs/고객검증/`).
 - 실제 AWS 로그 측정(Splunk BOTSv3, CC0): Splunk 없이 색인에서 원본 로그를 꺼내는 `scripts/public/botsv3_extract.py`와 결과 `docs/BOTSv3_측정.md`.
 - S3 버킷 공개 규칙(`CT_S3_PUBLIC`): PutBucketAcl·PutObjectAcl·PutBucketPolicy 등으로 버킷을 인터넷 전체(AllUsers, `*`)에 연 호출을 잡는다.
 - "GuardDuty 다음" 위치: 보고서의 로그 범위 칸에 GuardDuty 결과와 GuardDuty가 읽지 않는 로그(WAF·ALB·웹서버·SSH·서버 방화벽)를 함께 넣었는지 한 문장으로 알린다(`explain.guardduty_note`). `logsight check`의 WAF·ALB·GuardDuty 설명에 "GuardDuty는 이 로그를 읽지 않음", "켜기 전의 일은 보지 않음"을 넣었다. README·발표 자료에 위치와 장기 계획(GuardDuty 결과 하나로 시작하기)을 적었다.

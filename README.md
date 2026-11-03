@@ -135,7 +135,7 @@ summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
     app.py           FastAPI 웹 데모
     samples/demo/    작은 샘플 로그 4종 + 설정 스냅샷 예시
     samples/combined/ 로그 8종을 한곳에 모은 합성 샘플(정규화 점검용)
-    tests/           단위·통합 테스트(171개)
+    tests/           단위·통합 테스트(188개, 규칙 검증 포함)
     scripts/         성능 측정
     reports/demo/    샘플 분석 결과(HTML, JSON, 화면 캡처)
     reports/combined/ 8종 통합 분석 결과
@@ -151,6 +151,8 @@ MIT 라이선스는 이 저장소의 코드에만 적용됩니다. 성능 측정
 This project utilizes the AIT Log Data Set V2.0 (AIT-LDSv2) provided by M. Landauer et al. (AIT Austrian Institute of Technology), licensed under CC BY-NC-SA 4.0 (https://doi.org/10.5281/zenodo.5789064), for non-commercial evaluation only. 인용과 측정 결과는 `docs/공개데이터셋_독립측정.md`를 보세요.
 
 실제 AWS 계정 로그 측정에는 Splunk BOTSv3(https://github.com/splunk/botsv3, CC0)를 썼습니다. 결과는 `docs/BOTSv3_측정.md`를 보세요.
+
+처음 보는 데이터 측정에는 Splunk Security Content와 Splunk Attack Data(https://github.com/splunk/security_content, https://github.com/splunk/attack_data, Apache-2.0)의 AWS CloudTrail 표본을 썼습니다. 데이터는 저장소에 넣지 않고 받을 주소만 기록합니다. 결과는 `docs/처음보는데이터_측정.md`를 보세요.
 
 ## CTF 로그로 탐지 성능 재기
 
