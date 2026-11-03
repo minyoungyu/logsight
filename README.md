@@ -1,7 +1,7 @@
-# LogSight
+# LogSight: AWS 침해사고 초동 분석 도구
 
-흩어진 AWS 로그(CloudTrail, VPC Flow Logs, AWS WAF, ALB, SSH 인증 로그)를 하나의 공격 흐름으로 엮어
-한국어로 설명하고, 원인 설정과 보안그룹·NACL·WAF·IAM 수정안을 제안하는 보안 분석 도우미.
+작은 팀을 위한 AWS 침해사고 초동 분석 도구. GuardDuty가 경보를 울린 다음, 흩어진 로그(CloudTrail, VPC Flow Logs,
+AWS WAF, ALB, SSH 인증 로그)를 한 사건으로 엮어 침투 경로를 한국어로 설명하고, 원인 설정과 보안그룹·NACL·WAF·IAM 수정안을 제안한다.
 AI:ON 2026 출품작(팀 로그파인더).
 
 **GuardDuty 대신이 아니라 GuardDuty 다음에 쓰는 도구.** GuardDuty는 24시간 감시하다 경보를 주지만,
