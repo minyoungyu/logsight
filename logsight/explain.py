@@ -219,7 +219,7 @@ def verdict_for(inc: dict) -> dict:
 
 
 def _campaigns(incs: list[dict], verdicts: dict[str, str]) -> list[dict]:
-    """공격 판정 사건 중 같은 IP·액세스 키·인스턴스로 이어지는 것을 묶는다.
+    """공격 판정 사건 중 같은 IP·액세스 키로 이어지는 것을 묶는다.
     같은 /24 대역에서 2시간 안에 일어난 것은 '추정'으로 묶는다."""
     att = [i for i in incs if verdicts.get(i["id"]) == "attack"]
     parent = {i["id"]: i["id"] for i in att}
@@ -233,7 +233,7 @@ def _campaigns(incs: list[dict], verdicts: dict[str, str]) -> list[dict]:
 
     def keys(i):
         ks = {("ip", ip) for ip in i["src_ips"] if _public(ip)}
-        ks |= {("inst", x) for x in i.get("instances", [])}
+        # 같은 서버만으로는 잇지 않는다(여러 스캐너가 같은 서버를 두드리면 다른 공격도 한 덩어리가 된다)
         ks |= {("key", e["access_key"]) for e in i["events"] if e.get("access_key")}
         return ks
 

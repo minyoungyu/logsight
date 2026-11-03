@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T02:58:34Z",
+ "generated_at": "2026-11-02T07:34:16Z",
  "files": [
   {
    "file": "samples/combined/alb.log",
@@ -228,11 +228,17 @@
   "campaigns": [
    {
     "incident_ids": [
-     "INC-001",
+     "INC-001"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
      "INC-002"
     ],
-    "link_reason": "같은 서버",
-    "summary": "공격 의심 사건 2개 (INC-001, INC-002)"
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
    },
    {
     "incident_ids": [
@@ -347,11 +353,17 @@
   "campaigns": [
    {
     "incident_ids": [
-     "INC-001",
+     "INC-001"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
      "INC-002"
     ],
-    "link_reason": "같은 서버",
-    "summary": "공격 의심 사건 2개 (INC-001, INC-002)"
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
    },
    {
     "incident_ids": [
@@ -1156,6 +1168,7 @@
     "mode": "rules",
     "model": null,
     "payload_chars": 9501,
+    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
     "validation": {
      "evidence_total": 31,
      "evidence_invalid": 0,
@@ -2269,6 +2282,7 @@
     "mode": "rules",
     "model": null,
     "payload_chars": 18031,
+    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
     "validation": {
      "evidence_total": 37,
      "evidence_invalid": 0,
@@ -2374,6 +2388,7 @@
     "mode": "rules",
     "model": null,
     "payload_chars": 1005,
+    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
     "validation": {
      "evidence_total": 1,
      "evidence_invalid": 0,
@@ -2390,6 +2405,6 @@
  },
  "has_environment": true,
  "assumptions": [
-  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 올해(미래면 작년)로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
  ]
 }
