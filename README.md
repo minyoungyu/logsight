@@ -4,6 +4,17 @@
 한국어로 설명하고, 원인 설정과 보안그룹·NACL·WAF·IAM 수정안을 제안하는 보안 분석 도우미.
 AI:ON 2026 출품작(팀 로그파인더).
 
+**GuardDuty 대신이 아니라 GuardDuty 다음에 쓰는 도구.** GuardDuty는 24시간 감시하다 경보를 주지만,
+켜기 전의 일과 웹·서버 안쪽(ALB·WAF·웹서버·SSH 로그)은 보지 않는다. LogSight는 GuardDuty 결과와 이 로그들을
+한 사건으로 엮어 "어떻게 들어왔고 어디를 고칠지"를 근거와 함께 보여 준다. 사고가 없는 평소에는
+`logsight check`로 그때 필요한 로그가 켜져 있는지 점검한다. 근거: [GuardDuty_비교.md](docs/GuardDuty_비교.md)
+
+| 언제 | 무엇을 | 도구 |
+| --- | --- | --- |
+| 평소 | 경보 받기 | GuardDuty(켜 두기) |
+| 평소 | 사고 때 쓸 로그가 켜져 있는지 점검 | `logsight check` |
+| 경보가 울린 날 | GuardDuty 결과 + 웹·서버 로그로 원인과 고칠 설정 찾기 | `logsight analyze` |
+
 ## 빠른 실행
 
     python -m venv .venv

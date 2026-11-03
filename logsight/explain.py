@@ -129,6 +129,26 @@ def _periods(srcs: dict, gap: timedelta = timedelta(hours=6)) -> list[dict]:
     return out
 
 
+GD_BLIND = ("waf", "alb", "weblog", "sshauth", "hostfw")  # GuardDuty가 읽지 않는 로그
+
+
+def guardduty_note(cov: dict) -> str | None:
+    """GuardDuty 결과와 GuardDuty가 읽지 않는 로그를 함께 넣었는지 한 문장으로."""
+    srcs = cov.get("sources", {})
+    blind = [SOURCE_KO[s] for s in GD_BLIND if s in srcs]
+    if "guardduty" in srcs and blind:
+        n = srcs["guardduty"].get("n_events", 0)
+        return (f"GuardDuty 결과 {n}건에 GuardDuty가 읽지 않는 로그({', '.join(blind)})를 더해 분석했습니다. "
+                "웹·서버 안쪽에서 일어난 일은 이 로그들로 보았습니다.")
+    if "guardduty" in srcs:
+        return ("GuardDuty 결과만으로는 웹·서버 안쪽에서 일어난 일을 알 수 없습니다. "
+                "WAF·ALB·웹서버·SSH 로그가 있으면 함께 넣어 주세요.")
+    if blind:
+        return (f"GuardDuty 결과가 없습니다. GuardDuty 결과 파일도 함께 넣으면 "
+                f"이 로그({', '.join(blind)})와 한 사건으로 묶어 볼 수 있습니다.")
+    return None
+
+
 def coverage_notes(cov: dict, attack_incidents: list[dict] | None = None) -> list[str]:
     """coverage_summary(triage.py)의 결과를 '이 로그로는 알 수 없는 것' 문장으로 바꾼다."""
     notes = []

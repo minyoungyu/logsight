@@ -172,6 +172,28 @@ class PipelineAndReportTests(unittest.TestCase):
         self.assertIn("정상 작업 목록 일치 1건", render(out))  # 사건에는 규칙에 걸린 이벤트만 들어간다
 
 
+class GuardDutyNoteTests(unittest.TestCase):
+    def _cov(self, *srcs):
+        return {"sources": {s: {"n_events": 2, "first": "2026-10-11T05:00:00+00:00",
+                                "last": "2026-10-11T06:00:00+00:00"} for s in srcs}}
+
+    def test_with_blind_logs(self):
+        n = X.guardduty_note(self._cov("guardduty", "waf", "cloudtrail"))
+        self.assertIn("GuardDuty가 읽지 않는 로그(WAF)", n)
+        self.assertIn("2건", n)
+
+    def test_guardduty_only(self):
+        self.assertIn("알 수 없습니다", X.guardduty_note(self._cov("guardduty", "cloudtrail")))
+
+    def test_no_guardduty(self):
+        self.assertIn("GuardDuty 결과가 없습니다", X.guardduty_note(self._cov("alb", "sshauth")))
+        self.assertIsNone(X.guardduty_note(self._cov("cloudtrail", "vpcflow")))
+
+    def test_report_shows_note(self):
+        r = run_paths([str(ROOT / "samples" / "combined")], use_ai=False)
+        self.assertIn("GuardDuty가 읽지 않는 로그", render(r))
+
+
 class CompareScriptTests(unittest.TestCase):
     def test_side_by_side_page(self):
         r = run_paths([str(ROOT / "samples" / "demo")], use_ai=False)
