@@ -50,23 +50,27 @@ ITEMS: dict[str, dict[str, str]] = {
     },
     "WAF_LOGGING": {
         "title": "AWS WAF 로그",
-        "why": "웹 공격(SQL 인젝션 등)이 들어왔는지, WAF가 막았는지 알 수 있다.",
+        "why": "웹 공격(SQL 인젝션 등)이 들어왔는지, WAF가 막았는지 알 수 있다. "
+               "GuardDuty는 이 로그를 읽지 않으므로, 사고 때 웹으로 어떻게 들어왔는지 보려면 미리 켜 둬야 한다.",
         "cost": "WAF 자체가 월 5달러(ACL) + 규칙당 1달러 + 요청 100만 건당 0.60달러. "
                 "로그는 요청 100만 건당 500MB까지 포함.",
         "alt": "nginx/apache 접속 로그를 그대로 분석(SQL 인젝션 패턴, 경로 탐색 규칙).",
     },
     "ALB_LOGS": {
         "title": "ALB 접속 로그",
-        "why": "로드밸런서로 들어온 모든 웹 요청이 남는다.",
+        "why": "로드밸런서로 들어온 모든 웹 요청이 남는다. GuardDuty는 이 로그를 읽지 않으므로, "
+               "사고 때 어떤 요청으로 들어왔는지는 이 로그로만 알 수 있다.",
         "cost": "로그 기능 자체는 무료, S3 저장 비용만 든다.",
         "alt": "서버의 nginx/apache 접속 로그.",
     },
     "GUARDDUTY": {
         "title": "Amazon GuardDuty",
-        "why": "AWS가 직접 위협을 탐지한다. 로그를 따로 켜지 않아도 CloudTrail·VPC·DNS를 분석한다.",
+        "why": "AWS가 24시간 위협을 탐지해 경보를 준다. 로그를 따로 켜지 않아도 CloudTrail·VPC·DNS를 분석한다. "
+               "켜기 전의 일은 보지 않으므로 사고 전에 켜 둬야 한다.",
         "cost": "30일 무료 체험 후 사용량 과금(작은 계정은 월 몇 달러 수준, 추정). "
-                "여러 단계를 엮는 Extended Threat Detection은 추가 비용 없음.",
-        "alt": "LogSight는 GuardDuty 결과를 한국어로 풀어 설명하는 용도로 같이 쓸 수 있다(2단계).",
+                "그 위에서 여러 단계를 엮는 Extended Threat Detection은 GuardDuty 요금 외 추가 비용 없음.",
+        "alt": "켜 두기를 권한다. 경보가 울리면 GuardDuty 결과와 이 계정의 웹·서버 로그를 LogSight에 함께 넣어 "
+               "어떻게 들어왔고 어디를 고칠지 확인한다.",
     },
     "IMDSV2": {
         "title": "EC2 메타데이터 IMDSv2 강제",

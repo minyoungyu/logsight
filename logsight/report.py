@@ -14,7 +14,7 @@ PRI_KO = {"now": "즉시", "soon": "이번 주", "later": "여유 있을 때"}
 SRC_KO = {"cloudtrail": "CloudTrail", "vpcflow": "VPC Flow", "waf": "WAF", "alb": "ALB",
           "sshauth": "SSH 로그", "hostfw": "서버 방화벽", "weblog": "웹서버 로그", "guardduty": "GuardDuty"}
 
-CSS = """
+CSS = """.gdnote{margin:0 0 12px;padding:8px 12px;border-left:3px solid var(--accent);background:var(--soft);border-radius:6px}
 :root{--bg:#f4f5f7;--card:#fff;--fg:#16181d;--muted:#5f6670;--faint:#8a919b;--line:#e2e5ea;--soft:#f0f2f5;
 --accent:#2b59c3;--accent-soft:#e8eefb;--high:#c4372b;--high-soft:#fdecea;--medium:#a86a12;--medium-soft:#fdf3e1;
 --low:#2f7d4c;--low-soft:#e7f4ec;--gray:#6b7280;--gray-soft:#eef0f3;--code:#f3f4f6;--shadow:0 1px 2px rgba(16,24,40,.05)}
@@ -264,6 +264,10 @@ def _coverage_card(result: dict) -> str:
         return ""
     idx = result.get("incident_index", [])
     h = ["<h2 id=coverage>로그로 볼 수 있는 범위</h2><div class=card>"]
+    from .explain import guardduty_note
+    gd = guardduty_note(cov)
+    if gd:
+        h.append(f"<div class='small gdnote'>{escape(gd)}</div>")
     periods = _periods(srcs)
     for n, p in enumerate(periods):
         a, b = p["first"], p["last"]

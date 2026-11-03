@@ -18,9 +18,9 @@
     $ aws ec2 create-flow-logs --resource-type VPC --resource-ids vpc-2fe3549e6ca5b7824 --traffic-type ALL --log-destination-type s3 --log-destination arn:aws:s3:::logsight-logs-123456789012-ap-northeast-2
     → 자동으로 켜려면: python -m logsight check --apply VPC_FLOW
 [꺼짐] GUARDDUTY: Amazon GuardDuty - 탐지기 없음
-    왜: AWS가 직접 위협을 탐지한다. 로그를 따로 켜지 않아도 CloudTrail·VPC·DNS를 분석한다.
-    비용: 30일 무료 체험 후 사용량 과금(작은 계정은 월 몇 달러 수준, 추정). 여러 단계를 엮는 Extended Threat Detection은 추가 비용 없음.
-    대안: LogSight는 GuardDuty 결과를 한국어로 풀어 설명하는 용도로 같이 쓸 수 있다(2단계).
+    왜: AWS가 24시간 위협을 탐지해 경보를 준다. 로그를 따로 켜지 않아도 CloudTrail·VPC·DNS를 분석한다. 켜기 전의 일은 보지 않으므로 사고 전에 켜 둬야 한다.
+    비용: 30일 무료 체험 후 사용량 과금(작은 계정은 월 몇 달러 수준, 추정). 그 위에서 여러 단계를 엮는 Extended Threat Detection은 GuardDuty 요금 외 추가 비용 없음.
+    대안: 켜 두기를 권한다. 경보가 울리면 GuardDuty 결과와 이 계정의 웹·서버 로그를 LogSight에 함께 넣어 어떻게 들어왔고 어디를 고칠지 확인한다.
     $ aws guardduty create-detector --enable
     → 자동으로 켜려면: python -m logsight check --apply GUARDDUTY
 [주의] IMDSV2: EC2 메타데이터 IMDSv2 강제 - IMDSv1 허용 인스턴스 1개

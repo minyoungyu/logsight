@@ -5,6 +5,7 @@
 ## 미출시
 
 ### 추가
+- "GuardDuty 다음" 위치: 보고서의 로그 범위 칸에 GuardDuty 결과와 GuardDuty가 읽지 않는 로그(WAF·ALB·웹서버·SSH·서버 방화벽)를 함께 넣었는지 한 문장으로 알린다(`explain.guardduty_note`). `logsight check`의 WAF·ALB·GuardDuty 설명에 "GuardDuty는 이 로그를 읽지 않음", "켜기 전의 일은 보지 않음"을 넣었다. README·발표 자료에 위치와 장기 계획(GuardDuty 결과 하나로 시작하기)을 적었다.
 - AI 사건 재검토(`logsight/triage.py`): 사건마다 공격·정상 활동·위험 설정·판단 불가를 판정해 공격 사건을 위로 올리고, 같은 공격으로 보이는 사건을 묶는다. 근거 ref와 사건 ID는 코드로 다시 검사한다. API 키가 없으면 규칙 순서 그대로다.
 - 클라우드 공방전 통합로그 변환·가명 처리 스크립트(`scripts/ctf/convert_gongbang.py`)와 블루팀 보고서 기반 채점 스크립트(`scripts/ctf/eval_gongbang.py`). 결과는 `docs/공방전_로그_측정.md`.
 - API 객체 번호 탐색 규칙(`WEB_OBJECT_ENUM`): ALB·API Gateway 로그에서 같은 IP가 같은 API의 서로 다른 객체 번호 5개 이상에 10분 안에 403/404를 받으면 IDOR 탐색으로 표시한다.
