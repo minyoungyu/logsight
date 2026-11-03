@@ -168,7 +168,7 @@ class PipelineAndReportTests(unittest.TestCase):
         self.assertEqual(base["incident_index"][0]["verdict"], "attack")
         out = run(evs, env, use_ai=False)
         self.assertEqual(out["n_known"], 4)
-        self.assertEqual(out["incident_index"][0]["verdict"], "benign_activity")
+        self.assertEqual(out["incident_index"][0]["verdict"], "risky_not_attack")  # 운영자라도 로그 중지는 위험한 설정 변경
         self.assertIn("정상 작업 목록 일치 1건", render(out))  # 사건에는 규칙에 걸린 이벤트만 들어간다
 
 

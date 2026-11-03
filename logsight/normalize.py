@@ -153,6 +153,7 @@ def parse_vpcflow(text: str, name: str = "vpcflow") -> list[Event]:
                 outcome="accept" if f[12] == "ACCEPT" else "reject",
                 raw_ref=f"{name}:{i+1}",
                 extra={"interface": f[2], "protocol": _PROTO.get(f[7], f[7]),
+                       "src_port": int(f[5]) if f[5].isdigit() else None,
                        "packets": f[8], "bytes": f[9], "raw": line[:300]},
             ))
         except (ValueError, IndexError, OSError):
@@ -243,6 +244,12 @@ _SSH = re.compile(
     r'(?P<result>Failed|Accepted)\s+(?:password|publickey)\s+for\s+(?:invalid user\s+)?'
     r'(?P<user>\S+)\s+from\s+(?P<ip>[\d.a-fA-F:]+)\s+port\s+(?P<port>\d+)'
 )
+# 키 인증만 허용한 서버는 "Failed password" 없이 이 줄만 남는다(없는 사용자 이름으로 접속 시도)
+_SSH_INVALID = re.compile(
+    r'^(?P<mon>\w{3})\s+(?P<day>\d+)\s+(?P<time>[\d:]+)\s+(?P<host>\S+)\s+sshd\[(?P<pid>\d+)\]:\s+'
+    r'Invalid user\s+(?P<user>\S*)\s+from\s+(?P<ip>[\d.a-fA-F:]+)(?:\s+port\s+(?P<port>\d+))?'
+)
+_SSH_PID = re.compile(r'sshd\[(\d+)\]:\s+Failed\s')
 _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
@@ -258,8 +265,14 @@ def _host_ip(host: str) -> str | None:
 
 def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> list[Event]:
     events = []
-    for i, line in enumerate(text.splitlines()):
+    lines = text.splitlines()
+    failed_pids = {m.group(1) for m in map(_SSH_PID.search, lines) if m}
+    for i, line in enumerate(lines):
         m = _SSH.search(line)
+        if not m:
+            m = _SSH_INVALID.search(line)
+            if m and m["pid"] in failed_pids:
+                continue  # 같은 접속의 "Failed password" 줄로 이미 센다
         if not m or m["mon"] not in _MONTHS:
             continue
         hh, mm, ss = (int(x) for x in m["time"].split(":"))
@@ -267,7 +280,7 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
         events.append(Event(
             ts=ts, source="sshauth", src_ip=m["ip"], actor=m["user"], dst_port=22,
             dst_ip=_host_ip(m["host"]), action="ssh_login",
-            outcome="success" if m["result"] == "Accepted" else "failure",
+            outcome="success" if "result" in m.groupdict() and m["result"] == "Accepted" else "failure",
             raw_ref=f"{name}:{i+1}",
             extra={"raw": line.strip()[:300], "host": m["host"]},
         ))
@@ -446,8 +459,19 @@ def _iter_gd(text: str):
     for it in items or []:
         if isinstance(it, dict) and isinstance(it.get("detail"), dict):
             it = it["detail"]  # EventBridge 형식
+            if "type" in it and "Type" not in it:
+                it = _pascal(it)  # EventBridge는 키가 camelCase(type, service, resource)
         if isinstance(it, dict) and it.get("Type"):
             yield it
+
+
+def _pascal(o):
+    """EventBridge GuardDuty 이벤트의 camelCase 키를 API 형식(PascalCase)으로."""
+    if isinstance(o, dict):
+        return {(k[:1].upper() + k[1:] if isinstance(k, str) else k): _pascal(v) for k, v in o.items()}
+    if isinstance(o, list):
+        return [_pascal(v) for v in o]
+    return o
 
 
 def parse_guardduty(text: str, name: str = "guardduty") -> list[Event]:
@@ -484,6 +508,24 @@ def parse_guardduty(text: str, name: str = "guardduty") -> list[Event]:
 _INST = re.compile(r"assumed-role/[^/]+/(i-[0-9a-f]+)")
 
 
+S3_PUBLIC_CALLS = {"s3:PutBucketAcl", "s3:PutObjectAcl", "s3:PutBucketPolicy",
+                   "s3:DeleteBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock"}
+_S3_ALL = re.compile(r"acs\.amazonaws\.com/groups/global/(AllUsers|AuthenticatedUsers)|public-read")
+_S3_STAR = re.compile(r'"Principal"\s*:\s*(\{\s*"AWS"\s*:\s*\[?\s*)?"\*"')
+
+
+def s3_public(action: str, params) -> bool:
+    """버킷·객체를 모든 사용자에게 여는 호출인지(ACL의 AllUsers 그룹, public-read, 정책의 Principal "*", 공개 차단 해제)."""
+    if action == "s3:DeleteBucketPublicAccessBlock":
+        return True
+    txt = params if isinstance(params, str) else json.dumps(params, ensure_ascii=False, default=str)
+    if action == "s3:PutBucketPublicAccessBlock":
+        return re.search(r'"(BlockPublicAcls|RestrictPublicBuckets|BlockPublicPolicy)"\s*:\s*false', txt) is not None
+    if action == "s3:PutBucketPolicy":
+        return bool(_S3_STAR.search(txt.replace('\\"', '"')))
+    return bool(_S3_ALL.search(txt))
+
+
 def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
     try:
         ts = _iso(r["eventTime"])
@@ -506,6 +548,9 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
         # 근거 확인에 필요한 대표 파라미터만 남긴다(전체는 원본에 있음)
         extra["params"] = json.dumps({k: params[k] for k in list(params)[:8]},
                                      ensure_ascii=False, default=str)[:400]
+    act = f'{str(r.get("eventSource", "")).split(".")[0]}:{r.get("eventName", "")}'
+    if act in S3_PUBLIC_CALLS and s3_public(act, params or {}):
+        extra["s3_public"] = True  # params는 잘려 저장되므로 전체를 보고 여기서 판단
     src = r.get("sourceIPAddress")
     actor = arn or ident.get("type") or ident.get("invokedBy")
     key = ident.get("accessKeyId")

@@ -150,6 +150,8 @@ MIT 라이선스는 이 저장소의 코드에만 적용됩니다. 성능 측정
 
 This project utilizes the AIT Log Data Set V2.0 (AIT-LDSv2) provided by M. Landauer et al. (AIT Austrian Institute of Technology), licensed under CC BY-NC-SA 4.0 (https://doi.org/10.5281/zenodo.5789064), for non-commercial evaluation only. 인용과 측정 결과는 `docs/공개데이터셋_독립측정.md`를 보세요.
 
+실제 AWS 계정 로그 측정에는 Splunk BOTSv3(https://github.com/splunk/botsv3, CC0)를 썼습니다. 결과는 `docs/BOTSv3_측정.md`를 보세요.
+
 ## CTF 로그로 탐지 성능 재기
 
 동아리 CTF 등 허가된 환경에서 나온 로그로 판정 성능을 재는 방법은 `docs/CTF_로그_수집_가이드.md`를 보세요.
