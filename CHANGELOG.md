@@ -5,6 +5,8 @@
 ## 미출시
 
 ### 추가
+- 실제 AWS 로그 측정(Splunk BOTSv3, CC0): Splunk 없이 색인에서 원본 로그를 꺼내는 `scripts/public/botsv3_extract.py`와 결과 `docs/BOTSv3_측정.md`.
+- S3 버킷 공개 규칙(`CT_S3_PUBLIC`): PutBucketAcl·PutObjectAcl·PutBucketPolicy 등으로 버킷을 인터넷 전체(AllUsers, `*`)에 연 호출을 잡는다.
 - AI 사건 재검토(`logsight/triage.py`): 사건마다 공격·정상 활동·위험 설정·판단 불가를 판정해 공격 사건을 위로 올리고, 같은 공격으로 보이는 사건을 묶는다. 근거 ref와 사건 ID는 코드로 다시 검사한다. API 키가 없으면 규칙 순서 그대로다.
 - 클라우드 공방전 통합로그 변환·가명 처리 스크립트(`scripts/ctf/convert_gongbang.py`)와 블루팀 보고서 기반 채점 스크립트(`scripts/ctf/eval_gongbang.py`). 결과는 `docs/공방전_로그_측정.md`.
 - API 객체 번호 탐색 규칙(`WEB_OBJECT_ENUM`): ALB·API Gateway 로그에서 같은 IP가 같은 API의 서로 다른 객체 번호 5개 이상에 10분 안에 403/404를 받으면 IDOR 탐색으로 표시한다.
@@ -17,6 +19,9 @@
 - AI 재검토에 로그 범위 요약(`coverage`)을 함께 보낸다. 로그 종류·기간, 빠진 로그 종류, S3 객체 호출 수, 탈취 의심 키의 전체 호출 내역이 들어 있어 '로그에 없음'과 '일어나지 않음'을 구별하게 한다.
 
 ### 변경
+- EventBridge로 받은 GuardDuty 결과(camelCase 키)도 읽는다. auth.log의 `Invalid user` 줄을 SSH 실패로 센다.
+- VPC 흐름에서 서버 응답(서비스 포트 → 임시 포트)은 포트 스캔으로 세지 않는다.
+- 규칙 판정: 인터넷 스캐너가 관리 포트를 두드린 것만 있는 사건은 '위험 설정'으로, 정상 작업 목록 계정의 위험한 설정 변경은 '정상' 대신 '위험 설정'으로, 목록 계정이라도 키 유출 징후(권한 거부 폭주·여러 IP)가 있으면 '판단 불가'로 둔다. 공방전 채점 점수는 그대로다.
 - 규칙 판정의 사건 연결에서 "같은 서버를 노림"을 뺐다. 출발지가 다른 공격자를 같은 공격으로 묶는 경우가 있었다(통합 샘플 INC-001과 INC-002). 공방전 채점 점수는 그대로다.
 - 결과 JSON의 `triage`는 키가 없어도 규칙 판정(`mode: "rules"`)을 담는다. 사건에 `verdict`, `verdict_by`가 붙고, `ai_verdict`는 Claude 판정일 때만 붙는다. 규칙 판정은 `rule_triage`에 항상 따로 남는다.
 - 규칙 기반 보고서의 `report`에 `verdict`, `verdict_reason`이 붙는다(회귀 기준값 갱신).

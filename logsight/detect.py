@@ -9,13 +9,14 @@ MITRE ATT&CK(Enterprise, Cloud) 기법 ID에 대응한다. 이 표시가 있는 
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+import json
 import re
 from dataclasses import dataclass
 from functools import lru_cache
 from datetime import timedelta
 from urllib.parse import unquote_plus, urlsplit
 
-from .normalize import Event
+from .normalize import Event, S3_PUBLIC_CALLS
 
 # 규칙 ID -> (ATT&CK 기법, 전술(단계), 한국어 이름, 기본 심각도)
 RULES: dict[str, tuple[str, str, str, str]] = {
@@ -23,6 +24,7 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "CT_ROOT_USAGE":      ("T1078.004", "initial-access", "루트 계정 사용", "high"),
     "CT_IAM_PERSISTENCE": ("T1098", "persistence", "IAM 사용자·키·권한 생성/변경", "high"),
     "CT_SG_OPENED":       ("T1562.007", "defense-evasion", "보안그룹을 0.0.0.0/0에 개방", "high"),
+    "CT_S3_PUBLIC":       ("T1537", "exfiltration", "S3 버킷을 인터넷 전체에 공개(ACL·정책)", "high"),
     "CT_SNAPSHOT_SHARE":  ("T1537", "exfiltration", "스냅샷·AMI를 외부 계정과 공유", "high"),
     "CT_INSTANCE_CRED_MULTI_IP": ("T1552.005", "credential-access", "인스턴스 역할 자격증명이 여러 IP에서 사용", "high"),
     "CT_INSTANCE_CRED_OUTSIDE":  ("T1552.005", "credential-access", "인스턴스 역할 자격증명이 인스턴스 밖에서 사용", "high"),
@@ -102,6 +104,7 @@ DISCOVERY = {"sts:GetCallerIdentity", "s3:ListBuckets", "iam:ListUsers", "iam:Li
 ADMIN_PORTS = {22, 3389}
 _SQLI = re.compile(r"(?i)'\s*(or|and|union|select|;|--|#)|union\s+(all\s+)?select|"
                    r"sleep\s*\(|benchmark\s*\(|information_schema|'\s*$")
+
 
 
 def _ok_fail(evs) -> str:
@@ -213,6 +216,12 @@ def _ip_in(ip: str, cidrs: list[str]) -> bool:
     return False
 
 
+def _is_reply(e: Event) -> bool:
+    """흐름 기록이 서버 응답 방향으로 보이면 True(출발 포트가 낮고 대상 포트가 임시 포트 범위)."""
+    sp, dp = e.extra.get("src_port"), e.dst_port
+    return sp is not None and dp is not None and dp >= 32768 and sp < dp
+
+
 def run_detections(events: list[Event], env: dict | None = None) -> list[Finding]:
     """모든 규칙을 돌려 Finding 목록을 만들고, 해당 이벤트에 규칙 ID를 붙인다."""
     env = env or {}
@@ -242,6 +251,8 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             singles[("CT_IAM_PERSISTENCE", e.actor or "")].append(e)
         if a == "ec2:AuthorizeSecurityGroupIngress" and "0.0.0.0/0" in str(params):
             singles[("CT_SG_OPENED", e.actor or "")].append(e)
+        if a in S3_PUBLIC_CALLS and e.extra.get("s3_public"):
+            singles[("CT_S3_PUBLIC", e.actor or "")].append(e)
         if a in ("ec2:ModifySnapshotAttribute", "ec2:ModifyImageAttribute") and (
                 "createVolumePermission" in str(params) or "launchPermission" in str(params)):
             singles[("CT_SNAPSHOT_SHARE", e.actor or "")].append(e)
@@ -302,10 +313,14 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         if not _is_private(e.src_ip):
             by_vsrc[e.src_ip].append(e)
     for ip, evs in by_vsrc.items():
-        for seg in _bursts(evs, timedelta(minutes=5), 10, key=lambda e: e.dst_port):
+        # 서버가 서비스 포트(443·8088 등)에서 상대의 임시 포트(32768 이상)로 보내는 응답은 스캔이 아니다.
+        # 응답을 빼지 않으면 외부 서버와 오래 통신한 기록이 '포트 스캔'으로 잡힌다(BOTSv3 측정에서 확인)
+        scan = [e for e in evs if not _is_reply(e)]
+        for seg in _bursts(scan, timedelta(minutes=5), 10, key=lambda e: e.dst_port):
             findings.append(Finding("VPC_PORT_SCAN", seg,
                                     f"5분 안에 포트 {len({e.dst_port for e in seg})}개, "
                                     f"거부 {sum(e.outcome == 'reject' for e in seg)}건", ip))
+    for ip, evs in by_vsrc.items():
         adm = [e for e in evs if e.dst_port in ADMIN_PORTS and e.outcome == "accept"
                and not (trusted and _ip_in(ip, trusted))]
         if adm:

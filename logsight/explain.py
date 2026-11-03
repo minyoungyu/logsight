@@ -22,8 +22,14 @@ KST = timezone(timedelta(hours=9))
 
 # 공격 증거 없이 "위험한 사용"만 뜻하는 규칙
 HYGIENE_RULES = {"CT_ROOT_USAGE", "CT_CONSOLE_NO_MFA"}
+# 공격 행동이 아니라 "열려 있음"을 보여 주는 규칙(인터넷 스캐너가 열린 관리 포트에 접속)
+EXPOSURE_RULES = {"VPC_REMOTE_ADMIN_EXPOSED", "GD_FINDING"}
+# 정상 작업 목록의 계정이 했어도 위험한 설정 변경
+RISKY_CHANGE_RULES = {"CT_SG_OPENED", "CT_S3_PUBLIC", "CT_SNAPSHOT_SHARE", "CT_LOGGING_TAMPER"}
 # 자격증명 오용 규칙
 CRED_RULES = {"CT_INSTANCE_CRED_MULTI_IP", "CT_INSTANCE_CRED_OUTSIDE", "CT_UNTRUSTED_IP"}
+# 정상 작업 목록 계정이라도 키 유출 때 흔한 모습. 이름만 보고 정상으로 넘기지 않는다(BOTSv3 측정에서 확인)
+KEY_MISUSE_RULES = {"CT_ACCESS_DENIED_BURST", "CT_INSTANCE_CRED_MULTI_IP", "CT_INSTANCE_CRED_OUTSIDE"}
 # 신원 확인만 하는 호출(무해). 이것만 있으면 규칙으로는 공격이라 단정하지 않는다
 IDENTITY_ONLY = {"sts:GetCallerIdentity", "GetCallerIdentity"}
 
@@ -188,6 +194,17 @@ def verdict_for(inc: dict) -> dict:
     n_known = inc.get("n_known", len(known))
     labels = inc.get("known_labels") or sorted({e["known"] for e in known})
     out = {"id": inc["id"], "evidence": refs}
+    if n_all and n_known == n_all and rules & KEY_MISUSE_RULES:
+        ips = sorted({e.get("src_ip") for e in evs if e.get("src_ip")})[:3]
+        return out | {"verdict": "unclear", "confidence": "low",
+                      "reason": f"정상 작업 목록({', '.join(labels)})의 계정이지만 권한 거부가 몰리거나 한 키가 여러 곳에서 "
+                                f"쓰이는 등 키가 유출됐을 때 흔한 모습입니다. 접속 IP({', '.join(ips) or '없음'})가 "
+                                "우리 것인지, 그 사람이 실제로 한 작업인지 확인하세요."}
+    if n_all and n_known == n_all and rules & RISKY_CHANGE_RULES:
+        what = ", ".join(sorted({f["title"] for f in inc["findings"] if f["rule"] in RISKY_CHANGE_RULES}))
+        return out | {"verdict": "risky_not_attack", "confidence": "medium",
+                      "reason": f"정상 작업 목록({', '.join(labels)})의 계정이 했지만 위험한 설정 변경입니다({what}). "
+                                "의도한 변경인지 확인하고, 아니라면 되돌리세요."}
     if n_all and n_known == n_all:
         return out | {"verdict": "benign_activity", "confidence": "high",
                       "reason": f"이벤트 {n_all}건이 모두 설정의 정상 작업 목록({', '.join(labels)})과 일치합니다. "
@@ -197,6 +214,12 @@ def verdict_for(inc: dict) -> dict:
         return out | {"verdict": "risky_not_attack", "confidence": "medium",
                       "reason": f"루트·MFA 없는 로그인처럼 위험한 사용({ok}건 성공)만 있고, 함께 나타난 공격 행동은 "
                                 "없습니다. 누가 왜 썼는지 확인하고 일상 작업에서는 쓰지 않게 바꾸세요."}
+    if rules and rules <= EXPOSURE_RULES and all(
+            e.get("source") != "guardduty" or "PortProbe" in str(e.get("action")) for e in evs):
+        return out | {"verdict": "risky_not_attack", "confidence": "medium",
+                      "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 "
+                                "보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 "
+                                "열어 둔 설정을 닫으세요."}
     if rules and rules <= CRED_RULES:
         acts = {e.get("action") for e in evs}
         if acts and acts <= IDENTITY_ONLY:
@@ -331,6 +354,7 @@ def describe_finding(f: dict, inc: dict) -> str:
         "CT_DISCOVERY_BURST": f"{who}에서 계정·자원 목록을 짧은 시간에 {n}번 조회했습니다({_acts(evs)}). 공격 전 정찰일 수도, 관리 도구의 점검일 수도 있습니다.",
         "CT_S3_BULK_READ": f"{who}에서 S3 파일을 짧은 시간에 {n}건 읽었습니다. 데이터를 가져가는 단계일 수 있습니다.",
         "CT_SG_OPENED": f"{who}에서 보안그룹을 인터넷 전체(0.0.0.0/0)에 열었습니다.",
+        "CT_S3_PUBLIC": f"{who}에서 S3 버킷을 누구나 읽거나 쓸 수 있게 공개했습니다.",
         "CT_SNAPSHOT_SHARE": f"{who}에서 디스크 스냅샷·이미지를 다른 계정과 공유했습니다. 데이터 반출 경로가 될 수 있습니다.",
         "CT_RUN_INSTANCES_BURST": f"인스턴스를 짧은 시간에 {n}대 만들었습니다(코인 채굴 등 자원 탈취 의심).",
         "VPC_PORT_SCAN": f"{who}에서 서버 포트 {len({e.get('dst_port') for e in evs})}개에 접속을 시도했습니다(포트 스캔). "
