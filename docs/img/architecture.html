@@ -63,7 +63,7 @@ h2{font-size:14px;margin:0 0 8px;color:#3a3a40;letter-spacing:.02em}
 <div class="pipe">
  <div class="p in"><div class="n">1</div><b>형식 판별 · 정규화</b><span>로그 8종 + GuardDuty 결과를 공통 형식으로: 시각(UTC), 출발지·대상, 주체, 결과, 근거 위치(파일:줄)</span><code>normalize.py</code></div>
  <div class="p in"><div class="n">2</div><b>서버 연결 · 정상 작업 표시</b><span>설정 스냅샷으로 IP→서버 이름. 운영자·배포 계정(known_activity)과 맞는 이벤트에 표시만 함(지우지 않음)</span><code>pipeline.enrich · explain.mark_known</code></div>
- <div class="p"><div class="n">3</div><b>탐지 규칙 50종</b><span>AWS·SSH 24 + 웹서버 로그·파일 26, ATT&amp;CK 대응. 규칙마다 사각지대·오탐·검증 예시가 있음</span><code>detect.py · web/webdetect.py</code></div>
+ <div class="p"><div class="n">3</div><b>탐지 규칙 50종</b><span>analyze는 AWS·SSH·기본 웹 24종, 웹서버 정밀 분석·파일 26종은 scan에서 따로. ATT&amp;CK 대응, 규칙마다 사각지대·오탐·검증 예시</span><code>detect.py (analyze) · web/ (scan)</code></div>
  <div class="p rowend"><div class="n">4</div><b>사건으로 묶기</b><span>같은 IP·서버·IAM 주체·액세스 키로 30분 안의 탐지를 연결하고, 같은 유형 반복은 하나로 접음</span><code>correlate.py</code></div>
  <div class="turn">↓ 4번 다음은 아래 줄 왼쪽 5번으로 이어짐</div>
  <div class="p"><div class="n">5</div><b>사건 판정(규칙, 항상)</b><span>명시적 규칙으로 판정하고 이유를 붙임</span><div class="verd"><i class="v1">공격</i><i class="v2">위험 설정</i><i class="v3">판단 불가</i><i class="v4">정상 활동</i></div><code>explain.rule_triage</code></div>
