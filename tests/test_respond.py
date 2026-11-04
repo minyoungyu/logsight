@@ -75,7 +75,7 @@ class Classify(unittest.TestCase):
         far = rec("CreateUser", who=ALICE, ip="203.0.113.5", mfa=True, req={"userName": "x2"})
         p = self.plan([ok, no_mfa, far])
         self.assertEqual(sorted(a["id"] for a in p["actions"]), ["x1", "x2"])
-        self.assertIn("ci-bot", [i["id"] for i in json.loads(Path(self.cfg.allowlist).read_text())["items"]])
+        self.assertIn("ci-bot", [i["id"] for i in json.loads(Path(self.cfg.allowlist).read_text(encoding="utf-8"))["items"]])
 
     def test_deploy_role_is_allowlisted(self):
         p = self.plan([rec("CreateRole", who=DEPLOY, assumed=True, req={"roleName": "new-svc"})])
@@ -113,7 +113,7 @@ class Classify(unittest.TestCase):
         rs.prepare(rs.Responder(self.cfg), {"id": "d"}, recs, root / "d", now=t0)
         r = rs.tick(self.cfg, root, now=t0 + timedelta(minutes=6))[0]
         self.assertEqual((r["status"], r["actions"][0]["outcome"]["result"]), ("dry-run", "would-do"))
-        self.assertEqual(json.loads((root / "a" / "response.json").read_text())["status"], "acknowledged")
+        self.assertEqual(json.loads((root / "a" / "response.json").read_text(encoding="utf-8"))["status"], "acknowledged")
 
 
 @unittest.skipIf(boto3 is None, "moto 없음")
@@ -176,7 +176,7 @@ class Enforce(unittest.TestCase):
         self.assertEqual(key_status("app", base_key), "Active")  # 기준선 키는 그대로
         self.assertIn(deny, [p["PolicyArn"] for p in iam.list_attached_user_policies(UserName="evil")["AttachedPolicies"]])
         self.assertEqual(ports(), [443])
-        self.assertIn("update-access-key", (root / "x" / "undo.sh").read_text())
+        self.assertIn("update-access-key", (root / "x" / "undo.sh").read_text(encoding="utf-8"))
 
         rs.undo(root / "x", iam=iam, ec2=ec2)
         self.assertEqual(key_status("evil", evil_key), "Active")
