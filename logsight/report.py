@@ -490,7 +490,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
          f"<title>{escape(title)}</title><style>{CSS}{GRAPH_CSS}</style>"]
     pill = ("<span class='pill ai'>Claude 사용</span>" if _uses_ai(mode)
             else "<span class='pill rules'>AI 사용 안 함</span>")
-    h.append(f"<header class=top><div class=brand>LogSight</div><h1>{escape(title)}</h1>"
+    h.append(f"<header class=top><div class=brand>LogSight · AWS 침해사고 초동 분석</div><h1>{escape(title)}</h1>"
              f"<div class=metaline>{pill}<span>생성 {escape(result['generated_at'])}</span>"
              f"<span>원본 로그 {len(result['files'])}개 파일</span><span>처리 {result['timing']['total_s']}초</span></div></header>")
 
