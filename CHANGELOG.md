@@ -11,6 +11,9 @@
 - 통지(`logsight/notify.py`, `--notify notify.json`, `logsight notify-test`): 이메일(SMTP·SES SMTP, 정보성 고지와 마스킹된 보고서 첨부)·디스코드·슬랙·일반 웹훅(HMAC 서명)을 설정으로 골라 쓴다. 채널마다 기준 등급, 주소·비밀번호는 환경변수, 실패해도 분석은 계속, 디스코드·슬랙 전체 호출(@everyone, <!channel>) 차단. 예시 `deploy/notify.example.json`, 설명 `docs/통지.md`.
 - 자동 격리(`logsight/respond.py`, `logsight respond`, `watch --respond`): 높음 경보 뒤 5분 안에 확인이 없으면 기준선 이후 외부에서 만든 액세스 키(비활성)·IAM 사용자·역할(AWSDenyAll 부착)·보안그룹 규칙(닫기)만 격리한다. 허용 목록은 CloudTrail 생성 기록(배포 주체, 또는 관리자+관리 IP+MFA)으로 자동 갱신. 기본은 시험 모드(기록만), 사건당·하루 한도, 끄는 스위치, 되돌리기(`respond undo`, `undo.sh`). 실행 역할 템플릿 `deploy/aws/logsight-responder.yaml`, 설명 `docs/자동_격리.md`.
 - 수집 보호: 계정 밖 Object Lock 보관 버킷(`deploy/aws/logsight-log-archive.yaml`), 감시 대상 계정 트레일·Flow Logs·서버 쓰기 전용 정책(`deploy/aws/logsight-source-logging.yaml`), 로그 끄기 금지 SCP 예시, 서버 로그 즉시 전송 Fluent Bit 설정(`deploy/host/`), 생존 신호가 끊기면 경보(`logsight heartbeat`, `watch --heartbeat`). 설명 `docs/수집_보호.md`.
+- 처음 보는 데이터 측정: 규칙을 고정(20e4562)하고 Splunk attack_data의 AWS 표본 52개로 한 번 쟀다(맞게 탐지 16개). `scripts/public/eval_splunk_attack_data.py`, 결과 `docs/처음보는데이터_측정.md`.
+- 규칙 명세(`logsight/rulespec.py` → `docs/규칙_명세.md`): 규칙 50개마다 조건·사각지대·오탐·먼저 할 일. 모든 규칙의 양성·음성 검증 예(`tests/test_rule_validation.py`)와 명세 누락·문서 갱신 검사.
+- 사용자 평가 설계(`docs/사용자평가/`)와 집계 스크립트(`scripts/study_score.py`), 고객 인터뷰 가이드(`docs/고객검증/`).
 - 실제 AWS 로그 측정(Splunk BOTSv3, CC0): Splunk 없이 색인에서 원본 로그를 꺼내는 `scripts/public/botsv3_extract.py`와 결과 `docs/BOTSv3_측정.md`.
 - S3 버킷 공개 규칙(`CT_S3_PUBLIC`): PutBucketAcl·PutObjectAcl·PutBucketPolicy 등으로 버킷을 인터넷 전체(AllUsers, `*`)에 연 호출을 잡는다.
 - "GuardDuty 다음" 위치: 보고서의 로그 범위 칸에 GuardDuty 결과와 GuardDuty가 읽지 않는 로그(WAF·ALB·웹서버·SSH·서버 방화벽)를 함께 넣었는지 한 문장으로 알린다(`explain.guardduty_note`). `logsight check`의 WAF·ALB·GuardDuty 설명에 "GuardDuty는 이 로그를 읽지 않음", "켜기 전의 일은 보지 않음"을 넣었다. README·발표 자료에 위치와 장기 계획(GuardDuty 결과 하나로 시작하기)을 적었다.

@@ -1,0 +1,1775 @@
+{
+ "engine_commit": "20e4562",
+ "source": "splunk/security_content detections/cloud aws_*.yml",
+ "n_detections": 52,
+ "rows": [
+  {
+   "detection": "AWS AMI Attribute Modification for Exfiltration",
+   "file": "aws_ami_attribute_modification_for_exfiltration.yml",
+   "mitre": [
+    "T1537"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1537/aws_ami_shared_public/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ModifyImageAttribute"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_SNAPSHOT_SHARE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "AMI를 다른 계정에 공유 → CT_SNAPSHOT_SHARE"
+  },
+  {
+   "detection": "AWS Bedrock Delete GuardRails",
+   "file": "aws_bedrock_delete_guardrails.yml",
+   "mitre": [
+    "T1685.002"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.008/aws_bedrock_delete_guardrails/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteGuardrail"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "Bedrock 보호 설정 삭제 규칙 없음"
+  },
+  {
+   "detection": "AWS Bedrock Delete Knowledge Base",
+   "file": "aws_bedrock_delete_knowledge_base.yml",
+   "mitre": [
+    "T1485"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1485/aws_delete_knowledge_base/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteKnowledgeBase"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "Bedrock 자원 삭제 규칙 없음"
+  },
+  {
+   "detection": "AWS Bedrock Delete Model Invocation Logging Configuration",
+   "file": "aws_bedrock_delete_model_invocation_logging_configuration.yml",
+   "mitre": [
+    "T1685.002"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.008/aws_bedrock_delete_model_invocation_logging/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteModelInvocationLoggingConfiguration"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "Bedrock 로그 끄기를 로그 변조로 보지 않음"
+  },
+  {
+   "detection": "AWS Bedrock High Number List Foundation Model Failures",
+   "file": "aws_bedrock_high_number_list_foundation_model_failures.yml",
+   "mitre": [
+    "T1580"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1580/aws_bedrock_list_foundation_model_failures/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ListFoundationModels"
+   ],
+   "n_target_events": 12,
+   "target_rules": [
+    "CT_ACCESS_DENIED_BURST"
+   ],
+   "n_events": 12,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ACCESS_DENIED_BURST"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "권한 거부 폭주 → CT_ACCESS_DENIED_BURST"
+  },
+  {
+   "detection": "AWS Bedrock Invoke Model Access Denied",
+   "file": "aws_bedrock_invoke_model_access_denied.yml",
+   "mitre": [
+    "T1078",
+    "T1550"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1087.004/aws_invoke_model_access_denied/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "InvokeModel"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "거부 1건, 기준(폭주) 미달"
+  },
+  {
+   "detection": "AWS Concurrent Sessions From Different Ips",
+   "file": "aws_concurrent_sessions_from_different_ips.yml",
+   "mitre": [
+    "T1185"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1185/aws_concurrent_sessions_from_different_ips/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DescribeEventAggregates"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "루트 사용으로만 걸림. 같은 세션 여러 IP 규칙 없음"
+  },
+  {
+   "detection": "AWS Console Login Failed During MFA Challenge",
+   "file": "aws_console_login_failed_during_mfa_challenge.yml",
+   "mitre": [
+    "T1586.003",
+    "T1621"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/aws_failed_mfa/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ConsoleLogin"
+   ],
+   "n_target_events": 14,
+   "target_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 14,
+   "rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "루트 사용으로만 걸림. MFA 실패 규칙 없음"
+  },
+  {
+   "detection": "AWS Create Policy Version to allow all resources",
+   "file": "aws_create_policy_version_to_allow_all_resources.yml",
+   "mitre": [
+    "T1078.004"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/aws_create_policy_version/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CreatePolicyVersion"
+   ],
+   "n_target_events": 3,
+   "target_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "n_events": 3,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "권한 정책 변경 → CT_IAM_PERSISTENCE"
+  },
+  {
+   "detection": "AWS CreateAccessKey",
+   "file": "aws_createaccesskey.yml",
+   "mitre": [
+    "T1136.003"
+   ],
+   "type": "Hunting",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/aws_createaccesskey/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CreateAccessKey"
+   ],
+   "n_target_events": 67,
+   "target_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "n_events": 75,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-005",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-004",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-010",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-011",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-014",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-015",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-018",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-019",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-024",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-017",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-023",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-021",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "키 생성 → CT_IAM_PERSISTENCE"
+  },
+  {
+   "detection": "AWS CreateLoginProfile",
+   "file": "aws_createloginprofile.yml",
+   "mitre": [
+    "T1136.003"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/aws_createloginprofile/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ConsoleLogin",
+    "CreateLoginProfile"
+   ],
+   "n_target_events": 37,
+   "target_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_IAM_PERSISTENCE"
+   ],
+   "n_events": 37,
+   "rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_IAM_PERSISTENCE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_CONSOLE_NO_MFA",
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-003",
+     "rules": [
+      "CT_CONSOLE_NO_MFA"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "low"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "콘솔 비밀번호 생성 → CT_IAM_PERSISTENCE"
+  },
+  {
+   "detection": "AWS Defense Evasion Delete Cloudtrail",
+   "file": "aws_defense_evasion_delete_cloudtrail.yml",
+   "mitre": [
+    "T1685.002"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.008/stop_delete_cloudtrail/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteTrail"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "n_events": 3,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_LOGGING_TAMPER"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_LOGGING_TAMPER"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_LOGGING_TAMPER"
+  },
+  {
+   "detection": "AWS Defense Evasion Impair Security Services",
+   "file": "aws_defense_evasion_impair_security_services.yml",
+   "mitre": [
+    "T1685.002"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.008/aws_delete_security_services/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteDetector",
+    "DeleteIPSet",
+    "DeleteLoggingConfiguration",
+    "DeleteRule",
+    "DeleteRuleGroup",
+    "DeleteWebACL"
+   ],
+   "n_target_events": 7,
+   "target_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "n_events": 8,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_LOGGING_TAMPER"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "GuardDuty 탐지기 삭제 → CT_LOGGING_TAMPER"
+  },
+  {
+   "detection": "AWS Defense Evasion PutBucketLifecycle",
+   "file": "aws_defense_evasion_putbucketlifecycle.yml",
+   "mitre": [
+    "T1485.001",
+    "T1685.002"
+   ],
+   "type": "Hunting",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.008/put_bucketlifecycle/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "PutBucketLifecycle"
+   ],
+   "n_target_events": 5,
+   "target_rules": [],
+   "n_events": 5,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "버킷 수명 주기로 로그 지우기 규칙 없음"
+  },
+  {
+   "detection": "AWS Defense Evasion Stop Logging Cloudtrail",
+   "file": "aws_defense_evasion_stop_logging_cloudtrail.yml",
+   "mitre": [
+    "T1685.002"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.008/stop_delete_cloudtrail/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "StopLogging"
+   ],
+   "n_target_events": 1,
+   "target_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "n_events": 3,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_LOGGING_TAMPER"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_LOGGING_TAMPER"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_LOGGING_TAMPER"
+  },
+  {
+   "detection": "AWS Detect Users creating keys with encrypt policy without MFA",
+   "file": "aws_detect_users_creating_keys_with_encrypt_policy_without_mfa.yml",
+   "mitre": [
+    "T1486"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1486/aws_kms_key/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CreateKey",
+    "PutKeyPolicy"
+   ],
+   "n_target_events": 4,
+   "target_rules": [],
+   "n_events": 674,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "KMS 키로 암호화(랜섬웨어) 규칙 없음"
+  },
+  {
+   "detection": "AWS Detect Users with KMS keys performing encryption S3",
+   "file": "aws_detect_users_with_kms_keys_performing_encryption_s3.yml",
+   "mitre": [
+    "T1486"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1486/s3_file_encryption/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CopyObject"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 2,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "KMS 암호화(랜섬웨어) 규칙 없음"
+  },
+  {
+   "detection": "AWS Disable Bucket Versioning",
+   "file": "aws_disable_bucket_versioning.yml",
+   "mitre": [
+    "T1490"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1490/aws_bucket_version/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "PutBucketVersioning"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 2,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "버킷 버전 관리 끄기 규칙 없음"
+  },
+  {
+   "detection": "AWS EC2 Multiple SSH Public Keys Uploaded by a Single Identity",
+   "file": "aws_ec2_multiple_ssh_public_keys_uploaded_by_a_single_identity.yml",
+   "mitre": [
+    "T1021.004",
+    "T1021.008"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1021.008/aws_ec2_multiple_ssh_public_keys_uploaded/aws_ec2_multiple_ssh_public_keys_uploaded.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "SendSSHPublicKey"
+   ],
+   "n_target_events": 12,
+   "target_rules": [],
+   "n_events": 12,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "EC2 Instance Connect 키 업로드 규칙 없음"
+  },
+  {
+   "detection": "AWS EC2 Snapshot Shared Externally",
+   "file": "aws_ec2_snapshot_shared_externally.yml",
+   "mitre": [
+    "T1537"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1537/aws_snapshot_exfil/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ModifySnapshotAttribute"
+   ],
+   "n_target_events": 8,
+   "target_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "n_events": 9,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_SNAPSHOT_SHARE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-003",
+     "rules": [
+      "CT_SNAPSHOT_SHARE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_SNAPSHOT_SHARE"
+  },
+  {
+   "detection": "AWS EC2 Startup Script Modified on Stopped Instance",
+   "file": "aws_ec2_startup_script_modified_on_stopped_instance.yml",
+   "mitre": [
+    "T1578.005"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1578.005/aws_ec2_startup_script_modification/aws_ec2_startup_script_modification.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ModifyInstanceAttribute",
+    "StopInstances"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 2,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "인스턴스 시작 스크립트(userData) 변경 규칙 없음"
+  },
+  {
+   "detection": "AWS ECR Container Scanning Findings High",
+   "file": "aws_ecr_container_scanning_findings_high.yml",
+   "mitre": [
+    "T1204.003"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1204.003/aws_ecr_image_scanning/aws_ecr_scanning_findings_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DescribeImageScanFindings"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "ECR 이미지 취약점 결과를 읽지 않음"
+  },
+  {
+   "detection": "AWS ECR Container Scanning Findings Low Informational Unknown",
+   "file": "aws_ecr_container_scanning_findings_low_informational_unknown.yml",
+   "mitre": [
+    "T1204.003"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1204.003/aws_ecr_image_scanning/aws_ecr_scanning_findings_events.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "DescribeImageScanFindings"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "ECR 이미지 취약점 결과를 읽지 않음"
+  },
+  {
+   "detection": "AWS ECR Container Scanning Findings Medium",
+   "file": "aws_ecr_container_scanning_findings_medium.yml",
+   "mitre": [
+    "T1204.003"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1204.003/aws_ecr_image_scanning/aws_ecr_scanning_findings_events.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "DescribeImageScanFindings"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 1,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "ECR 이미지 취약점 결과를 읽지 않음"
+  },
+  {
+   "detection": "AWS ECR Container Upload Outside Business Hours",
+   "file": "aws_ecr_container_upload_outside_business_hours.yml",
+   "mitre": [
+    "T1204.003"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1204.003/aws_ecr_container_upload/aws_ecr_container_upload.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "PutImage"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 2,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "ECR 이미지 업로드 규칙 없음"
+  },
+  {
+   "detection": "AWS ECR Container Upload Unknown User",
+   "file": "aws_ecr_container_upload_unknown_user.yml",
+   "mitre": [
+    "T1204.003"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1204.003/aws_ecr_container_upload/aws_ecr_container_upload.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "PutImage"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 2,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "ECR 이미지 업로드 규칙 없음"
+  },
+  {
+   "detection": "AWS Excessive Security Scanning",
+   "file": "aws_excessive_security_scanning.yml",
+   "mitre": [
+    "T1526"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1526/aws_security_scanner/aws_security_scanner.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "Describe",
+    "Get",
+    "List"
+   ],
+   "n_target_events": 0,
+   "target_rules": [],
+   "n_events": 1071,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_DISCOVERY_BURST"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ACCESS_DENIED_BURST",
+      "CT_DISCOVERY_BURST"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "목록 조회 폭주 → CT_DISCOVERY_BURST"
+  },
+  {
+   "detection": "AWS Exfiltration via Anomalous GetObject API Activity",
+   "file": "aws_exfiltration_via_anomalous_getobject_api_activity.yml",
+   "mitre": [
+    "T1119"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1530/aws_exfil_high_no_getobject/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "GetObject"
+   ],
+   "n_target_events": 100,
+   "target_rules": [
+    "CT_S3_BULK_READ"
+   ],
+   "n_events": 100,
+   "rules": [
+    "CT_S3_BULK_READ"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_S3_BULK_READ"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_S3_BULK_READ"
+  },
+  {
+   "detection": "AWS Exfiltration via Batch Service",
+   "file": "aws_exfiltration_via_batch_service.yml",
+   "mitre": [
+    "T1119"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1119/aws_exfil_datasync/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "JobCreated"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 5,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "Batch로 데이터 옮기기 규칙 없음"
+  },
+  {
+   "detection": "AWS Exfiltration via Bucket Replication",
+   "file": "aws_exfiltration_via_bucket_replication.yml",
+   "mitre": [
+    "T1537"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1119/aws_exfil_datasync/cloudtrail.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "PutBucketReplication"
+   ],
+   "n_target_events": 1,
+   "target_rules": [],
+   "n_events": 5,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "버킷 복제 설정 규칙 없음"
+  },
+  {
+   "detection": "AWS Exfiltration via DataSync Task",
+   "file": "aws_exfiltration_via_datasync_task.yml",
+   "mitre": [
+    "T1119"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1119/aws_exfil_datasync/cloudtrail.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "CreateTask"
+   ],
+   "n_target_events": 2,
+   "target_rules": [],
+   "n_events": 5,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "DataSync 작업 규칙 없음"
+  },
+  {
+   "detection": "AWS Exfiltration via EC2 Snapshot",
+   "file": "aws_exfiltration_via_ec2_snapshot.yml",
+   "mitre": [
+    "T1537"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1537/aws_snapshot_exfil/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "CreateSnapshot",
+    "DeleteSnapshot",
+    "DescribeSnapshotAttribute",
+    "ModifySnapshotAttribute"
+   ],
+   "n_target_events": 9,
+   "target_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "n_events": 9,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_SNAPSHOT_SHARE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-003",
+     "rules": [
+      "CT_SNAPSHOT_SHARE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_SNAPSHOT_SHARE"
+  },
+  {
+   "detection": "AWS High Number Of Failed Authentications For User",
+   "file": "aws_high_number_of_failed_authentications_for_user.yml",
+   "mitre": [
+    "T1201"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1110.003/aws_multiple_login_fail_per_user/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ConsoleLogin"
+   ],
+   "n_target_events": 28,
+   "target_rules": [
+    "CT_CONSOLE_NO_MFA"
+   ],
+   "n_events": 28,
+   "rules": [
+    "CT_CONSOLE_NO_MFA"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_CONSOLE_NO_MFA"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "low"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "MFA 없는 로그인으로만 걸림. 콘솔 로그인 연속 실패 규칙 없음"
+  },
+  {
+   "detection": "AWS IAM AccessDenied Discovery Events",
+   "file": "aws_iam_accessdenied_discovery_events.yml",
+   "mitre": [
+    "T1580"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1580/aws_iam_accessdenied_discovery_events/aws_iam_accessdenied_discovery_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [],
+   "n_target_events": 0,
+   "target_rules": [],
+   "n_events": 1150,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_DISCOVERY_BURST"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ACCESS_DENIED_BURST",
+      "CT_DISCOVERY_BURST"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_ACCESS_DENIED_BURST"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_ACCESS_DENIED_BURST"
+  },
+  {
+   "detection": "AWS IAM Assume Role Policy Brute Force",
+   "file": "aws_iam_assume_role_policy_brute_force.yml",
+   "mitre": [
+    "T1580",
+    "T1110"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1580/aws_iam_assume_role_policy_brute_force/aws_iam_assume_role_policy_brute_force.json"
+   ],
+   "duplicate_data": false,
+   "targets": [],
+   "n_target_events": 0,
+   "target_rules": [],
+   "n_events": 10,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "역할 이름 대입(AssumeRole 실패) 규칙 없음"
+  },
+  {
+   "detection": "AWS IAM Delete Policy",
+   "file": "aws_iam_delete_policy.yml",
+   "mitre": [
+    "T1098"
+   ],
+   "type": "Hunting",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098/aws_iam_delete_policy/aws_iam_delete_policy.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeletePolicy"
+   ],
+   "n_target_events": 116,
+   "target_rules": [],
+   "n_events": 116,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "정책 삭제 규칙 없음"
+  },
+  {
+   "detection": "AWS IAM Failure Group Deletion",
+   "file": "aws_iam_failure_group_deletion.yml",
+   "mitre": [
+    "T1098"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098/aws_iam_failure_group_deletion/aws_iam_failure_group_deletion.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteGroup"
+   ],
+   "n_target_events": 50,
+   "target_rules": [],
+   "n_events": 50,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "그룹 삭제 규칙 없음"
+  },
+  {
+   "detection": "AWS IAM Role Created with External Trust",
+   "file": "aws_iam_role_created_with_external_trust.yml",
+   "mitre": [
+    "T1098.003"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098.003/aws_iam_role_created_with_external_trust/aws_iam_role_created_with_external_trust.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CreateRole"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "역할 생성 → CT_IAM_PERSISTENCE"
+  },
+  {
+   "detection": "AWS IAM Successful Group Deletion",
+   "file": "aws_iam_successful_group_deletion.yml",
+   "mitre": [
+    "T1069.003",
+    "T1098"
+   ],
+   "type": "Hunting",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098/aws_iam_successful_group_deletion/aws_iam_successful_group_deletion.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteGroup"
+   ],
+   "n_target_events": 93,
+   "target_rules": [],
+   "n_events": 93,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "그룹 삭제 규칙 없음"
+  },
+  {
+   "detection": "AWS Lambda UpdateFunctionCode",
+   "file": "aws_lambda_updatefunctioncode.yml",
+   "mitre": [
+    "T1204"
+   ],
+   "type": "Hunting",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1204/aws_updatelambdafunctioncode/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "UpdateFunctionCode"
+   ],
+   "n_target_events": 0,
+   "target_rules": [],
+   "n_events": 2,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "Lambda 코드 변경 규칙 없음"
+  },
+  {
+   "detection": "AWS Multi-Factor Authentication Disabled",
+   "file": "aws_multi_factor_authentication_disabled.yml",
+   "mitre": [
+    "T1556.006",
+    "T1586.003",
+    "T1621"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/aws_mfa_disabled/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeactivateMFADevice",
+    "DeleteVirtualMFADevice"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "루트 사용으로만 걸림. MFA 끄기 규칙 없음"
+  },
+  {
+   "detection": "AWS Multiple Failed MFA Requests For User",
+   "file": "aws_multiple_failed_mfa_requests_for_user.yml",
+   "mitre": [
+    "T1586.003",
+    "T1621"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/aws_failed_mfa/cloudtrail.json"
+   ],
+   "duplicate_data": true,
+   "targets": [
+    "ConsoleLogin"
+   ],
+   "n_target_events": 14,
+   "target_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 14,
+   "rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "루트 사용으로만 걸림. MFA 실패 규칙 없음"
+  },
+  {
+   "detection": "AWS Network Access Control List Created with All Open Ports",
+   "file": "aws_network_access_control_list_created_with_all_open_ports.yml",
+   "mitre": [
+    "T1686.001"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.007/aws_create_acl/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CreateNetworkAclEntry",
+    "ReplaceNetworkAclEntry"
+   ],
+   "n_target_events": 5,
+   "target_rules": [],
+   "n_events": 13274,
+   "rules": [
+    "CT_DISCOVERY_BURST",
+    "CT_SG_OPENED"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_SG_OPENED"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_DISCOVERY_BURST"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    }
+   ],
+   "judgement": "놓침",
+   "judgement_reason": "NACL 전체 개방을 보지 않음(다른 보안그룹 변경만 걸림)"
+  },
+  {
+   "detection": "AWS Network Access Control List Deleted",
+   "file": "aws_network_access_control_list_deleted.yml",
+   "mitre": [
+    "T1686.001"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562.007/aws_delete_acl/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteNetworkAclEntry"
+   ],
+   "n_target_events": 4,
+   "target_rules": [],
+   "n_events": 13274,
+   "rules": [
+    "CT_DISCOVERY_BURST",
+    "CT_SG_OPENED"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_SG_OPENED"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_DISCOVERY_BURST"
+     ],
+     "verdict": "attack",
+     "severity": "medium"
+    }
+   ],
+   "judgement": "놓침",
+   "judgement_reason": "NACL 항목 삭제 규칙 없음(다른 보안그룹 변경만 걸림)"
+  },
+  {
+   "detection": "AWS New MFA Method Registered For User",
+   "file": "aws_new_mfa_method_registered_for_user.yml",
+   "mitre": [
+    "T1556.006"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556.006/aws_new_mfa_method_registered_for_user/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "CreateVirtualMFADevice"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "루트 사용으로만 걸림. MFA 장치 추가 규칙 없음"
+  },
+  {
+   "detection": "AWS Password Policy Changes",
+   "file": "aws_password_policy_changes.yml",
+   "mitre": [
+    "T1201"
+   ],
+   "type": "Hunting",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1201/aws_password_policy/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DeleteAccountPasswordPolicy",
+    "GetAccountPasswordPolicy",
+    "UpdateAccountPasswordPolicy"
+   ],
+   "n_target_events": 7,
+   "target_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 7,
+   "rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "루트 사용으로만 걸림. 비밀번호 정책 변경 규칙 없음"
+  },
+  {
+   "detection": "AWS Repeated CloudWatch Logs Read Operations",
+   "file": "aws_repeated_cloudwatch_logs_read_operations.yml",
+   "mitre": [
+    "T1530"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1530/aws_cloudwatch_logs_high_volume_retrieval/aws_cloudwatch_logs_high_volume_retrieval.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "DescribeLogGroups",
+    "DescribeLogStreams",
+    "DownloadLogEvents",
+    "FilterLogEvents",
+    "GetLogEvents",
+    "GetQueryResults"
+   ],
+   "n_target_events": 650,
+   "target_rules": [],
+   "n_events": 650,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "CloudWatch 로그 대량 읽기 규칙 없음"
+  },
+  {
+   "detection": "AWS SAML Update identity provider",
+   "file": "aws_saml_update_identity_provider.yml",
+   "mitre": [
+    "T1078"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/update_saml_provider/update_saml_provider.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "UpdateSAMLProvider"
+   ],
+   "n_target_events": 10,
+   "target_rules": [],
+   "n_events": 10,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "SAML 공급자 변경 규칙 없음"
+  },
+  {
+   "detection": "AWS SetDefaultPolicyVersion",
+   "file": "aws_setdefaultpolicyversion.yml",
+   "mitre": [
+    "T1078.004"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/aws_setdefaultpolicyversion/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "SetDefaultPolicyVersion"
+   ],
+   "n_target_events": 4,
+   "target_rules": [],
+   "n_events": 4,
+   "rules": [],
+   "incidents": [],
+   "judgement": "놓침",
+   "judgement_reason": "정책 기본 버전 바꾸기 규칙 없음"
+  },
+  {
+   "detection": "AWS Successful Console Authentication From Multiple IPs",
+   "file": "aws_successful_console_authentication_from_multiple_ips.yml",
+   "mitre": [
+    "T1586",
+    "T1535"
+   ],
+   "type": "Anomaly",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1586.003/aws_console_login_multiple_ips/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ConsoleLogin"
+   ],
+   "n_target_events": 8,
+   "target_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 8,
+   "rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_CONSOLE_NO_MFA",
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    },
+    {
+     "id": "INC-002",
+     "rules": [
+      "CT_CONSOLE_NO_MFA",
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "MFA 없는 로그인·루트 사용으로만 걸림. 여러 IP 로그인 규칙 없음"
+  },
+  {
+   "detection": "AWS Successful Single-Factor Authentication",
+   "file": "aws_successful_single_factor_authentication.yml",
+   "mitre": [
+    "T1078.004",
+    "T1586.003"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078.004/aws_login_sfa/cloudtrail.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "ConsoleLogin"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_CONSOLE_NO_MFA",
+      "CT_ROOT_USAGE"
+     ],
+     "verdict": "risky_not_attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "CT_CONSOLE_NO_MFA"
+  },
+  {
+   "detection": "AWS UpdateLoginProfile",
+   "file": "aws_updateloginprofile.yml",
+   "mitre": [
+    "T1136.003"
+   ],
+   "type": "TTP",
+   "status": "production",
+   "data": [
+    "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/aws_updateloginprofile/aws_cloudtrail_events.json"
+   ],
+   "duplicate_data": false,
+   "targets": [
+    "UpdateLoginProfile"
+   ],
+   "n_target_events": 2,
+   "target_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "n_events": 2,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "incidents": [
+    {
+     "id": "INC-001",
+     "rules": [
+      "CT_IAM_PERSISTENCE"
+     ],
+     "verdict": "attack",
+     "severity": "high"
+    }
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "콘솔 비밀번호 변경 → CT_IAM_PERSISTENCE"
+  }
+ ],
+ "judgement_rule": "맞게 탐지: LogSight 규칙이 그 행동 자체를 설명한다. 다른 이유로만 걸림: 같은 이벤트가 루트 사용·MFA 없는 로그인 같은 다른 규칙으로만 표시됐다. 놓침: 행동에 해당하는 표시가 없다. 판정은 측정 뒤 사람이 했고 이유를 행마다 적었다.",
+ "summary": {
+  "by_detection": {
+   "맞게 탐지": 16,
+   "놓침": 28,
+   "다른 이유로만 걸림": 8
+  },
+  "by_unique_dataset": {
+   "맞게 탐지": 14,
+   "놓침": 23,
+   "다른 이유로만 걸림": 7
+  }
+ }
+}

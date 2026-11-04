@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8">
+<!-- docs/img/architecture.png 원본. 다시 만들기: python scripts/render_architecture.py -->
+<style>
+body{margin:0;font:14px/1.45 "Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#fff;color:#1d1d1f}
+.wrap{width:1360px;padding:28px 30px 24px;box-sizing:border-box}
+h1{font-size:24px;margin:0 0 4px}.sub{color:#5f5f66;margin:0 0 18px;font-size:15px}
+h2{font-size:14px;margin:0 0 8px;color:#3a3a40;letter-spacing:.02em}
+.lane{border:1.5px solid #d9d9d4;border-radius:12px;padding:12px 14px;margin-bottom:14px;background:#fcfcfa}
+.flow{display:flex;align-items:stretch;gap:0}
+.step{flex:1;border-radius:10px;padding:9px 11px;background:#fff;border:1.5px solid #c9c9c4}
+.step b{display:block;font-size:14.5px;margin-bottom:2px}
+.step span{color:#55555c;font-size:12.5px}
+.arr{display:flex;align-items:center;justify-content:center;width:26px;color:#8a8a90;font-size:18px;flex:none}
+.use .step{border-color:#7aa7d9;background:#f2f7fd}
+.use .step.gd{border-color:#c9a24a;background:#fdf8ec}
+.use .step.human{border-color:#6fb08a;background:#f1f9f4}
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 26px;position:relative}
+.p{border:1.6px solid #2f5fb3;border-radius:10px;padding:9px 11px 9px 40px;background:#fff;position:relative;min-height:92px}
+.p .n{position:absolute;left:10px;top:9px;width:22px;height:22px;border-radius:50%;background:#2f5fb3;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.p b{display:block;font-size:14.5px;margin-bottom:2px}
+.p span{display:block;color:#4a4a50;font-size:12.5px}
+.p code{font:11.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#2f5fb3;display:block;margin-top:4px}
+.p.ai{border-color:#8a6cc9;background:#f7f3fd}.p.ai .n{background:#8a6cc9}.p.ai code{color:#6f52ad}
+.p.out{border-color:#3f9a64;background:#f2faf5}.p.out .n{background:#3f9a64}.p.out code{color:#2f7d50}
+.p.in{border-color:#5b6b85}.p.in .n{background:#5b6b85}.p.in code{color:#46566f}
+.p::after{content:"→";position:absolute;right:-21px;top:34px;color:#8a8a90;font-size:18px}
+.p.last::after,.p.rowend::after{content:""}
+.turn{grid-column:1/-1;text-align:center;color:#6a6a70;font-size:12.5px;margin:-4px 0;border-top:1px dashed #c9c9c4;padding-top:2px}
+.card .big{font-size:20px}
+.verd{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.verd i{font-style:normal;font-size:11.5px;padding:1px 6px;border-radius:9px;border:1px solid}
+.v1{color:#b3261e;border-color:#e3a49f;background:#fdf0ef}.v2{color:#9a6200;border-color:#e8c98c;background:#fdf6e8}
+.v3{color:#555;border-color:#c9c9c9;background:#f4f4f4}.v4{color:#2f7d50;border-color:#9fd0b2;background:#eef8f2}
+.bottom{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.card{border:1.5px solid #d4d4ce;border-radius:10px;padding:8px 10px;background:#fff}
+.card b{display:block;font-size:13.5px;margin-bottom:2px}.card span{color:#4f4f55;font-size:12.3px}
+.big{font-size:20px;font-weight:700;color:#b3261e}.ok{font-size:20px;font-weight:700;color:#2f5fb3}
+.safe .card{border-color:#cfd8cf}
+</style>
+<div class="wrap">
+<h1>LogSight · AWS 침해사고 초동 분석 도구</h1>
+<p class="sub">GuardDuty가 경보를 울린 다음, 흩어진 로그를 한 사건으로 엮어 침투 경로와 고칠 설정을 한국어로 보여 준다. 내 PC·서버에서 실행하고, AI는 선택이다.</p>
+
+<div class="lane use">
+<h2>A. 언제 어떻게 쓰나</h2>
+<div class="flow">
+ <div class="step"><b>평소 · logsight check</b><span>읽기 전용으로 꺼진 로그를 점검하고 비용·무료 대안·켜는 명령 안내. 동의한 항목만 켬</span></div>
+ <div class="arr">→</div>
+ <div class="step gd"><b>경보 · GuardDuty</b><span>24시간 감시는 GuardDuty가 맡는다. 경보 결과(JSON)를 그대로 입력으로 쓴다</span></div>
+ <div class="arr">→</div>
+ <div class="step"><b>로그 모으기 · 사용자</b><span>그 시간대의 CloudTrail·VPC Flow·ALB·WAF·서버 로그와 설정 스냅샷(collect). AWS 키는 LogSight에 주지 않음</span></div>
+ <div class="arr">→</div>
+ <div class="step"><b>분석 · logsight analyze / 웹 업로드</b><span>폴더째 넣으면 형식 자동 판별. 아래 B의 8단계가 돈다</span></div>
+ <div class="arr">→</div>
+ <div class="step human"><b>사람이 검토 후 적용</b><span>보고서의 판정·근거를 확인하고 수정 명령을 직접 실행. 자동 적용 없음</span></div>
+</div>
+</div>
+
+<div class="lane">
+<h2>B. 분석이 실제로 진행되는 순서 (logsight/pipeline.py)</h2>
+<div class="pipe">
+ <div class="p in"><div class="n">1</div><b>형식 판별 · 정규화</b><span>로그 8종 + GuardDuty 결과를 공통 형식으로: 시각(UTC), 출발지·대상, 주체, 결과, 근거 위치(파일:줄)</span><code>normalize.py</code></div>
+ <div class="p in"><div class="n">2</div><b>서버 연결 · 정상 작업 표시</b><span>설정 스냅샷으로 IP→서버 이름. 운영자·배포 계정(known_activity)과 맞는 이벤트에 표시만 함(지우지 않음)</span><code>pipeline.enrich · explain.mark_known</code></div>
+ <div class="p"><div class="n">3</div><b>탐지 규칙 50종</b><span>analyze는 AWS·SSH·기본 웹 24종, 웹서버 정밀 분석·파일 26종은 scan에서 따로. ATT&amp;CK 대응, 규칙마다 사각지대·오탐·검증 예시</span><code>detect.py (analyze) · web/ (scan)</code></div>
+ <div class="p rowend"><div class="n">4</div><b>사건으로 묶기</b><span>같은 IP·서버·IAM 주체·액세스 키로 30분 안의 탐지를 연결하고, 같은 유형 반복은 하나로 접음</span><code>correlate.py</code></div>
+ <div class="turn">↓ 4번 다음은 아래 줄 왼쪽 5번으로 이어짐</div>
+ <div class="p"><div class="n">5</div><b>사건 판정(규칙, 항상)</b><span>명시적 규칙으로 판정하고 이유를 붙임</span><div class="verd"><i class="v1">공격</i><i class="v2">위험 설정</i><i class="v3">판단 불가</i><i class="v4">정상 활동</i></div><code>explain.rule_triage</code></div>
+ <div class="p ai"><div class="n">6</div><b>Claude 재검토(선택)</b><span>키가 있을 때만. 가린 사건 요약만 보내고, 답의 근거(파일:줄)가 입력에 있는지 코드로 검사. 실패하면 5번 판정 사용</span><code>triage.py · analyze.py</code></div>
+ <div class="p"><div class="n">7</div><b>상위 사건 · 설정 대조</b><span>공격 사건을 위로. 보안그룹·NACL·WAF·IAM과 비교해 원인 설정, 수정·되돌리기 AWS CLI 명령</span><code>config_audit.py</code></div>
+ <div class="p out last"><div class="n">8</div><b>보고서</b><span>먼저 할 일, 공격 흐름 그림, 판정과 이유, 로그 범위·알 수 없는 것, GuardDuty 안내, 근거 로그. HTML·JSON</span><code>report.py · graph.py · app.py</code></div>
+</div>
+</div>
+
+<div class="bottom">
+ <div class="lane" style="margin:0">
+ <h2>C. 맞는지 어떻게 확인하나</h2>
+ <div class="qa">
+  <div class="card"><b>규칙 검증 · CI</b><span>규칙 50개마다 걸려야 하는 예·걸리면 안 되는 예. 테스트 188개, 3개 OS × Python 2개 버전</span></div>
+  <div class="card"><b>개발에 쓴 데이터</b><span>자체 실습 34/34 · 공방전 판정 6/7(정상 작업 목록) · BOTSv3 큰 사건 2/3</span></div>
+  <div class="card"><b>처음 본 데이터</b><span><span class="big">31%</span> Splunk AWS 표본 16/52 · 웹서버 3/7. 규칙 고정 후 1회</span></div>
+  <div class="card"><b>사람 평가(준비 완료)</b><span>비전문가 8명, LogSight vs 원본 로그+GuardDuty 교차 비교</span></div>
+  <div class="card"><b>고객 인터뷰(준비 완료)</b><span>가설 7개, 미리 정한 판단 기준, 10건 목표</span></div>
+  <div class="card"><b>놓치는 것(공개)</b><span>Bedrock·ECR, KMS 랜섬웨어, 복제·DataSync, NACL, MFA 설정 변경, S3 접근 로그</span></div>
+ </div>
+ </div>
+ <div class="lane safe" style="margin:0">
+ <h2>D. 지키는 것</h2>
+ <div class="qa" style="grid-template-columns:1fr 1fr">
+  <div class="card"><b>AWS 키를 받지 않음</b><span>수집·점검은 사용자 계정에서 읽기 전용으로 직접 실행</span></div>
+  <div class="card"><b>자동 적용 없음</b><span>수정안마다 되돌리기 명령과 주의사항</span></div>
+  <div class="card"><b>AI는 선택</b><span>키 없이도 같은 형식의 보고서. 맨 위에 "AI 사용 안 함" 표시</span></div>
+  <div class="card"><b>가린 뒤 보냄</b><span>원본 대신 사건 요약, 액세스 키·비밀번호 마스킹. --dry-run으로 미리 보기</span></div>
+ </div>
+ </div>
+</div>
+</div>
