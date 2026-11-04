@@ -115,6 +115,16 @@ def main(argv: list[str] | None = None) -> int:
     hb.add_argument("--max-age", type=float, default=5.0)
     hb.add_argument("--region")
     hb.add_argument("--profile")
+    ob = sub.add_parser("onboard-link", help="고객이 버튼 하나로 설치하는 AWS 콘솔 링크 만들기")
+    ob.add_argument("--template-url", required=True, help="S3에 올린 logsight-onboard.yaml 주소(https)")
+    ob.add_argument("--bus-arn", required=True, help="허브 스택 출력 IntakeBusArn")
+    ob.add_argument("--archive-bucket", required=True, help="보관 버킷 이름")
+    ob.add_argument("--principal-arn", required=True, help="LogSight 분석 서버 역할 ARN")
+    ob.add_argument("--region", default="ap-northeast-2", help="고객의 주 리전")
+    ob.add_argument("--vpc-id", default="", help="VPC Flow Logs를 켤 VPC(선택)")
+    ob.add_argument("--isolation", action="store_true", help="격리 전용 역할도 만들기(LogSight는 시험 모드로 시작)")
+    ob.add_argument("--min-severity", default="MEDIUM", choices=["LOW", "MEDIUM", "HIGH"])
+    ob.add_argument("--no-trail", action="store_true", help="보관용 CloudTrail을 만들지 않음(기존 추적이 있어 비용이 걱정될 때)")
     rp = sub.add_parser("respond", help="자동 격리: 기준선·확인·마감 처리·되돌리기")
     rp.add_argument("action", choices=["baseline", "ack", "tick", "undo", "plan", "allow"])
     rp.add_argument("target", nargs="*", help="ack/undo: 경보 결과 폴더, plan: 로그 경로, allow: 종류 ID")
@@ -129,6 +139,17 @@ def main(argv: list[str] | None = None) -> int:
         return _alert_cmd(args)
     if args.cmd == "respond":
         return _respond_cmd(args)
+    if args.cmd == "onboard-link":
+        from .onboard import make
+        r = make(args.template_url, args.bus_arn, args.archive_bucket, args.principal_arn, region=args.region,
+                 vpc_id=args.vpc_id, isolation=args.isolation, min_severity=args.min_severity,
+                 create_trail=not args.no_trail)
+        for i, ln in enumerate(r["links"], 1):
+            what = "전체 설정" if ln["part"] == "full" else "IAM 경보 받기(키·사용자 생성은 이 리전으로만 옴)"
+            print(f"{i}. {ln['region']} — {what}\n   {ln['url']}")
+        print(f"\nExternalId(고객 기록에 저장): {r['external_id']}")
+        print("고객 계정 ID를 허브 스택 CustomerAccountIds와 보관 스택 SourceAccountIds에 더해야 경보·로그가 들어온다.")
+        return 0
     if args.cmd == "notify-test":
         from .notify import load_config, send_all, test_message
         res = send_all(load_config(args.config), test_message())

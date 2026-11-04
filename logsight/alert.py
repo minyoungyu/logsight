@@ -192,6 +192,20 @@ def _days(since: datetime, until: datetime) -> list[datetime]:
     return out
 
 
+def fill_prefix(uri: str, alert: "Alert") -> str:
+    """{account}·{region}을 경보가 난 계정·리전으로 바꾼다. 여러 고객의 경보를 대기열 하나로 받을 때
+    보관 버킷 AWSLogs/<계정>/... 중 그 고객 폴더만 읽게 한다. 값이 없거나 이상하면 바꾸지 않는다."""
+    acct = alert.account or ""
+    if "{account}" in uri and acct.isdigit() and len(acct) == 12:
+        uri = uri.replace("{account}", acct)
+    reg = alert.region or ""
+    if "{region}" in uri and reg and all(ch.isalnum() or ch == "-" for ch in reg):
+        uri = uri.replace("{region}", reg)
+    if "{account}" in uri or "{region}" in uri:
+        raise ValueError(f"경보에 계정·리전이 없어 접두어를 채울 수 없음: {uri}")
+    return uri
+
+
 def fetch_s3(uri: str, since: datetime, until: datetime, dest: Path, s3=None, *,
              max_objects: int = 2000, max_bytes: int = 500 * 1024 * 1024) -> dict:
     """s3://버킷/접두어 아래에서 기간 안에 쓰인 객체를 dest로 받는다.
@@ -284,7 +298,7 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
         (inputs / ai[0]).write_text(ai[1], encoding="utf-8")
     fetched = []
     for uri in opt.s3:
-        fetched.append(fetch_s3(uri, since, until, inputs / "s3", s3=s3))
+        fetched.append(fetch_s3(fill_prefix(uri, alert), since, until, inputs / "s3", s3=s3))
     paths.append(str(inputs))
 
     env_path = opt.env

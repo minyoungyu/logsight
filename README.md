@@ -55,6 +55,7 @@ GuardDuty 결과·CloudWatch 경보·위험 API 호출을 EventBridge → SQS로
     python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai   # AWS 없이 시험
 
 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명·측정 범위는 `docs/경보_연동.md`.
+- 고객 설치: `logsight onboard-link`가 고객이 AWS 콘솔에서 버튼 하나로 설치하는 링크를 만든다. 서버 설치 없이 경보 전달·보관용 추적·읽기 전용 역할만 더하고, 로그는 LogSight 계정 보관 버킷에 둔다. `docs/고객_설치.md`
 
 - 통지(`--notify notify.json`): 이메일(정보성 본문 + 마스킹된 보고서 첨부)·디스코드·슬랙·일반 웹훅(HMAC 서명) 중 골라 쓴다. 카카오 알림톡은 사업자 등록 뒤. `docs/통지.md`
 - 자동 격리(`--respond respond.json`): 높음 경보 뒤 5분 안에 아무도 확인하지 않으면, 도입 이후 외부에서 만든 키·사용자·역할·보안그룹 규칙만
