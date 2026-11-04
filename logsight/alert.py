@@ -115,6 +115,13 @@ def parse_event(ev: dict) -> Alert | None:
         return Alert(id=f"ct-{d.get('eventID', ev.get('id', ''))}", source="cloudtrail",
                      title=f"위험 API 호출: {name} ({d.get('sourceIPAddress', '-')})",
                      severity=sev, time=t, first_seen=t, detail=d, **base)
+    if src == "logsight.heartbeat":
+        last = _ts(d.get("last")) or when - timedelta(days=1)
+        age = d.get("age_min")
+        return Alert(id=f"hb-{d.get('host', '')}", source="heartbeat",
+                     title=f"서버 로그 전송 끊김: {d.get('host', '')} (마지막 신호 "
+                           + (f"{age}분 전)" if age is not None else "하루 넘게 없음)"),
+                     severity="high", time=when, first_seen=last, detail=d)
     if dt.startswith("Security Hub Findings"):
         fs = d.get("findings") or [{}]
         f = fs[0]
@@ -237,12 +244,21 @@ class Options:
     model: str | None = None
     notify_cmd: str | None = None                     # 보고서가 나오면 실행할 명령(통지 연결 지점)
     region: str | None = None
+    respond: str | None = None                        # 자동 격리 설정 respond.json(없으면 끔)
+    heartbeat: str | None = None                      # s3://보관 버킷/heartbeat/ (서버 로그 전송 끊김 감시)
+    heartbeat_max_min: float = 5.0
 
 
 def handle(alert: Alert, opt: Options, *, s3=None, session=None,
            now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict:
     """경보 하나를 처리한다. 반환: {"status": "done"|"skipped", ...}. 실패하면 예외(메시지를 지우지 않게)."""
     received = now()
+    rcfg = None
+    if opt.respond:
+        from . import respond as rs
+        rcfg = rs.Config.load(opt.respond)
+        if alert.source == "cloudtrail":  # 키·사용자 생성 이벤트로 허용 목록을 계속 갱신(등급과 무관)
+            rs.Responder(rcfg).observe([alert.detail])
     if SEV_ORDER[alert.severity] < SEV_ORDER[opt.min_severity]:
         return {"status": "skipped", "reason": f"등급 {alert.severity} < 기준 {opt.min_severity}", "alert": alert.summary()}
     seen = SeenStore(Path(opt.out) / ".seen.json", opt.cooldown_min)
@@ -293,15 +309,27 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
     result["alert"] = alert.summary()
     (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "report.html").write_text(render(result), encoding="utf-8")
+    resp = None
+    if rcfg and SEV_ORDER[alert.severity] >= SEV_ORDER[rcfg.min_severity]:
+        from . import respond as rs
+        resp = rs.prepare(rs.Responder(rcfg), alert.summary(), rs.iter_records(paths, since, until), out,
+                          now=now())
     done = now()
     text = summary_text(alert, result, out)
+    if resp:
+        from .respond import summary_lines
+        extra = summary_lines(resp, out)
+        if extra:
+            text = text.rstrip("\n").rsplit("\n", 1)
+            text = "\n".join([text[0], *extra, text[1]]) + "\n"
     (out / "summary.txt").write_text(text, encoding="utf-8")
     run_info = {"alert": alert.summary(), "received": _iso(received), "report_at": _iso(done),
                 "alert_to_report_s": round((done - alert.time).total_seconds(), 1),
                 "received_to_report_s": round((done - received).total_seconds(), 1),
                 "analyze_s": round(time.time() - t0, 2), "window": [_iso(since), _iso(until)],
                 "inputs": paths, "s3": fetched, "env": env_path, "env_note": env_note,
-                "n_events": result["n_events"], "n_incidents": result["n_incidents"]}
+                "n_events": result["n_events"], "n_incidents": result["n_incidents"],
+                "response": resp and {k: resp[k] for k in ("status", "mode", "deadline")}}
     if opt.notify_cmd:
         run_info["notify"] = notify(opt.notify_cmd, out, alert)
     (out / "run.json").write_text(json.dumps(run_info, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -339,20 +367,40 @@ def notify(cmd: str, out: Path, alert: Alert) -> dict:
 
 # ------------------------------------------------------------------ SQS 대기열 감시
 def watch(queue_url: str, opt: Options, *, sqs=None, s3=None, session=None, once: bool = False,
-          wait_s: int = 20, log: Callable[[str], None] = print, stop: Callable[[], bool] = lambda: False) -> list[dict]:
+          wait_s: int = 20, log: Callable[[str], None] = print, stop: Callable[[], bool] = lambda: False,
+          respond_session=None) -> list[dict]:
     """SQS를 긴 폴링으로 읽어 경보마다 handle()을 돌린다. 처리했거나 건너뛴 메시지만 지운다.
     once=True면 한 번 받고 끝(시험·cron용)."""
     if sqs is None:
         import boto3
         sqs = (session or boto3.Session(region_name=opt.region)).client("sqs")
     done: list[dict] = []
+    last_hb = 0.0
     while not stop():
+        if opt.heartbeat and time.time() - last_hb >= 60:  # 1분마다 생존 신호 확인
+            last_hb = time.time()
+            from .heartbeat import check, to_event
+            try:
+                rows = check(opt.heartbeat, s3=s3, max_age_min=opt.heartbeat_max_min)
+            except Exception as exc:  # noqa: BLE001
+                log(f"[생존 신호 확인 실패] {type(exc).__name__}")
+                rows = []
+            for row in rows:
+                if not row["ok"]:
+                    r = process_message(json.dumps(to_event(row, opt.heartbeat)), opt, s3=s3, session=session, log=log)
+                    if r is not None:
+                        done.append(r)
         resp = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=10, WaitTimeSeconds=wait_s)
         for m in resp.get("Messages", []):
             r = process_message(m.get("Body", ""), opt, s3=s3, session=session, log=log)
             if r is not None:
                 sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=m["ReceiptHandle"])
                 done.append(r)
+        if opt.respond:  # 마감이 지난 자동 격리 처리(최대 wait_s초 늦음)
+            from . import respond as rs
+            for resp in rs.tick(rs.Config.load(opt.respond), opt.out, session=respond_session):
+                n = sum(1 for a in resp["actions"] if (a.get("outcome") or {}).get("result") in ("done", "would-do"))
+                log(f"[격리 {resp['status']}] {resp['alert']['id']}: {n}개")
         if once:
             break
     return done

@@ -164,6 +164,27 @@ class WithAws(unittest.TestCase):
         self.assertEqual(sum(int(v) for v in left["Attributes"].values()), 0)
         self.assertEqual(len(list(self.out.glob("*_guardduty_*/report.html"))), 1)
 
+    def test_heartbeat_stale_host_raises_alert(self):
+        from logsight.heartbeat import check
+        s3 = boto3.client("s3", region_name=REGION)
+        s3.create_bucket(Bucket="logsight-test-archive", CreateBucketConfiguration={"LocationConstraint": REGION})
+        now = datetime.now(timezone.utc)
+        s3.put_object(Bucket="logsight-test-archive", Key=f"heartbeat/web1/{now:%Y/%m/%d}/a.txt", Body=b"hb")
+        s3.put_object(Bucket="logsight-test-archive", Key="heartbeat/web2/2020/01/01/a.txt", Body=b"hb")
+        uri = "s3://logsight-test-archive/heartbeat/"
+        rows = {r["host"]: r for r in check(uri, s3=s3)}
+        self.assertTrue(rows["web1"]["ok"])
+        self.assertFalse(rows["web2"]["ok"])
+        self.assertIsNone(rows["web2"]["last"])
+        self.assertFalse(check(uri, s3=s3, now=now + timedelta(minutes=10))[0]["ok"])  # 10분 신호 없음 → 끊김
+
+        sqs = boto3.client("sqs", region_name=REGION)
+        q = sqs.create_queue(QueueName="logsight-alerts")["QueueUrl"]
+        opt = al.Options(logs=[str(ROOT / "samples/demo")], out=str(self.out), use_ai=False, heartbeat=uri)
+        done = al.watch(q, opt, sqs=sqs, s3=s3, once=True, wait_s=0, log=lambda s: None)
+        self.assertEqual([(d["status"], d["alert"]["source"]) for d in done], [("done", "heartbeat")])
+        self.assertIn("web2", (Path(done[0]["out"]) / "summary.txt").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

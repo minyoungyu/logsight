@@ -56,6 +56,10 @@ GuardDuty 결과·CloudWatch 경보·위험 API 호출을 EventBridge → SQS로
 
 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명·측정 범위는 `docs/경보_연동.md`.
 
+- 자동 격리(`--respond respond.json`): 높음 경보 뒤 5분 안에 아무도 확인하지 않으면, 도입 이후 외부에서 만든 키·사용자·역할·보안그룹 규칙만
+  되돌릴 수 있게 막는다(삭제 없음, 기본은 기록만 하는 시험 모드). `docs/자동_격리.md`
+- 수집 보호: 로그를 다른 계정의 Object Lock 버킷에 보관하고, 서버 로그는 1분 안에 보내며 끊기면 경보(`--heartbeat`). `docs/수집_보호.md`
+
 ## 처리 흐름
 
     로그 파일/폴더(.json/.log/.gz)

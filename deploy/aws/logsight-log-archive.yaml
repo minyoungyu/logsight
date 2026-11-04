@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  LogSight log archive (protection option 1). Deploy in a SEPARATE account from the one being
+  watched. CloudTrail, VPC Flow Logs and host log shippers write here; nobody in the watched
+  account can delete or overwrite what was written, because the bucket lives elsewhere and
+  S3 Object Lock keeps every object for RetentionDays.
+
+Parameters:
+  SourceAccountIds:
+    Type: CommaDelimitedList
+    Description: Account IDs whose CloudTrail and VPC Flow Logs may write here.
+  HostShipperRoleArns:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: Optional. IAM role ARNs of servers (instance roles) that ship nginx/auth logs. Write-only to hosts/ and heartbeat/.
+  ReaderPrincipalArn:
+    Type: String
+    Default: ""
+    Description: Optional. LogSight analysis server role or user that may read the archive.
+  LockMode:
+    Type: String
+    Default: GOVERNANCE
+    AllowedValues: [GOVERNANCE, COMPLIANCE]
+    Description: >-
+      COMPLIANCE - nobody, not even this account's root, can delete before RetentionDays (use in production).
+      GOVERNANCE - only principals with s3:BypassGovernanceRetention can (use while testing).
+  RetentionDays:
+    Type: Number
+    Default: 90
+    MinValue: 1
+    MaxValue: 3650
+  ExpireDays:
+    Type: Number
+    Default: 400
+    Description: Delete objects after this many days (must be longer than RetentionDays).
+
+Conditions:
+  HasShippers: !Not [!Equals [!Join ["", !Ref HostShipperRoleArns], ""]]
+  HasReader: !Not [!Equals [!Ref ReaderPrincipalArn, ""]]
+
+Resources:
+  ArchiveBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub logsight-archive-${AWS::AccountId}-${AWS::Region}
+      ObjectLockEnabled: true
+      ObjectLockConfiguration:
+        ObjectLockEnabled: Enabled
+        Rule:
+          DefaultRetention:
+            Mode: !Ref LockMode
+            Days: !Ref RetentionDays
+      VersioningConfiguration: {Status: Enabled}
+      OwnershipControls:
+        Rules: [{ObjectOwnership: BucketOwnerEnforced}]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}
+      LifecycleConfiguration:
+        Rules:
+          - Id: Expire
+            Status: Enabled
+            ExpirationInDays: !Ref ExpireDays
+            NoncurrentVersionExpiration: {NoncurrentDays: !Ref ExpireDays}
+
+  ArchiveBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArchiveBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: TlsOnly
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource: [!GetAtt ArchiveBucket.Arn, !Sub "${ArchiveBucket.Arn}/*"]
+            Condition: {Bool: {aws:SecureTransport: "false"}}
+          - Sid: AwsLogDeliveryAclCheck
+            Effect: Allow
+            Principal: {Service: [cloudtrail.amazonaws.com, delivery.logs.amazonaws.com]}
+            Action: s3:GetBucketAcl
+            Resource: !GetAtt ArchiveBucket.Arn
+            Condition: {StringEquals: {aws:SourceAccount: !Ref SourceAccountIds}}
+          - Sid: AwsLogDeliveryWrite
+            Effect: Allow
+            Principal: {Service: [cloudtrail.amazonaws.com, delivery.logs.amazonaws.com]}
+            Action: s3:PutObject
+            Resource: !Sub "${ArchiveBucket.Arn}/AWSLogs/*"
+            Condition: {StringEquals: {aws:SourceAccount: !Ref SourceAccountIds}}
+          - !If
+            - HasShippers
+            - Sid: HostShippersWriteOnly
+              Effect: Allow
+              Principal: {AWS: !Ref HostShipperRoleArns}
+              Action: s3:PutObject
+              Resource: [!Sub "${ArchiveBucket.Arn}/hosts/*", !Sub "${ArchiveBucket.Arn}/heartbeat/*"]
+            - !Ref AWS::NoValue
+          - !If
+            - HasReader
+            - Sid: LogSightRead
+              Effect: Allow
+              Principal: {AWS: !Ref ReaderPrincipalArn}
+              Action: [s3:ListBucket, s3:GetObject]
+              Resource: [!GetAtt ArchiveBucket.Arn, !Sub "${ArchiveBucket.Arn}/*"]
+            - !Ref AWS::NoValue
+
+Outputs:
+  ArchiveBucketName:
+    Value: !Ref ArchiveBucket
+  LogSightS3Prefixes:
+    Description: Pass to logsight watch (replace <account> and <region>).
+    Value: !Sub "--s3 s3://${ArchiveBucket}/AWSLogs/<account>/CloudTrail/<region>/{date}/ --s3 s3://${ArchiveBucket}/hosts/ --heartbeat s3://${ArchiveBucket}/heartbeat/"

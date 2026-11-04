@@ -19,5 +19,5 @@ jobs:
       - run: python -m logsight analyze samples/free --out reports/ci-free --no-ai
       - run: python -m logsight analyze samples/combined --out reports/ci-combined --no-ai --year 2026
       - run: python -m logsight cost
-      - run: python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai --out reports/ci-alert
+      - run: python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai --out reports/ci-alert --respond deploy/respond.example.json
       - run: python -m logsight scan --profile samples/web/profile.json --no-ai --out reports/ci-web

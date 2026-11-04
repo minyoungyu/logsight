@@ -96,6 +96,10 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--notify-cmd", help="보고서가 나오면 실행할 명령(환경변수 LOGSIGHT_SUMMARY 등 전달)")
         p.add_argument("--region")
         p.add_argument("--profile")
+        p.add_argument("--heartbeat", help="s3://보관 버킷/heartbeat/ : 서버 로그 전송이 끊기면 경보")
+        p.add_argument("--heartbeat-max", type=float, default=5.0, help="생존 신호가 몇 분 없으면 끊김으로 볼지")
+        p.add_argument("--respond", help="자동 격리 설정 respond.json(없으면 격리 안 함)")
+        p.add_argument("--respond-profile", help="격리 실행용 ~/.aws 프로필(쓰기 권한이 있는 별도 역할)")
     oa = sub.add_parser("on-alert", help="EventBridge 경보 이벤트(JSON 파일)로 분석 한 번 실행")
     oa.add_argument("events", nargs="+", help="이벤트 JSON 파일")
     alert_opts(oa)
@@ -103,11 +107,36 @@ def main(argv: list[str] | None = None) -> int:
     w.add_argument("--queue-url", required=True)
     w.add_argument("--once", action="store_true", help="한 번만 받고 끝내기")
     alert_opts(w)
+    hb = sub.add_parser("heartbeat", help="서버 로그 전송 생존 신호 확인(끊긴 서버가 있으면 종료 코드 1)")
+    hb.add_argument("uri", help="s3://보관 버킷/heartbeat/")
+    hb.add_argument("--max-age", type=float, default=5.0)
+    hb.add_argument("--region")
+    hb.add_argument("--profile")
+    rp = sub.add_parser("respond", help="자동 격리: 기준선·확인·마감 처리·되돌리기")
+    rp.add_argument("action", choices=["baseline", "ack", "tick", "undo", "plan", "allow"])
+    rp.add_argument("target", nargs="*", help="ack/undo: 경보 결과 폴더, plan: 로그 경로, allow: 종류 ID")
+    rp.add_argument("--config", default="respond.json")
+    rp.add_argument("--out", default="reports/alerts", help="tick: 경보 결과 상위 폴더, baseline: 저장 파일")
+    rp.add_argument("--region")
+    rp.add_argument("--profile")
 
     args = ap.parse_args(argv)
 
     if args.cmd in ("on-alert", "watch"):
         return _alert_cmd(args)
+    if args.cmd == "respond":
+        return _respond_cmd(args)
+    if args.cmd == "heartbeat":
+        import boto3
+        from .heartbeat import check
+        rows = check(args.uri, boto3.Session(profile_name=args.profile, region_name=args.region).client("s3"),
+                     max_age_min=args.max_age)
+        for r in rows:
+            print(f"{'정상' if r['ok'] else '끊김'}  {r['host']}  마지막 {r['last'] or '없음'}"
+                  + (f" ({r['age_min']}분 전)" if r['age_min'] is not None else ""))
+        if not rows:
+            print("생존 신호를 보내는 서버가 없습니다.")
+        return 0 if rows and all(r["ok"] for r in rows) else 1
 
     if args.cmd == "scan":
         return _scan(args)
@@ -227,20 +256,28 @@ def _alert_cmd(args) -> int:
     opt = al.Options(logs=args.logs, s3=args.s3, env=args.env, collect_env=args.collect_env, out=args.out,
                      min_severity=args.min_severity, lookback_h=args.lookback_hours, cooldown_min=args.cooldown,
                      top=args.top, use_ai=not args.no_ai, model=args.model, notify_cmd=args.notify_cmd,
-                     region=args.region)
+                     region=args.region, respond=args.respond, heartbeat=args.heartbeat,
+                     heartbeat_max_min=args.heartbeat_max)
+    if args.respond:
+        from .respond import Config
+        try:
+            Config.load(args.respond)
+        except (TypeError, ValueError) as exc:
+            print(f"respond 설정 오류: {exc}", file=sys.stderr)
+            return 2
     missing = [p for p in args.logs if not Path(p).exists()]
     if missing:
         print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
         return 2
     session = None
-    if args.s3 or args.collect_env or args.cmd == "watch":
+    if args.s3 or args.heartbeat or args.collect_env or args.cmd == "watch":
         try:
             import boto3
         except ImportError:
             print("boto3가 필요합니다: pip install boto3", file=sys.stderr)
             return 2
         session = boto3.Session(profile_name=args.profile, region_name=args.region)
-    s3 = session.client("s3") if session and args.s3 else None
+    s3 = session.client("s3") if session and (args.s3 or args.heartbeat) else None
     if args.cmd == "on-alert":
         ok = True
         for ev in al.load_events(args.events):
@@ -249,9 +286,51 @@ def _alert_cmd(args) -> int:
         return 0 if ok else 1
     print(f"대기열 감시 시작: {args.queue_url} (기준 등급 {args.min_severity} 이상, Ctrl+C로 끝)")
     try:
-        al.watch(args.queue_url, opt, sqs=session.client("sqs"), s3=s3, session=session, once=args.once)
+        rsess = boto3.Session(profile_name=args.respond_profile, region_name=args.region) if args.respond_profile else None
+        al.watch(args.queue_url, opt, sqs=session.client("sqs"), s3=s3, session=session, once=args.once,
+                 respond_session=rsess)
     except KeyboardInterrupt:
         print("감시를 끝냈습니다.")
+    return 0
+
+
+def _respond_cmd(args) -> int:
+    from . import respond as rs
+    if args.action == "ack":
+        ok = all(rs.ack(t) for t in args.target)
+        print("확인했습니다. 자동 격리를 하지 않습니다." if ok and args.target else "response.json을 찾지 못함")
+        return 0 if ok and args.target else 1
+    if args.action == "baseline":
+        import boto3
+        b = rs.take_baseline(boto3.Session(profile_name=args.profile, region_name=args.region), args.region)
+        out = args.out if args.out.endswith(".json") else "baseline.json"
+        rs._save(out, b)
+        print(f"기준선 저장: {out} (사용자 {len(b['users'])}, 역할 {len(b['roles'])}, 키 {len(b['access_keys'])}, "
+              f"보안그룹 규칙 {len(b['sg_rules'])})")
+        return 0
+    cfg = rs.Config.load(args.config)
+    if args.action == "allow":
+        if len(args.target) != 2:
+            print("사용: respond allow <access_key|user|role|sg_rule> <ID>", file=sys.stderr)
+            return 2
+        rs.Responder(cfg).allow_manual(*args.target)
+        print("허용 목록에 추가했습니다.")
+        return 0
+    if args.action == "plan":
+        p = rs.Responder(cfg).plan(rs.iter_records(args.target))
+        print(json.dumps(p, ensure_ascii=False, indent=1))
+        return 0
+    session = None
+    if cfg.mode == "enforce" or args.action == "undo":
+        import boto3
+        session = boto3.Session(profile_name=args.profile, region_name=args.region)
+    if args.action == "tick":
+        for r in rs.tick(cfg, args.out, session=session):
+            print(f"{r['alert']['id']}: {r['status']}")
+        return 0
+    for t in args.target:
+        for a in rs.undo(t, session=session):
+            print(f"되돌림 {a['op']} {a['id']}: {a['undo']['result']}")
     return 0
 
 
