@@ -30,6 +30,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     enrich(events, env)
     n_known = mark_known(events, env)  # 설정의 정상 작업 목록과 맞는 이벤트 표시(지우지 않음)
     findings = run_detections(events, env)
+    team_info = _team(events, env)
     incidents = build_incidents(events, findings, window_min=window_min)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
     t_detect = time.time() - t0
@@ -80,9 +81,20 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
         "has_environment": bool(env),
+        "team": team_info,
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy"))),
     }
+
+
+def _team(events: list[Event], env: dict) -> dict:
+    """우리 팀 후보(아직 확인 안 된 것만)와 확인된 목록. 후보는 판정에 쓰지 않는다(확인 전에는 제안만)."""
+    from .team import LABEL, excluded, propose
+    confirmed = sorted({a for ent in env.get("known_activity", []) if ent.get("label") == LABEL
+                        for a in ent.get("actors", [])})
+    known_actors = {e.actor for e in events if e.extra.get("known")}
+    props = [p for p in propose(events, env) if p["actor"] not in known_actors]
+    return {"proposed": props, "confirmed": confirmed, "excluded": excluded(events)}
 
 
 def _explain_mode(results: list[dict], tri: dict, ai_tri: dict | None) -> dict:
@@ -156,7 +168,7 @@ def enrich(events: list[Event], env: dict) -> None:
 
 
 def run_paths(paths: list[str], env_path: str | None = None, *, since=None, until=None,
-              **kw) -> dict:
+              team_path: str | None = None, **kw) -> dict:
     events, stats = load_paths([Path(p) for p in paths], since=since, until=until)
     if env_path is None:
         # 폴더 안에 environment.json이 있으면 자동으로 쓴다
@@ -165,4 +177,12 @@ def run_paths(paths: list[str], env_path: str | None = None, *, since=None, unti
             if cand.is_file():
                 env_path = str(cand)
                 break
-    return run(events, load_env(env_path), file_stats=stats, **kw)
+    return run(events, with_team(load_env(env_path), team_path), file_stats=stats, **kw)
+
+
+def with_team(env: dict, team_path: str | None) -> dict:
+    """확인된 팀 목록(logsight team --confirm으로 만든 파일)을 설정에 더한다."""
+    if not team_path:
+        return env
+    from .team import load, merge
+    return merge(env, load(team_path))

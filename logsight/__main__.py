@@ -32,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("analyze", help="로그 파일/폴더 분석")
     a.add_argument("paths", nargs="+", help="로그 파일 또는 폴더(.json/.log/.gz)")
     a.add_argument("--env", help="설정 스냅샷 environment.json 경로")
+    a.add_argument("--team", help="확인된 우리 팀 목록 team.json(logsight team --confirm으로 만듦)")
     a.add_argument("--out", default="reports/latest", help="결과 폴더")
     a.add_argument("--top", type=int, default=5, help="상세 분석할 사건 수")
     a.add_argument("--window", type=int, default=30, help="사건 묶기 시간창(분)")
@@ -93,6 +94,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--top", type=int, default=5)
         p.add_argument("--no-ai", action="store_true")
         p.add_argument("--model")
+        p.add_argument("--team", help="확인된 우리 팀 목록 team.json")
         p.add_argument("--notify", help="통지 설정 notify.json(이메일·디스코드·슬랙·웹훅 중 골라 쓰기)")
         p.add_argument("--notify-cmd", help="보고서가 나오면 실행할 명령(환경변수 LOGSIGHT_SUMMARY 등 전달)")
         p.add_argument("--region")
@@ -115,6 +117,11 @@ def main(argv: list[str] | None = None) -> int:
     hb.add_argument("--max-age", type=float, default=5.0)
     hb.add_argument("--region")
     hb.add_argument("--profile")
+    tm = sub.add_parser("team", help="로그에서 우리 팀으로 보이는 계정을 찾아 확인받기(확인된 계정의 작업은 공격 판정에서 뺌)")
+    tm.add_argument("paths", nargs="+", help="로그 파일 또는 폴더")
+    tm.add_argument("--env", help="설정 스냅샷(기존 IAM 사용자 목록을 함께 봄)")
+    tm.add_argument("--confirm", nargs="+", metavar="이름", help="우리 팀이 맞다고 확인한 계정 이름(후보 목록의 이름)")
+    tm.add_argument("--out", default="team.json", help="확인 목록을 저장할 파일")
     ob = sub.add_parser("onboard-link", help="고객이 버튼 하나로 설치하는 AWS 콘솔 링크 만들기")
     ob.add_argument("--template-url", required=True, help="S3에 올린 logsight-onboard.yaml 주소(https)")
     ob.add_argument("--bus-arn", required=True, help="허브 스택 출력 IntakeBusArn")
@@ -139,6 +146,8 @@ def main(argv: list[str] | None = None) -> int:
         return _alert_cmd(args)
     if args.cmd == "respond":
         return _respond_cmd(args)
+    if args.cmd == "team":
+        return _team_cmd(args)
     if args.cmd == "onboard-link":
         from .onboard import make
         r = make(args.template_url, args.bus_arn, args.archive_bucket, args.principal_arn, region=args.region,
@@ -206,7 +215,7 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError:
         print("--since/--until 형식: 2017-02-12 또는 2017-02-12T10:00:00Z", file=sys.stderr)
         return 2
-    result = run_paths(args.paths, args.env, since=since, until=until, top=args.top, use_ai=not args.no_ai, preview=args.dry_run,
+    result = run_paths(args.paths, args.env, since=since, until=until, team_path=args.team, top=args.top, use_ai=not args.no_ai, preview=args.dry_run,
                        model=args.model, window_min=args.window)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -281,13 +290,44 @@ def _aws_cmd(args) -> int:
     return 0
 
 
+def _team_cmd(args) -> int:
+    from .detect import run_detections
+    from .normalize import load_paths
+    from .pipeline import load_env
+    from . import team
+    events, _ = load_paths([Path(p) for p in args.paths])
+    env = load_env(args.env)
+    run_detections(events, env)
+    props = team.propose(events, env)
+    if not args.confirm:
+        if not props:
+            print("우리 팀으로 보이는 계정을 찾지 못했습니다(콘솔로 오래 작업한 사람 계정이 없음).")
+        for p in props:
+            print(f"- {p['name']}: {', '.join(p['reasons'])} (이벤트 {p['n_events']:,}건, IP {p['n_ips']}개)")
+        for x in team.excluded(events):
+            print(f"  (제외) {x['name']}: 키 유출에서 흔한 모습({', '.join(x['rules'])})이 있어 후보에서 뺐습니다")
+        if props:
+            names = " ".join(p["name"] for p in props)
+            print(f"\n맞으면 확인하세요: python -m logsight team {' '.join(args.paths)} --confirm {names}")
+            print("확인한 계정의 작업은 공격 판정에서 뺍니다. 모르는 계정은 넣지 마세요(비밀번호를 훔친 공격자도 콘솔로 들어옵니다).")
+        return 0
+    allowed = {p["name"] for p in props}
+    unknown = [n for n in args.confirm if n not in allowed]
+    if unknown:
+        print(f"후보에 없는 이름: {', '.join(unknown)}. 후보 목록의 이름만 확인할 수 있습니다.", file=sys.stderr)
+        return 2
+    Path(args.out).write_text(json.dumps(team.to_env(args.confirm), ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"저장: {args.out} (analyze·watch에 --team {args.out})")
+    return 0
+
+
 def _alert_cmd(args) -> int:
     from . import alert as al
     opt = al.Options(logs=args.logs, s3=args.s3, env=args.env, collect_env=args.collect_env, out=args.out,
                      min_severity=args.min_severity, lookback_h=args.lookback_hours, cooldown_min=args.cooldown,
                      top=args.top, use_ai=not args.no_ai, model=args.model, notify_cmd=args.notify_cmd,
                      region=args.region, respond=args.respond, notify=args.notify, heartbeat=args.heartbeat,
-                     heartbeat_max_min=args.heartbeat_max)
+                     heartbeat_max_min=args.heartbeat_max, team=args.team)
     if args.notify:
         from .notify import load_config
         try:

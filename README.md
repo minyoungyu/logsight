@@ -55,6 +55,7 @@ GuardDuty 결과·CloudWatch 경보·위험 API 호출을 EventBridge → SQS로
     python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai   # AWS 없이 시험
 
 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명·측정 범위는 `docs/경보_연동.md`.
+- 우리 팀 알아보기: `logsight team <로그>`가 콘솔로 오래 작업한 사람 계정을 우리 팀 후보로 보여 주고, 확인(`--confirm`)하면 그 작업을 공격 판정에서 뺀다(`--team team.json`). 공방전에서 판정 4/7 → 6/7, 공격 사건 2위 → 1위. `docs/우리팀_알아보기_측정.md`
 - 고객 설치: `logsight onboard-link`가 고객이 AWS 콘솔에서 버튼 하나로 설치하는 링크를 만든다. 서버 설치 없이 경보 전달·보관용 추적·읽기 전용 역할만 더하고, 로그는 LogSight 계정 보관 버킷에 둔다. `docs/고객_설치.md`
 
 - 통지(`--notify notify.json`): 이메일(정보성 본문 + 마스킹된 보고서 첨부)·디스코드·슬랙·일반 웹훅(HMAC 서명) 중 골라 쓴다. 카카오 알림톡은 사업자 등록 뒤. `docs/통지.md`

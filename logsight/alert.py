@@ -262,6 +262,7 @@ class Options:
     respond: str | None = None                        # 자동 격리 설정 respond.json(없으면 끔)
     heartbeat: str | None = None                      # s3://보관 버킷/heartbeat/ (서버 로그 전송 끊김 감시)
     heartbeat_max_min: float = 5.0
+    team: str | None = None                           # 확인된 우리 팀 목록 team.json
 
 
 def handle(alert: Alert, opt: Options, *, s3=None, session=None,
@@ -320,7 +321,8 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
 
     t0 = time.time()
     events, stats = load_paths([Path(p) for p in paths], since=since, until=until)
-    result = run(events, load_env(env_path), file_stats=stats, top=opt.top, use_ai=opt.use_ai, model=opt.model)
+    from .pipeline import with_team
+    result = run(events, with_team(load_env(env_path), opt.team), file_stats=stats, top=opt.top, use_ai=opt.use_ai, model=opt.model)
     result["alert"] = alert.summary()
     (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "report.html").write_text(render(result), encoding="utf-8")
