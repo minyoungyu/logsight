@@ -5,6 +5,7 @@
 ## 미출시
 
 ### 추가
+- 경보 연동(`logsight/alert.py`, `logsight watch`, `logsight on-alert`): GuardDuty 결과·CloudWatch 경보·위험 API 호출(EventBridge)을 SQS 대기열로 받아, 경보 시각 앞뒤의 로컬·S3 로그로 분석을 자동 실행하고 `reports/alerts/<시각>_<종류>_<id>/`에 보고서와 통지용 요약(summary.txt)을 남긴다. 등급 기준·중복 경보 무시(cooldown)·실패 시 재시도(DLQ)·보고서 뒤 실행할 통지 명령(`--notify-cmd`) 지원. 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명 `docs/경보_연동.md`. AWS 설정은 바꾸지 않는다(읽기만).
 - 실제 AWS 로그 측정(Splunk BOTSv3, CC0): Splunk 없이 색인에서 원본 로그를 꺼내는 `scripts/public/botsv3_extract.py`와 결과 `docs/BOTSv3_측정.md`.
 - S3 버킷 공개 규칙(`CT_S3_PUBLIC`): PutBucketAcl·PutObjectAcl·PutBucketPolicy 등으로 버킷을 인터넷 전체(AllUsers, `*`)에 연 호출을 잡는다.
 - "GuardDuty 다음" 위치: 보고서의 로그 범위 칸에 GuardDuty 결과와 GuardDuty가 읽지 않는 로그(WAF·ALB·웹서버·SSH·서버 방화벽)를 함께 넣었는지 한 문장으로 알린다(`explain.guardduty_note`). `logsight check`의 WAF·ALB·GuardDuty 설명에 "GuardDuty는 이 로그를 읽지 않음", "켜기 전의 일은 보지 않음"을 넣었다. README·발표 자료에 위치와 장기 계획(GuardDuty 결과 하나로 시작하기)을 적었다.

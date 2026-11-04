@@ -9,6 +9,8 @@
   python -m logsight collect environment --out environment.json
   python -m logsight collect cloudtrail-history --days 30 --out logs/cloudtrail_history.json
   python -m logsight cost --web-requests 3000000
+  python -m logsight watch --queue-url <SQS URL> --logs /var/logsight/logs   # AWS 경보 → 자동 분석
+  python -m logsight on-alert event.json --logs samples/demo --no-ai          # 경보 이벤트 하나로 시험
 """
 from __future__ import annotations
 
@@ -78,7 +80,34 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--no-ai", action="store_true", help="Claude 호출 없이 규칙 기반으로만")
     s.add_argument("--model", help="Claude 모델 ID")
 
+    def alert_opts(p):
+        p.add_argument("--logs", action="append", default=[], help="로컬 로그 폴더/파일(여러 번 가능)")
+        p.add_argument("--s3", action="append", default=[],
+                       help="s3://버킷/접두어. {date}를 넣으면 날짜 폴더(YYYY/MM/DD)만 읽음")
+        p.add_argument("--env", help="environment.json")
+        p.add_argument("--collect-env", action="store_true", help="경보 때 설정 스냅샷을 새로 읽기(읽기 전용)")
+        p.add_argument("--out", default="reports/alerts")
+        p.add_argument("--min-severity", default="medium", choices=["low", "medium", "high"])
+        p.add_argument("--lookback-hours", type=float, default=24.0, help="활동이 처음 보인 시각보다 몇 시간 앞부터")
+        p.add_argument("--cooldown", type=int, default=60, help="같은 경보를 다시 분석하지 않는 시간(분)")
+        p.add_argument("--top", type=int, default=5)
+        p.add_argument("--no-ai", action="store_true")
+        p.add_argument("--model")
+        p.add_argument("--notify-cmd", help="보고서가 나오면 실행할 명령(환경변수 LOGSIGHT_SUMMARY 등 전달)")
+        p.add_argument("--region")
+        p.add_argument("--profile")
+    oa = sub.add_parser("on-alert", help="EventBridge 경보 이벤트(JSON 파일)로 분석 한 번 실행")
+    oa.add_argument("events", nargs="+", help="이벤트 JSON 파일")
+    alert_opts(oa)
+    w = sub.add_parser("watch", help="SQS 대기열의 AWS 경보를 받아 자동으로 분석")
+    w.add_argument("--queue-url", required=True)
+    w.add_argument("--once", action="store_true", help="한 번만 받고 끝내기")
+    alert_opts(w)
+
     args = ap.parse_args(argv)
+
+    if args.cmd in ("on-alert", "watch"):
+        return _alert_cmd(args)
 
     if args.cmd == "scan":
         return _scan(args)
@@ -190,6 +219,39 @@ def _aws_cmd(args) -> int:
     print(aws_check.format_text(res))
     if args.json:
         Path(args.json).write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
+    return 0
+
+
+def _alert_cmd(args) -> int:
+    from . import alert as al
+    opt = al.Options(logs=args.logs, s3=args.s3, env=args.env, collect_env=args.collect_env, out=args.out,
+                     min_severity=args.min_severity, lookback_h=args.lookback_hours, cooldown_min=args.cooldown,
+                     top=args.top, use_ai=not args.no_ai, model=args.model, notify_cmd=args.notify_cmd,
+                     region=args.region)
+    missing = [p for p in args.logs if not Path(p).exists()]
+    if missing:
+        print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
+        return 2
+    session = None
+    if args.s3 or args.collect_env or args.cmd == "watch":
+        try:
+            import boto3
+        except ImportError:
+            print("boto3가 필요합니다: pip install boto3", file=sys.stderr)
+            return 2
+        session = boto3.Session(profile_name=args.profile, region_name=args.region)
+    s3 = session.client("s3") if session and args.s3 else None
+    if args.cmd == "on-alert":
+        ok = True
+        for ev in al.load_events(args.events):
+            r = al.process_message(json.dumps(ev), opt, s3=s3, session=session)
+            ok &= r is not None
+        return 0 if ok else 1
+    print(f"대기열 감시 시작: {args.queue_url} (기준 등급 {args.min_severity} 이상, Ctrl+C로 끝)")
+    try:
+        al.watch(args.queue_url, opt, sqs=session.client("sqs"), s3=s3, session=session, once=args.once)
+    except KeyboardInterrupt:
+        print("감시를 끝냈습니다.")
     return 0
 
 

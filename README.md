@@ -46,6 +46,16 @@ Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.
 `LOGSIGHT_TRIAGE_MODEL`, 기본 `claude-opus-5-5`). 재검토는 순서만 바꾸고 사건을 지우지 않는다.
 Python 3.10 이상 필요.
 
+### 경보가 오면 자동 분석 (신규)
+
+GuardDuty 결과·CloudWatch 경보·위험 API 호출을 EventBridge → SQS로 받아 분석을 자동으로 돌린다.
+분석 서버는 들어오는 포트 없이 대기열만 읽고, AWS 설정은 바꾸지 않는다.
+
+    python -m logsight watch --queue-url <SQS URL> --logs <로그 폴더> --s3 "s3://<버킷>/AWSLogs/<계정>/CloudTrail/<리전>/{date}/"
+    python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai   # AWS 없이 시험
+
+배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명·측정 범위는 `docs/경보_연동.md`.
+
 ## 처리 흐름
 
     로그 파일/폴더(.json/.log/.gz)

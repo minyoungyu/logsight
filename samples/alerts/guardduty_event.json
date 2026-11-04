@@ -1,0 +1,53 @@
+{
+ "version": "0",
+ "id": "7bf73129-1428-4cd3-a780-95db273d1602",
+ "detail-type": "GuardDuty Finding",
+ "source": "aws.guardduty",
+ "account": "111122223333",
+ "time": "2026-01-13T04:41:30Z",
+ "region": "ap-northeast-2",
+ "resources": [],
+ "detail": {
+  "schemaVersion": "2.0",
+  "accountId": "111122223333",
+  "region": "ap-northeast-2",
+  "id": "a1b2c3d4e5f60000000000000000001",
+  "type": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+  "title": "Credentials for instance role ec2-app-role used from external IP address.",
+  "description": "Credentials created exclusively for an EC2 instance using instance role ec2-app-role have been used from external IP address 203.0.113.9.",
+  "severity": 8,
+  "createdAt": "2026-01-13T04:31:00.000Z",
+  "updatedAt": "2026-01-13T04:41:00.000Z",
+  "resource": {
+   "resourceType": "AccessKey",
+   "accessKeyDetails": {
+    "accessKeyId": "ASIAEXAMPLEEXAMPLE01",
+    "principalId": "AROAEXAMPLE:i-0abc123def456",
+    "userName": "ec2-app-role",
+    "userType": "AssumedRole"
+   },
+   "instanceDetails": {
+    "instanceId": "i-0abc123def456"
+   }
+  },
+  "service": {
+   "serviceName": "guardduty",
+   "count": 14,
+   "eventFirstSeen": "2026-01-13T04:30:00.000Z",
+   "eventLastSeen": "2026-01-13T04:40:00.000Z",
+   "action": {
+    "actionType": "AWS_API_CALL",
+    "awsApiCallAction": {
+     "api": "ListBuckets",
+     "serviceName": "s3.amazonaws.com",
+     "remoteIpDetails": {
+      "ipAddressV4": "203.0.113.9",
+      "country": {
+       "countryName": "Example"
+      }
+     }
+    }
+   }
+  }
+ }
+}
