@@ -93,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--top", type=int, default=5)
         p.add_argument("--no-ai", action="store_true")
         p.add_argument("--model")
+        p.add_argument("--notify", help="통지 설정 notify.json(이메일·디스코드·슬랙·웹훅 중 골라 쓰기)")
         p.add_argument("--notify-cmd", help="보고서가 나오면 실행할 명령(환경변수 LOGSIGHT_SUMMARY 등 전달)")
         p.add_argument("--region")
         p.add_argument("--profile")
@@ -107,6 +108,8 @@ def main(argv: list[str] | None = None) -> int:
     w.add_argument("--queue-url", required=True)
     w.add_argument("--once", action="store_true", help="한 번만 받고 끝내기")
     alert_opts(w)
+    nt = sub.add_parser("notify-test", help="통지 설정 확인: 시험 메시지를 모든 채널로 보냄")
+    nt.add_argument("config", help="notify.json")
     hb = sub.add_parser("heartbeat", help="서버 로그 전송 생존 신호 확인(끊긴 서버가 있으면 종료 코드 1)")
     hb.add_argument("uri", help="s3://보관 버킷/heartbeat/")
     hb.add_argument("--max-age", type=float, default=5.0)
@@ -126,6 +129,12 @@ def main(argv: list[str] | None = None) -> int:
         return _alert_cmd(args)
     if args.cmd == "respond":
         return _respond_cmd(args)
+    if args.cmd == "notify-test":
+        from .notify import load_config, send_all, test_message
+        res = send_all(load_config(args.config), test_message())
+        for r in res:
+            print(f"{r['channel']}: {'성공' if r.get('ok') else '실패 ' + str(r.get('error') or r.get('status'))}")
+        return 0 if res and all(r.get("ok") for r in res) else 1
     if args.cmd == "heartbeat":
         import boto3
         from .heartbeat import check
@@ -256,8 +265,15 @@ def _alert_cmd(args) -> int:
     opt = al.Options(logs=args.logs, s3=args.s3, env=args.env, collect_env=args.collect_env, out=args.out,
                      min_severity=args.min_severity, lookback_h=args.lookback_hours, cooldown_min=args.cooldown,
                      top=args.top, use_ai=not args.no_ai, model=args.model, notify_cmd=args.notify_cmd,
-                     region=args.region, respond=args.respond, heartbeat=args.heartbeat,
+                     region=args.region, respond=args.respond, notify=args.notify, heartbeat=args.heartbeat,
                      heartbeat_max_min=args.heartbeat_max)
+    if args.notify:
+        from .notify import load_config
+        try:
+            load_config(args.notify)
+        except (OSError, ValueError) as exc:
+            print(f"notify 설정 오류: {exc}", file=sys.stderr)
+            return 2
     if args.respond:
         from .respond import Config
         try:

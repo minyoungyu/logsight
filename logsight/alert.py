@@ -243,6 +243,7 @@ class Options:
     use_ai: bool = True
     model: str | None = None
     notify_cmd: str | None = None                     # 보고서가 나오면 실행할 명령(통지 연결 지점)
+    notify: str | None = None                         # 통지 설정 notify.json(이메일·디스코드·슬랙·웹훅)
     region: str | None = None
     respond: str | None = None                        # 자동 격리 설정 respond.json(없으면 끔)
     heartbeat: str | None = None                      # s3://보관 버킷/heartbeat/ (서버 로그 전송 끊김 감시)
@@ -330,6 +331,13 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
                 "inputs": paths, "s3": fetched, "env": env_path, "env_note": env_note,
                 "n_events": result["n_events"], "n_incidents": result["n_incidents"],
                 "response": resp and {k: resp[k] for k in ("status", "mode", "deadline")}}
+    if opt.notify:
+        from . import notify as nt
+        try:
+            channels = nt.load_config(opt.notify)
+            run_info["notify_channels"] = nt.send_all(channels, nt.build(alert.summary(), result, out, resp))
+        except (OSError, ValueError) as exc:
+            run_info["notify_channels"] = [{"ok": False, "error": f"설정 오류: {exc}"}]
     if opt.notify_cmd:
         run_info["notify"] = notify(opt.notify_cmd, out, alert)
     (out / "run.json").write_text(json.dumps(run_info, ensure_ascii=False, indent=1), encoding="utf-8")
