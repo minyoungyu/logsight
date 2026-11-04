@@ -11,6 +11,7 @@ from .correlate import build_incidents, group_repeats
 from .detect import run_detections
 from .explain import mark_known, rule_triage
 from .normalize import Event, load_paths
+from .guard import hold
 from .triage import reorder, triage
 
 
@@ -39,6 +40,8 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     rule_tri = rule_triage(groups, events)
     ai_tri = triage(groups, model=model, use_ai=use_ai and not preview, events=events)
     tri = ai_tri if ai_tri and "incidents" in ai_tri else rule_tri
+    if tri is ai_tri:
+        tri["guard"] = hold(groups, tri, rule_tri)  # AI가 규칙의 공격 판정을 낮춘 것을 표시·되돌림
     groups = reorder(groups, tri)
     rule_v = {x["id"]: x for x in rule_tri["incidents"]}
     results = []
@@ -72,6 +75,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
                            | {"rules": sorted({f["rule"] for f in i["findings"]})}
                            | ({"ai_verdict": i["ai_verdict"]} if "ai_verdict" in i else {})
                            | ({"verdict": i["verdict"], "verdict_by": i["verdict_by"]} if "verdict" in i else {})
+                           | {k: i[k] for k in ("contested", "ai_said", "injection") if i.get(k)}
                            for i in groups[:50]],
         "triage": tri,
         "rule_triage": rule_tri,

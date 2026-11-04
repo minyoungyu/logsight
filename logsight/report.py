@@ -379,6 +379,15 @@ def _incident(r: dict, verdicts: dict) -> str:
     h = [f"<article class='inc {escape(v)}' id='{escape(iid)}'><div class=head><div class=row>"
          f"<span class=id>{escape(iid)}</span>{_verdict(v, inc.get('verdict_by'))}"
          f"{_sev(rep.get('severity', inc['severity']))}"]
+    if inc.get("injection"):
+        h.append("<span class=chip title='User-Agent·요청 주소 등에 AI 판정을 바꾸려는 문장이 있음'>"
+                 "로그에 AI를 속이려는 문장</span>")
+    if inc.get("contested"):
+        c = inc["contested"]
+        h.append(f"<span class=chip title='사람이 근거 로그를 보고 정하세요'>규칙은 {VERDICT_KO['attack']}, "
+                 f"AI는 {escape(VERDICT_KO.get(c['ai'], c['ai']))} · 확인 필요</span>")
+    if inc.get("ai_said"):
+        h.append(f"<span class=chip>AI 판정({escape(VERDICT_KO.get(inc['ai_said'], inc['ai_said']))}) 따르지 않음</span>")
     if inc.get("repeats", 1) > 1:
         h.append(f"<span class=chip>같은 유형 {inc['repeats']}회 반복</span>")
     if inc.get("n_known"):
