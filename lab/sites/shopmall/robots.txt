@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /admin/
-Disallow: /uploads/
-Sitemap: /sitemap.xml
