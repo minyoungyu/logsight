@@ -80,7 +80,7 @@ def test_pipeline_uses_triage_order(monkeypatch):
 
     monkeypatch.setattr(T, "_call_claude", fake)
     monkeypatch.setattr("logsight.pipeline.analyze",
-                        lambda inc, checks, model=None, use_ai=True: {"report": {}, "meta": {}})
+                        lambda inc, checks, model=None, use_ai=True, verdict=None: {"report": {}, "meta": {}})
     out = run(_brute("203.0.113.5", 1) + _brute("203.0.113.6", 5), top=1)
     ids = [i["id"] for i in seen["payload"]["incidents"]]
     assert len(ids) == 2

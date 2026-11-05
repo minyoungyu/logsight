@@ -15,3 +15,9 @@ lab/sites/shopmall/uploads/
 lab/sites/board/data/
 reports/ci-web/
 *.run.log
+reports/ci-alert/
+reports/alerts/
+.coverage
+dist/
+build/
+*.egg-info/

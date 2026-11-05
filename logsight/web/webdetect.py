@@ -177,7 +177,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
     findings: list[Finding] = []
 
     access = [e for e in events if e.source == "access"]
-    errors = [e for e in events if e.source == "weberror"]
+    # 오류 로그(weberror)는 사건 묶기에는 들어가지만 아직 이것만 보는 규칙은 없다
     auth = [e for e in events if e.source in ("auth", "sshauth")]
 
     # 규칙별로 공격자 IP → 이벤트 목록을 모은다
@@ -189,7 +189,6 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
         target = _dec((e.extra.get("path", "") + "?" + e.extra.get("query", "")).rstrip("?"))
         ua = e.extra.get("ua", "")
         path = e.extra.get("path", "")
-        status = e.extra.get("status", "")
         trusted_ip = _trusted(e.src_ip, trusted)
 
         matched = False

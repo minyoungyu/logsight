@@ -15,6 +15,8 @@ import os
 import time
 from collections import Counter, defaultdict
 
+from .guard import RANK, SYSTEM_RULE, fence, find_injection
+
 TRIAGE_MODEL = os.environ.get("LOGSIGHT_TRIAGE_MODEL", "claude-opus-5-5")
 FALLBACK_MODELS = {"claude-opus-5-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5-5"}
 VERDICTS = ["attack", "risky_not_attack", "unclear", "benign_activity"]
@@ -85,7 +87,8 @@ SYSTEM = (
     "남을 수 없거나 남아 있지 않으면, 없었다고 단정하지 말고 무엇이 왜 보이지 않는지 적는다.\n"
     "규칙: 입력에 없는 사실을 만들지 않는다. evidence에는 입력 events의 ref만 그대로 쓴다. "
     "IP 대역의 소유자는 입력에 적혀 있을 때만 근거로 쓰고, 그 밖에는 입력에 적힌 사실(주체 이름, "
-    "호출 종류, 성공·실패, 시간)로 판단한다. 짧고 쉬운 한국어로 쓴다."
+    "호출 종류, 성공·실패, 시간)로 판단한다. 짧고 쉬운 한국어로 쓴다.\n"
+    + SYSTEM_RULE
 )
 
 
@@ -143,7 +146,7 @@ def build_triage_payload(incidents: list[dict], max_incidents: int = 30,
             "findings": [{k: f[k] for k in ("rule", "title", "detail", "key", "n_events")}
                          for f in inc["findings"]],
             "top_actions_nearby": inc.get("context", {}).get("top_actions", []),
-            "events": _sample(inc["events"], events_per_incident),
+            "events": fence(_sample(inc["events"], events_per_incident)),
         })
     payload = {"incidents": out, "n_incidents_total": len(incidents)}
     if coverage:
@@ -241,17 +244,33 @@ def reorder(incidents: list[dict], result: dict | None) -> list[dict]:
     """공격 → 위험 설정 → 판단 불가 → 정상 활동 순으로 정렬. 같은 판정 안에서는 규칙 순서를
     지킨다. 판정이 없는 사건은 '판단 불가'로 둔다. 사건 자체는 지우지 않는다.
     판정은 inc["verdict"]와 inc["verdict_by"]("claude" 또는 "rules")에 적는다.
-    Claude 판정이면 inc["ai_verdict"]에도 같은 값을 적는다(이전 형식 호환)."""
+    Claude 판정이면 inc["ai_verdict"]에도 같은 값을 적는다(이전 형식 호환).
+    규칙이 공격으로 본 것을 AI가 낮춘 사건(guard.hold의 contested)은 '판단 불가'보다 아래로 가지 않는다.
+    로그에 AI를 속이려는 문장이 있으면 inc["injection"]에 적는다(규칙 판정일 때도)."""
     if not result or "incidents" not in result:
         return incidents
     by = "rules" if result.get("mode") == "rules" else "claude"
-    v = {x["id"]: x["verdict"] for x in result["incidents"]}
-    rank = {"attack": 0, "risky_not_attack": 1, "unclear": 2, "benign_activity": 3}
+    rows = {x["id"]: x for x in result["incidents"]}
     for inc in incidents:
-        inc["verdict"] = v.get(inc["id"], "unclear")
+        row = rows.get(inc["id"], {})
+        inc["verdict"] = row.get("verdict", "unclear")
         inc["verdict_by"] = by
         if by == "claude":
             inc["ai_verdict"] = inc["verdict"]
         else:
             inc.pop("ai_verdict", None)
-    return sorted(incidents, key=lambda i: rank[i["verdict"]])  # 안정 정렬
+        for k in ("contested", "ai_said"):
+            if row.get(k):
+                inc[k] = row[k]
+            else:
+                inc.pop(k, None)
+        hits = row.get("injection") or find_injection(inc["events"])
+        if hits:
+            inc["injection"] = hits
+        else:
+            inc.pop("injection", None)
+
+    def key(i):
+        r = RANK[i["verdict"]]
+        return min(r, RANK["unclear"]) if i.get("contested") else r
+    return sorted(incidents, key=key)  # 안정 정렬

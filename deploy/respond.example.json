@@ -1,0 +1,15 @@
+{
+ "_comment": "LogSight 자동 격리 설정. 처음 2주는 mode를 dry-run으로 두고 response.json의 would-do 기록에 오판이 없는지 본 뒤 enforce로 바꾼다.",
+ "mode": "dry-run",
+ "deadline_min": 5,
+ "min_severity": "high",
+ "max_per_incident": 5,
+ "max_per_day": 20,
+ "deploy_principals": ["arn:aws:iam::123456789012:role/github-deploy"],
+ "admin_principals": ["arn:aws:iam::123456789012:user/alice"],
+ "trusted_ips": ["192.0.2.0/24"],
+ "require_mfa": true,
+ "baseline": "baseline.json",
+ "allowlist": "allowlist.json",
+ "stop_file": "STOP"
+}

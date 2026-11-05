@@ -60,7 +60,7 @@ button:hover{filter:brightness(1.08)}.row{display:flex;gap:14px;flex-wrap:wrap}
 .samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:8px}
 .samples a{display:block;border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--fg);background:var(--card)}
 .samples a:hover{border-color:var(--accent)}.samples small{display:block;color:var(--muted)}</style>
-<div class=wrap><div class=hero><div class=brand>LogSight</div><h1>로그를 올리면, 무슨 일이 있었고 무엇을 고칠지 알려 드립니다</h1>
+<div class=wrap><div class=hero><div class=brand>LogSight · AWS 침해사고 초동 분석</div><h1>로그를 올리면, 무슨 일이 있었고 무엇을 고칠지 알려 드립니다</h1>
 <p>AWS·서버 로그를 하나의 공격 흐름으로 엮어 한국어로 설명하고, 원인이 된 방화벽·권한 설정과 고치는 명령을 제안합니다.
 수정안은 자동으로 적용되지 않습니다.</p>
 <div class=steps><div><b>1 · 올리기</b>로그 파일을 폴더째 고르기</div><div><b>2 · 엮기</b>8종 로그를 사건 단위로 묶기</div>

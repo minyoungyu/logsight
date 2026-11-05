@@ -1,0 +1,12 @@
+{
+ "_comment": "쓸 채널만 남긴다. 주소·비밀번호는 환경변수에 넣고 여기에는 환경변수 이름만 쓴다. 확인: python -m logsight notify-test notify.json",
+ "channels": [
+  {"type": "email", "smtp_host": "email-smtp.ap-northeast-2.amazonaws.com", "smtp_port": 587,
+   "user_env": "LOGSIGHT_SMTP_USER", "password_env": "LOGSIGHT_SMTP_PASSWORD",
+   "from": "alerts@example.com", "to": ["security@example.com"], "attach_report": true},
+  {"type": "slack", "url_env": "LOGSIGHT_SLACK_WEBHOOK"},
+  {"type": "discord", "url_env": "LOGSIGHT_DISCORD_WEBHOOK", "min_severity": "medium"},
+  {"type": "webhook", "url_env": "LOGSIGHT_WEBHOOK_URL", "secret_env": "LOGSIGHT_WEBHOOK_SECRET"},
+  {"type": "kakao_alimtalk", "enabled": false, "_comment": "사업자 등록 뒤 지원 예정"}
+ ]
+}

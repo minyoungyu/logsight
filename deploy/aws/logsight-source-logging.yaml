@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  LogSight source-account logging (protection option 1 + 2). Deploy in the watched account.
+  Sends CloudTrail (all regions, with log file validation) and VPC Flow Logs straight to the
+  archive bucket in another account, and gives server roles a write-only policy for shipping
+  host logs. Existing resources are not changed; attach the shipper policy to instance roles yourself.
+
+Parameters:
+  ArchiveBucketName:
+    Type: String
+    Description: Bucket created by logsight-log-archive.yaml in the archive account.
+  VpcId:
+    Type: String
+    Default: ""
+    Description: Optional. VPC whose traffic should be recorded.
+  InstanceRoleNames:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: Optional. Existing instance roles of web servers to attach the write-only shipper policy to.
+
+Conditions:
+  HasVpc: !Not [!Equals [!Ref VpcId, ""]]
+  HasRoles: !Not [!Equals [!Join ["", !Ref InstanceRoleNames], ""]]
+
+Resources:
+  Trail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: logsight-archive-trail
+      S3BucketName: !Ref ArchiveBucketName
+      IsLogging: true
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
+
+  FlowLog:
+    Type: AWS::EC2::FlowLog
+    Condition: HasVpc
+    Properties:
+      ResourceId: !Ref VpcId
+      ResourceType: VPC
+      TrafficType: ALL
+      LogDestinationType: s3
+      LogDestination: !Sub arn:${AWS::Partition}:s3:::${ArchiveBucketName}
+      MaxAggregationInterval: 60
+
+  ShipperPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: logsight-host-shipper
+      Description: Write-only access for shipping host logs to the LogSight archive. No read, no delete.
+      Roles: !If [HasRoles, !Ref InstanceRoleNames, !Ref AWS::NoValue]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: s3:PutObject
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::${ArchiveBucketName}/hosts/*
+              - !Sub arn:${AWS::Partition}:s3:::${ArchiveBucketName}/heartbeat/*
+
+Outputs:
+  TrailArn:
+    Value: !GetAtt Trail.Arn
+  ShipperPolicyArn:
+    Value: !Ref ShipperPolicy

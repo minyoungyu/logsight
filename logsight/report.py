@@ -254,6 +254,27 @@ def _hm(d: datetime) -> str:
     return f"{d.astimezone(timezone.utc):%m-%d %H:%M} UTC · 한국 {d.astimezone(KST):%H:%M}"
 
 
+def _team_card(result: dict) -> str:
+    """우리 팀 후보를 보여 주고 확인을 받는다. 확인 전에는 판정에 쓰지 않는다."""
+    t = result.get("team") or {}
+    props, conf = t.get("proposed") or [], t.get("confirmed") or []
+    if not props and not conf:
+        return ""
+    rows = "".join(f"<li><b>{escape(p['name'])}</b> · {escape(', '.join(p['reasons']))} "
+                   f"<span class=muted>(이벤트 {p['n_events']:,}건)</span></li>" for p in props)
+    out = ["<div class='card note small'><b>우리 팀으로 보이는 계정</b>"]
+    if props:
+        names = " ".join(escape(p["name"]) for p in props)
+        out.append(f"<ul>{rows}</ul><div>우리 팀이 맞으면 한 번 확인해 주세요. 확인한 계정의 작업은 다음 분석부터 공격 판정에서 뺍니다: "
+                   f"<code>python -m logsight team &lt;로그&gt; --confirm {names}</code><br>"
+                   "모르는 계정은 넣지 마세요. 비밀번호를 훔친 공격자도 콘솔로 들어옵니다. 확인 전에는 판정을 바꾸지 않았습니다.</div>")
+    if conf:
+        out.append(f"<div>확인된 우리 팀: {escape(', '.join(conf))}. 이 계정들의 작업은 공격 판정에서 뺐습니다"
+                   "(키 유출에서 흔한 모습이 보이면 그래도 공격으로 봅니다).</div>")
+    out.append("</div>")
+    return "".join(out)
+
+
 def _coverage_card(result: dict) -> str:
     """로그로 볼 수 있는 범위: 로그 종류별 기간을 막대로, 빠진 로그와 알 수 없는 것을 문장으로."""
     from .explain import _periods
@@ -358,6 +379,15 @@ def _incident(r: dict, verdicts: dict) -> str:
     h = [f"<article class='inc {escape(v)}' id='{escape(iid)}'><div class=head><div class=row>"
          f"<span class=id>{escape(iid)}</span>{_verdict(v, inc.get('verdict_by'))}"
          f"{_sev(rep.get('severity', inc['severity']))}"]
+    if inc.get("injection"):
+        h.append("<span class=chip title='User-Agent·요청 주소 등에 AI 판정을 바꾸려는 문장이 있음'>"
+                 "로그에 AI를 속이려는 문장</span>")
+    if inc.get("contested"):
+        c = inc["contested"]
+        h.append(f"<span class=chip title='사람이 근거 로그를 보고 정하세요'>규칙은 {VERDICT_KO['attack']}, "
+                 f"AI는 {escape(VERDICT_KO.get(c['ai'], c['ai']))} · 확인 필요</span>")
+    if inc.get("ai_said"):
+        h.append(f"<span class=chip>AI 판정({escape(VERDICT_KO.get(inc['ai_said'], inc['ai_said']))}) 따르지 않음</span>")
     if inc.get("repeats", 1) > 1:
         h.append(f"<span class=chip>같은 유형 {inc['repeats']}회 반복</span>")
     if inc.get("n_known"):
@@ -469,7 +499,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
          f"<title>{escape(title)}</title><style>{CSS}{GRAPH_CSS}</style>"]
     pill = ("<span class='pill ai'>Claude 사용</span>" if _uses_ai(mode)
             else "<span class='pill rules'>AI 사용 안 함</span>")
-    h.append(f"<header class=top><div class=brand>LogSight</div><h1>{escape(title)}</h1>"
+    h.append(f"<header class=top><div class=brand>LogSight · AWS 침해사고 초동 분석</div><h1>{escape(title)}</h1>"
              f"<div class=metaline>{pill}<span>생성 {escape(result['generated_at'])}</span>"
              f"<span>원본 로그 {len(result['files'])}개 파일</span><span>처리 {result['timing']['total_s']}초</span></div></header>")
 
@@ -529,6 +559,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
     if result.get("assumptions"):
         h.append("<div class='card note small'><b>이렇게 해석했습니다</b><ul>" +
                  "".join(f"<li>{escape(a)}</li>" for a in result["assumptions"]) + "</ul></div>")
+    h.append(_team_card(result))
     h.append(_coverage_card(result))
 
     h.append(f"<h2>사건 {len(result['results'])}건 자세히</h2>" if result["results"] else "")

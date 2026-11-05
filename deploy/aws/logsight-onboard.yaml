@@ -1,0 +1,241 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  LogSight onboarding (deploy in the CUSTOMER account with one "Create stack" click; the
+  onboarding link fills every parameter). Nothing is installed on any server. It only adds
+  account settings: (1) forward security alerts to the LogSight hub, (2) a CloudTrail trail
+  writing to the LogSight archive (another account, Object Lock, the customer cannot delete it
+  and neither can an attacker in the customer account), (3) optional VPC Flow Logs to the
+  archive, (4) a read-only role for LogSight, (5) optionally the isolate-only role.
+  Existing resources are not changed. Deleting this stack removes everything it added
+  (logs already in the archive stay until retention ends).
+
+Parameters:
+  Part:
+    Type: String
+    Default: full
+    AllowedValues: [full, alerts-only]
+    Description: >-
+      full - everything (deploy once in the main region). alerts-only - only alert forwarding
+      (deploy a second time in us-east-1, where AWS delivers IAM events such as CreateAccessKey).
+  HubBusArn:
+    Type: String
+    Description: LogSight intake event bus (filled by the link).
+  ArchiveBucketName:
+    Type: String
+    Description: LogSight archive bucket (filled by the link).
+  LogSightPrincipalArn:
+    Type: String
+    Description: LogSight analysis server role that may assume the roles below (filled by the link).
+  ExternalId:
+    Type: String
+    MinLength: 16
+    Description: Customer-specific id LogSight must present (filled by the link).
+  MinGuardDutySeverity:
+    Type: String
+    Default: MEDIUM
+    AllowedValues: [LOW, MEDIUM, HIGH]
+  CreateTrail:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: >-
+      Adds a second CloudTrail trail to the archive. If the account already has a trail, this copy of
+      management events is billed (about USD 2 per 100,000 events); false skips it, but then logs stay deletable in the account.
+  VpcId:
+    Type: String
+    Default: ""
+    Description: Optional. VPC whose traffic is recorded to the archive (VPC Flow Logs, billed per GB).
+  EnableAutoIsolation:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: true creates the isolate-only role. LogSight still starts in test mode (record only) until you agree to enforce.
+
+Conditions:
+  Full: !Equals [!Ref Part, full]
+  MakeTrail: !And [!Condition Full, !Equals [!Ref CreateTrail, "true"]]
+  MakeFlow: !And [!Condition Full, !Not [!Equals [!Ref VpcId, ""]]]
+  MakeResponder: !And [!Condition Full, !Equals [!Ref EnableAutoIsolation, "true"]]
+  SevHigh: !Equals [!Ref MinGuardDutySeverity, HIGH]
+  SevMedium: !Equals [!Ref MinGuardDutySeverity, MEDIUM]
+
+Resources:
+  ForwarderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Lets EventBridge forward alerts to the LogSight hub bus. Nothing else.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: {Service: events.amazonaws.com}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: put-to-hub
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: events:PutEvents
+                Resource: !Ref HubBusArn
+
+  GuardDutyRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: logsight-guardduty
+      Description: GuardDuty findings to LogSight
+      EventPattern:
+        source: [aws.guardduty]
+        detail-type: [GuardDuty Finding]
+        detail:
+          severity: !If
+            - SevHigh
+            - [{numeric: [">=", 7]}]
+            - !If [SevMedium, [{numeric: [">=", 4]}], [{numeric: [">=", 1]}]]
+      Targets:
+        - {Arn: !Ref HubBusArn, Id: logsight-hub, RoleArn: !GetAtt ForwarderRole.Arn}
+
+  AlarmRule:
+    Type: AWS::Events::Rule
+    Condition: Full
+    Properties:
+      Name: logsight-alarms
+      Description: CloudWatch alarms entering ALARM to LogSight
+      EventPattern:
+        source: [aws.cloudwatch]
+        detail-type: [CloudWatch Alarm State Change]
+        detail:
+          state: {value: [ALARM]}
+      Targets:
+        - {Arn: !Ref HubBusArn, Id: logsight-hub, RoleArn: !GetAtt ForwarderRole.Arn}
+
+  RiskyApiRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: logsight-risky-api
+      Description: Log tampering, persistence and permission changes to LogSight
+      EventPattern:
+        detail-type: [AWS API Call via CloudTrail]
+        detail:
+          eventName:
+            - StopLogging
+            - DeleteTrail
+            - UpdateTrail
+            - PutEventSelectors
+            - DeleteDetector
+            - DeleteFlowLogs
+            - DeleteLogGroup
+            - PutBucketPolicy
+            - DeleteBucketPolicy
+            - DeactivateMFADevice
+            - ScheduleKeyDeletion
+            - CreateAccessKey
+            - CreateUser
+            - CreateLoginProfile
+            - UpdateLoginProfile
+            - AttachUserPolicy
+            - AttachRolePolicy
+            - PutUserPolicy
+            - PutRolePolicy
+            - CreatePolicyVersion
+            - UpdateAssumeRolePolicy
+            - AuthorizeSecurityGroupIngress
+      Targets:
+        - {Arn: !Ref HubBusArn, Id: logsight-hub, RoleArn: !GetAtt ForwarderRole.Arn}
+
+  Trail:
+    Type: AWS::CloudTrail::Trail
+    Condition: MakeTrail
+    Properties:
+      TrailName: logsight-archive-trail
+      S3BucketName: !Ref ArchiveBucketName
+      IsLogging: true
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
+
+  FlowLog:
+    Type: AWS::EC2::FlowLog
+    Condition: MakeFlow
+    Properties:
+      ResourceId: !Ref VpcId
+      ResourceType: VPC
+      TrafficType: ALL
+      LogDestinationType: s3
+      LogDestination: !Sub arn:${AWS::Partition}:s3:::${ArchiveBucketName}
+      MaxAggregationInterval: 60
+
+  ReaderRole:
+    Type: AWS::IAM::Role
+    Condition: Full
+    Properties:
+      RoleName: logsight-reader
+      Description: LogSight reads settings (who has which keys, open ports, logging on/off). Read-only.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: {AWS: !Ref LogSightPrincipalArn}
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: {sts:ExternalId: !Ref ExternalId}
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/SecurityAudit
+
+  ResponderRole:
+    Type: AWS::IAM::Role
+    Condition: MakeResponder
+    Properties:
+      RoleName: logsight-responder
+      Description: LogSight isolate-only - deactivate keys, attach AWSDenyAll, close ingress rules. Never deletes.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: {AWS: !Ref LogSightPrincipalArn}
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: {sts:ExternalId: !Ref ExternalId}
+      Policies:
+        - PolicyName: isolate-only
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ReadBeforeChange
+                Effect: Allow
+                Action: [iam:ListAccessKeys, iam:ListAttachedUserPolicies, iam:ListAttachedRolePolicies,
+                         ec2:DescribeSecurityGroups]
+                Resource: "*"
+              - Sid: DeactivateKeys
+                Effect: Allow
+                Action: iam:UpdateAccessKey
+                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:user/*
+              - Sid: DenyAllPolicyOnly
+                Effect: Allow
+                Action: [iam:AttachUserPolicy, iam:DetachUserPolicy, iam:AttachRolePolicy, iam:DetachRolePolicy]
+                Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:user/*
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*
+                Condition:
+                  ArnEquals:
+                    iam:PolicyARN: !Sub arn:${AWS::Partition}:iam::aws:policy/AWSDenyAll
+              - Sid: CloseIngressOnly
+                Effect: Allow
+                Action: ec2:RevokeSecurityGroupIngress
+                Resource: !Sub arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:security-group/*
+              - Sid: NeverTouchServiceRolesOrSelf
+                Effect: Deny
+                Action: [iam:AttachRolePolicy, iam:DetachRolePolicy]
+                Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/*
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/logsight-*
+
+Outputs:
+  ReaderRoleArn:
+    Condition: Full
+    Value: !GetAtt ReaderRole.Arn
+  ResponderRoleArn:
+    Condition: MakeResponder
+    Value: !GetAtt ResponderRole.Arn

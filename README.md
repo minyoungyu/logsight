@@ -1,157 +1,107 @@
-# LogSight
+# LogSight: AWS 침해사고 초동 분석 도구
 
-흩어진 AWS 로그(CloudTrail, VPC Flow Logs, AWS WAF, ALB, SSH 인증 로그)를 하나의 공격 흐름으로 엮어
-한국어로 설명하고, 원인 설정과 보안그룹·NACL·WAF·IAM 수정안을 제안하는 보안 분석 도우미.
-AI:ON 2026 출품작(팀 로그파인더).
+[![test](https://github.com/minyoungyu/logsight/actions/workflows/test.yml/badge.svg)](https://github.com/minyoungyu/logsight/actions/workflows/test.yml)
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.13-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-**GuardDuty 대신이 아니라 GuardDuty 다음에 쓰는 도구.** GuardDuty는 24시간 감시하다 경보를 주지만,
-켜기 전의 일과 웹·서버 안쪽(ALB·WAF·웹서버·SSH 로그)은 보지 않는다. LogSight는 GuardDuty 결과와 이 로그들을
-한 사건으로 엮어 "어떻게 들어왔고 어디를 고칠지"를 근거와 함께 보여 준다. 사고가 없는 평소에는
-`logsight check`로 그때 필요한 로그가 켜져 있는지 점검한다. 근거: [GuardDuty_비교.md](docs/GuardDuty_비교.md)
+**AWS 경보가 오면, 그것이 공격인지 우리 팀 작업인지 근거 로그와 함께 가려 주고,
+공격이면 어떻게 들어왔고 무엇을 고칠지 한국어 한 장으로 알려 주는 도구.**
+보안 담당자 없이 AWS에 서비스를 올린 작은 팀을 위해 만들었다. AI:ON 2026 출품작(팀 로그파인더).
 
-| 언제 | 무엇을 | 도구 |
+![보고서 첫 화면](docs/img/demo2_summary.png)
+
+## 왜 필요한가
+
+작은 팀은 경보가 울려도 그날 안에 답을 내기 어렵다. 로그가 여러 형식으로 흩어져 있고, 자기 팀의 작업과 공격을 구분하지 못한다.
+
+| 지금 쓰는 것 | 못 해 주는 것 | LogSight |
 | --- | --- | --- |
-| 평소 | 경보 받기 | GuardDuty(켜 두기) |
-| 평소 | 사고 때 쓸 로그가 켜져 있는지 점검 | `logsight check` |
-| 경보가 울린 날 | GuardDuty 결과 + 웹·서버 로그로 원인과 고칠 설정 찾기 | `logsight analyze` |
+| GuardDuty | 경보는 주지만 WAF·ALB·웹서버·SSH 로그는 읽지 않는다 | 이 로그들과 CloudTrail·VPC Flow를 한 사건으로 엮는다 |
+| 채팅 AI에 로그 붙여넣기 | 여러 로그를 엮지 못하고, 근거 없는 문장을 만든다 | 공방전 같은 사건에서 공격 단계 5/6(채팅 AI 3/6, [예비 1회](docs/채팅AI_기준선_실험.md)). 문장마다 근거(파일:줄)를 코드로 대조 |
+| 콘솔에서 직접 찾기 | 우리 팀 작업이 공격처럼 보인다 | 우리 팀으로 보이는 계정을 찾아 한 번 확인받는다. 공방전 판정 4/7 → 6/7 |
+
+비슷한 도구(GuardDuty 조사 에이전트, Detective, Suzaku, AI SOC 등)와의 비교: [docs/비슷한_제품_비교.md](docs/비슷한_제품_비교.md)
+
+## 무엇을 주나
+
+로그 폴더를 넣거나 AWS 경보가 오면 사건 보고서 한 장(HTML)을 만든다.
+
+1. **판정:** 공격 의심 / 공격 아님·위험 설정 / 판단 불가 / 정상 활동, 그리고 그렇게 본 이유
+2. **공격 흐름:** 침투 → 키 탈취 → 외부 사용처럼 시간순으로. 근거 이벤트가 있는 곳에만 선을 긋는다
+3. **고칠 곳:** 원인 설정과 AWS CLI 수정 명령, 되돌리기 명령. 자동 적용하지 않는다
+4. **모르는 것:** 로그가 없거나 끊겨서 판단할 수 없는 구간을 따로 적는다
+
+![공격 흐름 그림](docs/img/demo8_attack_flow.png)
 
 ## 빠른 실행
 
-    python -m venv .venv
-    # macOS/Linux: source .venv/bin/activate    Windows: .venv\Scripts\activate
-    pip install -r requirements.txt
-    python -m logsight analyze samples/demo --out reports/demo
-    # reports/demo/report.html 을 브라우저로 연다
-    python -m logsight analyze samples/combined --out reports/combined   # 로그 8종을 한 폴더에 넣은 예
+Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 돌린다.
 
-웹 데모: `uvicorn app:app --reload` → http://127.0.0.1:8000. 로그 파일 여러 개를 한 칸에 올리면 종류를 자동으로 알아본다(environment.json도 같이). 샘플 바로 보기: /demo?sample=demo|free|combined
+    pip install -r requirements.txt          # 또는 pip install .  (logsight 명령이 생긴다)
+    python -m logsight analyze samples/combined --out reports/combined --no-ai
+    # reports/combined/report.html 을 브라우저로 연다
 
-### 웹서버 침해 판단 (신규)
+웹 화면: `uvicorn app:app` → http://127.0.0.1:8000 · 모든 명령과 설정: [docs/사용법.md](docs/사용법.md)
 
-"우리 웹서버, 이미 뚫렸나?"를 **서버에 쌓인 로그·파일만으로** 판단하는 기능. nginx/Apache
-접속·오류 로그, 리눅스 인증 로그, 웹 루트 파일(웹셸)을 보고 침입 흐름을 복원해 판정한다.
+## 측정 결과
 
-    # 저장소에 포함된 샘플로 바로 (서버 불필요)
-    python -m logsight scan --profile samples/web/profile.json --no-ai --out reports/web_demo
-    # 실제 사이트: profile.json 하나만 바꾼다 (경로/웹루트/신뢰 IP)
-    python -m logsight scan --profile profile.json --out reports/mysite
+규칙을 고친 데이터(개발 데이터)와 처음 보는 데이터를 나눠 적는다. **처음 보는 데이터에서의 실력은 31%와 3/7이다.**
 
-웹 화면·API: `uvicorn app:app` → http://127.0.0.1:8000/web , JSON API는 `/api/web/scan`.
-설계·검증·한계는 `docs/웹서버_침해판단_설계.md`, 로컬 검증 환경은 `lab/README.md` 참고.
+| 데이터 | 처음 봤나 | 결과 | 문서 |
+| --- | --- | --- | --- |
+| Splunk attack_data AWS 표본 52개 | 예 | 행동 16개 맞게 탐지(31%) | [처음보는데이터_측정](docs/처음보는데이터_측정.md) |
+| AIT-LDS 웹서버(공개 데이터셋) | 예 | 공격 단계 3/7 | [공개데이터셋_독립측정](docs/공개데이터셋_독립측정.md) |
+| 클라우드 공방전 로그(실제 대회) | 아니오 | 데이터에 있는 공격 단계 5/6, 사건 판정 4/7 → 우리 팀 확인 후 6/7 | [공방전_로그_측정](docs/공방전_로그_측정.md), [우리팀_알아보기_측정](docs/우리팀_알아보기_측정.md) |
+| Splunk BOTSv3(실제 AWS 계정) | 아니오 | 큰 사건 3개 중 2개 | [BOTSv3_측정](docs/BOTSv3_측정.md) |
+| 자체 웹서버 실습 환경 | 아니오(시나리오를 우리가 만듦) | 34/34 단계, 정상 트래픽 오탐 0건 | [lab/README](lab/README.md) |
 
-Claude 분석을 켜려면 `ANTHROPIC_API_KEY`를 환경변수로 설정한다(.env.example 참고, 키는 커밋 금지).
-키가 없거나 호출이 실패하면 같은 형식의 규칙 기반 보고서를 만든다. 모델은 `LOGSIGHT_MODEL`
-(기본 `claude-haiku-5-5`)로 바꾼다. 키가 있으면 상세 분석 전에 사건 전체를 한 번 재검토해
-공격으로 보이는 사건을 위로 올리고 같은 공격의 사건들을 묶는다(`logsight/triage.py`, 모델은
-`LOGSIGHT_TRIAGE_MODEL`, 기본 `claude-opus-5-5`). 재검토는 순서만 바꾸고 사건을 지우지 않는다.
-Python 3.10 이상 필요.
+테스트 248개(커버리지 88%)를 Ubuntu·Windows·macOS × Python 3.10·3.13에서 돌린다. 규칙을 고칠 때마다 처음 보는 데이터에서 잡았던 16개를 계속 잡는지 CI가 다시 본다. 탐지 규칙 50개의 조건·사각지대·오탐은 [규칙_명세](docs/규칙_명세.md)에 있다.
 
-## 처리 흐름
+## 어떻게 동작하나
 
-    로그 파일/폴더(.json/.log/.gz)
-      → normalize.py   형식 자동 판별, 파서 5종, 공통 스키마(Event)
-      → detect.py      규칙 기반 1차 탐지 20종, MITRE ATT&CK 기법 대응
-      → correlate.py   의심 이벤트를 IP·인스턴스·IAM 주체·액세스 키로 묶어 사건 생성(networkx)
-                       나머지 이벤트는 맥락 집계로만 요약, 내보내는 데이터 마스킹
-      → config_audit.py 설정 스냅샷(environment.json)과 대조해 원인 설정·수정안·AWS CLI 생성
-      → analyze.py     Claude 구조화 출력(JSON 스키마) → 근거(ref)가 실제 입력에 있는지 코드로 검증
-      → graph.py       공격 흐름 그림: 근거 이벤트로만 선을 긋고, 모든 이벤트가 그림에 들어갔는지 다시 대조
-      → report.py      한 파일짜리 HTML 보고서(오프라인 시연 가능)
+    로그(CloudTrail, VPC Flow, WAF, ALB, 웹서버, SSH, GuardDuty 결과)
+      → 정규화: 형식을 자동으로 알아보고 공통 형식으로
+      → 탐지: 규칙 50개(MITRE ATT&CK 대응)
+      → 묶기: IP·인스턴스·IAM 주체·액세스 키로 사건을 만들고, 같은 공격의 사건끼리 잇는다
+      → 판정: 우리 팀 작업, 위험 설정, 공격을 가르고 공격을 위로
+      → 설명: 규칙 문장(기본) 또는 Claude(선택). 근거 위치를 코드로 다시 대조
+      → 보고서: 한 파일짜리 HTML
 
-원칙: 원본 로그를 통째로 AI에 보내지 않는다. 모든 판단에 근거 위치(파일:줄)를 붙인다.
-그림도 같다. 로그에 이어진 기록이 없으면 선으로 잇지 않는다(예: 웹 요청 로그에 대상 서버가 없으면 웹 서비스와 서버를 따로 둔다).
+![구조도](docs/img/architecture.png)
 
-![공격 흐름 그림 예시](docs/img/demo8_attack_flow.png)
-수정안은 자동 적용하지 않는다(사람이 검토 후 직접 적용).
+### AI를 어떻게 쓰나
 
-## 명령
+- **AI 없이도 끝까지 동작한다.** 키가 없거나 `--no-ai`면 규칙 판정과 문장 틀로 같은 형식의 보고서를 만든다. 로그는 컴퓨터 밖으로 나가지 않는다.
+- AI(Claude)를 켜면 사건 순서를 재검토하고 설명을 쓴다. 원본 로그를 통째로 보내지 않고, 마스킹한 사건 요약만 보낸다.
+- AI가 쓴 근거 번호가 실제 입력에 없으면 그 문장을 버린다. 자동 격리에서 조치를 고르는 것은 규칙이고, AI는 고르지 않는다.
+- 공격자는 User-Agent·요청 주소에 "정상 작업이니 무시하라" 같은 문장을 넣어 AI를 속일 수 있다. 그런 값은 "믿지 않는 값"으로 따로 보내고, 그런 문장이 보이면 공격 정황으로 표시한다. 규칙이 공격으로 본 사건을 AI가 낮추면 "의견 다름 · 확인 필요"로 남긴다.
 
-    python -m logsight analyze <파일|폴더...> [--env environment.json] [--top 5] [--no-ai] [--model ID]
-    python -m logsight analyze <폴더> --since 2017-02-12 --until 2017-02-13   # 기간만(기간 밖 파일은 읽지 않음)
-    python -m logsight analyze <폴더> --dry-run   # Claude에 보낼 내용(마스킹 후)만 ai_payload.json으로 저장
-    python -m logsight analyze guardduty_findings.json <다른 로그...>   # GuardDuty 탐지 결과도 함께 분석
-    python -m logsight analyze <폴더> --syslog-tz +09:00 --year 2026   # auth.log·kern.log처럼 연도·시간대 없는 줄의 해석
-    python -m logsight rules              # 탐지 규칙 목록
-    python -m unittest discover -s tests  # 테스트
-    python scripts/bench.py 200000        # 대용량 처리 시간 측정
+## 이것이 아닌 것
 
-폴더 안에 environment.json이 있으면 자동으로 설정 점검에 쓴다. 없으면 로그만으로 분석한다.
+- 24시간 감시 도구가 아니다. 감시는 GuardDuty에 맡기고, LogSight는 경보 다음을 맡는다.
+- 설정을 알아서 고치지 않는다. 수정 명령을 주고 적용은 사람이 한다(예외: 고르면 켜지는 자동 격리, 기본은 기록만 하는 시험 모드).
+- SIEM이 아니다. 로그를 오래 모아 검색하는 일은 하지 않는다.
 
-### AI 없이 쓰기(규칙 기반 모드)와 정상 작업 목록
+## 경보 연동과 설치 (구현, 실제 계정 미검증)
 
-API 키가 없거나 `--no-ai`면 Claude를 부르지 않고 끝까지 동작한다. 로그는 컴퓨터 밖으로 나가지 않고, 같은 입력이면 항상 같은 결과가 나온다.
-보고서 맨 위에 "AI 사용 안 함" 또는 "Claude 사용"이 표시된다.
+고객 서버에는 아무것도 설치하지 않는다. 고객 AWS 계정에는 콘솔 버튼 하나로 경보 전달, 보관용 CloudTrail, 읽기 전용 역할만 더한다.
+경보가 오면 분석 → 보고서 → 이메일·디스코드·슬랙·웹훅 통지까지 자동으로 이어진다.
+[고객_설치](docs/고객_설치.md) · [경보_연동](docs/경보_연동.md) · [통지](docs/통지.md) · [자동_격리](docs/자동_격리.md) · [수집_보호](docs/수집_보호.md)
 
-- 사건 판정: 공격 의심 / 공격 아님·위험 설정 / 판단 불가 / 정상 활동을 규칙으로 정하고 공격 의심을 위로 올린다(`logsight/explain.py`).
-- 설명 문장: 탐지 규칙마다 "누가, 무엇을, 몇 번, 성공·거부 몇 건, 왜 중요한가"를 쓰는 문장 틀이 있다.
-- 로그 범위: 로그 종류별 기간을 막대로 보여 주고, 없는 로그·먼저 끝난 로그·S3 데이터 이벤트 0건처럼 "이 로그로는 알 수 없는 것"을 적는다.
-- 정상 작업 목록: environment.json에 운영자·배포 계정·관리 IP를 적으면 그 활동만으로 된 사건을 "정상 활동"으로 내린다. 사건을 지우지 않고 순서만 바꾼다. `trusted_ips`도 목록으로 쓴다.
+## 알려진 한계
 
-```json
-"known_activity": [
-  {"label": "배포 자동화(CI)", "actors": ["github-actions-deploy", "*-deploy-role"]},
-  {"label": "모니터링 서버", "ips": ["10.0.9.5/32"]},
-  {"label": "백업 키", "access_keys": ["AKIA..."]}
-]
-```
+- 처음 보는 데이터 탐지 범위 31%. 놓친 행동(MFA 끄기, KMS 랜섬웨어, NACL 개방 등)은 [처음보는데이터_측정](docs/처음보는데이터_측정.md)에 있다.
+- 실제 고객 계정 시험 0회, 고객 인터뷰 0건, 비전문가 사용자 시험 0회. 계획은 [사용자평가](docs/사용자평가/설계.md), [고객검증](docs/고객검증/).
+- 경보 연동·설치 템플릿은 cfn-lint와 가짜 AWS(moto)로만 시험했다.
+- 우리 팀 알아보기는 공방전 데이터를 보며 만들었다. 공격자가 콘솔로 오래 활동하면 후보에 오를 수 있어 사람의 확인을 꼭 거친다.
 
-`actors`는 IAM ARN 전체나 마지막 이름에 `*` 패턴으로 맞춘다. 목록의 계정이 도용되면 공격을 정상으로 볼 수 있으므로 목록은 좁게 쓴다.
+## 문서
 
-같은 사건을 규칙과 Claude로 나란히 보는 화면: `python scripts/compare_modes.py --col "규칙=report.json:rule_triage" --col "Claude=report.json:triage"` (웹 데모는 `/compare`).
-
-## 분석 전에: 로그가 켜져 있는지 점검하고 켜기
-
-작은 팀은 분석할 로그가 아예 꺼져 있는 경우가 많다(추정). `pip install boto3` 후:
-
-    python -m logsight check                          # 읽기 전용 점검: 꺼진 로그, 비용, 무료 대안, 켜는 명령
-    python -m logsight check --apply CT_TRAIL VPC_FLOW GUARDDUTY   # 확인('yes') 후 지정 항목만 켜기
-    python -m logsight collect environment --out environment.json  # 보안그룹·NACL·WAF·IAM 설정 자동 수집
-    python -m logsight collect cloudtrail-history --days 30 --out logs/ct.json  # 무료 90일 이벤트 기록
-    python -m logsight cost --web-requests 3000000    # 로그를 켰을 때 월 비용 어림셈
-
-돈이 드는 로그의 무료 대안:
-
-| 유료 | 무료 대안 | 분석 방법 |
-| --- | --- | --- |
-| CloudTrail 추적 | CloudTrail 이벤트 기록(최근 90일) | `collect cloudtrail-history` |
-| VPC Flow Logs | 서버 방화벽 로그 | 서버에서 `sudo bash scripts/setup_hostfw_log.sh` → `kern.log` 분석 |
-| AWS WAF 로그 | nginx/apache 접속 로그 | `access.log` 그대로 분석 |
-
-자세한 내용: [docs/로그_점검과_무료대체.md](docs/로그_점검과_무료대체.md), 남은 문제 해결 방안: [docs/해결방안_조사.md](docs/해결방안_조사.md)
-
-## flaws.cloud 공개 데이터셋으로 돌리기
-
-summitroute.com에서 `flaws_cloudtrail_logs.tar`(약 240MB)를 받아 풀고:
-
-    tar -xf flaws_cloudtrail_logs.tar -C data/
-    python -m logsight analyze data/flaws_cloudtrail_logs --top 10 --no-ai --out reports/flaws
-
-이 데이터셋의 IP는 익명화되어 있어 파이프라인 동작·규모 검증용으로 쓴다.
-194만 건 전체는 메모리를 2GB 안팎 쓸 수 있으니 처음에는 파일 몇 개로 시작한다.
-
-## 폴더
-
-    logsight/        분석 엔진
-    app.py           FastAPI 웹 데모
-    samples/demo/    작은 샘플 로그 4종 + 설정 스냅샷 예시
-    samples/combined/ 로그 8종을 한곳에 모은 합성 샘플(정규화 점검용)
-    tests/           단위·통합 테스트(171개)
-    scripts/         성능 측정
-    reports/demo/    샘플 분석 결과(HTML, JSON, 화면 캡처)
-    reports/combined/ 8종 통합 분석 결과
-    docs/            중간보고서용 구현 요약, 발표 자료(중간보고_발표자료.md)
-    .github/workflows/test.yml  Windows·macOS·Linux 자동 테스트(저장소에 올리면 동작)
+전체 목록: [docs/README.md](docs/README.md) · 변경 기록: [CHANGELOG.md](CHANGELOG.md) · 보안 신고: [SECURITY.md](SECURITY.md) · 기여: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 라이선스
 
-MIT 라이선스. 자세한 내용은 `LICENSE` 파일을 보세요. 변경 기록은 `CHANGELOG.md`에 있습니다.
+코드는 MIT 라이선스([LICENSE](LICENSE)). 성능 측정에 쓴 외부 데이터셋은 저장소에 들어 있지 않고 각 데이터셋의 라이선스를 따른다.
 
-MIT 라이선스는 이 저장소의 코드에만 적용됩니다. 성능 측정에 쓴 외부 데이터셋은 저장소에 들어 있지 않고, 각 데이터셋의 라이선스를 따릅니다.
-
-This project utilizes the AIT Log Data Set V2.0 (AIT-LDSv2) provided by M. Landauer et al. (AIT Austrian Institute of Technology), licensed under CC BY-NC-SA 4.0 (https://doi.org/10.5281/zenodo.5789064), for non-commercial evaluation only. 인용과 측정 결과는 `docs/공개데이터셋_독립측정.md`를 보세요.
-
-실제 AWS 계정 로그 측정에는 Splunk BOTSv3(https://github.com/splunk/botsv3, CC0)를 썼습니다. 결과는 `docs/BOTSv3_측정.md`를 보세요.
-
-## CTF 로그로 탐지 성능 재기
-
-동아리 CTF 등 허가된 환경에서 나온 로그로 판정 성능을 재는 방법은 `docs/CTF_로그_수집_가이드.md`를 보세요.
+- This project utilizes the AIT Log Data Set V2.0 (AIT-LDSv2) provided by M. Landauer et al. (AIT Austrian Institute of Technology), licensed under CC BY-NC-SA 4.0 (https://doi.org/10.5281/zenodo.5789064), for non-commercial evaluation only.
+- Splunk BOTSv3(https://github.com/splunk/botsv3, CC0), Splunk attack_data·Security Content(Apache-2.0).

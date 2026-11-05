@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  LogSight alert hookup. Sends GuardDuty findings, CloudWatch alarms and risky API calls
+  to an SQS queue that `python -m logsight watch` reads. Nothing here changes existing resources:
+  it only adds a queue, EventBridge rules and a read policy for the LogSight analysis server.
+
+Parameters:
+  MinGuardDutySeverity:
+    Type: String
+    Default: MEDIUM
+    AllowedValues: [LOW, MEDIUM, HIGH]
+    Description: GuardDuty findings at or above this level start an analysis (LOW>=1, MEDIUM>=4, HIGH>=7).
+  WatchCloudWatchAlarms:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+  AlarmNamePrefix:
+    Type: String
+    Default: ""
+    Description: Optional. Only alarms whose name starts with this text (empty = all alarms).
+  WatchRiskyApiCalls:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: >-
+      Log tampering, key creation and permission changes seen by CloudTrail. IAM calls are
+      delivered to EventBridge in us-east-1 only, so deploy this stack there too to catch them.
+  LogBucketName:
+    Type: String
+    Default: ""
+    Description: Optional. Bucket with CloudTrail/VPC Flow/ALB logs the analysis server may read.
+  ConsumerRoleName:
+    Type: String
+    Default: ""
+    Description: Optional. Existing IAM role of the analysis server (e.g. the LogSight read-only role) to attach the policy to.
+
+Conditions:
+  SevHigh: !Equals [!Ref MinGuardDutySeverity, HIGH]
+  SevMedium: !Equals [!Ref MinGuardDutySeverity, MEDIUM]
+  UseAlarms: !Equals [!Ref WatchCloudWatchAlarms, "true"]
+  HasAlarmPrefix: !Not [!Equals [!Ref AlarmNamePrefix, ""]]
+  UseApi: !Equals [!Ref WatchRiskyApiCalls, "true"]
+  HasBucket: !Not [!Equals [!Ref LogBucketName, ""]]
+  HasRole: !Not [!Equals [!Ref ConsumerRoleName, ""]]
+
+Resources:
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-failed
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+
+  AlertQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-alerts
+      MessageRetentionPeriod: 345600        # 4 days: alerts wait while the analysis server is off
+      VisibilityTimeout: 900                # one analysis (with AI) may take minutes
+      ReceiveMessageWaitTimeSeconds: 20
+      SqsManagedSseEnabled: true
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  GuardDutyRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub ${AWS::StackName}-guardduty
+      Description: GuardDuty findings to LogSight
+      EventPattern:
+        source: [aws.guardduty]
+        detail-type: [GuardDuty Finding]
+        detail:
+          severity: !If
+            - SevHigh
+            - [{numeric: [">=", 7]}]
+            - !If [SevMedium, [{numeric: [">=", 4]}], [{numeric: [">=", 1]}]]
+      Targets:
+        - Arn: !GetAtt AlertQueue.Arn
+          Id: logsight-queue
+
+  AlarmRule:
+    Type: AWS::Events::Rule
+    Condition: UseAlarms
+    Properties:
+      Name: !Sub ${AWS::StackName}-alarms
+      Description: CloudWatch alarms entering ALARM to LogSight
+      EventPattern:
+        source: [aws.cloudwatch]
+        detail-type: [CloudWatch Alarm State Change]
+        detail: !If
+          - HasAlarmPrefix
+          - state: {value: [ALARM]}
+            alarmName: [{prefix: !Ref AlarmNamePrefix}]
+          - state: {value: [ALARM]}
+      Targets:
+        - Arn: !GetAtt AlertQueue.Arn
+          Id: logsight-queue
+
+  RiskyApiRule:
+    Type: AWS::Events::Rule
+    Condition: UseApi
+    Properties:
+      Name: !Sub ${AWS::StackName}-risky-api
+      Description: Log tampering, persistence and permission changes to LogSight
+      EventPattern:
+        detail-type: [AWS API Call via CloudTrail]
+        detail:
+          eventName:
+            - StopLogging
+            - DeleteTrail
+            - UpdateTrail
+            - PutEventSelectors
+            - DeleteDetector
+            - DeleteFlowLogs
+            - DeleteLogGroup
+            - PutBucketPolicy
+            - DeleteBucketPolicy
+            - DeactivateMFADevice
+            - ScheduleKeyDeletion
+            - CreateAccessKey
+            - CreateUser
+            - CreateLoginProfile
+            - UpdateLoginProfile
+            - AttachUserPolicy
+            - AttachRolePolicy
+            - PutUserPolicy
+            - PutRolePolicy
+            - CreatePolicyVersion
+            - UpdateAssumeRolePolicy
+            - AuthorizeSecurityGroupIngress
+      Targets:
+        - Arn: !GetAtt AlertQueue.Arn
+          Id: logsight-queue
+
+  AlertQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues: [!Ref AlertQueue]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: EventBridgeFromThisStackOnly
+            Effect: Allow
+            Principal: {Service: events.amazonaws.com}
+            Action: sqs:SendMessage
+            Resource: !GetAtt AlertQueue.Arn
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/${AWS::StackName}-*
+
+  ConsumerPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: LogSight analysis server - read alerts from the queue and read log files. No write access to anything else.
+      Roles: !If [HasRole, [!Ref ConsumerRoleName], !Ref AWS::NoValue]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ReadAlertQueue
+            Effect: Allow
+            Action: [sqs:ReceiveMessage, sqs:DeleteMessage, sqs:ChangeMessageVisibility, sqs:GetQueueAttributes]
+            Resource: !GetAtt AlertQueue.Arn
+          - !If
+            - HasBucket
+            - Sid: ReadLogBucket
+              Effect: Allow
+              Action: [s3:ListBucket, s3:GetObject]
+              Resource:
+                - !Sub arn:${AWS::Partition}:s3:::${LogBucketName}
+                - !Sub arn:${AWS::Partition}:s3:::${LogBucketName}/*
+            - !Ref AWS::NoValue
+
+Outputs:
+  QueueUrl:
+    Value: !Ref AlertQueue
+  FailedQueueUrl:
+    Description: Alerts that failed 3 times land here. Check it if a report is missing.
+    Value: !Ref DeadLetterQueue
+  ConsumerPolicyArn:
+    Description: Attach to the analysis server's role or user if ConsumerRoleName was empty.
+    Value: !Ref ConsumerPolicy
+  WatchCommand:
+    Value: !Sub python -m logsight watch --queue-url ${AlertQueue} --region ${AWS::Region} --logs <local log folder>

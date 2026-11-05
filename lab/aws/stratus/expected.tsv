@@ -1,0 +1,49 @@
+# technique	expected	rules	why
+# 실행 전에 detect.py 코드만 보고 적은 예상(2026-11-04). 실행 뒤에도 이 파일은 고치지 않는다.
+# expected: catch(잡을 것) / miss(놓칠 것) / maybe(기준·환경에 따라)
+aws.credential-access.ec2-get-password-data	miss	-	GetPasswordData 규칙 없음
+aws.credential-access.ec2-steal-instance-credentials	catch	CT_INSTANCE_CRED_OUTSIDE	역할 키를 인스턴스 밖 IP에서 사용(environment.json에 인스턴스 IP 필요)
+aws.credential-access.secretsmanager-batch-retrieve-secrets	miss	-	Secrets Manager 규칙 없음
+aws.credential-access.secretsmanager-retrieve-secrets	miss	-	Secrets Manager 규칙 없음
+aws.credential-access.ssm-retrieve-securestring-parameters	miss	-	SSM 파라미터 규칙 없음
+aws.defense-evasion.cloudtrail-delete	catch	CT_LOGGING_TAMPER	DeleteTrail
+aws.defense-evasion.cloudtrail-event-selectors	catch	CT_LOGGING_TAMPER	PutEventSelectors
+aws.defense-evasion.cloudtrail-lifecycle-rule	miss	-	PutBucketLifecycle 규칙 없음(Splunk 측정에서도 놓침)
+aws.defense-evasion.cloudtrail-stop	catch	CT_LOGGING_TAMPER	StopLogging
+aws.defense-evasion.dns-delete-logs	miss	-	Route 53 Resolver 로그 삭제 규칙 없음
+aws.defense-evasion.organizations-leave	miss	-	LeaveOrganization 규칙 없음
+aws.defense-evasion.vpc-remove-flow-logs	catch	CT_LOGGING_TAMPER	DeleteFlowLogs
+aws.discovery.ec2-download-user-data	miss	-	DescribeInstanceAttribute가 조회 목록에 없음
+aws.discovery.ec2-enumerate-from-instance	maybe	CT_DISCOVERY_BURST	조회 폭주 기준을 넘는지에 달림
+aws.discovery.ses-enumerate	miss	-	SES 조회가 조회 목록에 없음
+aws.execution.ec2-launch-unusual-instances	maybe	CT_ACCESS_DENIED_BURST	실행이 거부되면 거부 폭주로만 걸릴 수 있음
+aws.execution.ec2-user-data	miss	-	ModifyInstanceAttribute(userData) 규칙 없음(Splunk 측정에서도 놓침)
+aws.execution.sagemaker-update-lifecycle-config	miss	-	SageMaker 규칙 없음
+aws.execution.ssm-send-command	miss	-	SSM 명령 실행 규칙 없음(키 오용 규칙으로만 걸릴 수 있음)
+aws.execution.ssm-start-session	miss	-	SSM 세션 규칙 없음
+aws.exfiltration.ec2-security-group-open-port-22-ingress	catch	CT_SG_OPENED	0.0.0.0/0 인바운드
+aws.exfiltration.ec2-share-ami	catch	CT_SNAPSHOT_SHARE	ModifyImageAttribute
+aws.exfiltration.ec2-share-ebs-snapshot	catch	CT_SNAPSHOT_SHARE	ModifySnapshotAttribute
+aws.exfiltration.ec2-share-ebs-volume	miss	-	볼륨 공유 규칙 없음
+aws.exfiltration.rds-share-snapshot	miss	-	ModifyDBSnapshotAttribute 규칙 없음
+aws.exfiltration.s3-backdoor-bucket-policy	miss	-	다른 계정에 여는 버킷 정책은 '인터넷 전체 공개'가 아니라 안 걸림
+aws.impact.bedrock-invoke-model	miss	-	Bedrock 규칙 없음
+aws.impact.ec2-deregister-ami	miss	-	AMI 삭제 규칙 없음
+aws.impact.s3-ransomware-batch-deletion	miss	-	삭제 규칙 없음(S3 데이터 이벤트 필요)
+aws.impact.s3-ransomware-client-side-encryption	maybe	CT_S3_BULK_READ	GetObject가 기준 이상이면 대량 읽기로만 걸림(S3 데이터 이벤트 필요)
+aws.impact.s3-ransomware-individual-deletion	miss	-	삭제 규칙 없음(S3 데이터 이벤트 필요)
+aws.initial-access.console-login-without-mfa	catch	CT_CONSOLE_NO_MFA	MFA 없는 콘솔 로그인 성공
+aws.lateral-movement.ec2-instance-connect	miss	-	SendSSHPublicKey 규칙 없음
+aws.lateral-movement.ec2-serial-console-send-ssh-public-key	miss	-	직렬 콘솔 규칙 없음
+aws.persistence.ec2-create-suspicious-keypair	miss	-	CreateKeyPair 규칙 없음
+aws.persistence.iam-backdoor-role	catch	CT_IAM_PERSISTENCE	UpdateAssumeRolePolicy
+aws.persistence.iam-backdoor-user	catch	CT_IAM_PERSISTENCE	CreateAccessKey
+aws.persistence.iam-create-admin-user	catch	CT_IAM_PERSISTENCE	CreateUser·AttachUserPolicy
+aws.persistence.iam-create-backdoor-role	catch	CT_IAM_PERSISTENCE	CreateRole
+aws.persistence.iam-create-user-login-profile	catch	CT_IAM_PERSISTENCE	CreateLoginProfile
+aws.persistence.lambda-backdoor-function	miss	-	Lambda 권한 추가 규칙 없음
+aws.persistence.lambda-layer-extension	miss	-	Lambda 설정 변경 규칙 없음
+aws.persistence.lambda-overwrite-code	miss	-	UpdateFunctionCode 규칙 없음
+aws.persistence.rolesanywhere-create-trust-anchor	miss	-	IAM Roles Anywhere 규칙 없음
+aws.persistence.sts-federation-token	miss	-	GetFederationToken 규칙 없음
+aws.privilege-escalation.iam-update-user-login-profile	catch	CT_IAM_PERSISTENCE	UpdateLoginProfile

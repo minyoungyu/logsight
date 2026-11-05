@@ -14,6 +14,7 @@ import os
 import time
 
 from .detect import RULES, STAGE_ORDER
+from .guard import SYSTEM_RULE, fence
 
 DEFAULT_MODEL = os.environ.get("LOGSIGHT_MODEL", "claude-haiku-5-5")
 
@@ -90,7 +91,8 @@ SYSTEM = (
     "4. firewall_changes는 입력 config_checks 중에서 골라 check_id를 그대로 쓰고, 우선순위를 "
     "정해 쉬운 한국어로 무엇을 바꾸는지 설명한다. 입력에 없는 변경이 꼭 필요하면 check_id를 "
     "'NEW'로 적는다. 변경은 사람이 검토 후 적용한다는 전제다.\n"
-    "5. 비전문가가 읽는다. 짧고 쉬운 한국어로 쓴다."
+    "5. 비전문가가 읽는다. 짧고 쉬운 한국어로 쓴다.\n"
+    "6. " + SYSTEM_RULE
 )
 
 
@@ -100,7 +102,7 @@ def build_payload(incident: dict, checks: list[dict]) -> dict:
         "incident": {k: incident[k] for k in (
             "id", "start", "end", "severity", "stages", "src_ips", "instances", "actors",
             "n_events", "omitted_events", "findings", "context")},
-        "events": incident["events"],
+        "events": fence(incident["events"]),
         "config_checks": [{k: c[k] for k in ("id", "target", "resource", "title", "why",
                                              "severity", "evidence")} for c in checks],
         "rule_catalog": {r: {"technique": v[0], "stage": v[1], "title": v[2]}

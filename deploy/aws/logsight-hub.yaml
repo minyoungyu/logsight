@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  LogSight hub (deploy in the LOGSIGHT-operated account, not in a customer account).
+  Customer accounts forward security alerts to this event bus; a rule puts them on one SQS
+  queue that `logsight watch` reads. Each alert keeps the customer's account id, so one
+  analysis server serves many customers. Deploy logsight-log-archive.yaml in this same
+  account for the log archive. Add a customer's account id to CustomerAccountIds before
+  (or right after) the customer creates the onboarding stack.
+
+Parameters:
+  CustomerAccountIds:
+    Type: CommaDelimitedList
+    Description: AWS account ids of customers allowed to send alerts here.
+  ConsumerRoleName:
+    Type: String
+    Default: ""
+    Description: Optional. IAM role of the LogSight analysis server to attach the queue read policy to.
+
+Conditions:
+  HasRole: !Not [!Equals [!Ref ConsumerRoleName, ""]]
+
+Resources:
+  IntakeBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: logsight-intake
+
+  IntakeBusPolicy:
+    Type: AWS::Events::EventBusPolicy
+    Properties:
+      EventBusName: !Ref IntakeBus
+      StatementId: customers-may-send
+      Statement:
+        Effect: Allow
+        Principal: {AWS: !Ref CustomerAccountIds}
+        Action: events:PutEvents
+        Resource: !GetAtt IntakeBus.Arn
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: logsight-hub-failed
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+
+  AlertQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: logsight-hub-alerts
+      MessageRetentionPeriod: 345600        # 4 days: alerts wait while the analysis server is off
+      VisibilityTimeout: 900
+      ReceiveMessageWaitTimeSeconds: 20
+      SqsManagedSseEnabled: true
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  ForwardRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: logsight-hub-to-queue
+      Description: Every customer alert on the intake bus goes to the analysis queue
+      EventBusName: !Ref IntakeBus
+      EventPattern:
+        account: !Ref CustomerAccountIds
+      Targets:
+        - Arn: !GetAtt AlertQueue.Arn
+          Id: logsight-queue
+
+  AlertQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues: [!Ref AlertQueue]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: OnlyTheHubRule
+            Effect: Allow
+            Principal: {Service: events.amazonaws.com}
+            Action: sqs:SendMessage
+            Resource: !GetAtt AlertQueue.Arn
+            Condition:
+              ArnEquals: {aws:SourceArn: !GetAtt ForwardRule.Arn}
+
+  ConsumerPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: LogSight analysis server - read alerts from the hub queue.
+      Roles: !If [HasRole, [!Ref ConsumerRoleName], !Ref AWS::NoValue]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: [sqs:ReceiveMessage, sqs:DeleteMessage, sqs:ChangeMessageVisibility, sqs:GetQueueAttributes]
+            Resource: !GetAtt AlertQueue.Arn
+
+Outputs:
+  IntakeBusArn:
+    Description: Give this to the onboarding link (logsight onboard-link --bus-arn).
+    Value: !GetAtt IntakeBus.Arn
+  QueueUrl:
+    Value: !Ref AlertQueue
+  FailedQueueUrl:
+    Value: !Ref DeadLetterQueue
+  WatchCommand:
+    Value: !Sub >-
+      python -m logsight watch --queue-url ${AlertQueue} --region ${AWS::Region}
+      --s3 "s3://<archive bucket>/AWSLogs/{account}/CloudTrail/{region}/{date}/"
+      --s3 "s3://<archive bucket>/AWSLogs/{account}/vpcflowlogs/{region}/{date}/"

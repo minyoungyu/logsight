@@ -329,7 +329,7 @@ def svg(g: dict, width: int = 1000) -> str:
     for c in cols:
         out.append(f"<text x='{colx[c] + nw / 2:.0f}' y='18' class=colh text-anchor=middle>{COL_KO[c]}</text>")
     for lk in g["links"]:
-        (x1, y1, h1), (x2, y2, h2) = pos[lk["src"]], pos[lk["dst"]]
+        (x1, y1, _), (x2, y2, _) = pos[lk["src"]], pos[lk["dst"]]
         out.append(f"<path d='M{x1 + nw:.0f},{y1 + 16:.0f} C{x1 + nw + 60:.0f},{y1 + 16:.0f} {x2 - 60:.0f},{y2 + 16:.0f} "
                    f"{x2:.0f},{y2 + 16:.0f}' class=link><title>{escape(lk['label'])}</title></path>")
     out += paths

@@ -1,0 +1,42 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ProtectTrailsDetectorsFlowLogs",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:UpdateTrail",
+        "cloudtrail:PutEventSelectors",
+        "guardduty:DeleteDetector",
+        "guardduty:DisassociateFromMasterAccount",
+        "guardduty:DisassociateFromAdministratorAccount",
+        "ec2:DeleteFlowLogs"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/logsight-break-glass"
+        }
+      }
+    },
+    {
+      "Sid": "ProtectLogSightAlertRules",
+      "Effect": "Deny",
+      "Action": [
+        "events:DeleteRule",
+        "events:DisableRule",
+        "events:RemoveTargets",
+        "events:PutRule",
+        "events:PutTargets"
+      ],
+      "Resource": "arn:aws:events:*:*:rule/logsight-*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/logsight-break-glass"
+        }
+      }
+    }
+  ]
+}
