@@ -51,6 +51,9 @@ jobs:
   # 실제 키·비밀값이 커밋에 섞이지 않게 막는다(새로 들어오는 커밋만 본다)
   secrets:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read   # gitleaks-action이 PR의 커밋 목록을 읽는다
     steps:
       - uses: actions/checkout@v5
         with:
