@@ -339,6 +339,9 @@ class RuleExtensions(unittest.TestCase):
                                                               params={"dBInstanceIdentifier": "db", "skipFinalSnapshot": False})]))
         self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "DeleteDBInstance", "rds",
                                                            params={"dBInstanceIdentifier": "db", "skipFinalSnapshot": True})]))
+        # 저장용 params는 앞 8개 키·400자로 잘린다. 뒤쪽에 있어도 전체 파라미터로 판단해야 한다
+        long = {f"k{i}": "x" * 60 for i in range(9)} | {"skipFinalSnapshot": True}
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "DeleteDBInstance", "rds", params=long)]))
 
     def test_serverless_external_permission_and_layers(self):
         self.assertIn("CT_SERVERLESS_CHANGE", aws_rules([ct(0, "AddPermission20150331v2", "lambda",

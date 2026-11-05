@@ -285,7 +285,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         if a == "ec2:GetPasswordData" or (a == "secretsmanager:BatchGetSecretValue" and e.outcome == "success"):
             singles[("CT_SECRET_ACCESS", e.actor or "")].append(e)
         if a in DESTROY_ONE or "versioning_off" in flags:
-            if a not in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") or "skipFinalSnapshot\": true" in str(params):
+            if a not in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") or "no_final_snapshot" in flags:
                 singles[("CT_DATA_DESTRUCTION", e.actor or "")].append(e)
         if e.extra.get("identity_type") == "Root" and e.extra.get("eventType") != "AwsServiceEvent":
             singles[("CT_ROOT_USAGE", e.src_ip or "")].append(e)

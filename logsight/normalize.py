@@ -557,6 +557,9 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
             and "0.0.0.0/0" in txt and re.search(r'"ruleAction"\s*:\s*"allow"', txt) \
             and not re.search(r'"egress"\s*:\s*true', txt):
         flags.append("nacl_open")
+    if action in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") \
+            and re.search(r'"skipFinalSnapshot"\s*:\s*true', txt):
+        flags.append("no_final_snapshot")  # 마지막 스냅샷 없이 지움: 되살릴 수 없다
     if action in ("ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath") \
             and re.search(r'"withDecryption"\s*:\s*true', txt):
         flags.append("decrypt")
