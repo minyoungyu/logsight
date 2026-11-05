@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from urllib.parse import unquote_plus
 
-WEB_SOURCES = {"waf", "alb", "weblog", "apigw"}
+WEB_SOURCES = {"waf", "alb", "weblog", "apigw", "access"}
 # 공격자가 값을 정할 수 있는 필드(이벤트 종류와 상관없이)
 UNTRUSTED_KEYS = ("ua", "userAgent", "params", "http_host")
 
@@ -43,7 +43,7 @@ def _untrusted_of(e: dict) -> dict:
     out = {k: e[k] for k in UNTRUSTED_KEYS if e.get(k)}
     if e.get("source") in WEB_SOURCES and e.get("action"):
         out["request"] = e["action"]  # 요청 줄(경로·쿼리)은 공격자가 쓴다
-    if e.get("source") == "sshauth" and e.get("actor"):
+    if e.get("source") in ("sshauth", "auth") and e.get("actor"):
         out["login_name"] = e["actor"]  # 시도한 사용자 이름도 공격자가 정한다
     return out
 

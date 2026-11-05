@@ -331,7 +331,7 @@ def apply(ids: list[str], session=None, region: str | None = None) -> list[dict]
         try:
             if id_ not in APPLY_SUPPORTED:
                 results.append({"id": id_, "ok": False,
-                                "detail": f"자동 켜기를 지원하지 않음. check 결과의 명령을 참고하세요."})
+                                "detail": "자동 켜기를 지원하지 않음. check 결과의 명령을 참고하세요."})
                 continue
             if id_ == "GUARDDUTY":
                 g = s.client("guardduty", region_name=region)

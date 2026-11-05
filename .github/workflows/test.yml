@@ -13,11 +13,48 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -r requirements.txt httpx "moto[ec2,s3,cloudtrail,iam,wafv2,elbv2,guardduty,sts,sqs]>=5"
-      - run: python -m unittest discover -s tests -v
+      - run: pip install -r requirements.txt httpx pytest pytest-cov "moto[ec2,s3,cloudtrail,iam,wafv2,elbv2,guardduty,sts,sqs]>=5"
+      # pytest는 unittest 형식과 함수 형식 시험을 모두 돈다(unittest discover는 함수 형식을 건너뛴다)
+      - run: python -m pytest --cov --cov-report=term
       - run: python -m logsight analyze samples/demo --out reports/ci --no-ai
       - run: python -m logsight analyze samples/free --out reports/ci-free --no-ai
       - run: python -m logsight analyze samples/combined --out reports/ci-combined --no-ai --year 2026
       - run: python -m logsight cost
       - run: python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai --out reports/ci-alert --respond deploy/respond.example.json
       - run: python -m logsight scan --profile samples/web/profile.json --no-ai --out reports/ci-web
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install ruff
+      - run: ruff check .
+
+  # 처음 보는 데이터(Splunk attack_data)에서 한 번 맞게 잡은 것을 계속 잡는지 본다. 기준 파일은 다시 만들지 않는다.
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: data/public/attack_data
+          key: attack-data-${{ hashFiles('reports/public/splunk_attack_data.json') }}
+      - run: python scripts/public/regress_splunk.py --cache data/public/attack_data
+
+  # 실제 키·비밀값이 커밋에 섞이지 않게 막는다(새로 들어오는 커밋만 본다)
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

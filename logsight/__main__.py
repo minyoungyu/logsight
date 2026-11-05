@@ -28,6 +28,8 @@ def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")  # Windows 콘솔에서 한글 깨짐 방지
     ap = argparse.ArgumentParser(prog="logsight", description="AWS 로그 공격 흐름 분석")
+    from . import __version__
+    ap.add_argument("--version", action="version", version=f"logsight {__version__}")
     sub = ap.add_subparsers(dest="cmd", required=True)
     a = sub.add_parser("analyze", help="로그 파일/폴더 분석")
     a.add_argument("paths", nargs="+", help="로그 파일 또는 폴더(.json/.log/.gz)")

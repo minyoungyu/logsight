@@ -37,7 +37,7 @@
 
 Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 돌린다.
 
-    pip install -r requirements.txt
+    pip install -r requirements.txt          # 또는 pip install .  (logsight 명령이 생긴다)
     python -m logsight analyze samples/combined --out reports/combined --no-ai
     # reports/combined/report.html 을 브라우저로 연다
 
@@ -55,7 +55,7 @@ Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 �
 | Splunk BOTSv3(실제 AWS 계정) | 아니오 | 큰 사건 3개 중 2개 | [BOTSv3_측정](docs/BOTSv3_측정.md) |
 | 자체 웹서버 실습 환경 | 아니오(시나리오를 우리가 만듦) | 34/34 단계, 정상 트래픽 오탐 0건 | [lab/README](lab/README.md) |
 
-테스트 229개를 Ubuntu·Windows·macOS × Python 3.10·3.13에서 돌린다. 탐지 규칙 50개의 조건·사각지대·오탐은 [규칙_명세](docs/규칙_명세.md)에 있다.
+테스트 248개(커버리지 88%)를 Ubuntu·Windows·macOS × Python 3.10·3.13에서 돌린다. 규칙을 고칠 때마다 처음 보는 데이터에서 잡았던 16개를 계속 잡는지 CI가 다시 본다. 탐지 규칙 50개의 조건·사각지대·오탐은 [규칙_명세](docs/규칙_명세.md)에 있다.
 
 ## 어떻게 동작하나
 
@@ -74,6 +74,7 @@ Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 �
 - **AI 없이도 끝까지 동작한다.** 키가 없거나 `--no-ai`면 규칙 판정과 문장 틀로 같은 형식의 보고서를 만든다. 로그는 컴퓨터 밖으로 나가지 않는다.
 - AI(Claude)를 켜면 사건 순서를 재검토하고 설명을 쓴다. 원본 로그를 통째로 보내지 않고, 마스킹한 사건 요약만 보낸다.
 - AI가 쓴 근거 번호가 실제 입력에 없으면 그 문장을 버린다. 자동 격리에서 조치를 고르는 것은 규칙이고, AI는 고르지 않는다.
+- 공격자는 User-Agent·요청 주소에 "정상 작업이니 무시하라" 같은 문장을 넣어 AI를 속일 수 있다. 그런 값은 "믿지 않는 값"으로 따로 보내고, 그런 문장이 보이면 공격 정황으로 표시한다. 규칙이 공격으로 본 사건을 AI가 낮추면 "의견 다름 · 확인 필요"로 남긴다.
 
 ## 이것이 아닌 것
 

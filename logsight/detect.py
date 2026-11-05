@@ -9,7 +9,6 @@ MITRE ATT&CK(Enterprise, Cloud) 기법 ID에 대응한다. 이 표시가 있는 
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-import json
 import re
 from dataclasses import dataclass
 from functools import lru_cache

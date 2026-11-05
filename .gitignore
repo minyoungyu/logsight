@@ -17,3 +17,7 @@ reports/ci-web/
 *.run.log
 reports/ci-alert/
 reports/alerts/
+.coverage
+dist/
+build/
+*.egg-info/

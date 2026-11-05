@@ -1,0 +1,137 @@
+{
+ "demo": {
+  "n_events": 11,
+  "rules": {
+   "CT_IAM_PERSISTENCE": 1,
+   "CT_INSTANCE_CRED_OUTSIDE": 1,
+   "SSH_SUCCESS_AFTER_FAIL": 1,
+   "VPC_REMOTE_ADMIN_EXPOSED": 1,
+   "WEB_SQLI_PATTERN": 1
+  },
+  "incidents": [
+   {
+    "id": "INC-001",
+    "verdict": "attack",
+    "rules": [
+     "CT_IAM_PERSISTENCE",
+     "CT_INSTANCE_CRED_OUTSIDE",
+     "SSH_SUCCESS_AFTER_FAIL",
+     "VPC_REMOTE_ADMIN_EXPOSED",
+     "WEB_SQLI_PATTERN"
+    ],
+    "stages": [
+     "initial-access",
+     "credential-access",
+     "persistence"
+    ],
+    "severity": "high"
+   }
+  ]
+ },
+ "free": {
+  "n_events": 72,
+  "rules": {
+   "VPC_PORT_SCAN": 1,
+   "VPC_REMOTE_ADMIN_EXPOSED": 1,
+   "WEB_PATH_PROBE": 1,
+   "WEB_SQLI_PATTERN": 1
+  },
+  "incidents": [
+   {
+    "id": "INC-001",
+    "verdict": "attack",
+    "rules": [
+     "VPC_PORT_SCAN",
+     "VPC_REMOTE_ADMIN_EXPOSED",
+     "WEB_PATH_PROBE",
+     "WEB_SQLI_PATTERN"
+    ],
+    "stages": [
+     "discovery",
+     "initial-access"
+    ],
+    "severity": "medium"
+   }
+  ]
+ },
+ "combined": {
+  "n_events": 87,
+  "rules": {
+   "CT_IAM_PERSISTENCE": 1,
+   "CT_INSTANCE_CRED_OUTSIDE": 1,
+   "GD_FINDING": 2,
+   "SSH_SUCCESS_AFTER_FAIL": 1,
+   "VPC_PORT_SCAN": 1,
+   "VPC_REMOTE_ADMIN_EXPOSED": 2,
+   "WAF_BLOCKED": 1,
+   "WAF_SQLI_NOT_BLOCKED": 1,
+   "WEB_PATH_PROBE": 1,
+   "WEB_SQLI_PATTERN": 1
+  },
+  "incidents": [
+   {
+    "id": "INC-001",
+    "verdict": "attack",
+    "rules": [
+     "CT_IAM_PERSISTENCE",
+     "CT_INSTANCE_CRED_OUTSIDE",
+     "GD_FINDING",
+     "SSH_SUCCESS_AFTER_FAIL",
+     "VPC_REMOTE_ADMIN_EXPOSED",
+     "WAF_SQLI_NOT_BLOCKED"
+    ],
+    "stages": [
+     "initial-access",
+     "credential-access",
+     "persistence"
+    ],
+    "severity": "high"
+   },
+   {
+    "id": "INC-002",
+    "verdict": "attack",
+    "rules": [
+     "VPC_PORT_SCAN",
+     "VPC_REMOTE_ADMIN_EXPOSED",
+     "WEB_PATH_PROBE",
+     "WEB_SQLI_PATTERN"
+    ],
+    "stages": [
+     "discovery",
+     "initial-access"
+    ],
+    "severity": "medium"
+   },
+   {
+    "id": "INC-003",
+    "verdict": "attack",
+    "rules": [
+     "WAF_BLOCKED"
+    ],
+    "stages": [
+     "initial-access"
+    ],
+    "severity": "low"
+   }
+  ]
+ },
+ "guardduty": {
+  "n_events": 2,
+  "rules": {
+   "GD_FINDING": 2
+  },
+  "incidents": [
+   {
+    "id": "INC-001",
+    "verdict": "attack",
+    "rules": [
+     "GD_FINDING"
+    ],
+    "stages": [
+     "credential-access"
+    ],
+    "severity": "high"
+   }
+  ]
+ }
+}

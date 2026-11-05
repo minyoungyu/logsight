@@ -4,7 +4,25 @@
 
 ## 미출시
 
+## 0.4.0 (시험판)
+
+0.3.0 이후 '미출시'에 쌓인 경보 연동·통지·자동 격리·우리 팀 알아보기 등도 이 버전에 들어간다(아래 '추가(제품)' 목록).
+
+### 보안
+- AI 재검토를 로그 속 주입 문장으로부터 보호(`logsight/guard.py`). 공격자가 쓸 수 있는 값(User-Agent, 요청 주소, API 파라미터, SSH 로그인 이름)을 `untrusted` 아래로 옮겨 보내고, 그 안의 지시는 따르지 말라고 시스템 문구에 적었다. 판정·무시를 요구하는 문장을 찾으면 보고서에 "로그에 AI를 속이려는 문장"으로 표시하고, AI가 낮춘 판정을 공격으로 되돌린다. 규칙이 공격으로 본 사건을 AI가 낮추면 "규칙과 의견 다름 · 확인 필요"로 표시하고 '판단 불가'보다 아래로 내리지 않는다. 시키는 대로 하는 가짜 모델로 끝에서 끝까지 시험(`tests/test_guard.py`).
+- CI에 비밀값 검사(gitleaks)를 더했다.
+
 ### 추가
+- 회귀 시험: 처음 보는 데이터(Splunk attack_data)에서 한 번 맞게 잡은 16개를 계속 잡는지(`scripts/public/regress_splunk.py`, 기준 파일은 다시 만들지 않음), 저장소 샘플 결과 고정(`scripts/regress_samples.py`, `tests/regression/samples.json`).
+- 시험판 배포: `pyproject.toml`(`pip install`, `logsight` 명령), `logsight --version`, 태그를 올리면 설치 파일·샘플 보고서·Docker 이미지를 만드는 `.github/workflows/release.yml`. 시험판 안내 `docs/사용자평가/시험판_안내.md`, 이슈 양식 "시험판 의견".
+- Stratus Red Team 공격 재현 준비(`lab/aws/stratus/`): 46개 기법의 예상(잡음 15, 놓침 28, 기준에 따라 3)을 실행 전에 고정하고, 실행·채점 스크립트를 더했다. 실행은 0회.
+- CI: pytest와 커버리지(88%), ruff.
+
+### 고침
+- CI가 unittest만 돌려 함수 형식 시험 9개(`test_triage.py`, `test_gongbang_convert.py`)를 건너뛰고 있었다. 그중 1개는 깨져 있었다(파이프라인 연결 시험). 고치고 pytest로 바꿨다.
+- 쓰지 않는 import·변수 정리(ruff).
+
+### 추가(제품)
 - 경보 연동(`logsight/alert.py`, `logsight watch`, `logsight on-alert`): GuardDuty 결과·CloudWatch 경보·위험 API 호출(EventBridge)을 SQS 대기열로 받아, 경보 시각 앞뒤의 로컬·S3 로그로 분석을 자동 실행하고 `reports/alerts/<시각>_<종류>_<id>/`에 보고서와 통지용 요약(summary.txt)을 남긴다. 등급 기준·중복 경보 무시(cooldown)·실패 시 재시도(DLQ)·보고서 뒤 실행할 통지 명령(`--notify-cmd`) 지원. 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명 `docs/경보_연동.md`. AWS 설정은 바꾸지 않는다(읽기만).
 - 우리 팀 알아보기(`logsight/team.py`, `logsight team`, `--team`): 사람 계정·콘솔 작업·오래 활동·수상한 모습 없음을 모두 만족하는 계정을 우리 팀 후보로 제안하고, 사람이 확인한 계정의 작업만 공격 판정에서 뺀다. 보고서에 후보 카드. 공방전(개발 데이터) 판정 4/7 → 6/7, 처음 보는 Splunk 표본 44개에서 공격자를 후보로 낸 경우 0. 측정 `docs/우리팀_알아보기_측정.md`.
 - 고객 설치(`logsight onboard-link`, `deploy/aws/logsight-onboard.yaml`, `deploy/aws/logsight-hub.yaml`): 고객 계정에는 버튼 하나로 경보 전달·보관용 CloudTrail·읽기 전용 역할(고르면 격리 역할)만 더하고, 경보는 LogSight 허브 대기열 하나로, 로그는 LogSight 보관 버킷으로 모은다. `--s3` 접두어에 `{account}`·`{region}`을 넣으면 경보가 난 고객 폴더만 읽는다. 설명 `docs/고객_설치.md`.

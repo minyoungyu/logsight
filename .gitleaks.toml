@@ -1,0 +1,7 @@
+# 기본 규칙을 쓰고, 문서용 예시 값만 뺀다. 실제 로그·키는 data/(무시됨)에만 둔다.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "문서·시험용 예시 값"
+regexes = ['''(AKIA|ASIA)[A-Z0-9]*EXAMPLE[A-Z0-9]*''', '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''']
