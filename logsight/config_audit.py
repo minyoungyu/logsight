@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime, timezone
 
 ANY = ("0.0.0.0/0", "::/0")
 
@@ -179,6 +180,35 @@ def audit(incident: dict, env: dict) -> list[dict]:
                 "cli": [f"aws ec2 modify-instance-metadata-options --instance-id {inst['instance_id']} "
                         "--http-tokens required --http-endpoint enabled"],
                 "caution": "오래된 SDK를 쓰는 앱은 IMDSv2를 지원하는지 먼저 확인한다.",
+            })
+
+    # 4.5) 탈취된 인스턴스 역할 세션 무효화 — 즉시 봉쇄, 사람이 실행(서버만 내려도 임시 키는 계속 작동)
+    ev = _has_rule(incident, "CT_INSTANCE_CRED_OUTSIDE", "CT_INSTANCE_CRED_MULTI_IP")
+    if ev:
+        inst_roles = {inst.get("iam_role") for inst in env.get("instances", [])
+                      if inst["instance_id"] in inst_ids and inst.get("iam_role")}
+        if not inst_roles:  # 사건에 인스턴스가 특정 안 되면 환경의 인스턴스 역할을 모두 본다
+            inst_roles = {inst.get("iam_role") for inst in env.get("instances", []) if inst.get("iam_role")}
+        now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        for role in sorted(r for r in inst_roles if r):
+            out.append({
+                "id": "IAM_ROLE_SESSION_REVOKE", "target": "iam", "resource": role, "severity": "high",
+                "title": f"역할 {role}의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)",
+                "why": "인스턴스에서 빠져나간 임시 자격증명은 서버를 꺼도 세션 만료까지(기본 수 시간) "
+                       "공격자 PC에서 계속 작동한다. 지금까지 발급된 세션을 끊어야 멈춘다.",
+                "evidence": ev[:10],
+                "current": None,
+                "proposed": {"Version": "2012-10-17", "Statement": [{
+                    "Effect": "Deny", "Action": "*", "Resource": "*",
+                    "Condition": {"DateLessThan": {"aws:TokenIssueTime": now_iso}}}]},
+                "cli": [
+                    f"# 위 proposed를 policy.json으로 저장(aws:TokenIssueTime={now_iso}=지금 UTC, 그 이전 발급 세션만 거부)",
+                    f"aws iam put-role-policy --role-name {role} --policy-name AWSRevokeOlderSessions "
+                    "--policy-document file://policy.json",
+                    "# 같은 역할을 쓰는 정상 앱도 잠깐 끊긴다(인스턴스 프로필이 남아 있으면 재시작 때 새 자격증명을 받는다).",
+                    "# 다음 할 일(복구): 새 역할로 인스턴스 프로필을 교체(스왑)한 뒤, 확인되면 이 거부 정책을 뗀다.",
+                ],
+                "caution": "같은 역할을 쓰는 운영 앱도 끊기므로 사람이 판단해 실행한다. 되돌리기는 거부 정책을 떼는 것이다.",
             })
 
     # 5) IAM: 역할/사용자 권한이 과도
