@@ -1,11 +1,19 @@
 name: test
-on: [push, pull_request]
+# main에 올라온 커밋과 PR만 돈다(브랜치 push와 PR이 같은 커밋을 두 번 돌지 않게).
+# workflow_dispatch: Actions 화면에서 직접 돌리면 macOS까지 포함해 돈다.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # 비공개 저장소에서 macOS는 실행 시간을 10배로 센다. 한도를 넘으면 작업이 시작되지 않고 실패로 끝난다.
+        # 그래서 평소에는 ubuntu·windows만 돌고, macOS는 직접 실행할 때만 돈다.
+        os: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["ubuntu-latest", "windows-latest", "macos-latest"]' || '["ubuntu-latest", "windows-latest"]') }}
         python: ["3.10", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:

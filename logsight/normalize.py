@@ -526,6 +526,52 @@ def s3_public(action: str, params) -> bool:
     return bool(_S3_ALL.search(txt))
 
 
+_LAMBDA_VER = re.compile(r"\d{8}(v\d+)?$")  # UpdateFunctionCode20150331v2 → UpdateFunctionCode
+_LOG_BUCKET = re.compile(r"trail|log|audit", re.I)
+_ACCOUNT = re.compile(r"arn:aws[\w-]*:iam::(\d{12}):|\"(\d{12})\"")
+
+
+def _accounts(txt: str) -> set[str]:
+    return {a or b for a, b in _ACCOUNT.findall(txt)}
+
+
+def ct_flags(action: str, params, record: dict) -> list[str]:
+    """잘리기 전 전체 파라미터를 보고 규칙이 쓸 표시를 만든다(params는 잘려 저장되므로)."""
+    if not isinstance(params, dict) or not params:
+        return []
+    txt = json.dumps(params, ensure_ascii=False, default=str)
+    own = str(record.get("recipientAccountId") or (record.get("userIdentity") or {}).get("accountId") or "")
+    flags = []
+    if action == "ec2:ModifyInstanceAttribute" and "userData" in txt:
+        flags.append("userdata")
+    if action == "ec2:DescribeInstanceAttribute" and "userData" in txt:
+        flags.append("userdata_read")  # 시작 스크립트에는 비밀번호·키가 자주 들어 있다
+    if action == "s3:PutBucketVersioning" and re.search(r'"Status"\s*:\s*"Suspended"', txt):
+        flags.append("versioning_off")
+    if action in ("s3:PutObject", "s3:CopyObject") and "x-amz-server-side-encryption-customer-algorithm" in txt:
+        flags.append("sse_c")  # 고객 키 암호화: 키를 가진 사람만 풀 수 있다(랜섬웨어 수법)
+    if action == "s3:PutBucketLifecycle" or action == "s3:PutBucketLifecycleConfiguration":
+        if _LOG_BUCKET.search(str(params.get("bucketName", ""))):
+            flags.append("log_bucket_expire")
+    if action in ("ec2:CreateNetworkAclEntry", "ec2:ReplaceNetworkAclEntry") \
+            and "0.0.0.0/0" in txt and re.search(r'"ruleAction"\s*:\s*"allow"', txt) \
+            and not re.search(r'"egress"\s*:\s*true', txt):
+        flags.append("nacl_open")
+    if action in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") \
+            and re.search(r'"skipFinalSnapshot"\s*:\s*true', txt):
+        flags.append("no_final_snapshot")  # 마지막 스냅샷 없이 지움: 되살릴 수 없다
+    if action in ("ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath") \
+            and re.search(r'"withDecryption"\s*:\s*true', txt):
+        flags.append("decrypt")
+    if action in ("s3:PutBucketPolicy", "lambda:AddPermission", "lambda:AddLayerVersionPermission",
+                  "rds:ModifyDBSnapshotAttribute", "rds:ModifyDBClusterSnapshotAttribute",
+                  "ec2:ModifySnapshotAttribute", "ec2:ModifyImageAttribute"):
+        others = _accounts(txt) - {own} if own else set()
+        if others or re.search(r'"(principal|valuesToAdd)"\s*:\s*\[?\s*"(\*|all)"', txt, re.I):
+            flags.append("external")
+    return flags
+
+
 def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
     try:
         ts = _iso(r["eventTime"])
@@ -549,8 +595,13 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
         extra["params"] = json.dumps({k: params[k] for k in list(params)[:8]},
                                      ensure_ascii=False, default=str)[:400]
     act = f'{str(r.get("eventSource", "")).split(".")[0]}:{r.get("eventName", "")}'
+    if act.startswith("lambda:"):
+        act = _LAMBDA_VER.sub("", act)
     if act in S3_PUBLIC_CALLS and s3_public(act, params or {}):
         extra["s3_public"] = True  # params는 잘려 저장되므로 전체를 보고 여기서 판단
+    flags = ct_flags(act, params, r)
+    if flags:
+        extra["flags"] = flags
     src = r.get("sourceIPAddress")
     actor = arn or ident.get("type") or ident.get("invokedBy")
     key = ident.get("accessKeyId")
@@ -560,7 +611,7 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
         actor=sys.intern(actor) if isinstance(actor, str) else None,
         instance_id=m.group(1) if m else None,
         access_key=sys.intern(key) if isinstance(key, str) else None,
-        action=sys.intern(f'{str(r.get("eventSource", "")).split(".")[0]}:{r.get("eventName", "")}'),
+        action=sys.intern(act),
         outcome="failure" if r.get("errorCode") else "success",
         raw_ref=ref,
         extra=extra,

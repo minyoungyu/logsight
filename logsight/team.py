@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .explain import KEY_MISUSE_RULES
@@ -113,7 +113,7 @@ def excluded(events: list) -> list[dict]:
 def to_env(names: list[str], label: str = LABEL) -> dict:
     """확인된 이름을 known_activity 형식으로. 이름은 정확히 일치(와일드카드 없음)."""
     return {"known_activity": [{"label": label, "actors": sorted(set(names)),
-                                "confirmed_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")}]}
+                                "confirmed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}]}
 
 
 def merge(env: dict, team: dict) -> dict:

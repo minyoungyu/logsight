@@ -17,8 +17,10 @@ SPEC: dict[str, dict] = {
     "CT_LOGGING_TAMPER": {
         "logs": "CloudTrail",
         "when": "StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors, DeleteFlowLogs, GuardDuty DeleteDetector·"
-                "UpdateDetector, WAF DeleteLoggingConfiguration, Config StopConfigurationRecorder 호출 1건",
-        "blind": ["CloudWatch 로그 그룹 삭제, S3 수명 주기로 로그 지우기, Bedrock 로그 끄기는 보지 않음 [측정]",
+                "UpdateDetector, WAF DeleteLoggingConfiguration, Config 기록 중지·삭제, CloudWatch DeleteLogGroup, "
+                "Route 53 Resolver 질의 로그 삭제·해제, Security Hub 끄기, Access Analyzer 삭제, Bedrock 호출 로그 끄기, "
+                "LeaveOrganization(조직 통제 벗어나기) 호출 1건. 이름에 trail·log·audit가 든 버킷의 수명 주기 설정(로그 자동 삭제)도 포함",
+        "blind": ["로그 버킷 이름에 trail·log·audit가 없으면 수명 주기로 로그 지우기를 놓침",
                   "로그를 끄면 그 뒤 기록이 없으므로, 끄기 전 기록이 있어야 걸림"],
         "fp": ["운영자가 추적(trail) 설정을 바꾸는 정상 작업. 정상 작업 목록에 넣어도 '위험 설정'으로 남음"],
         "first": "누가 껐는지 확인하고 바로 다시 켠다. 끈 계정의 키를 의심한다.",
@@ -34,17 +36,19 @@ SPEC: dict[str, dict] = {
     "CT_IAM_PERSISTENCE": {
         "logs": "CloudTrail",
         "when": "CreateUser, CreateAccessKey, Create/UpdateLoginProfile, Attach/Put(User|Role)Policy, AddUserToGroup, "
-                "CreateRole, UpdateAssumeRolePolicy, CreatePolicyVersion 호출 1건(성공·실패 모두)",
-        "blind": ["SetDefaultPolicyVersion, 정책·그룹 삭제, SAML 공급자 변경, MFA 장치 추가·끄기는 보지 않음 [측정]",
+                "CreateRole, UpdateAssumeRolePolicy, Create·SetDefaultPolicyVersion, 임시 연합 토큰(GetFederationToken), "
+                "IAM Roles Anywhere 신뢰 앵커·프로필 생성, EC2 키 페어 생성·가져오기 호출 1건(성공·실패 모두)",
+        "blind": ["정책·그룹 삭제, SAML 공급자 변경은 보지 않음",
                   "역할을 '외부 계정이 맡을 수 있게' 만든 것과 내부용 역할을 구별하지 않음"],
         "fp": ["배포 도구(Terraform·CloudFormation)의 정상 IAM 변경. 배포 역할을 정상 작업 목록에 넣는다"],
         "first": "새로 생긴 사용자·키·권한이 의도한 것인지 확인하고, 아니면 키를 비활성화하고 권한을 되돌린다.",
     },
     "CT_SG_OPENED": {
         "logs": "CloudTrail",
-        "when": "AuthorizeSecurityGroupIngress 요청에 0.0.0.0/0이 들어 있음",
+        "when": "AuthorizeSecurityGroupIngress 요청에 0.0.0.0/0이 들어 있음. 네트워크 ACL에 0.0.0.0/0 인바운드 허용 "
+                "항목을 만들거나 바꾸는 호출(Create·ReplaceNetworkAclEntry)도 포함",
         "blind": ["IPv6 전체(::/0) 개방은 보지 않음",
-                  "네트워크 ACL(CreateNetworkAclEntry) 개방·삭제는 보지 않음 [측정]",
+                  "네트워크 ACL 항목 삭제(DeleteNetworkAclEntry)로 막던 규칙을 없애는 것은 보지 않음",
                   "포트를 가리지 않음(80/443 공개와 22 공개를 같게 취급)"],
         "fp": ["웹 서버의 80/443 공개처럼 의도한 개방. 정상 작업 목록에 넣으면 '위험 설정'으로 표시"],
         "first": "어떤 포트가 열렸는지 보고, 관리 포트(22·3389)면 바로 닫는다.",
@@ -52,25 +56,73 @@ SPEC: dict[str, dict] = {
     "CT_S3_PUBLIC": {
         "logs": "CloudTrail",
         "when": "PutBucketAcl·PutObjectAcl·PutBucketPolicy 등에서 AllUsers·AuthenticatedUsers 권한, public-read(-write) "
-                "ACL, Principal '*' 허용 정책이 들어 있음. 퍼블릭 액세스 차단을 지우거나 끄는 호출도 포함",
+                "ACL, Principal '*' 허용 정책이 들어 있음. 퍼블릭 액세스 차단을 지우거나 끄는 호출도 포함. "
+                "버킷 정책이 우리 계정이 아닌 계정 ID를 허용하는 경우도 포함",
         "blind": ["정책에 조건(Condition)이 붙어 실제로는 제한된 경우도 공개로 봄",
                   "공개된 뒤 외부인이 파일을 올리거나 읽은 것은 S3 접근 로그가 필요해 보지 않음 [측정]",
-                  "버킷 버전 관리 끄기, 복제 설정으로 다른 계정에 복사는 보지 않음 [측정]"],
+                  "복제 설정으로 다른 계정에 복사는 보지 않음 [측정]",
+                  "다른 계정이 우리 조직 계정이어도 외부로 봄(조직 계정 목록을 모름)"],
         "fp": ["정적 웹사이트 호스팅 버킷처럼 일부러 공개한 경우"],
         "first": "공개가 의도한 것인지 확인하고, 아니면 버킷의 퍼블릭 액세스 차단을 켠다.",
     },
     "CT_SNAPSHOT_SHARE": {
         "logs": "CloudTrail",
-        "when": "ModifySnapshotAttribute(createVolumePermission) 또는 ModifyImageAttribute(launchPermission) 호출",
+        "when": "ModifySnapshotAttribute(createVolumePermission) 또는 ModifyImageAttribute(launchPermission) 호출, "
+                "RDS ModifyDB(Cluster)SnapshotAttribute로 우리 계정이 아닌 계정·all에 복원 권한을 준 호출",
         "blind": ["공유 대상이 우리 조직 계정인지 외부 계정인지 구별하지 않음",
-                  "RDS 스냅샷 공유는 보지 않음"],
+                  "스냅샷을 다른 계정으로 복사(CopySnapshot)하는 것은 보지 않음"],
         "fp": ["조직 안 다른 계정으로의 정상 백업 공유"],
         "first": "공유 대상 계정 ID를 확인하고, 모르는 계정이면 공유를 취소한다.",
+    },
+    "CT_SECRET_ACCESS": {
+        "logs": "CloudTrail",
+        "when": "같은 주체가 10분 안에 서로 다른 비밀값 5개 이상을 성공적으로 읽음(Secrets Manager GetSecretValue, "
+                "SSM GetParameter(s) 복호화, 인스턴스 시작 스크립트(userData) 조회). BatchGetSecretValue 성공, EC2 GetPasswordData(Windows 관리자 암호) 호출은 1건으로도",
+        "blind": ["천천히(10분에 4개 이하) 읽으면 걸리지 않음",
+                  "앱 자신의 역할로 평소 읽던 비밀값을 공격자가 읽으면 구별하지 못함"],
+        "fp": ["배포·시작 때 여러 설정 값을 한꺼번에 읽는 앱. 그 역할을 정상 작업 목록에 넣는다"],
+        "first": "읽힌 비밀값 목록을 보고 모두 교체(rotate)한다. 읽은 주체의 키를 의심한다.",
+    },
+    "CT_INSTANCE_EXEC": {
+        "logs": "CloudTrail",
+        "when": "SSM SendCommand·StartSession, EC2 Instance Connect·직렬 콘솔로 SSH 키 밀어넣기, "
+                "ModifyInstanceAttribute로 시작 스크립트(userData) 바꾸기 호출 1건(성공·실패 모두)",
+        "blind": ["명령 내용은 CloudTrail에 남지 않음(SSM 실행 기록이나 서버 로그 필요)",
+                  "SSH 키를 서버 안에서 직접 추가한 것은 보지 않음"],
+        "fp": ["운영자의 정상 SSM 접속·패치 명령. 이 규칙만 걸린 사건은 '판단 불가'로 두고, 우리 팀 확인(logsight team)으로 뺀다",
+               "공방전(개발 데이터)에서 블루팀의 SSM 명령 약 260건이 걸림 [측정]"],
+        "first": "어느 인스턴스에 무엇을 했는지 확인하고, 모르는 접속이면 그 주체의 키를 막고 인스턴스를 격리한다.",
+    },
+    "CT_SERVERLESS_CHANGE": {
+        "logs": "CloudTrail",
+        "when": "Lambda 함수 생성·코드 바꾸기, 레이어를 붙이는 설정 변경, 다른 계정·모두(*)에 호출 권한 주기, "
+                "SageMaker 노트북 시작 스크립트(lifecycle config) 만들기·바꾸기 1건",
+        "blind": ["함수 환경 변수만 바꾸는 것, 함수 URL 공개는 보지 않음",
+                  "Glue·ECS 작업 정의 변경은 보지 않음"],
+        "fp": ["배포 파이프라인의 정상 배포가 자주 걸린다. 이 규칙만 걸린 사건은 '판단 불가'로 두고, 배포 역할을 정상 작업 목록에 넣는다"],
+        "first": "바뀐 함수와 바꾼 주체를 확인한다. 배포가 아니면 이전 버전으로 되돌리고 그 주체의 키를 막는다.",
+    },
+    "CT_DATA_DESTRUCTION": {
+        "logs": "CloudTrail(S3 삭제·암호화는 S3 데이터 이벤트 필요)",
+        "when": "같은 주체가 10분 안에 S3 객체·AMI·스냅샷·버킷 삭제 20건 이상, 또는 DeleteObjects(일괄 삭제) 3회 이상, "
+                "또는 고객 키(SSE-C)로 객체 5개 이상 다시 쓰기. 버킷 버전 관리 중지, KMS 키 삭제 예약·끄기, "
+                "백업 지점·보관함 삭제, 마지막 스냅샷 없이 RDS 삭제는 1건으로도",
+        "blind": ["S3 데이터 이벤트가 꺼져 있으면 객체 삭제·암호화를 볼 수 없음",
+                  "공격자 계정의 KMS 키(SSE-KMS)로 다시 쓰는 수법은 보지 않음"],
+        "fp": ["수명 주기·정리 작업의 정상 대량 삭제, 키 교체 뒤 옛 키 삭제 예약"],
+        "first": "삭제·암호화를 한 주체의 키를 바로 막고, 버전 관리·백업에서 복구할 수 있는지 확인한다.",
+    },
+    "CT_ACCOUNT_SECURITY": {
+        "logs": "CloudTrail",
+        "when": "MFA 장치 끄기·삭제(DeactivateMFADevice, DeleteVirtualMFADevice), 계정 비밀번호 정책 바꾸기·삭제 1건",
+        "blind": ["콘솔 로그인 연속 실패, MFA 단계 실패, 여러 IP 동시 로그인은 보지 않음 [측정]"],
+        "fp": ["MFA 장치를 바꾸는 직원의 정상 작업(끄고 새로 등록)"],
+        "first": "누가 바꿨는지 확인하고 MFA를 다시 켠다. 본인이 아니면 그 계정의 비밀번호와 키를 바꾼다.",
     },
     "CT_CONSOLE_NO_MFA": {
         "logs": "CloudTrail",
         "when": "ConsoleLogin 성공이고 MFAUsed가 No",
-        "blind": ["콘솔 로그인 연속 실패(비밀번호 대입), MFA 단계 실패, 여러 IP 동시 로그인은 보지 않음 [측정]"],
+        "blind": ["콘솔 로그인 연속 실패(비밀번호 대입)는 보지 않음 [측정]"],
         "fp": ["MFA를 아직 안 건 직원의 정상 로그인. 그 자체로는 공격이 아니라 위험한 습관"],
         "first": "그 계정에 MFA를 건다. 로그인 IP가 평소와 다르면 비밀번호를 바꾼다.",
     },
@@ -110,7 +162,8 @@ SPEC: dict[str, dict] = {
     },
     "CT_DISCOVERY_BURST": {
         "logs": "CloudTrail",
-        "when": "같은 공인 IP에서 10분 안에 정해진 목록 조회 API(ListUsers, DescribeInstances 등 21종) 중 4종 이상",
+        "when": "같은 공인 IP에서 10분 안에 정해진 목록 조회 API(ListUsers, DescribeInstances, DescribeInstanceAttribute, "
+                "ListSecrets, SES 조회 등 29종) 중 4종 이상",
         "blind": ["CloudWatch 로그 대량 읽기 등 목록에 없는 조회 API는 보지 않음 [측정]",
                   "천천히(10분에 3종 이하) 조회하면 걸리지 않음"],
         "fp": ["보안 점검 도구·콘솔 화면 열기·연동 계정(예: SIEM 수집 계정)의 정기 조회 [측정]"],

@@ -13,6 +13,7 @@
 - CI에 비밀값 검사(gitleaks)를 더했다.
 
 ### 추가
+- 탐지 공백 보강(개발 데이터): 새 규칙 5개(CT_SECRET_ACCESS 비밀값 대량 조회, CT_INSTANCE_EXEC 인스턴스 원격 명령·접속, CT_SERVERLESS_CHANGE Lambda·SageMaker 변경, CT_DATA_DESTRUCTION 삭제·랜섬웨어·복구 수단 제거, CT_ACCOUNT_SECURITY MFA·비밀번호 정책 약화)와 기존 규칙 5개 범위 확장(로그 끄기, NACL 개방, 다른 계정 공유, IAM 지속성, 목록 조회). Splunk 표본 16→26(개발 데이터), 기존 16개 유지. 운영 작업과 같은 모양의 규칙만 걸린 사건은 '판단 불가'로 둔다. 기록 `docs/탐지공백_보강.md`.
 - 회귀 시험: 처음 보는 데이터(Splunk attack_data)에서 한 번 맞게 잡은 16개를 계속 잡는지(`scripts/public/regress_splunk.py`, 기준 파일은 다시 만들지 않음), 저장소 샘플 결과 고정(`scripts/regress_samples.py`, `tests/regression/samples.json`).
 - 시험판 배포: `pyproject.toml`(`pip install`, `logsight` 명령), `logsight --version`, 태그를 올리면 설치 파일·샘플 보고서·Docker 이미지를 만드는 `.github/workflows/release.yml`. 시험판 안내 `docs/사용자평가/시험판_안내.md`, 이슈 양식 "시험판 의견".
 - Stratus Red Team 공격 재현 준비(`lab/aws/stratus/`): 46개 기법의 예상(잡음 15, 놓침 28, 기준에 따라 3)을 실행 전에 고정하고, 실행·채점 스크립트를 더했다. 실행은 0회.
@@ -21,6 +22,9 @@
 ### 고침
 - CI가 unittest만 돌려 함수 형식 시험 9개(`test_triage.py`, `test_gongbang_convert.py`)를 건너뛰고 있었다. 그중 1개는 깨져 있었다(파이프라인 연결 시험). 고치고 pytest로 바꿨다.
 - 쓰지 않는 import·변수 정리(ruff).
+- Lambda 이벤트 이름의 버전 꼬리(`UpdateFunctionCode20150331v2`)를 떼어 규칙이 알아보게 했다.
+- `team.py`의 `datetime.utcnow()` 경고 제거.
+- CI: 비공개 저장소의 macOS 실행 시간 한도를 넘어 macOS 작업이 시작되지 못하고 실패로 끝났다. PR마다 Ubuntu·Windows만 돌고 macOS는 직접 실행할 때만 돌게 했다. 브랜치 push와 PR이 같은 커밋을 두 번 돌던 것도 없앴다.
 
 ### 추가(제품)
 - 경보 연동(`logsight/alert.py`, `logsight watch`, `logsight on-alert`): GuardDuty 결과·CloudWatch 경보·위험 API 호출(EventBridge)을 SQS 대기열로 받아, 경보 시각 앞뒤의 로컬·S3 로그로 분석을 자동 실행하고 `reports/alerts/<시각>_<종류>_<id>/`에 보고서와 통지용 요약(summary.txt)을 남긴다. 등급 기준·중복 경보 무시(cooldown)·실패 시 재시도(DLQ)·보고서 뒤 실행할 통지 명령(`--notify-cmd`) 지원. 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명 `docs/경보_연동.md`. AWS 설정은 바꾸지 않는다(읽기만).
