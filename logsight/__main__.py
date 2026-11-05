@@ -201,7 +201,7 @@ def main(argv: list[str] | None = None) -> int:
 
     missing = [p for p in args.paths if not Path(p).exists()]
     if missing:
-        print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
+        print(f"경로를 찾을 수 없음: {', '.join(missing)}. hint: 경로 철자와 파일 존재를 확인하세요.", file=sys.stderr)
         return 2
     from .normalize import SYSLOG, parse_tz, parse_when
     if args.year:
@@ -346,7 +346,7 @@ def _alert_cmd(args) -> int:
             return 2
     missing = [p for p in args.logs if not Path(p).exists()]
     if missing:
-        print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
+        print(f"경로를 찾을 수 없음: {', '.join(missing)}. hint: 경로 철자와 파일 존재를 확인하세요.", file=sys.stderr)
         return 2
     session = None
     if args.s3 or args.heartbeat or args.collect_env or args.cmd == "watch":
@@ -419,7 +419,11 @@ def _scan(args) -> int:
     from .web.webreport import render as render_web
 
     if args.profile:
-        profile = SiteProfile.load(args.profile)
+        try:
+            profile = SiteProfile.load(args.profile)
+        except (FileNotFoundError, ValueError) as e:
+            print(f"오류: {e}", file=sys.stderr)
+            return 2
     else:
         log_paths: dict[str, list[str]] = {}
         if args.access:

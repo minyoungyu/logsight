@@ -22,6 +22,7 @@ from .webscan import scan_webroot
 from .webanalyze import analyze_web, rule_verdict, VERDICT_KO
 from .webprofile import SiteProfile
 from .expert import expert_report
+from .. import log as slog
 from .layman import layman_card
 
 PARSERS = {
@@ -123,6 +124,8 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
     }
+    slog.info("web_scan_done", site=profile.name, events=len(events), findings=len(findings),
+              incidents=len(incidents), verdict=overall, ai=use_ai, seconds=round(time.time() - t0, 2))
     # 같은 결과를 두 독자용으로 나눈 뷰: 비숙련자 카드 + 숙련자 상세
     out["simple"] = layman_card(out)
     out["expert"] = expert_report(out, profile_dict)

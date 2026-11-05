@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T16:33:10Z",
+ "generated_at": "2026-11-05T18:45:57Z",
  "files": [
   {
    "file": "samples/demo/alb.log",
@@ -855,8 +855,7 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 7250,
-    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
+    "payload_chars": 7464,
     "validation": {
      "evidence_total": 26,
      "evidence_invalid": 0,
@@ -872,6 +871,11 @@
   "total_s": 0.0
  },
  "has_environment": true,
+ "team": {
+  "proposed": [],
+  "confirmed": [],
+  "excluded": []
+ },
  "assumptions": [
   "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 올해(미래면 작년)로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
  ]

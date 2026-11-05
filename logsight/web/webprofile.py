@@ -46,7 +46,15 @@ class SiteProfile:
 
     @classmethod
     def load(cls, path: str | Path) -> "SiteProfile":
-        data = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+        p = Path(path)
+        if not p.is_file():
+            raise FileNotFoundError(f"프로필 파일을 찾을 수 없음: {p}. hint: 경로를 확인하세요. "
+                                    "예: samples/web/profile.json")
+        try:
+            data = json.loads(p.read_text(encoding="utf-8-sig"))
+        except json.JSONDecodeError as e:
+            raise ValueError(f"프로필이 올바른 JSON이 아님: {p} ({e.msg}, 줄 {e.lineno}). "
+                             "hint: 쉼표와 따옴표를 확인하세요.") from None
         known = {f for f in cls.__dataclass_fields__}
         return cls(**{k: v for k, v in data.items() if k in known})
 

@@ -21,6 +21,7 @@ from logsight.pipeline import run, run_paths
 from logsight.report import CSS as REPORT_CSS, render
 from logsight.web.webprofile import SiteProfile
 from logsight.web.webpipeline import assess
+from logsight.web.ui import landing
 from logsight.web.webreport import render as render_web
 
 # 안전한 데모 모드: LOGSIGHT_DEMO=1 이면 로그 업로드를 받지 않고 샘플 보고서만 보여 준다.
@@ -226,28 +227,9 @@ def api_demo(sample: str = "demo"):
 
 # --------------------------------------------------------------- 웹서버 침해 점검
 # 미래의 일반 사용자용 UI가 그대로 붙을 수 있게, 백엔드는 assess() 하나만 부른다.
-WEB_PAGE = """<!doctype html><html lang=ko><meta charset=utf-8>
-<meta name=viewport content='width=device-width,initial-scale=1'><title>LogSight 웹서버 점검</title>
-<style>body{font:15px/1.6 -apple-system,"Malgun Gothic","Noto Sans KR",sans-serif;max-width:720px;
-margin:0 auto;padding:24px 16px}label{display:block;margin:10px 0}button{padding:8px 16px;font-size:15px}
-.muted{color:#777}</style>
-<h1>웹서버, 이미 뚫렸나요?</h1>
-<p class=muted>서버에 쌓인 로그를 올리면 공격 흔적과 침입 흐름을 분석해 판정합니다.
-비워 둔 칸은 건너뜁니다. .gz 파일도 됩니다. 로그는 분석에만 쓰고 저장하지 않습니다.</p>
-<form action=/web/scan method=post enctype=multipart/form-data>
-<label>접속 로그 (nginx/Apache access.log) <input type=file name=access multiple></label>
-<label>오류 로그 (error.log) <input type=file name=weberror multiple></label>
-<label>인증 로그 (auth.log / secure) <input type=file name=auth multiple></label>
-<button>점검</button></form>
-<p><a href=/web/demo>샘플로 바로 보기</a> · <a href=/docs>API 문서</a></p></html>"""
-
-
 @app.get("/web", response_class=HTMLResponse)
 def web_home():
-    if DEMO:
-        return WEB_PAGE.replace("<form action=/web/scan", "<form action=/web/scan hidden").replace(
-            "<button>점검</button>", "<p>" + DEMO_MSG + "</p>")
-    return WEB_PAGE
+    return landing(demo=DEMO)
 
 
 @app.get("/web/demo", response_class=HTMLResponse)

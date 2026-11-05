@@ -21,3 +21,6 @@ reports/alerts/
 dist/
 build/
 *.egg-info/
+
+# 취약한 테스트 사이트 코드는 저장소에 두지 않는다(로컬에서만 둔다, lab/README.md 참고)
+lab/sites/
