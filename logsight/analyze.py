@@ -19,7 +19,8 @@ from .guard import SYSTEM_RULE, fence
 DEFAULT_MODEL = os.environ.get("LOGSIGHT_MODEL", "claude-haiku-5-5")
 
 STAGE_KO = {
-    "discovery": "정찰·탐색", "initial-access": "초기 침투", "credential-access": "자격증명 탈취",
+    "discovery": "정찰·탐색", "initial-access": "초기 침투", "execution": "명령 실행",
+    "credential-access": "자격증명 탈취",
     "persistence": "지속성 확보", "privilege-escalation": "권한 상승",
     "defense-evasion": "방어 회피", "collection": "데이터 수집", "exfiltration": "유출",
     "impact": "피해", "other": "기타",

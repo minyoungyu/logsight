@@ -139,6 +139,25 @@ CASES = {
                                                     {"userId": "444455556666"}]}}})]),
                           lambda: aws_rules([ct(0, "ModifySnapshotAttribute", "ec2",
                                                 params={"attributeType": "description"})])),
+    "CT_SECRET_ACCESS": (lambda: aws_rules([ct(i, "GetSecretValue", "secretsmanager", params={"secretId": f"app/s{i}"})
+                                            for i in range(5)]),
+                         lambda: aws_rules([ct(i, "GetSecretValue", "secretsmanager", params={"secretId": f"app/s{i}"})
+                                            for i in range(4)])),
+    "CT_INSTANCE_EXEC": (lambda: aws_rules([ct(0, "SendSSHPublicKey", "ec2-instance-connect",
+                                               params={"instanceId": "i-0abc", "instanceOSUser": "ec2-user"})]),
+                         lambda: aws_rules([ct(0, "ModifyInstanceAttribute", "ec2",
+                                               params={"instanceId": "i-0abc", "disableApiTermination": {"value": True}})])),
+    "CT_SERVERLESS_CHANGE": (lambda: aws_rules([ct(0, "UpdateFunctionCode20150331v2", "lambda",
+                                                   params={"functionName": "billing"})]),
+                             lambda: aws_rules([ct(0, "AddPermission20150331v2", "lambda",
+                                                   params={"functionName": "billing", "principal": f"arn:aws:iam::{ACCT}:root"},
+                                                   recipientAccountId=ACCT)])),
+    "CT_DATA_DESTRUCTION": (lambda: aws_rules([ct(0, "PutBucketVersioning", "s3",
+                                                  params={"bucketName": "data", "VersioningConfiguration": {"Status": "Suspended"}})]),
+                            lambda: aws_rules([ct(0, "PutBucketVersioning", "s3",
+                                                  params={"bucketName": "data", "VersioningConfiguration": {"Status": "Enabled"}})])),
+    "CT_ACCOUNT_SECURITY": (lambda: aws_rules([ct(0, "DeactivateMFADevice", params={"userName": "dev"})]),
+                            lambda: aws_rules([ct(0, "EnableMFADevice", params={"userName": "dev"})])),
     "CT_CONSOLE_NO_MFA": (lambda: aws_rules([ct(0, "ConsoleLogin", "signin", additionalEventData={"MFAUsed": "No"})]),
                           lambda: aws_rules([ct(0, "ConsoleLogin", "signin",
                                                 additionalEventData={"MFAUsed": "Yes"})])),
@@ -254,6 +273,81 @@ class RuleSpecCompleteness(unittest.TestCase):
         from rule_spec_doc import render
         doc = (ROOT / "docs" / "규칙_명세.md").read_text(encoding="utf-8")
         self.assertEqual(doc, render(), "docs/규칙_명세.md가 오래됨: python scripts/rule_spec_doc.py 실행")
+
+
+class RuleExtensions(unittest.TestCase):
+    """기존 규칙의 범위를 넓힌 조건(규칙마다 양성 1개는 CASES에 있고, 여기서는 넓힌 조건만 본다)."""
+    OTHER = "444455556666"
+
+    def test_logging_tamper_more_services(self):
+        for name, src in (("DeleteResolverQueryLogConfig", "route53resolver"), ("LeaveOrganization", "organizations"),
+                          ("DeleteLogGroup", "logs"), ("DisableSecurityHub", "securityhub")):
+            self.assertIn("CT_LOGGING_TAMPER", aws_rules([ct(0, name, src)]), name)
+        self.assertIn("CT_LOGGING_TAMPER", aws_rules([ct(0, "PutBucketLifecycle", "s3",
+                                                         params={"bucketName": "org-cloudtrail-logs"})]))
+        self.assertNotIn("CT_LOGGING_TAMPER", aws_rules([ct(0, "PutBucketLifecycle", "s3",
+                                                            params={"bucketName": "user-uploads"})]))
+
+    def test_nacl_open(self):
+        p = {"networkAclId": "acl-1", "ruleNumber": 100, "egress": False, "ruleAction": "allow", "cidrBlock": "0.0.0.0/0"}
+        self.assertIn("CT_SG_OPENED", aws_rules([ct(0, "CreateNetworkAclEntry", "ec2", params=p)]))
+        self.assertNotIn("CT_SG_OPENED", aws_rules([ct(0, "CreateNetworkAclEntry", "ec2", params=p | {"egress": True})]))
+        self.assertNotIn("CT_SG_OPENED", aws_rules([ct(0, "CreateNetworkAclEntry", "ec2", params=p | {"ruleAction": "deny"})]))
+
+    def test_cross_account_shares(self):
+        pol = json.dumps({"Statement": [{"Effect": "Allow", "Principal": {"AWS": f"arn:aws:iam::{self.OTHER}:root"},
+                                         "Action": "s3:GetObject", "Resource": "*"}]})
+        own = json.dumps({"Statement": [{"Effect": "Allow", "Principal": {"AWS": f"arn:aws:iam::{ACCT}:role/app"},
+                                         "Action": "s3:GetObject", "Resource": "*"}]})
+        self.assertIn("CT_S3_PUBLIC", aws_rules([ct(0, "PutBucketPolicy", "s3", params={"bucketName": "b", "bucketPolicy": pol},
+                                                    recipientAccountId=ACCT)]))
+        self.assertNotIn("CT_S3_PUBLIC", aws_rules([ct(0, "PutBucketPolicy", "s3", params={"bucketName": "b", "bucketPolicy": own},
+                                                       recipientAccountId=ACCT)]))
+        rds = {"dBSnapshotIdentifier": "db1", "attributeName": "restore", "valuesToAdd": [self.OTHER]}
+        self.assertIn("CT_SNAPSHOT_SHARE", aws_rules([ct(0, "ModifyDBSnapshotAttribute", "rds", params=rds,
+                                                         recipientAccountId=ACCT)]))
+
+    def test_instance_exec_userdata_and_ssm(self):
+        self.assertIn("CT_INSTANCE_EXEC", aws_rules([ct(0, "ModifyInstanceAttribute", "ec2",
+                                                        params={"instanceId": "i-0abc", "userData": "<sensitiveDataRemoved>"})]))
+        self.assertIn("CT_INSTANCE_EXEC", aws_rules([ct(0, "SendCommand", "ssm", params={"documentName": "AWS-RunShellScript"},
+                                                        err="AccessDenied")]))
+
+    def test_secret_access_single_calls(self):
+        self.assertIn("CT_SECRET_ACCESS", aws_rules([ct(0, "GetPasswordData", "ec2", params={"instanceId": "i-0abc"})]))
+        ud = [ct(i, "DescribeInstanceAttribute", "ec2", params={"instanceId": f"i-{i}", "attribute": "userData"})
+              for i in range(5)]
+        self.assertIn("CT_SECRET_ACCESS", aws_rules(ud))
+        other = [ct(i, "DescribeInstanceAttribute", "ec2", params={"instanceId": f"i-{i}", "attribute": "instanceType"})
+                 for i in range(5)]
+        self.assertNotIn("CT_SECRET_ACCESS", aws_rules(other))
+        ssm = [ct(i, "GetParameter", "ssm", params={"name": f"/app/p{i}", "withDecryption": True}) for i in range(5)]
+        self.assertIn("CT_SECRET_ACCESS", aws_rules(ssm))
+        plain = [ct(i, "GetParameter", "ssm", params={"name": f"/app/p{i}", "withDecryption": False}) for i in range(5)]
+        self.assertNotIn("CT_SECRET_ACCESS", aws_rules(plain))
+
+    def test_destruction_bursts(self):
+        dels = [ct(i, "DeleteObject", "s3", params={"bucketName": "data", "key": f"k{i}"}, sec=10) for i in range(20)]
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules(dels))
+        self.assertNotIn("CT_DATA_DESTRUCTION", aws_rules(dels[:19]))
+        sse = [ct(i, "CopyObject", "s3", params={"bucketName": "data", "key": f"k{i}",
+                                                 "x-amz-server-side-encryption-customer-algorithm": "AES256"}, sec=10)
+               for i in range(5)]
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules(sse))
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "ScheduleKeyDeletion", "kms", params={"keyId": "k"})]))
+        self.assertNotIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "DeleteDBInstance", "rds",
+                                                              params={"dBInstanceIdentifier": "db", "skipFinalSnapshot": False})]))
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "DeleteDBInstance", "rds",
+                                                           params={"dBInstanceIdentifier": "db", "skipFinalSnapshot": True})]))
+
+    def test_serverless_external_permission_and_layers(self):
+        self.assertIn("CT_SERVERLESS_CHANGE", aws_rules([ct(0, "AddPermission20150331v2", "lambda",
+                                                            params={"functionName": "f", "principal": "*"},
+                                                            recipientAccountId=ACCT)]))
+        self.assertIn("CT_SERVERLESS_CHANGE", aws_rules([ct(0, "UpdateFunctionConfiguration20150331v2", "lambda",
+                                                            params={"functionName": "f", "layers": ["arn:aws:lambda:x"]})]))
+        self.assertNotIn("CT_SERVERLESS_CHANGE", aws_rules([ct(0, "UpdateFunctionConfiguration20150331v2", "lambda",
+                                                               params={"functionName": "f", "timeout": 30})]))
 
 
 class RuleValidation(unittest.TestCase):
