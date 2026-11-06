@@ -217,8 +217,10 @@ def _explain_mode(result: dict) -> dict:
     models = sorted({r["meta"].get("model") for r in result.get("results", [])
                      if r["meta"].get("mode") == "claude"})
     tri = result.get("triage") or {}
+    tri_ai = tri.get("mode") != "rules" and "incidents" in tri
     return {"report": "claude" if models else "rules", "models": models,
-            "triage": "claude" if tri.get("mode") != "rules" and "incidents" in tri else "rules", "ai_errors": []}
+            "triage": "claude" if tri_ai else "rules",
+            "triage_model": (tri.get("meta") or {}).get("model") if tri_ai else None, "ai_errors": []}
 
 
 def _uses_ai(m: dict) -> bool:
@@ -234,12 +236,16 @@ def _mode_card(result: dict) -> str:
                "결과가 나옵니다. 규칙에 없는 상황은 설명하지 못하므로 '판단 불가' 사건은 사람이 확인하세요.</div>")
         cls, ico = "modecard", "규칙"
     else:
-        models = ", ".join(m.get("models") or [m.get("triage_model") or ""]) or "Claude"
-        parts = []
+        parts, labels = [], []
         if m["triage"] == "claude":
             parts.append("사건 판정(공격·정상 구분, 순서)")
+            if m.get("triage_model"):
+                labels.append(f"판정 {m['triage_model']}")
         if m["report"] == "claude":
             parts.append("사건 설명")
+            if m.get("models"):
+                labels.append("설명 " + ", ".join(m["models"]))
+        models = " · ".join(labels) or "Claude"
         txt = (f"<b>설명 방식: Claude 사용 ({escape(models)})</b><div class=small>{' · '.join(parts)}에 Claude를 썼습니다. "
                "원본 로그가 아니라 사건별 축약본을 액세스 키 등을 가린 뒤 보냈고, Claude가 든 근거(파일:줄)는 "
                "코드로 다시 검사했습니다. 탐지·원인 설정·수정 명령은 AI가 아니라 코드가 만듭니다.</div>")
