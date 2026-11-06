@@ -32,7 +32,10 @@ VKO = {"attack": "공격 의심", "risky_not_attack": "공격 아님·위험 설
 RANK = {"attack": 0, "risky_not_attack": 1, "unclear": 2, "benign_activity": 3}
 
 CSS = REPORT_CSS + """
-main.cmp{max-width:1240px;margin:0 auto;padding:0 16px 72px}
+header.top{max-width:1240px;margin:28px auto 0;padding:40px 56px 0;background:var(--paper);border:1px solid #d2cfc7;border-bottom:0}
+header.top{padding-bottom:4px}header.top .metaline{display:block;border:0;color:var(--muted);margin:10px 0 0}header.top .metaline>span{border:0}
+main.cmp{max-width:1240px;margin:0 auto 48px;padding:1px 56px 40px;background:var(--paper);border:1px solid #d2cfc7;border-top:0;counter-reset:sec}
+.score{border-top:1px solid var(--rule)!important}.score.best{border-top-color:var(--high)!important}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .score b.big{font-size:30px;line-height:1.2;font-variant-numeric:tabular-nums}.score .lab{font-size:12.5px;color:var(--muted)}
 .score .row2{display:flex;gap:18px;align-items:flex-end;margin-top:10px}.score.best{border-color:var(--accent)}
