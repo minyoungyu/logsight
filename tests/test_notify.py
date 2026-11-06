@@ -100,6 +100,16 @@ class Notify(unittest.TestCase):
         self.assertEqual(r["notify_channels"][0], {"channel": "slack", "ok": False, "status": 400})
         self.assertEqual(len(Recorder.got), 1)  # 4xx는 다시 보내지 않는다
 
+    def test_stages_in_korean(self):
+        """관리자가 받는 카드·요약에 공격 단계를 영어 코드 대신 한국어로 쓴다."""
+        r = self.run_alert([{"type": "discord", "url_env": "T_DISCORD"}])
+        desc = Recorder.got[0]["body"]["embeds"][0]["description"]
+        self.assertIn("초기 침투", desc)
+        self.assertNotIn("initial-access", desc)
+        summary = (Path(r["out"]) / "summary.txt").read_text(encoding="utf-8")
+        self.assertIn("초기 침투", summary)
+        self.assertNotIn("initial-access", summary)
+
     def test_slack_mentions_escaped(self):
         msg = nt.test_message()
         msg["title"] = "<!channel> 경보"
