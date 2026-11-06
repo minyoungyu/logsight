@@ -4,7 +4,7 @@
 
 ## 미출시
 
-## 0.4.0 (시험판)
+## 0.4.0 (시험판) - 2026-11-06
 
 0.3.0 이후 '미출시'에 쌓인 경보 연동·통지·자동 격리·우리 팀 알아보기 등도 이 버전에 들어간다(아래 '추가(제품)' 목록).
 
@@ -27,6 +27,7 @@
 - CI: 비공개 저장소의 macOS 실행 시간 한도를 넘어 macOS 작업이 시작되지 못하고 실패로 끝났다. PR마다 Ubuntu·Windows만 돌고 macOS는 직접 실행할 때만 돌게 했다. 브랜치 push와 PR이 같은 커밋을 두 번 돌던 것도 없앴다.
 
 ### 추가(제품)
+- 자동 격리·AI 재검토 보강: 탈취된 인스턴스 역할의 세션을 무효화하는 수정안(`IAM_ROLE_SESSION_REVOKE`, 사람이 실행, 되돌리기 포함). 자동 격리 마감 기본값 5분 → 10분(늦게 도착하는 로그까지 보고 판단). AI가 코드 점검 밖에서 낸 변경 제안은 '검증 안 된 제안'으로 따로 표시. `on-alert --respond`에 집행 경로가 없으면 경고.
 - 경보 연동(`logsight/alert.py`, `logsight watch`, `logsight on-alert`): GuardDuty 결과·CloudWatch 경보·위험 API 호출(EventBridge)을 SQS 대기열로 받아, 경보 시각 앞뒤의 로컬·S3 로그로 분석을 자동 실행하고 `reports/alerts/<시각>_<종류>_<id>/`에 보고서와 통지용 요약(summary.txt)을 남긴다. 등급 기준·중복 경보 무시(cooldown)·실패 시 재시도(DLQ)·보고서 뒤 실행할 통지 명령(`--notify-cmd`) 지원. 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명 `docs/경보_연동.md`. AWS 설정은 바꾸지 않는다(읽기만).
 - 우리 팀 알아보기(`logsight/team.py`, `logsight team`, `--team`): 사람 계정·콘솔 작업·오래 활동·수상한 모습 없음을 모두 만족하는 계정을 우리 팀 후보로 제안하고, 사람이 확인한 계정의 작업만 공격 판정에서 뺀다. 보고서에 후보 카드. 공방전(개발 데이터) 판정 4/7 → 6/7, 처음 보는 Splunk 표본 44개에서 공격자를 후보로 낸 경우 0. 측정 `docs/우리팀_알아보기_측정.md`.
 - 고객 설치(`logsight onboard-link`, `deploy/aws/logsight-onboard.yaml`, `deploy/aws/logsight-hub.yaml`): 고객 계정에는 버튼 하나로 경보 전달·보관용 CloudTrail·읽기 전용 역할(고르면 격리 역할)만 더하고, 경보는 LogSight 허브 대기열 하나로, 로그는 LogSight 보관 버킷으로 모은다. `--s3` 접두어에 `{account}`·`{region}`을 넣으면 경보가 난 고객 폴더만 읽는다. 설명 `docs/고객_설치.md`.
