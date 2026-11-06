@@ -1,9 +1,11 @@
 name: release
 # 버전 태그(v0.4.0 등)를 올리면 시험판을 만든다: 설치 파일(whl), 샘플 보고서, Docker 이미지(GHCR).
-# 태그는 GitHub 웹의 Releases → Draft a new release에서 만들어도 된다.
+# 태그를 올리지 않고 Actions 화면에서 "Run workflow"로 돌려도 된다(workflow_dispatch).
+# 그때는 코드의 버전(logsight.__version__)으로 v태그와 릴리스를 main의 그 커밋에 만든다.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 permissions:
   contents: write
   packages: write
@@ -18,7 +20,12 @@ jobs:
       - name: 태그와 코드 버전이 같은지 확인
         run: |
           v=$(python -c "import logsight; print(logsight.__version__)")
-          test "v$v" = "${GITHUB_REF_NAME}" || { echo "태그 ${GITHUB_REF_NAME} ≠ 코드 v$v"; exit 1; }
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "TAG=v$v" >> "$GITHUB_ENV"
+          else
+            test "v$v" = "${GITHUB_REF_NAME}" || { echo "태그 ${GITHUB_REF_NAME} ≠ 코드 v$v"; exit 1; }
+            echo "TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          fi
       - run: pip install build -r requirements.txt
       - run: python -m build
       - name: 샘플 보고서
@@ -27,15 +34,15 @@ jobs:
           (cd sample-report && zip -r ../sample-report.zip .)
       - name: 변경 기록에서 이 버전 부분만 꺼내기
         run: |
-          v=${GITHUB_REF_NAME#v}
+          v=${TAG#v}
           awk -v v="## $v" '$0 ~ "^## " {p = index($0, v) == 1} p' CHANGELOG.md > notes.md
           test -s notes.md || echo "변경 기록: CHANGELOG.md" > notes.md
       - name: GitHub 릴리스
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/* sample-report.zip \
-            --title "LogSight $GITHUB_REF_NAME (시험판)" --notes-file notes.md --prerelease
+          gh release create "$TAG" dist/* sample-report.zip --target "$GITHUB_SHA" \
+            --title "LogSight $TAG (시험판)" --notes-file notes.md --prerelease
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -44,6 +51,6 @@ jobs:
       - name: Docker 이미지
         run: |
           img=ghcr.io/${GITHUB_REPOSITORY,,}
-          docker build -t "$img:${GITHUB_REF_NAME#v}" -t "$img:latest" .
-          docker push "$img:${GITHUB_REF_NAME#v}"
+          docker build -t "$img:${TAG#v}" -t "$img:latest" .
+          docker push "$img:${TAG#v}"
           docker push "$img:latest"
