@@ -16,5 +16,3 @@ lab/
 tests/
 reports/
 scripts/
-# 데모 웹의 "공방전 비교" 화면이 쓰는 파일 하나만 다시 넣는다(Dockerfile이 복사함)
-!reports/ctf/compare_gongbang.html

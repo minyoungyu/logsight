@@ -29,7 +29,7 @@ class DatasetLicenseTest(unittest.TestCase):
             if line.strip().upper().startswith(("COPY", "ADD")):
                 srcs = line.split()[1:-1]
                 for d in MEASUREMENT_DIRS:
-                    self.assertNotIn(d, [s.strip("./") for s in srcs], line)
+                    self.assertFalse(any(s.strip("./") == d or s.strip("./").startswith(d + "/") for s in srcs), line)
                 self.assertNotIn(".", srcs, f"전체 복사는 허용 목록을 우회함: {line}")
 
     def test_product_files_have_no_dataset_content(self):

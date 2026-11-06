@@ -24,7 +24,7 @@
 - 쓰지 않는 import·변수 정리(ruff).
 - Lambda 이벤트 이름의 버전 꼬리(`UpdateFunctionCode20150331v2`)를 떼어 규칙이 알아보게 했다.
 - `team.py`의 `datetime.utcnow()` 경고 제거.
-- Docker 이미지 빌드 실패: `.dockerignore`가 `reports/`를 빼서 Dockerfile이 복사하는 공방전 비교 화면 파일을 찾지 못했다. 그 파일 하나만 다시 넣었다.
+- Docker 이미지 빌드 실패: Dockerfile이 측정 결과 폴더(`reports/`)의 공방전 비교 화면 파일을 복사하려 했지만, 이미지에는 측정 데이터를 넣지 않는 규칙(`.dockerignore`)이 막고 있었다. 복사를 빼고(데모의 `/compare`는 파일이 없다고 안내), 시험이 파일 단위 복사도 잡게 했다.
 - CI: 비공개 저장소의 macOS 실행 시간 한도를 넘어 macOS 작업이 시작되지 못하고 실패로 끝났다. PR마다 Ubuntu·Windows만 돌고 macOS는 직접 실행할 때만 돌게 했다. 브랜치 push와 PR이 같은 커밋을 두 번 돌던 것도 없앴다.
 
 ### 추가(제품)
