@@ -231,7 +231,8 @@ def parse_alb(text: str, name: str = "alb") -> list[Event]:
                 action=f"{method} {path}"[:300],
                 outcome="success" if f[8].startswith(("2", "3")) else "failure",
                 raw_ref=f"{name}:{i+1}",
-                extra={"http_status": int(f[8]) if f[8].isdigit() else None, "http_host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else ""},
+                extra={"http_status": int(f[8]) if f[8].isdigit() else None, "http_host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else "",
+                       "resp_bytes": int(f[11]) if f[11].isdigit() else None},
             ))
         except (ValueError, IndexError):
             continue
@@ -394,6 +395,8 @@ def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
         st = m["status"]
         src, extra = _client_ip(m["ip"], m["xff"])
         extra.update({"http_status": int(st), "ua": (m["ua"] or "")[:200]})
+        if m["size"].isdigit():
+            extra["resp_bytes"] = int(m["size"])  # 응답 크기: 공격 성공 신호 판단에 쓴다
         events.append(Event(
             ts=ts, source="weblog", src_ip=src,
             action=(f"{req[0]} {req[1]}" if len(req) > 1 else m["req"])[:300],

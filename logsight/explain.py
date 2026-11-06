@@ -393,7 +393,8 @@ def describe_finding(f: dict, inc: dict) -> str:
         "WAF_BLOCKED": f"{who}에서 보낸 공격 요청 {n}건을 WAF가 막았습니다.",
         "SSH_BRUTE_FORCE": f"{who}에서 SSH 비밀번호를 {n}번 틀렸습니다(무차별 대입).",
         "SSH_SUCCESS_AFTER_FAIL": f"{who}에서 SSH 비밀번호를 {bad}번 틀린 뒤 로그인에 성공했습니다. 비밀번호가 뚫렸을 수 있습니다.",
-        "WEB_SQLI_PATTERN": f"{who}에서 보낸 웹 요청 {n}건에 SQL 인젝션 문자열이 있었습니다(정상 응답 {ok}건, 오류·거부 {bad}건).",
+        "WEB_SQLI_PATTERN": f"{who}에서 보낸 웹 요청 {n}건에 SQL 인젝션 문자열이 있었습니다(정상 응답 {ok}건, 오류·거부 {bad}건)."
+                            + _sqli_signal_sentence(f.get("detail", "")),
         "WEB_PATH_PROBE": f"{who}에서 없는 경로 {n}곳을 연달아 요청했습니다({_acts(evs, 2)} 등). 취약한 파일을 찾는 스캐너입니다.",
         "WEB_OBJECT_ENUM": f"{who}에서 같은 API의 번호만 바꿔 다른 사람의 데이터 {n}건을 열어 보려 했습니다(IDOR 탐색, 거부 {bad}건).",
         "GD_FINDING": f"GuardDuty 탐지: {f['title'].replace('GuardDuty: ', '')} ({f['detail']}).",
@@ -401,6 +402,13 @@ def describe_finding(f: dict, inc: dict) -> str:
     if not t:  # 템플릿이 없는 규칙(웹서버 로그 규칙 등)도 같은 꼴로
         t = f"{who}에서 {f['title']}에 해당하는 요청이 {n}건 있었습니다({f['detail']})."
     return t + known
+
+
+def _sqli_signal_sentence(detail: str) -> str:
+    """detect.sqli_success_signal이 detail 뒤에 붙인 코드 판단을 문장으로."""
+    if " · " not in detail:
+        return ""
+    return " 응답 크기로 본 판단: " + detail.split(" · ", 1)[1] + "."
 
 
 def _span(a_iso: str, b_iso: str) -> str:

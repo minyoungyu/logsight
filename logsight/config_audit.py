@@ -14,10 +14,58 @@ from datetime import datetime, timezone
 ANY = ("0.0.0.0/0", "::/0")
 
 
+def _int(v, default: int) -> int:
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return default
+
+
 def _rule_ports(r: dict) -> range:
     if str(r.get("protocol", "tcp")) in ("-1", "all"):
         return range(0, 65536)
-    return range(int(r.get("from_port", 0)), int(r.get("to_port", r.get("from_port", 0))) + 1)
+    lo = _int(r.get("from_port"), 0)
+    hi = _int(r.get("to_port"), lo)
+    return range(lo, max(lo, hi) + 1)
+
+
+def _perm(r: dict, cidr: str | None = None) -> str:
+    """보안그룹 규칙 하나를 AWS CLI --ip-permissions 형식으로. revoke는 원래 규칙과 정확히 같아야 지워진다."""
+    proto = str(r.get("protocol", "tcp"))
+    cidr = cidr or r["cidr"]
+    rng = f"Ipv6Ranges=[{{CidrIpv6={cidr}}}]" if ":" in cidr else f"IpRanges=[{{CidrIp={cidr}}}]"
+    if proto in ("-1", "all"):
+        return f"IpProtocol=-1,{rng}"
+    lo = _int(r.get("from_port"), 0)
+    hi = _int(r.get("to_port"), lo)
+    return f"IpProtocol={proto},FromPort={lo},ToPort={hi},{rng}"
+
+
+def _sg_cmd(verb: str, gid: str, r: dict, cidr: str | None = None) -> str:
+    """단일 포트·IPv4·tcp면 짧은 형식, 아니면(포트 범위, IPv6, 모든 프로토콜) --ip-permissions."""
+    c = cidr or r["cidr"]
+    lo, hi = _int(r.get("from_port"), -1), _int(r.get("to_port"), _int(r.get("from_port"), -1))
+    if str(r.get("protocol", "tcp")) in ("tcp", "udp") and lo == hi and ":" not in c:
+        return f"aws ec2 {verb}-security-group-ingress --group-id {gid} --protocol {r.get('protocol', 'tcp')} --port {lo} --cidr {c}"
+    return f"aws ec2 {verb}-security-group-ingress --group-id {gid} --ip-permissions '{_perm(r, c)}'"
+
+
+def _incident_sgs(env: dict, inst_ids: set) -> set | None:
+    """사건 서버에 붙은 보안그룹. 서버와 보안그룹의 연결을 모르면 None(전체를 본다)."""
+    sgs = {g for i in env.get("instances", []) if i.get("instance_id") in inst_ids
+           for g in i.get("security_groups", [])}
+    return sgs or None
+
+
+def _incident_nacl(env: dict, inst_ids: set) -> tuple[dict | None, bool]:
+    """사건 서버의 서브넷에 붙은 NACL. (NACL, 서브넷으로 확인했는지)"""
+    nacls = [n for n in env.get("network_acls", []) if n.get("nacl_id")]
+    subnets = {i.get("subnet_id") for i in env.get("instances", [])
+               if i.get("instance_id") in inst_ids and i.get("subnet_id")}
+    for n in nacls:
+        if subnets & set(n.get("subnet_ids", [])):
+            return n, True
+    return (nacls[0] if nacls else None), False
 
 
 def _has_rule(inc: dict, *rules: str) -> list[str]:
@@ -32,7 +80,7 @@ def _attacker_ips(inc: dict) -> list[str]:
 
 def audit(incident: dict, env: dict) -> list[dict]:
     """사건 + 환경 설정 → 원인 설정과 수정안 목록."""
-    if not env:
+    if not env or env.get("_error"):
         return []
     out: list[dict] = []
     trusted = [t["cidr"] if isinstance(t, dict) else t for t in env.get("trusted_ips", [])]
@@ -45,10 +93,14 @@ def audit(incident: dict, env: dict) -> list[dict]:
     # 1) 보안그룹: 관리 포트(22/3389)가 전 세계에 열림
     ev = _has_rule(incident, "SSH_BRUTE_FORCE", "SSH_SUCCESS_AFTER_FAIL",
                    "VPC_REMOTE_ADMIN_EXPOSED", "VPC_PORT_SCAN")
+    linked = _incident_sgs(env, inst_ids)
     for sg in env.get("security_groups", []):
+        if not sg.get("group_id") or (linked is not None and sg["group_id"] not in linked):
+            continue  # 사건 서버에 붙지 않은 보안그룹은 이 사건의 원인이 아니다
         for r in sg.get("ingress", []):
             if r.get("cidr") in ANY and any(p in _rule_ports(r) for p in (22, 3389)) and ev:
                 port = 22 if 22 in _rule_ports(r) else 3389
+                wide = len(_rule_ports(r)) > 1
                 out.append({
                     "id": "SG_ADMIN_PORT_OPEN", "target": "security_group",
                     "resource": sg["group_id"], "severity": "high",
@@ -59,17 +111,20 @@ def audit(incident: dict, env: dict) -> list[dict]:
                     "proposed": {**r, "cidr": admin_cidr,
                                  "description": "관리자 IP만 허용(또는 SSM Session Manager로 대체)"},
                     "cli": [
-                        f"aws ec2 revoke-security-group-ingress --group-id {sg['group_id']} "
-                        f"--protocol tcp --port {port} --cidr {r['cidr']}",
-                        f"aws ec2 authorize-security-group-ingress --group-id {sg['group_id']} "
-                        f"--protocol tcp --port {port} --cidr {admin_cidr}",
+                        _sg_cmd("revoke", sg["group_id"], r),
+                        _sg_cmd("authorize", sg["group_id"], {"protocol": "tcp", "from_port": port,
+                                                              "to_port": port}, admin_cidr),
                     ],
                     "caution": "관리자 IP가 바뀌면 접속이 끊긴다. 적용 전 현재 관리자 IP와 "
-                               "SSM 접속 경로를 확인한다.",
+                               "SSM 접속 경로를 확인한다."
+                               + (f" 이 규칙은 {port}번만이 아니라 포트 {_rule_ports(r).start}~{_rule_ports(r).stop - 1}"
+                                  "(프로토콜 전체일 수 있음)를 함께 열고 있어, 지우면 그 포트들도 닫힌다. "
+                                  "서비스에 필요한 포트(예: 80, 443)는 따로 다시 열어야 한다." if wide else ""),
                 })
             # 스캔에서 응답한 불필요 포트(DB 등)
             if r.get("cidr") in ANY and any(p in _rule_ports(r) for p in (3306, 5432, 6379, 27017, 9200)) \
-                    and "VPC_PORT_SCAN" in rules_in_inc:
+                    and "VPC_PORT_SCAN" in rules_in_inc \
+                    and not any(c.get("current") is r for c in out):  # 같은 규칙을 이미 지우라고 했으면 생략
                 out.append({
                     "id": "SG_DB_PORT_OPEN", "target": "security_group",
                     "resource": sg["group_id"], "severity": "high",
@@ -77,8 +132,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
                     "why": "포트 스캔 대상이 된 DB 포트가 인터넷에 노출되어 있다.",
                     "evidence": _has_rule(incident, "VPC_PORT_SCAN")[:10],
                     "current": r, "proposed": None,
-                    "cli": [f"aws ec2 revoke-security-group-ingress --group-id {sg['group_id']} "
-                            f"--protocol tcp --port {r.get('from_port')} --cidr {r['cidr']}"],
+                    "cli": [_sg_cmd("revoke", sg["group_id"], r)],
                     "caution": "애플리케이션 서버의 보안그룹만 참조하도록 바꾼다.",
                 })
 
@@ -86,16 +140,19 @@ def audit(incident: dict, env: dict) -> list[dict]:
     if attackers and env.get("network_acls") and rules_in_inc & {
             "VPC_PORT_SCAN", "SSH_BRUTE_FORCE", "WAF_SQLI_NOT_BLOCKED", "SSH_SUCCESS_AFTER_FAIL",
             "VPC_REMOTE_ADMIN_EXPOSED", "WEB_SQLI_PATTERN"}:
-        nacl = env["network_acls"][0]
-        used = {int(x.get("rule_number", 0)) for x in nacl.get("entries", [])}
+        nacl, by_subnet = _incident_nacl(env, inst_ids)
+    else:
+        nacl, by_subnet = None, False
+    if nacl:
+        used = {_int(x.get("rule_number"), 0) for x in nacl.get("entries", [])}
         cmds, n = [], 50
         for ip in attackers[:5]:
             while n in used:
                 n += 1
             used.add(n)
+            block = f"--ipv6-cidr-block {ip}/128" if ":" in ip else f"--cidr-block {ip}/32"
             cmds.append(f"aws ec2 create-network-acl-entry --network-acl-id {nacl['nacl_id']} "
-                        f"--ingress --rule-number {n} --protocol -1 --rule-action deny "
-                        f"--cidr-block {ip}/32")
+                        f"--ingress --rule-number {n} --protocol -1 --rule-action deny {block}")
         out.append({
             "id": "NACL_BLOCK_ATTACKER", "target": "nacl", "resource": nacl["nacl_id"],
             "severity": "medium",
@@ -106,13 +163,18 @@ def audit(incident: dict, env: dict) -> list[dict]:
             "proposed": {"deny": [f"{ip}/32" for ip in attackers[:5]]},
             "cli": cmds,
             "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 "
-                       "근본 원인(열린 포트, WAF 설정)을 함께 고친다.",
+                       "근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 "
+                       "그 규칙이 먼저 적용되니 번호를 확인한다."
+                       + ("" if by_subnet else " 사건 서버의 서브넷을 설정에서 찾지 못해 첫 NACL로 적었다. "
+                          "서버가 있는 서브넷의 NACL인지 확인한다."),
         })
 
     # 3) WAF: SQLi 규칙 그룹이 COUNT 모드
     ev = _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEB_SQLI_PATTERN")
     if ev:
         for acl in env.get("waf_web_acls", []):
+            if not acl.get("name"):
+                continue
             for r in acl.get("rules", []):
                 if "SQLi" in str(r.get("managed_rule_group", "")) and \
                         str(r.get("override_action", "")).lower() == "count":
@@ -130,7 +192,8 @@ def audit(incident: dict, env: dict) -> list[dict]:
                             "# acl.json의 Rules에서 위 규칙의 OverrideAction을 {\"None\": {}}로 바꾼 뒤",
                             f"aws wafv2 update-web-acl --scope REGIONAL --name {acl['name']} "
                             f"--id {acl.get('id', '<web-acl-id>')} --lock-token {acl.get('lock_token') or '<LockToken>'} "
-                            "--default-action Allow={} --rules file://rules.json "
+                            f"--default-action {'Block' if str(acl.get('default_action', 'ALLOW')).upper() == 'BLOCK' else 'Allow'}={{}} "
+                            "--rules file://rules.json "
                             "--visibility-config <기존 값>",
                         ],
                         "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
@@ -150,7 +213,8 @@ def audit(incident: dict, env: dict) -> list[dict]:
                         "# 처음엔 SecRuleEngine DetectionOnly로 오탐 확인 후 On으로 전환"],
                 "caution": "WAF는 보조 수단이다. 취약한 쿼리 자체를 고쳐야 한다.",
             })
-        if not any(c["id"] == "WAF_SQLI_COUNT" for c in out) and env.get("waf_web_acls"):
+        if not any(c["id"] == "WAF_SQLI_COUNT" for c in out) and env.get("waf_web_acls") \
+                and env["waf_web_acls"][0].get("name"):
             acl = env["waf_web_acls"][0]
             if not any("SQLi" in str(r.get("managed_rule_group", "")) for r in acl.get("rules", [])):
                 out.append({
@@ -169,14 +233,15 @@ def audit(incident: dict, env: dict) -> list[dict]:
     # 4) 인스턴스: IMDSv1 허용 + 역할 자격증명 외부 사용
     ev = _has_rule(incident, "CT_INSTANCE_CRED_OUTSIDE", "CT_INSTANCE_CRED_MULTI_IP")
     for inst in env.get("instances", []):
-        if ev and inst["instance_id"] in inst_ids and inst.get("imds", "optional") != "required":
+        if ev and inst.get("instance_id") in inst_ids and inst.get("imds", "optional") != "required":
             out.append({
                 "id": "IMDSV1_ENABLED", "target": "ec2", "resource": inst["instance_id"],
                 "severity": "high",
                 "title": f"인스턴스 {inst['instance_id']}가 IMDSv1을 허용",
                 "why": "토큰 없이 메타데이터에서 역할 자격증명을 꺼낼 수 있어 탈취 위험이 크다.",
                 "evidence": ev[:10],
-                "current": {"HttpTokens": "optional"}, "proposed": {"HttpTokens": "required"},
+                "current": {"HttpTokens": inst.get("imds") or "확인 안 됨(설정에 없음)"},
+                "proposed": {"HttpTokens": "required"},
                 "cli": [f"aws ec2 modify-instance-metadata-options --instance-id {inst['instance_id']} "
                         "--http-tokens required --http-endpoint enabled"],
                 "caution": "오래된 SDK를 쓰는 앱은 IMDSv2를 지원하는지 먼저 확인한다.",

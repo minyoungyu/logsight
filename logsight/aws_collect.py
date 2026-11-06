@@ -66,6 +66,7 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
                         "private_dns": i.get("PrivateDnsName"),
                         "name": next((t["Value"] for t in i.get("Tags", []) if t.get("Key") == "Name"), None),
                         "security_groups": [g["GroupId"] for g in i.get("SecurityGroups", [])],
+                        "subnet_id": i.get("SubnetId"),
                         "instance_profile": prof_name,
                         "iam_role": prof_name,  # 아래 IAM 단계에서 실제 역할 이름으로 바꾼다
                         "imds": "required" if i.get("MetadataOptions", {}).get("HttpTokens") == "required"
