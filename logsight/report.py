@@ -493,7 +493,7 @@ def _incident(r: dict, verdicts: dict) -> str:
     return "".join(h)
 
 
-def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
+def render(result: dict, title: str = "LogFinder 분석 보고서") -> str:
     mode = _explain_mode(result)
     tri = result.get("triage") or {}
     verdicts = {x["id"]: x for x in tri.get("incidents", [])}
@@ -513,7 +513,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
     doc_no = f"LS-{gen:%Y%m%d-%H%M}" if gen else "LS"
     srcs = ", ".join(f"{SRC_KO.get(k, k)} {v:,}" for k, v in sorted(result["events_by_source"].items(),
                                                                      key=lambda kv: -kv[1]))
-    header = (f"<header class=top><div class=brand><span><b>LogSight</b> 침해사고 초동 분석 보고서 · 문서번호 "
+    header = (f"<header class=top><div class=brand><span><b>LogFinder</b> 침해사고 초동 분석 보고서 · 문서번호 "
               f"<code>{doc_no}</code></span><span class=cls>내부 검토용</span></div><h1>{escape(title)}</h1>"
               f"<div class=metaline><span>분석 방식</span><span>{pill}</span>"
               f"<span>분석 대상</span><span>원본 로그 {len(result['files'])}개 파일 · 이벤트 {result['n_events']:,}건"
@@ -603,7 +603,7 @@ def render(result: dict, title: str = "LogSight 분석 보고서") -> str:
                      f"<td class=act>{escape(', '.join(i['src_ips'][:3]))}</td><td>{i['n_events']}</td>"
                      f"<td>{rep_txt}</td></tr>")
         h.append("</table></div>")
-    h.append("<div class=sign><div>분석 · LogSight (자동 생성)</div><div>검토자</div><div>승인</div></div>"
-             f"<footer><span>LogSight · {doc_no}</span><span>판단마다 근거 로그 위치(파일:줄)를 붙였습니다. "
+    h.append("<div class=sign><div>분석 · LogFinder (자동 생성)</div><div>검토자</div><div>승인</div></div>"
+             f"<footer><span>LogFinder · {doc_no}</span><span>판단마다 근거 로그 위치(파일:줄)를 붙였습니다. "
              "수정안은 자동 적용되지 않습니다.</span></footer></main></div></html>")
     return "".join(h)

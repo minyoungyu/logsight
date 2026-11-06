@@ -28,7 +28,7 @@ from logsight.web.webreport import render as render_web
 # 데모에서는 API 문서(/docs, /openapi.json)도 끈다(내부 경로·매개변수 구조를 주지 않기 위함).
 DEMO = os.environ.get("LOGSIGHT_DEMO") == "1"
 DEMO_MSG = "데모 모드에서는 파일 업로드를 받지 않습니다. 샘플 보고서를 확인하세요."
-app = FastAPI(title="LogSight",
+app = FastAPI(title="LogFinder",
               docs_url=None if DEMO else "/docs",
               redoc_url=None if DEMO else "/redoc",
               openapi_url=None if DEMO else "/openapi.json")
@@ -80,12 +80,12 @@ background:var(--red);color:#111;cursor:pointer}button:hover{background:transpar
 .note{padding:10px 16px;font-size:12px;color:var(--dim);border-bottom:1px solid var(--ln)}
 .demo{padding:12px 16px;color:var(--amb);border-bottom:1px solid var(--ln);font-size:13px}
 """
-CONSOLE_BAR = ("<div class=bar><a class=logo href='/'><i></i>LOGSIGHT</a><span>AWS 침해사고 초동 분석</span>"
+CONSOLE_BAR = ("<div class=bar><a class=logo href='/'><i></i>LOGFINDER</a><span>AWS 침해사고 초동 분석</span>"
                "<span class=sp></span><a href='/'>로그 분석</a><a href='/web'>웹서버 점검</a><a href='/compare'>규칙 vs Claude</a>"
                "{docs}</div>")
 
 PAGE = """<!doctype html><html lang=ko><meta charset=utf-8>
-<meta name=viewport content='width=device-width,initial-scale=1'><title>LogSight</title>
+<meta name=viewport content='width=device-width,initial-scale=1'><title>LogFinder</title>
 <style>{css}</style>{bar}
 <div class=grid><div class=pane>
 <div class=hero><h1>로그를 올리면, 무슨 일이 있었고 무엇을 고칠지 알려 드립니다</h1>
@@ -134,7 +134,7 @@ def _page_with_back(html: str) -> str:
     """보고서·비교 화면 위에 콘솔과 같은 상단 막대를 붙여 앱 안에서 연 것임을 보여 준다."""
     bar = (f"<style>.lsbar{{{BAR_CSS}}}.lsbar a{{color:#8b939d;text-decoration:none}}.lsbar a:hover{{color:#d7dbe0}}"
            ".lsbar b{color:#d7dbe0;letter-spacing:.04em}.lsbar i{display:inline-block;width:8px;height:8px;background:#ff5a4e;"
-           "margin-right:8px}</style><div class=lsbar><a href='/'><b><i></i>LOGSIGHT</b></a>"
+           "margin-right:8px}</style><div class=lsbar><a href='/'><b><i></i>LOGFINDER</b></a>"
            "<a href='/'>← 다른 로그 분석하기</a></div>")
     i = html.find("</style>")
     return html[:i + 8] + bar + html[i + 8:] if i >= 0 else bar + html
@@ -193,7 +193,7 @@ def demo(sample: str = "demo"):
     label, path = SAMPLES[sample]
     with _Syslog(year=2026):  # 샘플은 2026년 기준 합성 데이터. 보는 사람이 돈을 쓰지 않게 AI는 끈다
         res = run_paths([str(path)], use_ai=False)
-    return _page_with_back(render(res, f"LogSight 샘플 분석: {label}"))
+    return _page_with_back(render(res, f"LogFinder 샘플 분석: {label}"))
 
 
 @app.post("/analyze", response_class=HTMLResponse)
@@ -267,7 +267,7 @@ def api_demo(sample: str = "demo"):
 # --------------------------------------------------------------- 웹서버 침해 점검
 # 미래의 일반 사용자용 UI가 그대로 붙을 수 있게, 백엔드는 assess() 하나만 부른다.
 WEB_PAGE = """<!doctype html><html lang=ko><meta charset=utf-8>
-<meta name=viewport content='width=device-width,initial-scale=1'><title>LogSight 웹서버 점검</title>
+<meta name=viewport content='width=device-width,initial-scale=1'><title>LogFinder 웹서버 점검</title>
 <style>{css}</style>{bar}
 <div class=grid><div class=pane>
 <div class=hero><h1>웹서버, 이미 뚫렸나요?</h1>

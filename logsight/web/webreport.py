@@ -32,7 +32,7 @@ def _refs(refs, inc_id: str) -> str:
     return "".join(f'<a class="ref" href="#{escape(inc_id)}-{escape(r)}">{escape(r)}</a>' for r in refs)
 
 
-def render(result: dict, title: str = "LogSight 웹서버 침해 점검 보고서") -> str:
+def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고서") -> str:
     site = result.get("site", {})
     v = result["overall_verdict"]
     vcls = VERDICT_CLASS.get(v, "low")
@@ -43,7 +43,7 @@ def render(result: dict, title: str = "LogSight 웹서버 침해 점검 보고�
     h = [f"<!doctype html><html lang=ko><meta charset=utf-8>"
          f"<meta name=viewport content='width=device-width,initial-scale=1'>"
          f"<title>{escape(title)}</title><style>{CSS}</style><div class='shell one'><main>"
-         f"<header class=top><div class=brand><span><b>LogSight</b> 웹서버 침해 점검 보고서 · 문서번호 "
+         f"<header class=top><div class=brand><span><b>LogFinder</b> 웹서버 침해 점검 보고서 · 문서번호 "
          f"<code>{doc_no}</code></span><span class=cls>내부 검토용</span></div><h1>{escape(title)}</h1>"
          f"<div class=metaline><span>점검 대상</span><span>{target}</span>"
          f"<span>읽은 로그</span><span>이벤트 {result['n_events']:,}건 ({escape(srcs) or '없음'})</span>"
@@ -125,10 +125,10 @@ def render(result: dict, title: str = "LogSight 웹서버 침해 점검 보고�
         h.append(f"<tr><td><code>{escape(rid)}</code></td><td>{escape(c.get('title', ''))}</td>"
                  f"<td>{c['findings']}</td><td>{c['events']}</td></tr>")
     h.append("</table></div>")
-    h.append("<div class=sign><div>분석 · LogSight (자동 생성)</div><div>검토자</div><div>승인</div></div>"
+    h.append("<div class=sign><div>분석 · LogFinder (자동 생성)</div><div>검토자</div><div>승인</div></div>"
              "<p class='small muted' style='margin-top:18px'>이 보고서는 쌓여 있는 로그와 파일만 보고 자동으로 "
              "판단한 결과입니다. 조치(파일 삭제·계정 잠금 등)는 사람이 확인한 뒤 직접 적용하세요. "
              "웹 로그는 보통 요청 본문을 남기지 않아, 로그만으로 공격 성공을 단정하기 어려운 경우가 있습니다.</p>")
-    h.append(f"<footer><span>LogSight · {doc_no}</span><span>근거 로그 위치를 판단마다 붙였습니다.</span></footer>"
+    h.append(f"<footer><span>LogFinder · {doc_no}</span><span>근거 로그 위치를 판단마다 붙였습니다.</span></footer>"
              "</main></div></html>")
     return "".join(h)
