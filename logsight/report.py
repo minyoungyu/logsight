@@ -447,6 +447,8 @@ def _incident(r: dict, verdicts: dict) -> str:
         h.append(f"<div class=fix><div class=t><span class='pri {escape(fc['priority'])}'>"
                  f"{PRI_KO.get(fc['priority'], fc['priority'])}</span>{escape(fc['change'])}</div>"
                  f"<div class=res>{escape(fc['target'])} · {escape(fc['resource'])}</div>")
+        if fc["check_id"] == "NEW":  # AI가 코드 점검 밖에서 새로 제안한 것: 실행 명령이 없는 '검증 안 된 제안'
+            h.append("<div class='muted small'>AI 제안 · 코드가 만든 적용 명령이 아님(직접 확인 후 적용)</div>")
         if rc:  # 원인 설명을 같은 카드에 붙여 '왜 → 무엇을 바꾸나'를 한곳에서 본다
             h.append(f"<div class=why>{escape(rc['why'])}</div>{_refs(rc.get('evidence', []), iid)}")
         if c:

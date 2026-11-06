@@ -19,12 +19,17 @@ from .normalize import Event, S3_PUBLIC_CALLS
 
 # 규칙 ID -> (ATT&CK 기법, 전술(단계), 한국어 이름, 기본 심각도)
 RULES: dict[str, tuple[str, str, str, str]] = {
-    "CT_LOGGING_TAMPER":  ("T1562.008", "defense-evasion", "감사 로그(CloudTrail/Flow Logs) 중지·삭제", "high"),
+    "CT_LOGGING_TAMPER":  ("T1562.008", "defense-evasion", "감사 로그·보안 서비스 중지·삭제", "high"),
     "CT_ROOT_USAGE":      ("T1078.004", "initial-access", "루트 계정 사용", "high"),
     "CT_IAM_PERSISTENCE": ("T1098", "persistence", "IAM 사용자·키·권한 생성/변경", "high"),
-    "CT_SG_OPENED":       ("T1562.007", "defense-evasion", "보안그룹을 0.0.0.0/0에 개방", "high"),
-    "CT_S3_PUBLIC":       ("T1537", "exfiltration", "S3 버킷을 인터넷 전체에 공개(ACL·정책)", "high"),
-    "CT_SNAPSHOT_SHARE":  ("T1537", "exfiltration", "스냅샷·AMI를 외부 계정과 공유", "high"),
+    "CT_SG_OPENED":       ("T1562.007", "defense-evasion", "보안그룹·네트워크 ACL을 0.0.0.0/0에 개방", "high"),
+    "CT_S3_PUBLIC":       ("T1537", "exfiltration", "S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책)", "high"),
+    "CT_SNAPSHOT_SHARE":  ("T1537", "exfiltration", "스냅샷·AMI(EC2·RDS)를 외부 계정과 공유", "high"),
+    "CT_SECRET_ACCESS":   ("T1555.006", "credential-access", "비밀값(Secrets Manager·SSM 암호 파라미터·Windows 암호) 대량 조회", "high"),
+    "CT_INSTANCE_EXEC":   ("T1651", "execution", "인스턴스에 원격 명령·접속 경로(SSM·Instance Connect·시작 스크립트)", "medium"),
+    "CT_SERVERLESS_CHANGE": ("T1525", "persistence", "Lambda·SageMaker 코드·권한·실행 설정 변경", "medium"),
+    "CT_DATA_DESTRUCTION": ("T1485", "impact", "데이터 대량 삭제·암호화(랜섬웨어)·복구 수단 제거", "high"),
+    "CT_ACCOUNT_SECURITY": ("T1556.006", "defense-evasion", "MFA·비밀번호 정책 등 계정 보안 설정 약화", "high"),
     "CT_INSTANCE_CRED_MULTI_IP": ("T1552.005", "credential-access", "인스턴스 역할 자격증명이 여러 IP에서 사용", "high"),
     "CT_INSTANCE_CRED_OUTSIDE":  ("T1552.005", "credential-access", "인스턴스 역할 자격증명이 인스턴스 밖에서 사용", "high"),
     "CT_ACCESS_DENIED_BURST": ("T1580", "discovery", "권한 없는 API를 연속 시도(권한 탐색)", "medium"),
@@ -81,25 +86,49 @@ GD_STAGE = {"Recon": "discovery", "Discovery": "discovery", "UnauthorizedAccess"
             "Backdoor": "impact", "Trojan": "impact", "Execution": "impact",
             "AttackSequence": "impact"}
 
-STAGE_ORDER = ["discovery", "initial-access", "credential-access", "persistence",
+STAGE_ORDER = ["discovery", "initial-access", "execution", "credential-access", "persistence",
                "privilege-escalation", "defense-evasion", "collection", "exfiltration",
                "impact", "other"]
 
 LOGGING_TAMPER = {"cloudtrail:StopLogging", "cloudtrail:DeleteTrail", "cloudtrail:UpdateTrail",
                   "cloudtrail:PutEventSelectors", "ec2:DeleteFlowLogs",
                   "guardduty:DeleteDetector", "guardduty:UpdateDetector",
-                  "wafv2:DeleteLoggingConfiguration", "config:StopConfigurationRecorder"}
+                  "wafv2:DeleteLoggingConfiguration", "config:StopConfigurationRecorder",
+                  "config:DeleteConfigurationRecorder", "logs:DeleteLogGroup",
+                  "route53resolver:DeleteResolverQueryLogConfig",
+                  "route53resolver:DisassociateResolverQueryLogConfig",
+                  "securityhub:DisableSecurityHub", "access-analyzer:DeleteAnalyzer",
+                  "bedrock:DeleteModelInvocationLoggingConfiguration",
+                  "organizations:LeaveOrganization"}
 IAM_PERSIST = {"iam:CreateUser", "iam:CreateAccessKey", "iam:CreateLoginProfile",
                "iam:UpdateLoginProfile", "iam:AttachUserPolicy", "iam:AttachRolePolicy",
                "iam:PutUserPolicy", "iam:PutRolePolicy", "iam:AddUserToGroup",
-               "iam:CreateRole", "iam:UpdateAssumeRolePolicy", "iam:CreatePolicyVersion"}
+               "iam:CreateRole", "iam:UpdateAssumeRolePolicy", "iam:CreatePolicyVersion",
+               "iam:SetDefaultPolicyVersion", "sts:GetFederationToken",
+               "rolesanywhere:CreateTrustAnchor", "rolesanywhere:CreateProfile",
+               "ec2:ImportKeyPair", "ec2:CreateKeyPair"}
 DISCOVERY = {"sts:GetCallerIdentity", "s3:ListBuckets", "iam:ListUsers", "iam:ListRoles",
              "iam:ListPolicies", "iam:GetAccountAuthorizationDetails", "iam:ListAccessKeys",
              "iam:ListAttachedUserPolicies", "iam:ListAttachedRolePolicies", "iam:GetUser",
              "ec2:DescribeInstances", "ec2:DescribeRegions", "ec2:DescribeSecurityGroups",
              "ec2:DescribeSnapshots", "ec2:DescribeImages", "lambda:ListFunctions",
              "rds:DescribeDBInstances", "s3:ListObjects", "s3:GetBucketAcl",
-             "s3:GetBucketPolicy", "organizations:DescribeOrganization"}
+             "s3:GetBucketPolicy", "organizations:DescribeOrganization",
+             "secretsmanager:ListSecrets", "ssm:DescribeParameters",
+             "ses:ListIdentities", "ses:GetSendQuota", "ses:GetAccountSendingEnabled",
+             "ses:ListEmailIdentities", "ses:GetAccount"}
+SECRET_READ = {"secretsmanager:GetSecretValue", "secretsmanager:BatchGetSecretValue"}
+INSTANCE_EXEC = {"ssm:SendCommand", "ssm:StartSession", "ec2-instance-connect:SendSSHPublicKey",
+                 "ec2-instance-connect:SendSerialConsoleSSHPublicKey"}
+SERVERLESS = {"lambda:UpdateFunctionCode", "lambda:CreateFunction",
+              "sagemaker:CreateNotebookInstanceLifecycleConfig",
+              "sagemaker:UpdateNotebookInstanceLifecycleConfig"}
+ACCOUNT_SECURITY = {"iam:DeactivateMFADevice", "iam:DeleteVirtualMFADevice",
+                    "iam:UpdateAccountPasswordPolicy", "iam:DeleteAccountPasswordPolicy"}
+DESTROY_ONE = {"kms:ScheduleKeyDeletion", "kms:DisableKey", "backup:DeleteRecoveryPoint",
+               "backup:DeleteBackupVault", "rds:DeleteDBCluster", "rds:DeleteDBInstance"}
+DESTROY_BURST = {"s3:DeleteObject", "s3:DeleteObjects", "ec2:DeregisterImage", "ec2:DeleteSnapshot",
+                 "s3:DeleteBucket"}
 ADMIN_PORTS = {22, 3389}
 _SQLI = re.compile(r"(?i)'\s*(or|and|union|select|;|--|#)|union\s+(all\s+)?select|"
                    r"sleep\s*\(|benchmark\s*\(|information_schema|'\s*$")
@@ -281,18 +310,34 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
     for e in ct:
         a = e.action or ""
         params = e.extra.get("params") or {}
-        if a in LOGGING_TAMPER:
+        flags = e.extra.get("flags") or ()
+        if a in LOGGING_TAMPER or "log_bucket_expire" in flags:
             singles[("CT_LOGGING_TAMPER", e.src_ip or "")].append(e)
+        if a in ACCOUNT_SECURITY:
+            singles[("CT_ACCOUNT_SECURITY", e.actor or "")].append(e)
+        if a in INSTANCE_EXEC or "userdata" in flags:
+            singles[("CT_INSTANCE_EXEC", e.actor or "")].append(e)
+        if a in SERVERLESS or (a in ("lambda:AddPermission", "lambda:AddLayerVersionPermission")
+                               and "external" in flags) or (
+                a == "lambda:UpdateFunctionConfiguration" and "layers" in str(params).lower()):
+            singles[("CT_SERVERLESS_CHANGE", e.actor or "")].append(e)
+        if a == "ec2:GetPasswordData" or (a == "secretsmanager:BatchGetSecretValue" and e.outcome == "success"):
+            singles[("CT_SECRET_ACCESS", e.actor or "")].append(e)
+        if a in DESTROY_ONE or "versioning_off" in flags:
+            if a not in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") or "no_final_snapshot" in flags:
+                singles[("CT_DATA_DESTRUCTION", e.actor or "")].append(e)
         if e.extra.get("identity_type") == "Root" and e.extra.get("eventType") != "AwsServiceEvent":
             singles[("CT_ROOT_USAGE", e.src_ip or "")].append(e)
         if a in IAM_PERSIST:
             singles[("CT_IAM_PERSISTENCE", e.actor or "")].append(e)
-        if a == "ec2:AuthorizeSecurityGroupIngress" and "0.0.0.0/0" in str(params):
+        if (a == "ec2:AuthorizeSecurityGroupIngress" and "0.0.0.0/0" in str(params)) or "nacl_open" in flags:
             singles[("CT_SG_OPENED", e.actor or "")].append(e)
-        if a in S3_PUBLIC_CALLS and e.extra.get("s3_public"):
+        if a in S3_PUBLIC_CALLS and (e.extra.get("s3_public") or "external" in flags):
             singles[("CT_S3_PUBLIC", e.actor or "")].append(e)
         if a in ("ec2:ModifySnapshotAttribute", "ec2:ModifyImageAttribute") and (
-                "createVolumePermission" in str(params) or "launchPermission" in str(params)):
+                "createVolumePermission" in str(params) or "launchPermission" in str(params)) or (
+                a in ("rds:ModifyDBSnapshotAttribute", "rds:ModifyDBClusterSnapshotAttribute")
+                and "external" in flags):
             singles[("CT_SNAPSHOT_SHARE", e.actor or "")].append(e)
         if a == "signin:ConsoleLogin" and e.extra.get("mfa") == "No" and e.outcome == "success":
             singles[("CT_CONSOLE_NO_MFA", e.actor or "")].append(e)
@@ -320,6 +365,24 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             odd = [e for ip, l in ips.items() if ip != normal for e in l]
             findings.append(Finding("CT_INSTANCE_CRED_MULTI_IP", sorted(odd, key=lambda e: e.ts),
                                     f"정상 추정 IP {normal} 외 {len(ips) - 1}개 IP", inst))
+
+    # --- CloudTrail: 같은 주체가 짧은 시간에 여러 비밀값을 읽거나 데이터를 지움
+    for actor, evs in by_actor.items():
+        reads = [e for e in evs if (e.action in SECRET_READ
+                                    or {"decrypt", "userdata_read"} & set(e.extra.get("flags") or ()))
+                 and e.outcome == "success"]
+        for seg in _bursts(reads, timedelta(minutes=10), 5, key=lambda e: e.extra.get("params") or e.raw_ref):
+            findings.append(Finding("CT_SECRET_ACCESS", seg, f"10분 안에 비밀값 {len(seg)}건 조회", actor))
+        dels = [e for e in evs if e.action in DESTROY_BURST and e.outcome == "success"]
+        for seg in _bursts(dels, timedelta(minutes=10), 20, key=lambda e: e.raw_ref):
+            findings.append(Finding("CT_DATA_DESTRUCTION", seg, f"10분 안에 삭제 {len(seg)}건", actor))
+        multi = [e for e in evs if e.action == "s3:DeleteObjects" and e.outcome == "success"]
+        for seg in _bursts(multi, timedelta(minutes=10), 3, key=lambda e: e.raw_ref):
+            findings.append(Finding("CT_DATA_DESTRUCTION", seg, f"10분 안에 일괄 삭제(DeleteObjects) {len(seg)}회", actor))
+        enc = [e for e in evs if "sse_c" in (e.extra.get("flags") or ())]
+        for seg in _bursts(enc, timedelta(minutes=10), 5, key=lambda e: e.raw_ref):
+            findings.append(Finding("CT_DATA_DESTRUCTION", seg,
+                                    f"10분 안에 고객 키(SSE-C)로 객체 {len(seg)}개를 다시 씀(랜섬웨어 수법)", actor))
 
     # --- CloudTrail: 시간창 기반 규칙(같은 출발지 IP 기준)
     for ip, evs in by_src.items():

@@ -7,7 +7,7 @@
     make lint      # ruff
     make regress   # 샘플 결과 고정 비교 + 처음 보는 데이터에서 잡은 것 계속 잡는지
 
-GitHub Actions가 Ubuntu·Windows·macOS × Python 3.10·3.13에서 시험을 돌리고, lint, 회귀(Splunk attack_data), 비밀값 검사(gitleaks)를 함께 한다.
+GitHub Actions가 PR마다 Ubuntu·Windows × Python 3.10·3.13에서 시험을 돌리고(macOS는 Actions 화면에서 직접 실행할 때만), lint, 회귀(Splunk attack_data), 비밀값 검사(gitleaks)를 함께 한다.
 모두 통과해야 합친다.
 
 ## 시험판 내기

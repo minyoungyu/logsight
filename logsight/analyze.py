@@ -19,7 +19,8 @@ from .guard import SYSTEM_RULE, fence
 DEFAULT_MODEL = os.environ.get("LOGSIGHT_MODEL", "claude-haiku-5-5")
 
 STAGE_KO = {
-    "discovery": "정찰·탐색", "initial-access": "초기 침투", "credential-access": "자격증명 탈취",
+    "discovery": "정찰·탐색", "initial-access": "초기 침투", "execution": "명령 실행",
+    "credential-access": "자격증명 탈취",
     "persistence": "지속성 확보", "privilege-escalation": "권한 상승",
     "defense-evasion": "방어 회피", "collection": "데이터 수집", "exfiltration": "유출",
     "impact": "피해", "other": "기타",
@@ -177,9 +178,13 @@ def validate(report: dict, incident: dict, checks: list[dict]) -> dict:
                 item["unverified_evidence"] = wrong
     unknown_checks = [c.get("check_id") for c in report.get("firewall_changes", [])
                       if c.get("check_id") not in check_ids]
+    # AI가 코드 점검에 없이 새로 제안한 변경(check_id="NEW"). 실행 명령이 없으므로 '검증 안 된 제안'으로 따로 센다.
+    new_changes = [{"resource": c.get("resource"), "change": c.get("change")}
+                   for c in report.get("firewall_changes", []) if c.get("check_id") == "NEW"]
     no_evidence = sum(1 for it in report.get("attack_flow", []) if not it.get("evidence"))
     return {"evidence_total": total, "evidence_invalid": bad,
             "steps_without_evidence": no_evidence, "unknown_check_ids": unknown_checks,
+            "ai_new_changes": new_changes,
             "passed": bad == 0 and no_evidence == 0 and not unknown_checks}
 
 

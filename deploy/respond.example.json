@@ -1,7 +1,7 @@
 {
- "_comment": "LogSight 자동 격리 설정. 처음 2주는 mode를 dry-run으로 두고 response.json의 would-do 기록에 오판이 없는지 본 뒤 enforce로 바꾼다.",
+ "_comment": "LogSight 자동 격리 설정. 처음 2주는 mode를 dry-run으로 두고 response.json의 would-do 기록에 오판이 없는지 본 뒤 enforce로 바꾼다. deadline_min(분)은 S3 전달 지연 뒤 로그까지 반영하려고 10으로 둔다. 집행(tick)은 watch 또는 cron에서만 돈다(on-alert 단독으로는 pending으로 남는다).",
  "mode": "dry-run",
- "deadline_min": 5,
+ "deadline_min": 10,
  "min_severity": "high",
  "max_per_incident": 5,
  "max_per_day": 20,

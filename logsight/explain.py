@@ -25,7 +25,9 @@ HYGIENE_RULES = {"CT_ROOT_USAGE", "CT_CONSOLE_NO_MFA"}
 # 공격 행동이 아니라 "열려 있음"을 보여 주는 규칙(인터넷 스캐너가 열린 관리 포트에 접속)
 EXPOSURE_RULES = {"VPC_REMOTE_ADMIN_EXPOSED", "GD_FINDING"}
 # 정상 작업 목록의 계정이 했어도 위험한 설정 변경
-RISKY_CHANGE_RULES = {"CT_SG_OPENED", "CT_S3_PUBLIC", "CT_SNAPSHOT_SHARE", "CT_LOGGING_TAMPER"}
+RISKY_CHANGE_RULES = {"CT_SG_OPENED", "CT_S3_PUBLIC", "CT_SNAPSHOT_SHARE", "CT_LOGGING_TAMPER", "CT_ACCOUNT_SECURITY"}
+# 운영자가 평소 하는 작업과 모양이 같은 규칙(SSM 명령, 함수 배포). 이것만 있으면 공격이라 단정하지 않는다
+OPS_RULES = {"CT_INSTANCE_EXEC", "CT_SERVERLESS_CHANGE"}
 # 자격증명 오용 규칙
 CRED_RULES = {"CT_INSTANCE_CRED_MULTI_IP", "CT_INSTANCE_CRED_OUTSIDE", "CT_UNTRUSTED_IP"}
 # 정상 작업 목록 계정이라도 키 유출 때 흔한 모습. 이름만 보고 정상으로 넘기지 않는다(BOTSv3 측정에서 확인)
@@ -240,6 +242,12 @@ def verdict_for(inc: dict) -> dict:
                       "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 "
                                 "보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 "
                                 "열어 둔 설정을 닫으세요."}
+    if rules and rules <= OPS_RULES:
+        who = sorted({(e.get("actor") or "?").split("/")[-1] for e in evs})[:3]
+        return out | {"verdict": "unclear", "confidence": "low",
+                      "reason": f"인스턴스 원격 명령·함수 배포처럼 운영자가 평소 하는 작업({', '.join(who)})만 있어 "
+                                "규칙만으로는 공격인지 판단할 수 없습니다. 누가 했는지 확인하고, 우리 팀이면 "
+                                "`logsight team`으로 확인해 두면 다음부터 빠집니다."}
     if rules and rules <= CRED_RULES:
         acts = {e.get("action") for e in evs}
         if acts and acts <= IDENTITY_ONLY:

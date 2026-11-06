@@ -40,7 +40,7 @@ class ConfigAuditEdges(unittest.TestCase):
     def test_sample_produces_expected_checks(self):
         ids = {c["id"] for c in _checks(_run(BASE))}
         self.assertEqual(ids, {"SG_ADMIN_PORT_OPEN", "WAF_SQLI_COUNT", "IMDSV1_ENABLED",
-                               "IAM_OVERBROAD", "NACL_BLOCK_ATTACKER"})
+                               "IAM_OVERBROAD", "NACL_BLOCK_ATTACKER", "IAM_ROLE_SESSION_REVOKE"})
         for c in _checks(_run(BASE)):
             if any(not x.startswith("#") for x in c["cli"]) and c["id"] != "WAF_SQLI_COUNT":
                 self.assertTrue(c["rollback"], c["id"])  # 실행 명령이 있으면 되돌리기도 있다

@@ -358,6 +358,10 @@ def _alert_cmd(args) -> int:
         session = boto3.Session(profile_name=args.profile, region_name=args.region)
     s3 = session.client("s3") if session and (args.s3 or args.heartbeat) else None
     if args.cmd == "on-alert":
+        if args.respond:
+            print("참고: on-alert 단독으로는 자동 격리가 집행되지 않고 response.json이 pending으로 남습니다. "
+                  "집행하려면 watch로 돌리거나, cron에 'logsight respond tick --config <respond.json> "
+                  "--out <결과 폴더>'를 등록하세요.", file=sys.stderr)
         ok = True
         for ev in al.load_events(args.events):
             r = al.process_message(json.dumps(ev), opt, s3=s3, session=session)

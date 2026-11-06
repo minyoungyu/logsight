@@ -1,6 +1,9 @@
 """
-자동 격리(구상 3단계, 방안 A): 경보 뒤 5분 안에 아무도 확인하지 않으면, 도입 이후 외부에서 만들어진
-키·사용자·역할·보안그룹 규칙만 **되돌릴 수 있게** 막는다. 삭제는 하지 않는다(사람이 보고서를 보고 한다).
+자동 격리(구상 3단계, 방안 A): 경보 뒤 마감(기본 10분) 안에 아무도 확인하지 않으면, 도입 이후 외부에서
+만들어진 키·사용자·역할·보안그룹 규칙만 **되돌릴 수 있게** 막는다. 삭제는 하지 않는다(사람이 보고서를 보고 한다).
+마감을 10분으로 둔 것은 S3 전달 지연(CloudTrail 약 5분, Flow Logs 약 10분) 뒤에 도착하는 로그까지 허용
+목록에 반영한 다음 판단하기 위해서다(정상 생성을 공격으로 오인하지 않도록). 도입(기준선) 전부터 있던
+자원은 기준선에 들어가 자동 격리 대상에서 영원히 빠진다(정상·악성을 구분할 수 없어 자동으로 손대지 않음).
 
     기준선(baseline.json)   도입한 날의 IAM 사용자·역할·액세스 키·보안그룹 규칙. 여기 있는 것은 절대 건드리지 않음
     허용 목록(allowlist.json) 기준선 뒤에 만들어졌지만 내부에서 만든 것. CloudTrail 생성 기록으로 자동 추가:
@@ -78,7 +81,7 @@ def rule_key(group: str, proto: Any, frm: Any, to: Any, cidr: str) -> str:
 @dataclass
 class Config:
     mode: str = "dry-run"                 # dry-run | enforce
-    deadline_min: float = 5.0
+    deadline_min: float = 10.0
     min_severity: str = "high"
     max_per_incident: int = 5
     max_per_day: int = 20
