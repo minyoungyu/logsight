@@ -81,7 +81,7 @@ def build(alert: dict, result: dict, out: Path, response: dict | None = None) ->
 
 def text(msg: dict) -> str:
     a = msg["alert"]
-    lines = [f"[LogSight] {msg['title']}",
+    lines = [f"[LogFinder] {msg['title']}",
              f"시각 {a['time'][:16].replace('T', ' ')} UTC · 계정 {a.get('account') or '-'} {a.get('region') or ''}".rstrip(),
              f"이벤트 {msg['counts']['events']:,}건 → 사건 {msg['counts']['incidents']:,}건"]
     for i in msg["incidents"]:
@@ -135,7 +135,7 @@ def send_discord(c: dict, msg: dict) -> dict:
     if not url:
         return {"ok": False, "error": "웹훅 주소 없음(url_env)"}
     color = {"high": 0xD93025, "medium": 0xF29900, "low": 0x5F6368}.get(msg["severity"], 0x5F6368)
-    body = {"username": "LogSight", "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
+    body = {"username": "LogFinder", "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
             "embeds": [{"title": msg["title"][:250], "description": text(msg)[:3900], "color": color}]}
     return _post(url, json.dumps(body, ensure_ascii=False).encode(), {})
 
@@ -159,15 +159,15 @@ def send_webhook(c: dict, msg: dict) -> dict:
 
 EMAIL_FOOTER = (
     "\n\n─────────────\n"
-    "이 메일은 귀사가 이용 중인 LogSight 보안 분석이 AWS 보안 경보를 받아 자동으로 보낸 정보성 알림입니다. "
-    "광고가 아니며, 수신 담당자 변경은 LogSight 설정(notify.json)에서 합니다.\n"
+    "이 메일은 귀사가 이용 중인 LogFinder 보안 분석이 AWS 보안 경보를 받아 자동으로 보낸 정보성 알림입니다. "
+    "광고가 아니며, 수신 담당자 변경은 LogFinder 설정(notify.json)에서 합니다.\n"
     "첨부한 보고서는 IP·키를 일부 가린(마스킹) 분석 결과이며, 원본 로그는 들어 있지 않습니다."
 )
 
 
 def email_message(c: dict, msg: dict) -> EmailMessage:
     m = EmailMessage()
-    m["Subject"] = f"[LogSight 보안 경보·정보성] {msg['title'][:150]}"
+    m["Subject"] = f"[LogFinder 보안 경보·정보성] {msg['title'][:150]}"
     m["From"] = c["from"]
     m["To"] = ", ".join(c["to"])
     body = [text(msg), "", "무슨 일이 있었나: 보고서의 '공격 흐름'과 '판정 이유'를 보세요.",
@@ -227,9 +227,9 @@ def send_all(channels: list[dict], msg: dict) -> list[dict]:
 
 def test_message() -> dict:
     """설정 확인용 시험 메시지(`logsight notify-test`)."""
-    alert: dict[str, Any] = {"id": "test", "source": "test", "title": "LogSight 통지 시험입니다. 실제 경보가 아닙니다.",
+    alert: dict[str, Any] = {"id": "test", "source": "test", "title": "LogFinder 통지 시험입니다. 실제 경보가 아닙니다.",
                              "severity": "low", "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                              "account": "", "region": ""}
-    return {"title": "시험: LogSight 통지 연결 확인", "severity": "high", "alert": alert,
+    return {"title": "시험: LogFinder 통지 연결 확인", "severity": "high", "alert": alert,
             "counts": {"events": 0, "incidents": 0}, "incidents": [], "first_actions": [],
             "report_dir": "-", "report_html": "-"}
