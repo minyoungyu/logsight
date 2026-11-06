@@ -103,15 +103,15 @@ class Classify(unittest.TestCase):
         t0 = datetime(2026, 11, 4, 2, 0, tzinfo=timezone.utc)
         for name in ("a", "b", "c"):
             rs.prepare(rs.Responder(self.cfg), {"id": name}, recs, root / name, now=t0)
-        self.assertEqual(rs.tick(self.cfg, root, now=t0 + timedelta(minutes=4)), [])  # 아직 5분 안
+        self.assertEqual(rs.tick(self.cfg, root, now=t0 + timedelta(minutes=9)), [])  # 아직 마감(10분) 전
         rs.ack(root / "a")
         (Path(self.tmp.name) / "STOP").touch()
-        out = {r["alert"]["id"]: r for r in rs.tick(self.cfg, root, now=t0 + timedelta(minutes=6))}
+        out = {r["alert"]["id"]: r for r in rs.tick(self.cfg, root, now=t0 + timedelta(minutes=11))}
         self.assertEqual(set(out), {"b", "c"})
         self.assertEqual(out["b"]["status"], "stopped")
         os.remove(Path(self.tmp.name) / "STOP")
         rs.prepare(rs.Responder(self.cfg), {"id": "d"}, recs, root / "d", now=t0)
-        r = rs.tick(self.cfg, root, now=t0 + timedelta(minutes=6))[0]
+        r = rs.tick(self.cfg, root, now=t0 + timedelta(minutes=11))[0]
         self.assertEqual((r["status"], r["actions"][0]["outcome"]["result"]), ("dry-run", "would-do"))
         self.assertEqual(json.loads((root / "a" / "response.json").read_text(encoding="utf-8"))["status"], "acknowledged")
 
@@ -161,7 +161,7 @@ class Enforce(unittest.TestCase):
         t0 = datetime.now(timezone.utc)
         resp = rs.prepare(rs.Responder(cfg), {"id": "x", "region": REGION}, recs, root / "x", now=t0)
         self.assertEqual([a["op"] for a in resp["actions"]], ["deactivate_key", "deny_user", "revoke_ingress"])
-        r = rs.tick(cfg, root, iam=iam, ec2=ec2, now=t0 + timedelta(minutes=6))[0]
+        r = rs.tick(cfg, root, iam=iam, ec2=ec2, now=t0 + timedelta(minutes=11))[0]
         self.assertEqual([a["outcome"]["result"] for a in r["actions"]], ["done"] * 3)
 
         def key_status(user, kid):
