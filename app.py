@@ -300,7 +300,7 @@ def web_home():
 
 @app.get("/web/demo", response_class=HTMLResponse)
 def web_demo():
-    return render_web(assess(SiteProfile.load(WEB_SAMPLE), use_ai=False))
+    return _page_with_back(render_web(assess(SiteProfile.load(WEB_SAMPLE), use_ai=False)))
 
 
 def _profile_from_uploads(tmp: Path, files: dict[str, list]) -> SiteProfile:
@@ -341,7 +341,7 @@ async def web_scan(
         return HTMLResponse("로그 파일을 하나 이상 올려 주세요.", status_code=400)
     with tempfile.TemporaryDirectory() as d:
         profile = _profile_from_uploads(Path(d), files)
-        return render_web(assess(profile, use_ai=not no_ai))
+        return _page_with_back(render_web(assess(profile, use_ai=not no_ai)))
 
 
 @app.post("/api/web/scan")
