@@ -80,7 +80,7 @@ def render(cols: list[dict], title: str, notes: list[str]) -> str:
             truth[v["id"]] = v["is_attack"]
     has_truth = bool(truth)
     h = [f"<!doctype html><html lang=ko><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>"
-         f"<title>{escape(title)}</title><style>{CSS}</style><header class=top><div class=brand>LogSight · 설명 방식 비교</div>"
+         f"<title>{escape(title)}</title><style>{CSS}</style><header class=top><div class=brand>LogFinder · 설명 방식 비교</div>"
          f"<h1>{escape(title)}</h1><div class=metaline><span>같은 사건을 설명 방식만 바꿔 판정한 결과입니다. "
          "탐지 규칙과 사건 묶기는 모든 열이 같습니다.</span></div></header><main class=cmp>"]
 
@@ -145,7 +145,7 @@ def render(cols: list[dict], title: str, notes: list[str]) -> str:
         body = "".join(f"<li><b>{escape(', '.join(x['incident_ids']))}</b>: {escape(x.get('link_reason', ''))}</li>"
                        for x in camps) or "<li class=muted>없음</li>"
         h.append(f"<div class=card><b>{escape(c['label'])}</b><ul>{body}</ul></div>")
-    h.append("</div><footer>LogSight · 입력: " + ", ".join(escape(c["path"]) for c in cols) + "</footer></main></html>")
+    h.append("</div><footer>LogFinder · 입력: " + ", ".join(escape(c["path"]) for c in cols) + "</footer></main></html>")
     return "".join(h)
 
 
