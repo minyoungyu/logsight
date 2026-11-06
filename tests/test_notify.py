@@ -1,6 +1,8 @@
 """통지(logsight/notify.py) 테스트. 웹훅은 이 PC 안의 임시 HTTP 서버로, 이메일은 SMTP를 흉내 내서 시험한다."""
 from __future__ import annotations
 
+import email
+import email.policy
 import hashlib
 import hmac
 import json
@@ -28,8 +30,17 @@ class Recorder(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         body = self.rfile.read(int(self.headers["Content-Length"]))
+        files = {}
+        if self.headers.get("Content-Type", "").startswith("multipart/form-data"):
+            msg = email.message_from_bytes(b"Content-Type: " + self.headers["Content-Type"].encode() + b"\r\n\r\n" + body,
+                                           policy=email.policy.HTTP)
+            parts = {p.get_param("name", header="content-disposition"): p for p in msg.iter_parts()}
+            data = parts.pop("payload_json").get_payload(decode=True)
+            files = {p.get_filename(): p.get_payload(decode=True) for p in parts.values()}
+        else:
+            data = body
         Recorder.got.append({"path": self.path, "headers": {k.lower(): v for k, v in self.headers.items()},
-                             "raw": body, "body": json.loads(body)})
+                             "raw": body, "body": json.loads(data), "files": files})
         self.send_response(Recorder.status)
         self.end_headers()
 
@@ -99,6 +110,21 @@ class Notify(unittest.TestCase):
         self.assertEqual(r["status"], "done")
         self.assertEqual(r["notify_channels"][0], {"channel": "slack", "ok": False, "status": 400})
         self.assertEqual(len(Recorder.got), 1)  # 4xx는 다시 보내지 않는다
+
+    def test_discord_attaches_report(self):
+        """디스코드 카드에 보고서 HTML이 첨부되어, 받은 사람이 바로 열어 볼 수 있다."""
+        r = self.run_alert([{"type": "discord", "url_env": "T_DISCORD"}])
+        self.assertTrue(r["notify_channels"][0]["ok"])
+        got = Recorder.got[0]
+        self.assertEqual(got["body"]["allowed_mentions"], {"parse": []})
+        (name, data), = got["files"].items()
+        self.assertTrue(name.endswith(".html"))
+        self.assertEqual(data, (Path(r["out"]) / "report.html").read_bytes())
+
+    def test_discord_no_attach_when_off(self):
+        self.run_alert([{"type": "discord", "url_env": "T_DISCORD", "attach_report": False}])
+        self.assertEqual(Recorder.got[0]["files"], {})
+        self.assertEqual(Recorder.got[0]["headers"]["content-type"], "application/json")
 
     def test_stages_in_korean(self):
         """관리자가 받는 카드·요약에 공격 단계를 영어 코드 대신 한국어로 쓴다."""
