@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py ./
 COPY logsight ./logsight
 COPY samples ./samples
-COPY reports/ctf/compare_gongbang.html ./reports/ctf/compare_gongbang.html
 
 RUN useradd --create-home --uid 10001 app
 USER app
