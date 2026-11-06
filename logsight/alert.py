@@ -26,6 +26,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+from .analyze import STAGE_KO
+
 SEV_ORDER = {"low": 0, "medium": 1, "high": 2}
 
 # EventBridge로 받는 CloudTrail API 호출 중 바로 분석을 돌릴 것(로그 훼손·지속성 확보·권한 상승)
@@ -371,7 +373,7 @@ def summary_text(alert: Alert, result: dict, out: Path) -> str:
         inc = r["incident"]
         first = next((c.get("title") for c in r.get("checks", []) if c.get("title")), None)
         lines.append(f"- {inc['id']} [{sev.get(inc['severity'], inc['severity'])}] "
-                     f"{'→'.join(inc['stages'][:4])}" + (f" / 먼저: {first[:40]}" if first else ""))
+                     f"{'→'.join(STAGE_KO.get(x, x) for x in inc['stages'][:4])}" + (f" / 먼저: {first[:40]}" if first else ""))
     lines.append("참고: CloudTrail(약 5분)·Flow Logs(약 10분)는 S3 전달이 늦어 경보 직전 몇 분은 빠졌을 수 있음")
     lines.append(f"보고서: {out / 'report.html'}")
     return "\n".join(lines) + "\n"

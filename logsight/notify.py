@@ -30,6 +30,8 @@ from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
 
+from .analyze import STAGE_KO
+
 SEV_ORDER = {"low": 0, "medium": 1, "high": 2}
 SEV_KO = {"high": "높음", "medium": "중간", "low": "낮음"}
 TYPES = ("email", "slack", "discord", "webhook", "kakao_alimtalk")
@@ -85,7 +87,7 @@ def text(msg: dict) -> str:
              f"시각 {a['time'][:16].replace('T', ' ')} UTC · 계정 {a.get('account') or '-'} {a.get('region') or ''}".rstrip(),
              f"이벤트 {msg['counts']['events']:,}건 → 사건 {msg['counts']['incidents']:,}건"]
     for i in msg["incidents"]:
-        lines.append(f"- {i['id']} [{SEV_KO.get(i['severity'], i['severity'])}] {' → '.join(i['stages'])}"
+        lines.append(f"- {i['id']} [{SEV_KO.get(i['severity'], i['severity'])}] {' → '.join(STAGE_KO.get(x, x) for x in i['stages'])}"
                      + (f" (출발지 {', '.join(i['src_ips'])})" if i["src_ips"] else ""))
     if msg["first_actions"]:
         lines.append("먼저 할 일:")
