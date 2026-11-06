@@ -138,7 +138,8 @@ def send_discord(c: dict, msg: dict) -> dict:
         return {"ok": False, "error": "웹훅 주소 없음(url_env)"}
     color = {"high": 0xD93025, "medium": 0xF29900, "low": 0x5F6368}.get(msg["severity"], 0x5F6368)
     body = {"username": "LogFinder", "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
-            "embeds": [{"title": msg["title"][:250], "description": text(msg)[:3900], "color": color}]}
+            "embeds": [{"title": msg["title"][:250], "description": text(msg).split("\n", 1)[-1][:3900],  # 첫 줄=제목, 중복 빼기
+                        "color": color}]}
     return _post(url, json.dumps(body, ensure_ascii=False).encode(), {})
 
 
