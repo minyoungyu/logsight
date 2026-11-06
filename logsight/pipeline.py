@@ -16,10 +16,20 @@ from .triage import reorder, triage
 
 
 def load_env(path: str | Path | None) -> dict:
+    """environment.json을 읽는다. 깨진 파일 때문에 분석 전체가 멈추지 않게, 읽지 못하면 빈 설정으로 두고
+    이유를 "_error"에 남긴다(보고서의 '가정'에 그대로 보여 준다)."""
     if not path:
         return {}
     p = Path(path)
-    return json.loads(p.read_text(encoding="utf-8-sig")) if p.is_file() else {}
+    if not p.is_file():
+        return {}
+    try:
+        env = json.loads(p.read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        return {"_error": f"{p.name}을 JSON으로 읽지 못했습니다({exc})"}
+    if not isinstance(env, dict):
+        return {"_error": f"{p.name}의 최상위가 객체({{...}})가 아니라 {type(env).__name__}입니다"}
+    return env
 
 
 def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] | None = None,
@@ -44,9 +54,13 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         tri["guard"] = hold(groups, tri, rule_tri)  # AI가 규칙의 공격 판정을 낮춘 것을 표시·되돌림
     groups = reorder(groups, tri)
     rule_v = {x["id"]: x for x in rule_tri["incidents"]}
-    results = []
+    results, audit_errors = [], []
     for inc in groups[:top]:
-        checks = audit(inc, env)
+        try:
+            checks = audit(inc, env)
+        except Exception as exc:  # noqa: BLE001 — 설정 파일 하나가 이상해도 분석은 끝까지 간다
+            checks = []
+            audit_errors.append(f"{inc['id']}: {type(exc).__name__}: {exc}"[:200])
         out = analyze(inc, checks, model=model, use_ai=use_ai and not preview,
                       verdict=rule_v.get(inc["id"]))
         row = {"incident": inc, "checks": checks, **out}
@@ -84,10 +98,11 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},
-        "has_environment": bool(env),
+        "has_environment": bool(env) and not env.get("_error"),
         "team": team_info,
         "assumptions": _assumptions(by_source, env, file_stats or [],
-                                    sum(1 for e in events if e.extra.get("behind_proxy"))),
+                                    sum(1 for e in events if e.extra.get("behind_proxy")))
+        + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]],
     }
 
 
@@ -127,7 +142,10 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
         out.append(f"auth.log·kern.log처럼 연도·시간대가 없는 줄은 "
                    f"{'UTC' if not hours else f'UTC{hours:+g}'} 기준, 연도는 "
                    f"{SYSLOG['year'] or '올해(미래면 작년)'}로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요.")
-    if not env:
+    if env.get("_error"):
+        out.append(f"설정 스냅샷을 쓰지 못해 방화벽 수정안을 만들지 않았습니다: {env['_error']}. "
+                   "python -m logsight collect environment로 다시 만들 수 있습니다.")
+    elif not env:
         out.append("설정 스냅샷(environment.json)이 없어 방화벽 수정안을 만들지 않았습니다. "
                    "python -m logsight collect environment로 만들 수 있습니다.")
     elif not env.get("trusted_ips"):

@@ -106,6 +106,45 @@ _SQLI = re.compile(r"(?i)'\s*(or|and|union|select|;|--|#)|union\s+(all\s+)?selec
 
 
 
+def _path(action: str | None) -> str:
+    """'GET /item?id=1' → '/item'"""
+    a = (action or "").split(" ", 1)[-1]
+    return a.split("?", 1)[0]
+
+
+def sqli_success_signal(attempts: list, events: list) -> str:
+    """SQL 인젝션 요청이 실제로 먹혔는지에 대한 코드 판단(AI에 맡기지 않는다).
+    응답 크기만 본다. 같은 경로의 평소 응답(인젝션 문자열이 없는 2xx)과 크기가 같으면 같은 페이지가
+    돌아온 것이라 성공 근거가 없고, 크게 다르면 데이터가 더 나왔을 수 있다. 확정이 아니라 신호다."""
+    ok = [e for e in attempts if str(e.extra.get("http_status", ""))[:1] == "2"]
+    if not ok:
+        return "성공 신호 없음: 2xx 응답이 없음"
+    sized = [e for e in ok if isinstance(e.extra.get("resp_bytes"), int)]
+    if not sized:
+        return "성공 판단 불가: 로그에 응답 크기가 없음"
+    att = {id(e) for e in attempts}
+    paths = {_path(e.action) for e in sized}
+    base = [e.extra["resp_bytes"] for e in events
+            if id(e) not in att and e.source in ("alb", "weblog") and _path(e.action) in paths
+            and str(e.extra.get("http_status", ""))[:1] == "2" and isinstance(e.extra.get("resp_bytes"), int)
+            and not _SQLI.search(unquote_plus((e.action or "").split("?", 1)[-1]))]
+    sizes = [e.extra["resp_bytes"] for e in sized]
+    if base:
+        ref = sorted(base)[len(base) // 2]
+        odd = [s for s in sizes if abs(s - ref) > max(200, ref * 0.2)]
+        if odd:
+            return (f"성공 의심: 2xx {len(sized)}건 중 {len(odd)}건의 응답 크기가 평소({ref}바이트)와 크게 다름"
+                    f"(최대 {max(odd, key=lambda s: abs(s - ref))}바이트). 데이터가 나왔을 수 있어 확인 필요")
+        return f"성공 근거 없음: 2xx {len(sized)}건 모두 평소 응답({ref}바이트)과 크기가 비슷함(같은 페이지로 보임)"
+    if len(set(sizes)) == 1 and len(sizes) > 1:
+        return (f"성공 근거 없음: 2xx {len(sized)}건의 응답 크기가 모두 {sizes[0]}바이트로 같음"
+                "(같은 페이지가 돌아온 것으로 보임). 평소 응답이 로그에 없어 확정은 못 함")
+    if len(sizes) > 1 and max(sizes) - min(sizes) > max(200, min(sizes) * 0.2):
+        return (f"성공 의심: 2xx {len(sized)}건의 응답 크기가 {min(sizes)}~{max(sizes)}바이트로 크게 다름. "
+                "데이터가 나왔을 수 있어 확인 필요")
+    return f"성공 판단 불가: 2xx {len(sized)}건, 비교할 평소 응답이 로그에 없음"
+
+
 def _ok_fail(evs) -> str:
     ok = sum(1 for e in evs if e.outcome in ("success", "accept", "allow"))
     return f"{len(evs)}건(성공 {ok}, 실패·거부 {len(evs) - ok})"
@@ -388,7 +427,8 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
     for ip, evs in web.items():
         if any(f.rule == "WAF_SQLI_NOT_BLOCKED" and f.key == ip for f in findings):
             continue
-        findings.append(Finding("WEB_SQLI_PATTERN", evs, _ok_fail(evs), ip))
+        findings.append(Finding("WEB_SQLI_PATTERN", evs,
+                                f"{_ok_fail(evs)} · {sqli_success_signal(evs, events)}", ip))
 
     # --- 웹 경로 탐색: 한 IP가 5분 안에 서로 다른 경로 20개 이상에서 404/403
     probe: dict[str, list[Event]] = defaultdict(list)
