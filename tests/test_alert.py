@@ -90,7 +90,7 @@ class Handle(unittest.TestCase):
         rep = json.loads((d / "report.json").read_text(encoding="utf-8"))
         self.assertEqual(rep["events_by_source"].get("guardduty"), 1)  # 경보 자체도 분석 입력
         self.assertGreaterEqual(rep["n_incidents"], 1)
-        self.assertIn("[LogSight] 높음 경보", (d / "summary.txt").read_text(encoding="utf-8"))
+        self.assertIn("[LogFinder] 높음 경보", (d / "summary.txt").read_text(encoding="utf-8"))
 
     def test_low_severity_skipped(self):
         r = al.handle(al.parse_event(ct_event("DescribeInstances")), self.opt())

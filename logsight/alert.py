@@ -364,7 +364,7 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
 def summary_text(alert: Alert, result: dict, out: Path) -> str:
     """통지용 짧은 요약(문자 한 통·이메일 제목+본문에 들어갈 길이). 원본 로그·키는 넣지 않는다."""
     sev = {"high": "높음", "medium": "중간", "low": "낮음"}
-    lines = [f"[LogSight] {sev[alert.severity]} 경보: {alert.title[:80]}",
+    lines = [f"[LogFinder] {sev[alert.severity]} 경보: {alert.title[:80]}",
              f"시각 {alert.time.strftime('%m-%d %H:%M')} UTC, 계정 {alert.account or '-'} {alert.region}",
              f"이벤트 {result['n_events']:,}건 → 사건 {result['n_groups']:,}건"]
     for r in result.get("results", [])[:3]:
