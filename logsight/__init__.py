@@ -1,7 +1,7 @@
 """LogSight: 흩어진 AWS 로그를 하나의 공격 흐름으로 엮어 설명하고 방화벽 수정안을 제안한다."""
 import sys
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 if sys.version_info < (3, 10):  # Amazon Linux 2023 기본 python3는 3.9
     raise SystemExit(
