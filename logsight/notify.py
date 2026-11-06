@@ -132,6 +132,9 @@ def send_slack(c: dict, msg: dict) -> dict:
     return _post(url, json.dumps(body, ensure_ascii=False).encode(), {})
 
 
+DISCORD_MAX_FILE = 8 * 1024 * 1024  # 웹후크 첨부 한도(서버 부스트 없는 기본 10MB보다 작게)
+
+
 def send_discord(c: dict, msg: dict) -> dict:
     url = _secret(c, "url")
     if not url:
@@ -140,7 +143,21 @@ def send_discord(c: dict, msg: dict) -> dict:
     body = {"username": "LogFinder", "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
             "embeds": [{"title": msg["title"][:250], "description": text(msg).split("\n", 1)[-1][:3900],  # 첫 줄=제목, 중복 빼기
                         "color": color}]}
-    return _post(url, json.dumps(body, ensure_ascii=False).encode(), {})
+    payload = json.dumps(body, ensure_ascii=False).encode()
+    rep = Path(msg.get("report_html") or "-")
+    if c.get("attach_report", True) and rep.is_file() and rep.stat().st_size <= DISCORD_MAX_FILE:
+        # 보고서 파일을 카드와 함께 올린다(웹후크 multipart: payload_json + files[0])
+        boundary = "logfinder" + hashlib.sha256(os.urandom(16)).hexdigest()[:24]
+        name = f"logfinder_report_{rep.parent.name}.html"
+        parts = [
+            f"--{boundary}\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n"
+            "Content-Type: application/json\r\n\r\n".encode() + payload + b"\r\n",
+            f"--{boundary}\r\nContent-Disposition: form-data; name=\"files[0]\"; filename=\"{name}\"\r\n"
+            "Content-Type: text/html\r\n\r\n".encode() + rep.read_bytes() + b"\r\n",
+            f"--{boundary}--\r\n".encode(),
+        ]
+        return _post(url, b"".join(parts), {"Content-Type": f"multipart/form-data; boundary={boundary}"})
+    return _post(url, payload, {})
 
 
 def send_webhook(c: dict, msg: dict) -> dict:
