@@ -13,7 +13,8 @@ from datetime import timedelta
 
 import networkx as nx
 
-from .detect import RULES, STAGE_ORDER, Finding, _is_ip, _is_private
+from .detect import (APP_SOURCES, NET_SOURCES, RULES, STAGE_ORDER, Finding, _is_ip, _is_private,
+                     anchored_private_ips, shared_private_ips)
 from .normalize import Event, mask_obj
 
 SEV_RANK = {"high": 3, "medium": 2, "low": 1}
@@ -22,11 +23,33 @@ SEV_RANK = {"high": 3, "medium": 2, "low": 1}
 WEB_SOURCES = {"access", "weberror", "auth", "sshauth", "alb", "waf", "file"}
 
 
-def _keys(e: Event):
-    # 웹/엣지 로그는 공격자 IP가 연결 축이다. 로컬·사내 IP(127.0.0.1 등)라도 그대로 쓴다
-    # (프록시 없는 단독 서버, 로컬 테스트, 사내 침해 모두 이 경로로 묶여야 한다).
-    if e.src_ip and _is_ip(e.src_ip) and (e.source in WEB_SOURCES or not _is_private(e.src_ip)):
-        yield ("ip", e.src_ip)
+def _key_policy(events: list[Event], findings: list[Finding], env: dict | None):
+    """사설(사내) IP를 연결고리로 쓸지 정하는 기준을 만든다.
+
+    - 공인 IP: 어느 로그든 연결고리.
+    - 사설 IP, 웹·엣지·인증 로그(nginx·Apache 포함): 연결고리. 사내에서 시작된 공격도 엮여야 한다.
+      단 여러 사용자가 함께 쓰는 주소(로드밸런서·프록시·NAT로 보이는 것, shared_private_ips)는 뺀다.
+      빼지 않으면 XFF 없는 로드밸런서 뒤 웹서버에서 모든 사용자의 의심 행동이 한 사건으로 뭉친다.
+    - 사설 IP, 네트워크 로그(VPC Flow·서버 방화벽): 웹·서버 로그에서 의심 행동이 잡힌 IP일 때만.
+      사내 통신(10.x ↔ 10.x)을 모두 이으면 무관한 활동이 다 이어지기 때문이다.
+    - 그 밖(CloudTrail의 VPC 엔드포인트 주소 등)의 사설 IP: 연결고리 아님.
+    반환: (키 함수, 공유 주소 {IP: 이유})"""
+    shared = shared_private_ips(events, env)
+    anchors = anchored_private_ips(findings, shared)
+
+    def keys(e: Event):
+        ip = e.src_ip
+        if ip and _is_ip(ip):
+            if not _is_private(ip):
+                yield ("ip", ip)
+            elif ip not in shared and (e.source in APP_SOURCES or e.source in WEB_SOURCES
+                                       or (e.source in NET_SOURCES and ip in anchors)):
+                yield ("ip", ip)
+        yield from _other_keys(e)
+    return keys, shared
+
+
+def _other_keys(e: Event):
     if e.extra.get("webshell_path"):
         yield ("path", e.extra["webshell_path"])  # 웹셸 파일 ↔ 그 경로로의 접근 요청을 잇는다
     if e.instance_id:
@@ -50,9 +73,10 @@ def _split_long(evs: list[Event], max_span: timedelta) -> list[list[Event]]:
 
 def build_incidents(events: list[Event], findings: list[Finding],
                     window_min: int = 30, max_events: int = 60,
-                    max_span_min: int = 120) -> list[dict]:
+                    max_span_min: int = 120, env: dict | None = None) -> list[dict]:
     """탐지 이벤트를 사건으로 묶는다. max_events: 사건 하나에 상세로 남길 이벤트 수 상한,
-    max_span_min: 사건 하나의 최대 길이(분)."""
+    max_span_min: 사건 하나의 최대 길이(분). env: 설정(shared_ips로 공유 사설 주소를 지정할 수 있음)."""
+    keys_of, _ = _key_policy(events, findings, env)
     flagged = sorted({id(e): e for f in findings for e in f.events}.values(), key=lambda e: e.ts)
     if not flagged:
         return []
@@ -61,7 +85,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
     uf = nx.utils.UnionFind(range(len(flagged)))
     idx_by_key: dict[tuple, list[int]] = defaultdict(list)
     for i, e in enumerate(flagged):
-        for k in _keys(e):
+        for k in keys_of(e):
             idx_by_key[k].append(i)
     for idxs in idx_by_key.values():
         for a, b in zip(idxs, idxs[1:]):
@@ -72,7 +96,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
     ctx_by_key: dict[tuple, list[Event]] = defaultdict(list)
     for e in events:
         if not e.findings:
-            for k in _keys(e):
+            for k in keys_of(e):
                 ctx_by_key[k].append(e)
     ctx_ts: dict[tuple, list] = {}
     for k, lst in ctx_by_key.items():
@@ -90,7 +114,7 @@ def build_incidents(events: list[Event], findings: list[Finding],
         fset = {id(f): f for e in evs for f in finding_by_event[id(e)]}
         fl = sorted(fset.values(), key=lambda f: f.events[0].ts)
         start, end = evs[0].ts, evs[-1].ts
-        keys = {k for e in evs for k in _keys(e)}
+        keys = {k for e in evs for k in keys_of(e)}
         ctx = []
         seen = {id(e) for e in evs}
         for k in keys:

@@ -289,6 +289,82 @@ def _is_reply(e: Event) -> bool:
     return sp is not None and dp is not None and dp >= 32768 and sp < dp
 
 
+NET_SOURCES = ("vpcflow", "hostfw")
+# 요청 하나가 사용자 한 명의 행동인 로그(웹·엣지·인증). 사설 IP도 그 사용자를 가리킨다
+APP_SOURCES = frozenset({"weblog", "access", "weberror", "auth", "sshauth", "alb", "waf"})
+# 로드밸런서·프록시가 자기 주소로 보내는 상태 확인 요청의 User-Agent
+_HEALTH_UA = re.compile(r"(?i)ELB-HealthChecker|kube-probe|HealthCheck|GoogleHC|Consul Health")
+# 한 사설 IP에서 이만큼 서로 다른 User-Agent가 보이면 여러 사용자가 함께 쓰는 중계 주소로 본다.
+# AIT-LDS 사내 NAT 주소(공격자 + 원격 근무자)는 4일 동안 7종이었다. 인터넷 사용자를 받는
+# 로드밸런서 뒤 웹서버(XFF 없음)는 수십~수백 종이 된다.
+SHARED_UA_MIN = 20
+
+
+def shared_private_ips(events: list[Event], env: dict | None = None) -> dict[str, str]:
+    """여러 사용자가 함께 쓰는 사설 IP(로드밸런서·프록시·NAT)와 그렇게 본 이유.
+    이런 주소를 연결고리로 쓰면 서로 무관한 사용자의 의심 행동이 거대한 사건 하나로 뭉친다."""
+    env = env or {}
+    out: dict[str, str] = {}
+    conf = [c["cidr"] if isinstance(c, dict) else c for c in env.get("shared_ips", [])]
+    uas: dict[str, set] = defaultdict(set)
+    for e in events:
+        ip = e.src_ip
+        px = e.extra.get("proxy_ip")
+        if px and _is_ip(px):
+            out.setdefault(px, "웹 로그에서 프록시(X-Forwarded-For 앞 단계)로 확인됨")
+        if e.source not in APP_SOURCES or not _is_ip(ip) or not _is_private(ip):
+            continue
+        if conf and ip not in out and _ip_in(ip, conf):
+            out[ip] = "설정의 shared_ips에 있음"
+        ua = e.extra.get("ua") or e.extra.get("userAgent")
+        if ua:
+            if ip not in out and _HEALTH_UA.search(ua):
+                out[ip] = f"상태 확인 요청({ua[:40]})을 보냄: 로드밸런서·프록시 주소"
+            uas[ip].add(ua)
+    for ip, s in uas.items():
+        if ip not in out and len(s) >= SHARED_UA_MIN:
+            out[ip] = f"User-Agent {len(s)}종: 여러 사용자가 함께 쓰는 주소"
+    return out
+
+
+def anchored_private_ips(findings: list[Finding], shared: dict[str, str]) -> dict[str, tuple]:
+    """웹·서버 로그에서 의심 행동이 잡힌 사설 IP(공유 주소 제외)와 그 행동의 (처음, 마지막) 시각.
+    이 IP의 네트워크 기록만 탐지·엮기에 쓴다."""
+    out: dict[str, tuple] = {}
+    for f in findings:
+        for e in f.events:
+            ip = e.src_ip
+            if e.source in APP_SOURCES and _is_ip(ip) and _is_private(ip) and ip not in shared:
+                lo, hi = out.get(ip, (e.ts, e.ts))
+                out[ip] = (min(lo, e.ts), max(hi, e.ts))
+    return out
+
+
+# 사내 IP의 네트워크 기록은 의심 행동 앞뒤 이 시간 안의 것만 탐지에 쓴다. 정찰은 침투보다 먼저 오므로
+# 앞뒤를 넉넉히 두되, 같은 주소의 며칠 전·후 정상 통신까지 보지는 않는다
+ANCHOR_SPAN = timedelta(hours=6)
+
+
+def _net_rules(by_vsrc: dict[str, list[Event]], trusted: list[str]) -> list[Finding]:
+    """VPC Flow·서버 방화벽 규칙(출발지 IP별)."""
+    findings: list[Finding] = []
+    for ip, evs in by_vsrc.items():
+        # 서버가 서비스 포트(443·8088 등)에서 상대의 임시 포트(32768 이상)로 보내는 응답은 스캔이 아니다.
+        # 응답을 빼지 않으면 외부 서버와 오래 통신한 기록이 '포트 스캔'으로 잡힌다(BOTSv3 측정에서 확인)
+        scan = [e for e in evs if not _is_reply(e)]
+        for seg in _bursts(scan, timedelta(minutes=5), 10, key=lambda e: e.dst_port):
+            findings.append(Finding("VPC_PORT_SCAN", seg,
+                                    f"5분 안에 포트 {len({e.dst_port for e in seg})}개, "
+                                    f"거부 {sum(e.outcome == 'reject' for e in seg)}건", ip))
+        adm = [e for e in evs if e.dst_port in ADMIN_PORTS and e.outcome == "accept"
+               and not (trusted and _ip_in(ip, trusted))]
+        if adm:
+            findings.append(Finding("VPC_REMOTE_ADMIN_EXPOSED", adm,
+                                    f"포트 {sorted({e.dst_port for e in adm})} 허용 {len(adm)}건"
+                                    + (" (사내 IP에서)" if _is_private(ip) else ""), ip))
+    return findings
+
+
 def run_detections(events: list[Event], env: dict | None = None) -> list[Finding]:
     """모든 규칙을 돌려 Finding 목록을 만들고, 해당 이벤트에 규칙 ID를 붙인다."""
     env = env or {}
@@ -407,26 +483,15 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             findings.append(Finding("CT_RUN_INSTANCES_BURST", seg, f"30분 안에 {len(seg)}회", ip))
 
     # --- VPC Flow Logs
-    # 서버 방화벽 로그(hostfw)는 VPC Flow Logs의 무료 대안이라 같은 규칙을 쓴다
-    vpc = [e for e in events if e.source in ("vpcflow", "hostfw")]
+    # 서버 방화벽 로그(hostfw)는 VPC Flow Logs의 무료 대안이라 같은 규칙을 쓴다.
+    # 사설 출발지는 여기서 보지 않는다(사내 통신은 대부분 정상). 웹·서버 로그에서 이미 의심 행동이
+    # 잡힌 사내 IP만 아래 '사내 IP 공격자' 단계에서 같은 규칙으로 다시 본다.
+    vpc = [e for e in events if e.source in NET_SOURCES]
     by_vsrc: dict[str, list[Event]] = defaultdict(list)
     for e in vpc:
         if not _is_private(e.src_ip):
             by_vsrc[e.src_ip].append(e)
-    for ip, evs in by_vsrc.items():
-        # 서버가 서비스 포트(443·8088 등)에서 상대의 임시 포트(32768 이상)로 보내는 응답은 스캔이 아니다.
-        # 응답을 빼지 않으면 외부 서버와 오래 통신한 기록이 '포트 스캔'으로 잡힌다(BOTSv3 측정에서 확인)
-        scan = [e for e in evs if not _is_reply(e)]
-        for seg in _bursts(scan, timedelta(minutes=5), 10, key=lambda e: e.dst_port):
-            findings.append(Finding("VPC_PORT_SCAN", seg,
-                                    f"5분 안에 포트 {len({e.dst_port for e in seg})}개, "
-                                    f"거부 {sum(e.outcome == 'reject' for e in seg)}건", ip))
-    for ip, evs in by_vsrc.items():
-        adm = [e for e in evs if e.dst_port in ADMIN_PORTS and e.outcome == "accept"
-               and not (trusted and _ip_in(ip, trusted))]
-        if adm:
-            findings.append(Finding("VPC_REMOTE_ADMIN_EXPOSED", adm,
-                                    f"포트 {sorted({e.dst_port for e in adm})} 허용 {len(adm)}건", ip))
+    findings += _net_rules(by_vsrc, trusted)
 
     # --- AWS WAF
     waf = [e for e in events if e.source == "waf"]
@@ -504,6 +569,18 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         for seg in _bursts(evs, timedelta(minutes=5), 20, key=lambda e: e.action):
             findings.append(Finding("WEB_PATH_PROBE", seg,
                                     f"5분 안에 서로 다른 경로 {len({e.action for e in seg})}개 404/403", ip))
+
+    # --- 사내 IP 공격자: 웹·서버 로그에서 의심 행동이 잡힌 사설 IP의 네트워크 기록(VPC Flow·서버 방화벽)
+    # 사내 IP끼리의 통신은 그 자체로는 보지 않는다. 같은 IP가 웹 경로 대입·SSH 무차별 대입 같은 행동을
+    # 이미 보였을 때만 그 IP의 포트 스캔·관리 포트 접속을 같은 규칙으로 찾는다(AIT-LDS 측정, 사내 공격자).
+    anchors = anchored_private_ips(findings, shared_private_ips(events, env))
+    if anchors:
+        by_psrc: dict[str, list[Event]] = defaultdict(list)
+        for e in vpc:
+            span = anchors.get(e.src_ip)
+            if span and span[0] - ANCHOR_SPAN <= e.ts <= span[1] + ANCHOR_SPAN:
+                by_psrc[e.src_ip].append(e)
+        findings += _net_rules(by_psrc, trusted)
 
     # --- GuardDuty 탐지 결과: 결과 하나가 탐지 하나. 같은 IP·인스턴스·키로 다른 로그와 엮인다
     for e in events:
