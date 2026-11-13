@@ -40,7 +40,10 @@ def _parse_clf_time(s: str) -> datetime:
 # Common/Combined Log Format:
 #   host ident authuser [time] "request" status bytes "referer" "user-agent"
 _ACCESS = re.compile(
-    r'^(?P<host>\S+(?:,\s*[0-9a-fA-F.:]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<time>[^\]]+)\]\s+'
+    # Apache vhost_combined: 줄 앞의 '가상호스트:포트'는 건너뛴다(normalize._WEB과 같은 기준).
+    r'^(?:(?P<vhost>(?:[^\s:\[\]"]*[^\s\d:.\[\]"][^\s:\[\]"]*|\[[\da-fA-F:]+\]|\d{1,3}(?:\.\d{1,3}){3}):\d{1,5})\s+'
+    r'(?=[0-9a-fA-F.:]+\s))?'
+    r'(?P<host>\S+(?:,\s*[0-9a-fA-F.:]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<time>[^\]]+)\]\s+'
     r'"(?P<request>[^"]*)"\s+(?P<status>\d{3}|-)\s+(?P<bytes>\d+|-)'
     r'(?:\s+"(?P<referer>[^"]*)"\s+"(?P<ua>[^"]*)")?'
 )
@@ -100,6 +103,7 @@ def parse_access(text: str, name: str = "access") -> list[Event]:
                 "ua": (m["ua"] or "")[:300],
                 "proto": proto,
                 "raw": line[:500],
+                **({"vhost": m["vhost"]} if m["vhost"] else {}),
             },
         ))
     return events
