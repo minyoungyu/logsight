@@ -8,7 +8,7 @@ from pathlib import Path
 from .analyze import analyze, build_payload
 from .config_audit import audit
 from .correlate import build_incidents, group_repeats
-from .detect import run_detections
+from .detect import run_detections, shared_private_ips
 from .explain import mark_known, rule_triage
 from .normalize import Event, load_paths
 from .guard import hold
@@ -42,7 +42,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     n_known = mark_known(events, env)  # 설정의 정상 작업 목록과 맞는 이벤트 표시(지우지 않음)
     findings = run_detections(events, env)
     team_info = _team(events, env)
-    incidents = build_incidents(events, findings, window_min=window_min)
+    incidents = build_incidents(events, findings, window_min=window_min, env=env)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
     t_detect = time.time() - t0
     # 재검토: 공격으로 보이는 사건을 위로 올린다. 규칙 판정은 항상 만들고(키 없이도, 비교용),
@@ -102,7 +102,9 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "team": team_info,
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy")))
-        + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]],
+        + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]]
+        + [f"사내 IP {ip}는 여러 사용자가 함께 쓰는 주소로 보여 사건을 엮는 연결고리에서 뺐습니다({why})."
+           for ip, why in sorted(shared_private_ips(events, env).items())[:5]],
     }
 
 
@@ -151,8 +153,9 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
     elif not env.get("trusted_ips"):
         out.append("관리자 IP(trusted_ips)가 비어 있어 수정안의 허용 IP가 자리표시로 나옵니다.")
     if proxied:
-        out.append(f"웹서버 로그 {proxied:,}줄은 ALB·프록시 내부 IP에서 왔고 실제 사용자 IP가 없어 내부 IP로 분석했습니다. "
-                   "nginx 로그 형식 끝에 \"$http_x_forwarded_for\"를 넣으면(nginx 기본 main 형식) 실제 IP로 분석합니다.")
+        out.append(f"웹서버 로그 {proxied:,}줄은 내부 IP(사내 사용자이거나 ALB·프록시)에서 왔고 X-Forwarded-For에 "
+                   "실제 사용자 IP가 없어 내부 IP로 분석했습니다. ALB·프록시 뒤라면 nginx 로그 형식 끝에 "
+                   "\"$http_x_forwarded_for\"를 넣으면(nginx 기본 main 형식) 실제 IP로 분석합니다.")
     return out
 
 
