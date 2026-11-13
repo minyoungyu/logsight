@@ -11,6 +11,7 @@ import ipaddress
 import json
 import re
 import sys
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -89,6 +90,35 @@ def _iso(s: str) -> datetime:
     return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
+# ------------------------------------------------------------------ 못 읽은 줄 세기
+# 줄 단위 파서가 형식이 맞지 않아 버린 줄을 이유별로 센다. load_paths·load_uploads가 파일마다 새로 열고
+# 결과를 파일별 처리 결과(stats)의 "unparsed"에 넣으며, 보고서의 "이렇게 해석했습니다"에 드러난다.
+_UNPARSED: ContextVar[dict | None] = ContextVar("logsight_unparsed", default=None)
+
+
+def _unparsed(reason: str, line: str) -> None:
+    box = _UNPARSED.get()
+    if box is None:
+        return
+    box["count"] = box.get("count", 0) + 1
+    box.setdefault("reasons", {})
+    box["reasons"][reason] = box["reasons"].get(reason, 0) + 1
+    ex = box.setdefault("examples", [])
+    if len(ex) < 3:
+        ex.append(line[:200])
+
+
+def _run_parser(kind: str, text: str, name: str) -> tuple[list[Event], dict]:
+    """파서를 돌리고 (이벤트, 못 읽은 줄 정보)를 돌려준다."""
+    box: dict = {}
+    tok = _UNPARSED.set(box)
+    try:
+        evs = PARSERS[kind](text, name=name)
+    finally:
+        _UNPARSED.reset(tok)
+    return evs, box
+
+
 # ------------------------------------------------------------------ 마스킹
 _SECRET = re.compile(r"(?i)(password|passwd|secret|token|authorization|cookie)(\"?\s*[=:]\s*\"?)[^\s\"&,}]+")
 _AKID = re.compile(r"\b((?:AKIA|ASIA)[0-9A-Z]{4})[0-9A-Z]{8}([0-9A-Z]{4})\b")
@@ -131,33 +161,87 @@ def mask(events: list[Event]) -> None:
 # 기본 형식 version 2, 공백 구분 14필드
 # version account-id interface-id srcaddr dstaddr srcport dstport
 # protocol packets bytes start end action log-status
+# 사용자 지정 형식은 필드 순서가 다르다. S3로 보낸 파일은 첫 줄에 필드 이름 머리줄이 있으므로 그 순서대로 읽는다.
+# 머리줄이 없으면(CloudWatch Logs에서 내려받은 경우 등) 기본 형식으로 보되, 값이 맞지 않는 줄은 조용히 버리지 않고
+# 못 읽은 줄로 센다(시각이 1970년, 출발지가 IP가 아닌 이벤트를 만들지 않는다).
 _PROTO = {"1": "icmp", "6": "tcp", "17": "udp"}
+_VPC_DEFAULT = ("version", "account-id", "interface-id", "srcaddr", "dstaddr", "srcport", "dstport",
+                "protocol", "packets", "bytes", "start", "end", "action", "log-status")
+_VPC_FIELD = re.compile(r"^[a-z][a-z0-9_-]*$")
+_VPC_MIN_EPOCH = 946684800  # 2000-01-01. 이보다 이르면 시각 칸이 아닌 값을 읽은 것
+
+
+def _vpc_header(line: str) -> tuple[str, ...] | None:
+    """'version account-id ...' 같은 필드 이름 머리줄이면 이름 목록(밑줄은 하이픈으로)을 돌려준다."""
+    parts = line.split()
+    if not parts or not all(_VPC_FIELD.match(x) for x in parts):
+        return None
+    names = tuple(x.replace("_", "-") for x in parts)
+    return names if {"srcaddr", "dstaddr"} <= set(names) else None
+
+
+def _ip_or_none(v: str | None) -> bool:
+    if not v or v == "-":
+        return False
+    try:
+        ipaddress.ip_address(v)
+        return True
+    except ValueError:
+        return False
 
 
 def parse_vpcflow(text: str, name: str = "vpcflow") -> list[Event]:
     events = []
+    cols = _VPC_DEFAULT
+    has_header = False
     for i, line in enumerate(text.splitlines()):
         line = line.strip()
-        if not line or line.startswith("version"):
+        if not line:
+            continue
+        hdr = _vpc_header(line)
+        if hdr:
+            cols, has_header = hdr, True
+            continue
+        if line.startswith("version"):  # 이름을 알 수 없는 머리줄
             continue
         f = line.split()
-        if len(f) < 14 or f[13] in ("NODATA", "SKIPDATA") or f[3] == "-":
+        if len(f) != len(cols) and not (not has_header and len(f) > len(cols)):
+            _unparsed("칸 수가 머리줄과 다름" if has_header else "기본 형식(14칸)이 아님", line)
             continue
-        try:
-            events.append(Event(
-                ts=_epoch(f[10]),
-                source="vpcflow",
-                src_ip=f[3], dst_ip=f[4],
-                dst_port=int(f[6]) if f[6].isdigit() else None,
-                action=f"{_PROTO.get(f[7], f[7])}/{f[6]} {f[12]}",
-                outcome="accept" if f[12] == "ACCEPT" else "reject",
-                raw_ref=f"{name}:{i+1}",
-                extra={"interface": f[2], "protocol": _PROTO.get(f[7], f[7]),
-                       "src_port": int(f[5]) if f[5].isdigit() else None,
-                       "packets": f[8], "bytes": f[9], "raw": line[:300]},
-            ))
-        except (ValueError, IndexError, OSError):
+        r = dict(zip(cols, f))
+        if r.get("log-status") in ("NODATA", "SKIPDATA") or r.get("srcaddr") == "-":
+            continue  # 기록할 트래픽이 없던 구간(정상)
+        start = r.get("start") or r.get("end")
+        act = (r.get("action") or "").upper()
+        if not (_ip_or_none(r.get("srcaddr")) and _ip_or_none(r.get("dstaddr"))
+                and start and start.isdigit() and int(start) >= _VPC_MIN_EPOCH
+                and act in ("ACCEPT", "REJECT", "", "-")):
+            _unparsed("값이 형식과 맞지 않음(머리줄 없는 사용자 지정 형식일 수 있음)" if not has_header
+                      else "값이 형식과 맞지 않음", line)
             continue
+        if act == "-" or "action" not in r:
+            act = ""
+        proto = _PROTO.get(r.get("protocol", ""), r.get("protocol", "-"))
+        dport = r.get("dstport", "-")
+        sport = r.get("srcport", "-")
+        extra = {"interface": r.get("interface-id", "-"), "protocol": proto,
+                 "src_port": int(sport) if sport.isdigit() else None,
+                 "packets": r.get("packets", "-"), "bytes": r.get("bytes", "-"), "raw": line[:300]}
+        # 사용자 지정 형식에만 있는 칸. 인스턴스 ID는 연결고리(Event.instance_id)로 쓰지 않는다:
+        # 한 서버로 들어온 모든 흐름이 하나로 엮이고, CloudTrail용 '인스턴스 자격증명 외부 사용' 규칙이 오탐한다.
+        for k in ("vpc-id", "subnet-id", "instance-id", "pkt-srcaddr", "pkt-dstaddr", "flow-direction", "tcp-flags"):
+            if r.get(k) not in (None, "-"):
+                extra[k.replace("-", "_")] = r[k]
+        events.append(Event(
+            ts=_epoch(start),
+            source="vpcflow",
+            src_ip=r["srcaddr"], dst_ip=r["dstaddr"],
+            dst_port=int(dport) if dport.isdigit() else None,
+            action=f"{proto}/{dport} {act}" if act else f"{proto}/{dport}",
+            outcome={"ACCEPT": "accept", "REJECT": "reject"}.get(act),
+            raw_ref=f"{name}:{i+1}",
+            extra=extra,
+        ))
     return events
 
 
@@ -344,7 +428,11 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
 # ------------------------------------------------------------------ 웹 서버 접속 로그(nginx/apache combined)
 # WAF 로그 대신 쓰는 무료 대안. 예:
 #   203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET /item?id=1 HTTP/1.1" 200 512 "-" "curl/8.0"
-_WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+)\s+\S+\s+\S+\s+\[(?P<ts>[^\]]+)\]\s+'
+# Apache vhost_combined 형식은 줄 앞에 '가상호스트:포트'가 붙는다(Debian·Ubuntu 기본 other_vhosts_access.log). 예:
+#   www.example.com:443 203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET / HTTP/1.1" 200 512 "-" "curl/8.0"
+_WEB = re.compile(r'^(?:(?P<vhost>[^\s:\[\]"]*[^\s\d:.\[\]"][^\s:\[\]"]*|\[[\da-fA-F:]+\]|\d{1,3}(?:\.\d{1,3}){3}):'
+                  r'(?P<vport>\d{1,5})\s+)?'
+                  r'(?P<ip>[\da-fA-F.:]+)\s+\S+\s+\S+\s+\[(?P<ts>[^\]]+)\]\s+'
                   r'"(?P<req>[^"]*)"\s+(?P<status>\d{3})\s+(?P<size>\S+)'
                   r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?'
                   r'(?:\s+"(?P<xff>[^"]*)")?')  # nginx 기본 'main' 형식의 마지막 칸 $http_x_forwarded_for
@@ -384,17 +472,24 @@ def _client_ip(remote: str, xff: str | None) -> tuple[str, dict]:
 def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
     events = []
     for i, line in enumerate(text.splitlines()):
-        m = _WEB.match(line.strip())
+        line = line.strip()
+        if not line:
+            continue
+        m = _WEB.match(line)
         if not m:
+            _unparsed("접속 로그 형식이 아님", line)
             continue
         try:
             ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
         except ValueError:
+            _unparsed("시각을 읽지 못함", line)
             continue
         req = m["req"].split(" ")
         st = m["status"]
         src, extra = _client_ip(m["ip"], m["xff"])
         extra.update({"http_status": int(st), "ua": (m["ua"] or "")[:200]})
+        if m["vhost"]:
+            extra["vhost"] = f"{m['vhost']}:{m['vport']}"
         if m["size"].isdigit():
             extra["resp_bytes"] = int(m["size"])  # 응답 크기: 공격 성공 신호 판단에 쓴다
         events.append(Event(
@@ -696,7 +791,7 @@ def detect_kind(name: str, text: str) -> str | None:
         return "weblog"
     first = head.splitlines()[0] if head else ""
     parts = first.split()
-    if first.startswith("version account-id") or (len(parts) >= 14 and parts[0] == "2"):
+    if first.startswith("version account-id") or _vpc_header(first) or (len(parts) >= 14 and parts[0] == "2"):
         return "vpcflow"
     if parts and parts[0] in ("http", "https", "h2", "ws", "wss"):
         return "alb"
@@ -748,6 +843,15 @@ def _path_day(p: Path) -> datetime | None:
         return None
 
 
+def _stat(file: str, kind: str, evs: list[Event], bad: dict) -> dict:
+    st = {"file": file, "kind": kind, "events": len(evs)}
+    if bad.get("count"):
+        st["unparsed"] = bad["count"]
+        st["unparsed_reasons"] = bad["reasons"]
+        st["unparsed_examples"] = bad["examples"]
+    return st
+
+
 def load_paths(paths: Iterable[Path], kind: str | None = None, since: datetime | None = None,
                until: datetime | None = None) -> tuple[list[Event], list[dict]]:
     """파일/폴더 목록을 읽어 이벤트로 바꾼다. 반환: (이벤트, 파일별 처리 결과).
@@ -774,11 +878,11 @@ def load_paths(paths: Iterable[Path], kind: str | None = None, since: datetime |
         if not k:
             stats.append({"file": str(p), "kind": None, "events": 0, "error": "형식 판별 실패"})
             continue
-        evs = PARSERS[k](text, name=p.name)
+        evs, bad = _run_parser(k, text, p.name)
         if since or until:
             evs = [e for e in evs if (not since or e.ts >= since) and (not until or e.ts <= until)]
         events.extend(evs)
-        stats.append({"file": str(p), "kind": k, "events": len(evs)})
+        stats.append(_stat(str(p), k, evs, bad))
     return events, stats
 
 
@@ -794,7 +898,7 @@ def load_uploads(files: dict[str, tuple[str, bytes]]) -> tuple[list[Event], list
         if not k:
             stats.append({"file": fname, "kind": None, "events": 0, "error": "형식 판별 실패"})
             continue
-        evs = PARSERS[k](text, name=fname or k)
+        evs, bad = _run_parser(k, text, fname or k)
         events.extend(evs)
-        stats.append({"file": fname, "kind": k, "events": len(evs)})
+        stats.append(_stat(fname, k, evs, bad))
     return events, stats

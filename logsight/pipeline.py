@@ -136,6 +136,19 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
     if bad:
         out.append(f"형식을 알 수 없어 건너뛴 파일 {len(bad)}개: {', '.join(map(str, bad[:5]))}"
                    + (" 외" if len(bad) > 5 else "") + ". 파일 이름에 로그 종류(cloudtrail, vpcflow, nginx 등)를 넣으면 판별됩니다.")
+    for s in file_stats:
+        n = s.get("unparsed") or 0
+        if not n:
+            continue
+        total = n + (s.get("events") or 0)
+        why = ", ".join(f"{r} {c:,}줄" for r, c in sorted((s.get("unparsed_reasons") or {}).items(),
+                                                          key=lambda kv: -kv[1])[:3])
+        msg = (f"{Path(str(s['file'])).name}: {total:,}줄 중 {n:,}줄({n / total:.1%})을 읽지 못해 분석에서 빠졌습니다"
+               + (f"({why})" if why else "") + ".")
+        if s.get("kind") == "vpcflow":
+            msg += (" VPC Flow 사용자 지정 형식이면 파일 첫 줄에 필드 이름 머리줄(S3로 보내면 자동으로 붙음, "
+                    "예: version account-id interface-id srcaddr …)이 있어야 칸 순서를 알 수 있습니다.")
+        out.append(msg)
     if by_source.get("sshauth") or by_source.get("hostfw"):
         tz = SYSLOG["tz"].utcoffset(None)
         hours = tz.total_seconds() / 3600
