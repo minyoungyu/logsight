@@ -292,7 +292,7 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
 # VPC Flow Logs 대신 쓰는 무료 대안. 커널 LOG 줄 예:
 #   Nov  1 10:00:01 web1 kernel: [123.4] LOGSIGHT-NEW IN=eth0 OUT= SRC=203.0.113.5 DST=10.0.1.10 ... PROTO=TCP SPT=40000 DPT=22 ... SYN
 # 보안그룹을 통과해 서버까지 들어온 패킷만 보인다(보안그룹이 막은 것은 안 보임).
-_FW_KV = re.compile(r"\b(SRC|DST|PROTO|SPT|DPT|IN)=(\S*)")
+_FW_KV = re.compile(r"\b(SRC|DST|PROTO|SPT|DPT|IN|ID)=(\S*)")
 _FW_ISO = re.compile(r"^(\d{4}-\d\d-\d\dT[\d:.]+(?:Z|[+-]\d\d:?\d\d)?)")
 _FW_SYSLOG = re.compile(r"^(\w{3})\s+(\d+)\s+(\d\d):(\d\d):(\d\d)")
 _FW_PREFIX = re.compile(r"kernel:\s*(?:\[\s*[\d.]+\]\s*)?(.*?)\s*IN=")
@@ -315,9 +315,21 @@ def _line_ts(line: str, year: int | None) -> datetime | None:
     return None
 
 
+_UFW_SILENT = {("UDP", "137"), ("UDP", "138"), ("TCP", "139"), ("TCP", "445"), ("UDP", "67"), ("UDP", "68")}
+
+
+def _fw_packet(kv: dict) -> tuple:
+    return tuple(kv.get(k) for k in ("SRC", "SPT", "DST", "DPT", "PROTO", "ID"))
+
+
 def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> list[Event]:
+    lines = text.splitlines()
+    # ufw의 [UFW AUDIT] 줄은 판정 전에 남는 기록이라 허용·차단을 뜻하지 않는다(logging medium 이상).
+    # 같은 패킷에 [UFW BLOCK]·[UFW ALLOW] 줄이 따로 있으면 AUDIT 줄은 버린다(실제 ufw 로그로 확인, docs/ufw_실측.md)
+    verdict = {_fw_packet(dict(_FW_KV.findall(ln))) for ln in lines
+               if "[UFW " in ln and "AUDIT" not in ln and "SRC=" in ln}
     events = []
-    for i, line in enumerate(text.splitlines()):
+    for i, line in enumerate(lines):
         if "SRC=" not in line or "DPT=" not in line and "PROTO=ICMP" not in line:
             continue
         kv = dict(_FW_KV.findall(line))
@@ -326,8 +338,16 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
             continue
         pm = _FW_PREFIX.search(line)
         prefix = (pm.group(1) if pm else "").upper()
+        if "AUDIT" in prefix:
+            if _fw_packet(kv) in verdict:
+                continue
+            # logging full은 연결의 모든 패킷을 AUDIT로 남긴다. TCP는 연결 시작(SYN만)만 센다
+            if kv.get("PROTO") == "TCP" and not (re.search(r"\bSYN\b", line) and not re.search(r"\bACK\b", line)):
+                continue
+        # ufw는 NetBIOS·SMB·DHCP 포트를 기록 없이 기본 정책(보통 차단)으로 넘긴다. 그래서 AUDIT 줄만 남는다
+        silent = "AUDIT" in prefix and (kv.get("PROTO"), kv.get("DPT")) in _UFW_SILENT
         # 차단 규칙 접두어면 reject, 그 외(허용·신규 연결 기록)는 서버까지 도달 = accept
-        outcome = "reject" if any(w in prefix for w in ("BLOCK", "DROP", "REJECT", "DENY")) else "accept"
+        outcome = "reject" if silent or any(w in prefix for w in ("BLOCK", "DROP", "REJECT", "DENY")) else "accept"
         proto = kv.get("PROTO", "").lower()
         port = kv.get("DPT")
         events.append(Event(
@@ -335,7 +355,8 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
             dst_port=int(port) if port and port.isdigit() else None,
             action=f"{proto}/{port or '-'} {'REJECT' if outcome == 'reject' else 'ACCEPT'}",
             outcome=outcome, raw_ref=f"{name}:{i+1}",
-            extra={"interface": kv.get("IN"), "protocol": proto, "prefix": prefix.strip()[:40],
+            extra={"interface": kv.get("IN"), "protocol": proto,
+                   "src_port": int(kv["SPT"]) if kv.get("SPT", "").isdigit() else None, "prefix": prefix.strip()[:40],
                    "raw": line.strip()[:300]},
         ))
     return events
