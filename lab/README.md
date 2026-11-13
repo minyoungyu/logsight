@@ -28,3 +28,7 @@ python -m logsight scan --profile samples/web/profile.json --no-ai --out reports
 ```
 
 필요 패키지: `nginx`, `php-fpm`(php-sqlite3 포함). Ubuntu: `apt-get install nginx php-fpm php-sqlite3`.
+
+## ufw/ — 실제 서버 방화벽 로그 만들기
+
+`sudo bash lab/ufw/run.sh`: 리눅스 한 대 안에서 실제 ufw를 켜고 정상 접속·포트 스캔·SSH 연속 접속을 보내 low·medium·full 로그를 `lab/ufw/out/`에 남긴다(비용 0, 이 컴퓨터의 ufw 설정을 바꿈). 결과와 발견은 `docs/ufw_실측.md`.
