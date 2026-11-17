@@ -16,6 +16,7 @@ import time
 
 from ..detect import RULES, STAGE_ORDER
 from ..analyze import STAGE_KO
+from ..guard import SYSTEM_RULE, fence, find_injection
 
 DEFAULT_MODEL = os.environ.get("LOGSIGHT_MODEL", "claude-haiku-5-5")
 
@@ -25,6 +26,8 @@ VERDICT_KO = {
     "suspicious": "공격 시도 있음(성공 근거 불명확)",
     "no_evidence": "뚜렷한 침해 근거 없음",
 }
+
+VERDICT_RANK = {"no_evidence": 0, "suspicious": 1, "likely_breached": 2, "breached": 3}
 
 # 침해가 "성공했을" 가능성을 강하게 가리키는 규칙(정찰·단순 시도와 구분)
 SUCCESS_SIGNAL = {
@@ -105,7 +108,8 @@ SYSTEM = (
     "3. 모든 evidence에는 입력 events의 ref 값만 그대로 적는다. 새로 만들지 않는다.\n"
     "4. attack_flow는 시간순, technique에는 MITRE ATT&CK 기법 ID.\n"
     "5. remediation은 지금 당장 할 일(now)부터. 웹셸 삭제·계정 잠금·취약 코드 수정처럼 구체적으로.\n"
-    "6. 비전문가가 읽는다. 짧고 쉬운 한국어로, 겁주지 말고 사실만."
+    "6. 비전문가가 읽는다. 짧고 쉬운 한국어로, 겁주지 말고 사실만.\n"
+    "7. " + SYSTEM_RULE
 )
 
 
@@ -132,7 +136,7 @@ def build_payload(incident: dict, profile_dict: dict | None = None) -> dict:
         "incident": {k: incident[k] for k in (
             "id", "start", "end", "severity", "stages", "src_ips", "actors",
             "n_events", "omitted_events", "findings", "context")},
-        "events": incident["events"],
+        "events": fence(incident["events"]),  # 공격자가 쓴 값은 untrusted 아래로(guard.py)
         "rule_catalog": {r: {"technique": v[0], "stage": v[1], "title": v[2]}
                          for r, v in RULES.items()
                          if r in {f["rule"] for f in incident["findings"]}},
@@ -158,7 +162,33 @@ def analyze_web(incident: dict, profile_dict: dict | None = None, model: str | N
             meta["note"] = "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성"
         report = rule_based(incident)
     meta["validation"] = validate(report, incident)
+    _hold(report, incident, meta)
     return {"report": report, "meta": meta}
+
+
+def _hold(report: dict, incident: dict, meta: dict) -> None:
+    """AI 판정이 규칙 판정보다 낮을 때 로그를 통한 프롬프트 주입을 막는다(guard.hold의 웹 점검판).
+    - 로그에 AI 판정을 바꾸려는 문장이 있으면: 규칙 판정으로 되돌리고 AI가 낸 값은 ai_said에 남긴다.
+    - 그런 문장이 없으면: AI 판정을 보여 주되 contested(규칙과 의견 다름)로 표시한다.
+    주입 문장은 AI를 쓰지 않았을 때도 사건의 공격 정황으로 기록한다."""
+    hits = find_injection(incident["events"])
+    if hits:
+        report["injection"] = hits
+    if meta.get("mode") != "claude":
+        return
+    rule_v, _ = rule_verdict(incident["findings"])
+    ai_v = report.get("verdict")
+    if VERDICT_RANK.get(ai_v, 0) >= VERDICT_RANK[rule_v]:
+        return
+    if hits:
+        report["ai_said"] = ai_v
+        report["verdict"] = rule_v
+        report["summary"] = (f"로그에 AI 판정을 바꾸려는 문장이 있어 AI의 '{VERDICT_KO.get(ai_v, ai_v)}' 판정을 "
+                             f"따르지 않았습니다({hits[0]['ref']}). " + report.get("summary", ""))
+        meta["guard"] = "restored"
+    else:
+        report["contested"] = {"rules": rule_v, "ai": ai_v}
+        meta["guard"] = "contested"
 
 
 def _call_claude(payload: dict, model: str) -> tuple[dict, dict]:

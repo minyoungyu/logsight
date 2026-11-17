@@ -16,12 +16,37 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
 from .correlate import summarize_rules
 from .pipeline import run_paths
 from .report import render
+
+
+# 흔히 잘못 넣는 키 이름. 별칭으로 받지 않고(어느 키가 쓰였는지 헷갈림) 알려만 준다
+WRONG_KEY_NAMES = ("LOGSIGHT_ANTHROPIC_KEY", "ANTHROPIC_KEY", "CLAUDE_API_KEY", "CLAUDE_KEY")
+
+
+def ai_key_warning(use_ai: bool, environ=None) -> str | None:
+    """AI를 켰는데 ANTHROPIC_API_KEY가 없으면 경고 문구를 돌려준다(없으면 조용히 규칙 모드로 넘어가므로)."""
+    env = os.environ if environ is None else environ
+    if not use_ai or env.get("ANTHROPIC_API_KEY"):
+        return None
+    msg = "ANTHROPIC_API_KEY가 없어 AI 없이 규칙으로만 분석합니다."
+    wrong = [k for k in WRONG_KEY_NAMES if env.get(k)]
+    if wrong:
+        msg += f" {', '.join(wrong)}는 읽지 않습니다. 같은 키를 ANTHROPIC_API_KEY라는 이름으로 설정하세요."
+    else:
+        msg += " AI를 쓰려면 ANTHROPIC_API_KEY를 설정하세요(규칙만 쓰려면 --no-ai)."
+    return msg
+
+
+def _warn_ai_key(use_ai: bool) -> None:
+    w = ai_key_warning(use_ai)
+    if w:
+        print(f"[알림] {w}", file=sys.stderr)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -217,6 +242,7 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError:
         print("--since/--until 형식: 2017-02-12 또는 2017-02-12T10:00:00Z", file=sys.stderr)
         return 2
+    _warn_ai_key(not args.no_ai and not args.dry_run)
     result = run_paths(args.paths, args.env, since=since, until=until, team_path=args.team, top=args.top, use_ai=not args.no_ai, preview=args.dry_run,
                        model=args.model, window_min=args.window)
     out = Path(args.out)
@@ -344,6 +370,7 @@ def _alert_cmd(args) -> int:
         except (TypeError, ValueError) as exc:
             print(f"respond 설정 오류: {exc}", file=sys.stderr)
             return 2
+    _warn_ai_key(not args.no_ai)
     missing = [p for p in args.logs if not Path(p).exists()]
     if missing:
         print(f"경로를 찾을 수 없음: {', '.join(missing)}", file=sys.stderr)
@@ -438,6 +465,7 @@ def _scan(args) -> int:
             return 2
         profile = SiteProfile(name=args.name, webroot=args.webroot, log_paths=log_paths)
 
+    _warn_ai_key(not args.no_ai)
     result = assess(profile, top=args.top, use_ai=not args.no_ai, model=args.model,
                     window_min=args.window)
     out = Path(args.out)
