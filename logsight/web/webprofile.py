@@ -17,6 +17,7 @@ profile.json) 하나만 바꾸면 된다. 코드에는 경로·IP를 박아 두�
   private_object_paths  남의 것을 열면 안 되는 객체 경로(예: /order.php, /api/orders/{id}).
                 같은 IP가 여기서 서로 다른 번호를 짧은 시간에 많이 열면 IDOR 의심. 비우면 이 판단은 끈다
   large_response_bytes  공격 요청의 응답이 이보다 크면 유출 의심(기본 50000바이트)
+  known_activity  정상 작업 목록(사후 분석 environment.json과 같은 형식). 맞는 이벤트는 '정상 작업'으로 표시
   since/until   분석 시간 범위(ISO, 선택) — 큰 로그에서 사고 구간만 보고 싶을 때
   year          연도 없는 syslog 형식(auth.log)에 붙일 연도(없으면 올해, 미래면 작년)
 """
@@ -44,6 +45,8 @@ class SiteProfile:
         "id_rsa", ".git/config", "composer.json"])
     own_hosts: list[str] = field(default_factory=lambda: ["127.0.0.1", "localhost"])
     private_object_paths: list[str] = field(default_factory=list)
+    # 정상 작업 목록(사후 분석의 environment.json known_activity와 같은 형식): [{"label", "ips"|"actors"}]
+    known_activity: list[dict] = field(default_factory=list)
     large_response_bytes: int = 50_000
     since: str | None = None
     until: str | None = None
