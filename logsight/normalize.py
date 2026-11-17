@@ -54,7 +54,8 @@ class Event:
 
 # 원본마다 다른 결과 표현을 공통 값으로(OCSF의 status/disposition 개념을 단순화)
 _STATUS = {"success": "success", "accept": "success", "allow": "success", "count": "success",
-           "failure": "failure", "reject": "failure", "block": "failure", "detected": "unknown"}
+           "failure": "failure", "reject": "failure", "block": "failure", "detected": "unknown",
+           "client-error": "failure", "server-error": "failure"}  # 뒤의 둘: 웹서버 점검의 접속 로그
 _DISPOSITION = {"accept": "allowed", "allow": "allowed", "count": "allowed", "reject": "blocked",
                 "block": "blocked", "detected": "detected"}
 
@@ -344,10 +345,12 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
 # ------------------------------------------------------------------ 웹 서버 접속 로그(nginx/apache combined)
 # WAF 로그 대신 쓰는 무료 대안. 예:
 #   203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET /item?id=1 HTTP/1.1" 200 512 "-" "curl/8.0"
-_WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+)\s+\S+\s+\S+\s+\[(?P<ts>[^\]]+)\]\s+'
-                  r'"(?P<req>[^"]*)"\s+(?P<status>\d{3})\s+(?P<size>\S+)'
+_WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+(?:,\s*[\da-fA-F.:]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<ts>[^\]]+)\]\s+'
+                  r'"(?P<req>[^"]*)"\s+(?P<status>\d{3}|-)\s+(?P<size>\S+)'
                   r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?'
                   r'(?:\s+"(?P<xff>[^"]*)")?')  # nginx 기본 'main' 형식의 마지막 칸 $http_x_forwarded_for
+# 첫 칸에 쉼표로 여러 IP가 오는 변형($proxy_add_x_forwarded_for를 첫 칸에 찍는 설정)도 받는다.
+# 그 값은 "요청이 가져온 X-Forwarded-For, 접속해 온 쪽" 순서라 맨 오른쪽만 믿을 수 있다(parse_web_line).
 
 
 # 내부망 대역(RFC 1918, CGNAT, 루프백, 링크 로컬, IPv6 ULA). ipaddress의 is_private는 문서용 예약 대역까지
@@ -381,28 +384,69 @@ def _client_ip(remote: str, xff: str | None) -> tuple[str, dict]:
     return remote, {"behind_proxy": True}  # 프록시 뒤인데 실제 IP를 알 수 없음
 
 
+def parse_web_line(line: str) -> dict | None:
+    """nginx·Apache 접속 로그 한 줄 → 공통 웹 요청 필드. 두 파서(이 모듈의 parse_weblog, 웹서버 점검의
+    web/weblog.parse_access)가 같이 쓴다. 같은 줄이면 어느 경로로 읽어도 같은 IP·필드가 나온다.
+
+    반환: ts, src_ip, ip_extra(proxy_ip·behind_proxy), user, method, path, query, uri, proto,
+          status(문자열, 없으면 "-"), http_status(정수 또는 None), resp_bytes(정수), referer, ua
+    """
+    m = _WEB.match(line)
+    if not m:
+        return None
+    try:
+        ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
+    except ValueError:
+        try:  # 시간대가 없는 변형
+            ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S").replace(tzinfo=timezone.utc)
+        except ValueError:
+            return None
+    hosts = [h.strip() for h in m["ip"].split(",") if h.strip()]
+    # 첫 칸이 목록이면 맨 오른쪽이 실제로 접속해 온 쪽이고, 그 앞은 요청이 가져온(위조 가능한) 값이다
+    remote, carried = hosts[-1], hosts[:-1]
+    xff = ", ".join([*carried, *([m["xff"]] if m["xff"] and m["xff"] != "-" else [])]) or None
+    src, ip_extra = _client_ip(remote, xff)
+    # 요청 줄 "METHOD URI PROTO": URI에 (비정상) 공백이 있어도 잃지 않도록 첫 토큰과 마지막 HTTP/x만 뗀다
+    req = (m["req"] or "").split(" ")
+    method = req[0] if req and req[0] else "-"
+    proto = ""
+    if len(req) >= 3 and req[-1].upper().startswith("HTTP/"):
+        proto, uri = req[-1], " ".join(req[1:-1])
+    else:
+        uri = " ".join(req[1:]) if len(req) > 1 else ""
+    path, _, query = uri.partition("?")
+    st = m["status"]
+    size = m["size"]
+    return {"ts": ts, "src_ip": src, "ip_extra": ip_extra,
+            "user": m["user"] if m["user"] not in ("-", "") else None,
+            "method": method, "uri": uri, "path": path, "query": query, "proto": proto,
+            "status": st, "http_status": int(st) if st.isdigit() else None,
+            "resp_bytes": int(size) if size.isdigit() else 0,
+            "referer": (m["ref"] or "")[:300], "ua": (m["ua"] or "")[:300]}
+
+
+def web_extra(w: dict) -> dict:
+    """공통 웹 요청 필드를 Event.extra로. 규칙·보고서·AI가 모두 이 이름을 쓴다."""
+    out = dict(w["ip_extra"])
+    out.update({"method": w["method"], "path": w["path"], "query": w["query"], "proto": w["proto"],
+                "http_status": w["http_status"], "resp_bytes": w["resp_bytes"],
+                "referer": w["referer"], "ua": w["ua"]})
+    return out
+
+
 def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
     events = []
     for i, line in enumerate(text.splitlines()):
-        m = _WEB.match(line.strip())
-        if not m:
+        w = parse_web_line(line.strip())
+        if not w:
             continue
-        try:
-            ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
-        except ValueError:
-            continue
-        req = m["req"].split(" ")
-        st = m["status"]
-        src, extra = _client_ip(m["ip"], m["xff"])
-        extra.update({"http_status": int(st), "ua": (m["ua"] or "")[:200]})
-        if m["size"].isdigit():
-            extra["resp_bytes"] = int(m["size"])  # 응답 크기: 공격 성공 신호 판단에 쓴다
+        st = w["http_status"]
         events.append(Event(
-            ts=ts, source="weblog", src_ip=src,
-            action=(f"{req[0]} {req[1]}" if len(req) > 1 else m["req"])[:300],
-            outcome="success" if st[0] in "23" else "failure",
+            ts=w["ts"], source="weblog", src_ip=w["src_ip"],
+            action=f"{w['method']} {w['uri']}"[:300],
+            outcome="success" if st and str(st)[0] in "23" else "failure",
             raw_ref=f"{name}:{i+1}",
-            extra=extra,
+            extra=web_extra(w),
         ))
     return events
 

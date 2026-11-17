@@ -15,7 +15,7 @@ import re
 from datetime import datetime, timezone
 from urllib.parse import unquote_plus
 
-from ..normalize import Event
+from ..normalize import Event, parse_web_line, web_extra
 
 _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
@@ -37,15 +37,7 @@ def _parse_clf_time(s: str) -> datetime:
 
 
 # ------------------------------------------------------------------ 접속 로그
-# Common/Combined Log Format:
-#   host ident authuser [time] "request" status bytes "referer" "user-agent"
-_ACCESS = re.compile(
-    r'^(?P<host>\S+(?:,\s*[0-9a-fA-F.:]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<time>[^\]]+)\]\s+'
-    r'"(?P<request>[^"]*)"\s+(?P<status>\d{3}|-)\s+(?P<bytes>\d+|-)'
-    r'(?:\s+"(?P<referer>[^"]*)"\s+"(?P<ua>[^"]*)")?'
-)
-# 프록시/로드밸런서 뒤의 실제 클라이언트가 X-Forwarded-For로 들어오는 변형(nginx 커스텀)도
-# 흔하므로, host 자리에 쉼표로 여러 IP가 올 수 있다. 맨 앞(원 클라이언트)을 쓴다.
+# Common/Combined Log Format. 줄 해석은 normalize.parse_web_line 하나로 한다(AWS 분석 경로와 같은 IP·필드).
 
 
 def _status_outcome(status: str) -> str:
@@ -65,42 +57,18 @@ def parse_access(text: str, name: str = "access") -> list[Event]:
         line = line.strip()
         if not line:
             continue
-        m = _ACCESS.match(line)
-        if not m:
+        w = parse_web_line(line)
+        if not w:
             continue
-        try:
-            ts = _parse_clf_time(m["time"])
-        except (ValueError, KeyError):
-            continue
-        host = m["host"].split(",")[0].strip()
-        # 요청 줄은 "METHOD URI PROTO". URI 안에 (비정상) 공백이 있어도 잃지 않도록
-        # 첫 토큰(메서드)과 마지막 HTTP/x 토큰(프로토콜)만 떼고 가운데 전체를 URI로 본다.
-        req = (m["request"] or "").split(" ")
-        method = req[0] if req and req[0] else "-"
-        proto = ""
-        if len(req) >= 3 and req[-1].startswith(("HTTP/", "http/")):
-            proto = req[-1]
-            path = " ".join(req[1:-1])
-        else:
-            path = " ".join(req[1:]) if len(req) > 1 else ""
-        q = path.split("?", 1)
+        extra = web_extra(w)
+        # 웹서버 점검 규칙이 쓰는 옛 이름(문자열 상태 코드·바이트 수)도 함께 둔다
+        extra.update({"status": w["status"], "bytes": str(w["resp_bytes"]), "raw": line[:500]})
         events.append(Event(
-            ts=ts, source="access", src_ip=host,
-            actor=m["user"] if m["user"] not in ("-", "") else None,
-            action=f"{method} {path}"[:400],
-            outcome=_status_outcome(m["status"]),
+            ts=w["ts"], source="access", src_ip=w["src_ip"], actor=w["user"],
+            action=f"{w['method']} {w['uri']}"[:400],
+            outcome=_status_outcome(w["status"]),
             raw_ref=f"{name}:{i+1}",
-            extra={
-                "status": m["status"],
-                "method": method,
-                "path": q[0],
-                "query": q[1] if len(q) > 1 else "",
-                "bytes": m["bytes"] if m["bytes"] != "-" else "0",
-                "referer": (m["referer"] or "")[:300],
-                "ua": (m["ua"] or "")[:300],
-                "proto": proto,
-                "raw": line[:500],
-            },
+            extra=extra,
         ))
     return events
 
