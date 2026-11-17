@@ -289,6 +289,31 @@ def _is_reply(e: Event) -> bool:
     return sp is not None and dp is not None and dp >= 32768 and sp < dp
 
 
+# AWS 분석에서 웹 규칙과 같은 행동을 보는 AWS 쪽 규칙. 같은 요청이 두 번 세지지 않게 한다.
+#   WEBLOG_SQLI는 항상 뺀다: WEB_SQLI_PATTERN이 같은 요청을 본다(WAF가 이미 잡은 것은 빼는 판단도 그쪽에 있다).
+#   나머지 둘은 같은 IP에 AWS 쪽 규칙이 이미 있을 때만 뺀다. 문턱이 달라(경로 20개 vs 404 15건,
+#   ALB 403/404 vs 주문 번호 열람) AWS 쪽이 놓친 것을 웹 규칙이 잡을 수 있기 때문이다.
+WEB_RULES_COVERED = frozenset({"WEBLOG_SQLI"})
+WEB_RULES_SAME_IP = {"WEBLOG_ENUM_404": "WEB_PATH_PROBE", "WEBLOG_IDOR_ENUM": "WEB_OBJECT_ENUM"}
+
+
+def _web_rule_findings(events: list[Event], env: dict, prior: list[Finding]) -> list[Finding]:
+    web = [e for e in events if e.source in ("weblog", "alb")]
+    if not web:
+        return []
+    from .web.webdetect import run_web_detections  # web.webdetect가 이 모듈을 가져다 쓰므로 여기서 부른다
+    from .web.webprofile import web_profile_from_env
+    hosts_seen = {str(e.extra["http_host"]).lower() for e in web if e.extra.get("http_host")}
+    profile = web_profile_from_env(env, hosts_seen)
+    skip = set(WEB_RULES_COVERED)
+    # 우리 사이트 이름을 모르면 외부 Referer를 가릴 수 없다(정상 관리자 요청을 CSRF로 오인)
+    if not hosts_seen and not (env.get("web") or {}).get("own_hosts"):
+        skip.add("WEBLOG_CSRF_SUSPECT")
+    covered = {w: {f.key for f in prior if f.rule == a} for w, a in WEB_RULES_SAME_IP.items()}
+    return run_web_detections(web, profile, sources=("weblog", "alb"), skip=frozenset(skip),
+                              covered=covered, include_auth=False)
+
+
 def run_detections(events: list[Event], env: dict | None = None) -> list[Finding]:
     """모든 규칙을 돌려 Finding 목록을 만들고, 해당 이벤트에 규칙 ID를 붙인다."""
     env = env or {}
@@ -504,6 +529,11 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         for seg in _bursts(evs, timedelta(minutes=5), 20, key=lambda e: e.action):
             findings.append(Finding("WEB_PATH_PROBE", seg,
                                     f"5분 안에 서로 다른 경로 {len({e.action for e in seg})}개 404/403", ip))
+
+    # --- 웹서버 점검과 같은 웹 공격 규칙(스캐너·경로 조작·웹셸·명령 삽입 등)을 nginx·ALB 로그에도 돌린다.
+    # 위의 WEB_SQLI_PATTERN·WEB_PATH_PROBE·WEB_OBJECT_ENUM과 겹치는 것은 WEB_RULES_COVERED·WEB_RULES_SAME_IP를
+    # 따라 뺀다. SSH는 위의 SSH 규칙이 본다.
+    findings += _web_rule_findings(events, env, findings)
 
     # --- GuardDuty 탐지 결과: 결과 하나가 탐지 하나. 같은 IP·인스턴스·키로 다른 로그와 엮인다
     for e in events:

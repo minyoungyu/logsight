@@ -159,6 +159,50 @@ def _foreign_host(referer: str, own_hosts: list[str]) -> bool:
     return bool(host) and host not in own_hosts
 
 
+# 웹 요청을 담는 로그 종류. access는 웹서버 점검(scan), weblog·alb는 AWS 분석(analyze·watch)에서 읽은 것이다.
+# 모두 normalize.parse_web_line과 같은 필드(method, path, query, http_status, resp_bytes, referer, ua)를 갖는다.
+WEB_REQUEST_SOURCES = ("access", "weblog", "alb")
+
+
+def _status(e: Event) -> str:
+    """응답 코드 문자열("404"). 웹서버 점검은 status, AWS 분석은 http_status(정수)를 둔다."""
+    st = e.extra.get("status")
+    if st:
+        return str(st)
+    st = e.extra.get("http_status")
+    return str(st) if st is not None else ""
+
+
+def _resp_bytes(e: Event) -> int:
+    v = e.extra.get("resp_bytes")
+    if v is None:
+        v = e.extra.get("bytes", 0)
+    try:
+        return int(v or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _oc(e: Event) -> str:
+    """success | client-error | server-error | unknown. 웹서버 점검 접속 로그의 결과 표현으로 맞춘다."""
+    if e.source == "access":
+        return e.outcome or "unknown"
+    st = _status(e)
+    if not st.isdigit():
+        return "unknown"
+    code = int(st)
+    return "success" if code < 400 else "client-error" if code < 500 else "server-error"
+
+
+def _is_login_path(path: str, login_paths: list[str]) -> bool:
+    """로그인 처리 경로인가. 프로필에 적은 경로이거나, 마지막 조각에 login이 든 경로
+    (/login, /login.php, /admin/login.php, /wp-login.php, /user/login). 예전의 'login.php로 끝남'을 넓힌 것이다."""
+    p = path.lower().rstrip("/")
+    if any(p == lp or p.startswith(lp + "/") for lp in (x.lower().rstrip("/") for x in login_paths)):
+        return True
+    return "login" in p.rsplit("/", 1)[-1]
+
+
 def _mk(rule: str, by_ip: dict[str, list[Event]], detail_fn) -> list[Finding]:
     out = []
     for ip, evs in by_ip.items():
@@ -167,7 +211,14 @@ def _mk(rule: str, by_ip: dict[str, list[Event]], detail_fn) -> list[Finding]:
     return out
 
 
-def run_web_detections(events: list[Event], profile: SiteProfile | None = None) -> list[Finding]:
+def run_web_detections(events: list[Event], profile: SiteProfile | None = None, *,
+                       sources: tuple[str, ...] = ("access",), skip: frozenset[str] = frozenset(),
+                       covered: dict[str, set[str]] | None = None,
+                       include_auth: bool = True) -> list[Finding]:
+    """sources: 볼 웹 요청 로그 종류. 웹서버 점검은 access, AWS 분석은 weblog·alb(detect.run_detections가 부름).
+    skip: 만들지 않을 규칙(같은 행동을 AWS 분석의 다른 규칙이 이미 잡을 때).
+    covered: {규칙: IP 집합}. 그 IP에 대해서만 그 규칙을 만들지 않는다(다른 규칙이 이미 같은 IP를 잡았을 때).
+    include_auth: auth.log의 SSH 규칙도 볼지(AWS 분석은 detect.py의 SSH 규칙이 따로 본다)."""
     profile = profile or SiteProfile()
     trusted = [t["cidr"] if isinstance(t, dict) else t for t in profile.trusted_ips]
     upload_dirs = tuple(profile.upload_dirs)
@@ -176,9 +227,9 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
     own_hosts = [h.lower() for h in profile.own_hosts]
     findings: list[Finding] = []
 
-    access = [e for e in events if e.source == "access"]
+    access = [e for e in events if e.source in sources]
     # 오류 로그(weberror)는 사건 묶기에는 들어가지만 아직 이것만 보는 규칙은 없다
-    auth = [e for e in events if e.source in ("auth", "sshauth")]
+    auth = [e for e in events if e.source in ("auth", "sshauth")] if include_auth else []
 
     # 규칙별로 공격자 IP → 이벤트 목록을 모은다
     buckets: dict[str, dict[str, list[Event]]] = defaultdict(lambda: defaultdict(list))
@@ -205,7 +256,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
         # 웹셸 접근은 "존재하는 자원"에 닿았을 때만(404 스캔 제외). cmd 류 파라미터 또는
         # 구별력 있는 웹셸 파일 이름이 있고 응답이 404가 아니면 센다.
         if (_shell_param_hit(path, e.extra.get("query", "")) or WEBSHELL_NAME.search(path)) \
-                and e.outcome != "client-error":
+                and _oc(e) != "client-error":
             buckets["WEBLOG_WEBSHELL_ACCESS"][ip].append(e); matched = True
         if any(s in target.lower() for s in sensitive) or "/.git/" in path.lower():
             buckets["WEBLOG_SENSITIVE_FILE"][ip].append(e)
@@ -216,9 +267,9 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
             buckets["WEBLOG_OPEN_REDIRECT"][ip].append(e)
         if EXPLOIT_PROBE.search(ua) or EXPLOIT_PROBE.search(e.extra.get("referer", "")):
             buckets["WEBLOG_EXPLOIT_PROBE"][ip].append(e)
-        if e.outcome == "success" and BACKUP_NAME.search(path) and not path.endswith("/"):
+        if _oc(e) == "success" and BACKUP_NAME.search(path) and not path.endswith("/"):
             buckets["WEBLOG_BACKUP_LEAK"][ip].append(e); matched = True
-        if method == "GET" and e.outcome == "success" and path.endswith("/") \
+        if method == "GET" and _oc(e) == "success" and path.endswith("/") \
                 and path.lower().startswith(upload_dirs):
             buckets["WEBLOG_DIR_LISTING"][ip].append(e)
         if method == "POST" and _is_admin_path(path, admin_prefixes) and e.extra.get("referer") \
@@ -229,9 +280,9 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
             buckets["WEBLOG_CODE_IN_HEADER"][ip].append(e)
         # 관리자 영역에 성공적으로 들어간 흔적: 2xx 응답, 또는 관리자 로그인 뒤 302(로그인 성공).
         # 인증 없이 302로 로그인 화면에 튕긴 것은 성공으로 치지 않는다.
-        login_ok = e.extra.get("status") == "302" and path.lower().endswith("login.php")
+        login_ok = _status(e) == "302" and _is_login_path(path, profile.login_paths)
         if not trusted_ip and _is_admin_path(path, admin_prefixes) and (
-                (e.outcome == "success" and e.extra.get("status") != "302") or login_ok):
+                (_oc(e) == "success" and _status(e) != "302") or login_ok):
             buckets["WEBLOG_ADMIN_ACCESS"][ip].append(e)
             if not login_ok:
                 admin_pages[ip].append(e)
@@ -241,15 +292,12 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
         if _in_upload_dir(path, upload_dirs) and re.search(r"\.(php\d?|phtml|phar|jsp|asp|aspx|cgi|pl)\b", path, re.I):
             buckets["WEBLOG_UPLOAD_EXEC"][ip].append(e); matched = True
         # 공격 패턴 요청에 서버가 500으로 반응하면 취약점이 실제로 건드려졌을 가능성
-        if matched and e.outcome == "server-error":
+        if matched and _oc(e) == "server-error":
             buckets["WEBLOG_EXPLOIT_5XX"][ip].append(e)
         # 공격 패턴 요청이 성공(2xx)하면서 응답이 유난히 크면 데이터 유출 의심
-        if (matched or _is_admin_path(path, admin_prefixes)) and e.outcome == "success":
-            try:
-                if int(e.extra.get("bytes", "0")) >= 50_000:
-                    buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)
-            except ValueError:
-                pass
+        if (matched or _is_admin_path(path, admin_prefixes)) and _oc(e) == "success" \
+                and _resp_bytes(e) >= 50_000:
+            buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)
 
     for rule, by_ip in buckets.items():
         findings += _mk(rule, by_ip, lambda evs: _ok_fail(evs))
@@ -257,7 +305,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
     # --- 주문 번호 연속 열람(IDOR): 같은 IP가 서로 다른 주문 번호를 10개 이상 연속으로 열람
     idor: dict[str, list[Event]] = defaultdict(list)
     for e in access:
-        if e.extra.get("path") == "/order.php" and e.outcome == "success":
+        if e.extra.get("path") == "/order.php" and _oc(e) == "success":
             idor[e.src_ip or "?"].append(e)
     for ip, evs in idor.items():
         for seg in _bursts(evs, timedelta(minutes=5), 10, key=lambda e: e.extra.get("query", "")):
@@ -266,7 +314,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
 
     # --- 로그인 기록 없이 관리자 페이지에 바로 들어감: 쿠키 위조 의심
     login_ips = {e.src_ip for e in access if e.extra.get("method") == "POST"
-                 and e.extra.get("status") == "302" and e.extra.get("path", "").lower().endswith("login.php")}
+                 and _status(e) == "302" and _is_login_path(e.extra.get("path", ""), profile.login_paths)}
     for ip, evs in admin_pages.items():
         if ip not in login_ips:
             findings.append(Finding("WEBLOG_ADMIN_FORGED", evs,
@@ -275,7 +323,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
     # --- 404 열거(없는 경로 연속 탐색) — 자동 스캐너의 전형
     enum: dict[str, list[Event]] = defaultdict(list)
     for e in access:
-        if e.extra.get("status") == "404" and not _trusted(e.src_ip, trusted):
+        if _status(e) == "404" and not _trusted(e.src_ip, trusted):
             enum[e.src_ip or "?"].append(e)
     for ip, evs in enum.items():
         for seg in _bursts(evs, timedelta(minutes=5), 15, key=lambda e: e.extra.get("path", e.raw_ref)):
@@ -306,15 +354,15 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
                                     f"10분 안에 로그인 POST {len(seg)}건", ip))
         # 반복 시도(실패) 뒤 리다이렉트(302 등)로 바뀌면 로그인 성공 신호. 리다이렉트 직전의
         # 같은-상태 시도가 충분히 많을 때만(정상 사용자의 1회 로그인 성공은 제외).
-        redirects = [e for e in evs if e.extra.get("status") in REDIRECT]
-        fails = [e for e in evs if e.extra.get("status") not in REDIRECT]
+        redirects = [e for e in evs if _status(e) in REDIRECT]
+        fails = [e for e in evs if _status(e) not in REDIRECT]
         if redirects and len(fails) >= 5:
             first_ok = redirects[0]
             prior = [e for e in fails if e.ts <= first_ok.ts]
             if len(prior) >= 5:
                 findings.append(Finding("WEBLOG_AUTH_SUCCESS_AFTER_FAIL", prior + [first_ok],
                                         f"로그인 실패 {len(prior)}건 뒤 성공 추정(응답 "
-                                        f"{first_ok.extra.get('status')})", ip))
+                                        f"{_status(first_ok)})", ip))
 
     # --- SSH 무차별 대입/성공(auth 로그) — 웹 사고가 서버 계정 탈취로 이어졌는지 본다
     by_ssh: dict[str, list[Event]] = defaultdict(list)
@@ -333,6 +381,9 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None) 
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 SSH 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
 
+    if skip or covered:
+        covered = covered or {}
+        findings = [f for f in findings if f.rule not in skip and f.key not in covered.get(f.rule, ())]
     # 이벤트에 규칙 ID 표시(상관분석·보고서 근거용)
     for f in findings:
         for e in f.events:

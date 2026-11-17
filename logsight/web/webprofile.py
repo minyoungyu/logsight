@@ -67,3 +67,29 @@ class SiteProfile:
             if files:
                 out[kind] = files
         return out
+
+
+# 사이트 프로필 중 AWS 분석(analyze·watch)이 env에서 가져와 쓰는 필드
+_ENV_WEB_FIELDS = ("admin_paths", "login_paths", "upload_dirs", "sensitive_files", "own_hosts")
+
+
+def web_profile_from_env(env: dict | None, hosts_seen: set[str] | frozenset[str] = frozenset()) -> SiteProfile:
+    """AWS 분석에서 웹 규칙을 돌릴 때 쓰는 프로필. 웹서버 점검의 profile.json 대신 env(environment.json)를 읽는다.
+
+    trusted_ips는 env의 것을 그대로, own_hosts에는 인스턴스 IP·DNS 이름과 로그에 보인 Host(ALB)를 더한다.
+    env["web"]이 있으면 admin_paths·login_paths·upload_dirs·sensitive_files·own_hosts를 거기서 덮어쓴다
+    (own_hosts는 더한다)."""
+    env = env or {}
+    p = SiteProfile(name="AWS 웹")
+    p.trusted_ips = list(env.get("trusted_ips", []))
+    web = env.get("web") or {}
+    for k in _ENV_WEB_FIELDS:
+        if k != "own_hosts" and isinstance(web.get(k), list):
+            setattr(p, k, [str(x) for x in web[k]])
+    hosts = set(p.own_hosts) | {str(h).lower() for h in web.get("own_hosts") or []} | set(hosts_seen)
+    for inst in env.get("instances", []):
+        for k in ("public_ip", "private_ip", "private_dns", "public_dns"):
+            if inst.get(k):
+                hosts.add(str(inst[k]).lower())
+    p.own_hosts = sorted(h for h in hosts if h)
+    return p

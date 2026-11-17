@@ -14,6 +14,9 @@
 - nginx·Apache 접속 로그 한 줄을 읽는 코드를 하나(`normalize.parse_web_line`)로 합쳤다. AWS 분석(`analyze`·`watch`)과 웹서버 점검(`scan`)이 같은 줄을 같은 IP·같은 필드(method, path, query, http_status, resp_bytes, referer, ua)로 읽는다.
 - 웹서버 점검이 첫 칸에 IP 목록이 찍힌 로그에서 맨 왼쪽 IP(요청이 가져온 X-Forwarded-For, 공격자가 위조 가능)를 출발지로 쓰던 것을 고쳤다. 이제 실제로 접속해 온 쪽을 쓰고, 사설 IP(ALB·프록시) 뒤일 때만 전달된 IP를 오른쪽부터 믿는다.
 - 웹서버 점검에서 AI와 보고서에 HTTP 응답 코드·응답 크기가 빠지던 것을 고쳤다(필드 이름 불일치). 접속 로그의 4xx·5xx도 공통 결과(status)에서 실패로 센다.
+- 사후 분석·경보 분석(`analyze`·`watch`·`on-alert`)이 nginx·ALB 로그에 웹 규칙 3개(SQL 인젝션·경로 탐색·객체 번호)만 돌려 sqlmap 같은 스캐너, 경로 조작, 웹셸 접근, 명령 삽입 등을 놓치던 것을 고쳤다. 웹서버 점검(`scan`)의 `WEBLOG_` 규칙을 같은 코드로 함께 돌린다. 같은 행동을 보는 규칙은 한 번만 센다(WEBLOG_SQLI는 WEB_SQLI_PATTERN이, WEBLOG_ENUM_404·WEBLOG_IDOR_ENUM은 같은 IP에 WEB_PATH_PROBE·WEB_OBJECT_ENUM이 있으면 그쪽이). 사이트 구조는 environment.json의 `web` 항목에서 읽는다. 샘플 `free`·`combined`에서 스캐너(WEBLOG_SCANNER)와 `.env`·`.git` 탐색(WEBLOG_SENSITIVE_FILE)이 새로 잡힌다. 사건 수·심각도는 같다.
+- ALB 로그에도 method·path·query 필드를 둔다. 상관분석이 nginx 로그(weblog)의 사설 IP도 웹 로그로 보고 묶는다.
+- 웹서버 점검의 로그인 성공 판단이 `login.php`로 끝나는 경로만 보던 것을, 프로필의 `login_paths`이거나 마지막 조각에 login이 든 경로(`/login`, `/user/login` 등)로 넓혔다.
 - 디스코드 카드 본문 첫 줄에 제목이 한 번 더 나오던 것을 뺐다.
 - 디스코드·슬랙·이메일 통지와 경보 요약(summary.txt)에 공격 단계가 영어 코드(initial-access 등)로 나가던 것을 한국어(초기 침투 등)로 바꿨다.
 

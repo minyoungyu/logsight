@@ -19,7 +19,7 @@ from .normalize import Event, mask_obj
 SEV_RANK = {"high": 3, "medium": 2, "low": 1}
 
 
-WEB_SOURCES = {"access", "weberror", "auth", "sshauth", "alb", "waf", "file"}
+WEB_SOURCES = {"access", "weblog", "weberror", "auth", "sshauth", "alb", "waf", "file"}
 
 
 def _keys(e: Event):

@@ -233,7 +233,9 @@ def parse_alb(text: str, name: str = "alb") -> list[Event]:
                 outcome="success" if f[8].startswith(("2", "3")) else "failure",
                 raw_ref=f"{name}:{i+1}",
                 extra={"http_status": int(f[8]) if f[8].isdigit() else None, "http_host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else "",
-                       "resp_bytes": int(f[11]) if f[11].isdigit() else None},
+                       "resp_bytes": int(f[11]) if f[11].isdigit() else None,
+                       # 웹 공격 규칙(web/webdetect)이 nginx 로그와 같은 이름으로 읽는 필드. ALB 로그에는 Referer가 없다
+                       "method": method, "path": u.path or "/", "query": u.query, "referer": ""},
             ))
         except (ValueError, IndexError):
             continue
