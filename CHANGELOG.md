@@ -37,7 +37,7 @@
   - WAF 로그도 웹 공격 규칙의 입력이 된다(WAF가 막은 요청은 뺀다). WAF 로그에 method·path·query·referer 필드를 둔다.
 - 실습 사이트에 묶여 있던 웹 규칙을 일반화했다.
   - 남의 객체 연속 열람(WEBLOG_IDOR_ENUM)이 `/order.php`에 고정돼 있던 것을, 사이트 프로필·env `web` 항목의 `private_object_paths`(예: `/order.php`, `/api/orders/{id}`)로 정한다. 적지 않으면 이 판단은 끈다. 샘플 프로필에는 `/order.php`를 적었다.
-  - 관리자 영역을 `/admin`으로 시작하는 경로만 보던 것을, `admin_paths` 중 로그인 화면이 아닌 것 전부(`/wp-admin`, `/manager/html` 등)로 넓혔다. 누구나 부르는 `admin-ajax.php`·`admin-post.php`와 정적 파일은 뺀다(AIT 측정에서 정상 요청 475줄이 걸려 확인).
+  - 관리자 영역을 `/admin`으로 시작하는 경로만 보던 것을, `admin_paths` 중 로그인 화면이 아닌 것 전부(`/wp-admin`, `/manager/html` 등)로 넓혔다. 누구나 부르는 `admin-ajax.php`·`admin-post.php`와 정적 파일은 뺀다(AIT 측정에서 정상 요청 475줄이 걸려 확인). 관리자 화면이 부르는 CSS·JS 묶음(`load-scripts.php`·`load-styles.php`)도 뺀다. `trusted_ips`를 적지 않은 사이트에서는 내부망 IP의 관리자 영역 접근과 관리자 화면의 큰 응답을, 같은 IP에 다른 공격 신호가 있을 때만 알린다(사무실·VPN 관리자와 구분할 근거가 없어서다. 공인 IP는 전과 같이 알린다. 처음 보는 AIT 테스트베드 shaw·wilson에서 정상 관리 작업 169줄·1,367줄이 걸려 확인).
   - 유출 의심 응답 크기(50,000바이트)를 `large_response_bytes`로 바꿀 수 있게 했다.
 - 웹서버 점검도 사후 분석과 같은 처리 단계를 거친다: 정상 작업 목록(프로필 `known_activity`, `trusted_ips`)에 맞는 이벤트 표시, 같은 모양으로 되풀이된 사건은 대표 하나로 접기(`repeats`), 규칙 재검토. 사건마다 침해 판정('뚫렸는가')과 함께 사후 분석과 같은 기준의 공격 판정('공격인가', `attack_verdict`)을 보고서에 나란히 보인다. 샘플·AIT 측정 결과는 같다.
 - 디스코드 카드 본문 첫 줄에 제목이 한 번 더 나오던 것을 뺐다.

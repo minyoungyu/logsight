@@ -17,7 +17,7 @@ from collections import defaultdict
 from datetime import timedelta
 from urllib.parse import parse_qsl, unquote_plus, urlparse
 
-from ..normalize import Event
+from ..normalize import Event, _private
 from ..detect import Finding, _bursts, _ok_fail, _route, host_auth_findings, sqli_success_signal
 from .webprofile import SiteProfile
 
@@ -136,9 +136,10 @@ def _trusted(ip: str | None, cidrs: list[str]) -> bool:
     return False
 
 
-# 관리자 영역 안에 있지만 누구나 부르는 곳: WordPress의 AJAX·폼 처리 창구(방문자 브라우저가 늘 부름), 정적 파일.
-# AIT-LDS 측정에서 /wp-admin/admin-ajax.php 정상 POST 475줄이 '관리자 접근'으로 잡혀 뺐다.
-ADMIN_PUBLIC = re.compile(r"(?i)/(?:admin-ajax|admin-post)\.php$|\.(?:css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|map)$")
+# 관리자 영역 안에 있지만 관리 작업이 아닌 곳: WordPress의 AJAX·폼 처리 창구(방문자 브라우저가 늘 부름),
+# 관리자 화면이 부르는 CSS·JS 묶음(load-scripts·load-styles), 정적 파일.
+ADMIN_PUBLIC = re.compile(r"(?i)/(?:admin-ajax|admin-post|load-scripts|load-styles)\.php$"
+                          r"|\.(?:css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|map)$")
 
 
 def _is_admin_path(path: str, prefixes: tuple[str, ...]) -> bool:
@@ -287,6 +288,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     # 규칙별로 공격자 IP → 이벤트 목록을 모은다
     buckets: dict[str, dict[str, list[Event]]] = defaultdict(lambda: defaultdict(list))
     admin_pages: dict[str, list[Event]] = defaultdict(list)
+    admin_large: dict[str, list[Event]] = defaultdict(list)  # 공격 패턴 없이 관리자 화면에서 큰 응답
 
     for e in access:
         if e.disposition == "blocked":
@@ -350,10 +352,14 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
         if matched and _oc(e) == "server-error":
             buckets["WEBLOG_EXPLOIT_5XX"][ip].append(e)
         # 공격 패턴 요청이 성공(2xx)하면서 응답이 유난히 크면 데이터 유출 의심
-        if (matched or _is_admin_path(path, admin_prefixes)) and _oc(e) == "success" \
-                and _resp_bytes(e) >= profile.large_response_bytes:
-            buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)
+        if _oc(e) == "success" and _resp_bytes(e) >= profile.large_response_bytes:
+            if matched:
+                buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)
+            elif _is_admin_path(path, admin_prefixes):
+                admin_large[ip].append(e)
 
+    # 관리자 영역 접근은 뒤에서 다른 공격 신호와 함께 본다(아래 '관리자 영역 접근' 참고)
+    admin_access = buckets.pop("WEBLOG_ADMIN_ACCESS", {})
     for rule, by_ip in buckets.items():
         if rule == "WEBLOG_SQLI":  # 응답 크기로 본 성공 신호(코드 판단)를 함께 적는다
             findings += _mk(rule, by_ip, lambda evs: f"{_ok_fail(evs)} · {sqli_success_signal(evs, access)}")
@@ -463,6 +469,21 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     # --- 서버 권한 상승·계정 생성(sudo·su·useradd): 웹셸에서 root로 올라갔는지 본다(사후 분석과 같은 코드)
     if auth:
         findings += host_auth_findings(auth)
+
+    # --- 관리자 영역 접근: 관리자는 원래 관리자 화면을 쓰므로 그것만으로는 공격 근거가 아니다.
+    # 프로필에 믿을 IP(trusted_ips)를 적었으면 그 밖에서 들어온 것을 모두 알린다(주인이 관리자 IP를 밝힌 경우).
+    # 적지 않았으면 인터넷(공인 IP)에서 들어온 것, 또는 내부망 IP라도 같은 IP에 다른 공격 신호
+    # (스캐너·탐색·인젝션·무차별 대입·쿠키 위조 등)가 있는 것만 알린다. 사무실·VPN의 관리자가 내부망에서
+    # 관리 화면을 쓰는 것은 평소 모습이라서다.
+    # 공격 패턴 없이 관리자 화면에서 받은 큰 응답(대용량 유출 의심)도 같은 조건을 따른다.
+    signal_ips = {f.key for f in findings}
+    for rule, by_ip in (("WEBLOG_ADMIN_ACCESS", admin_access), ("WEBLOG_LARGE_EXFIL", admin_large)):
+        keep = {ip: evs for ip, evs in by_ip.items() if trusted or not _private(ip) or ip in signal_ips}
+        for f in findings:  # 같은 IP의 대용량 응답 결과가 이미 있으면 그 결과에 합친다
+            if f.rule == rule and f.key in keep:
+                f.events = sorted({id(e): e for e in f.events + keep.pop(f.key)}.values(), key=lambda e: e.ts)
+                f.detail = _ok_fail(f.events)
+        findings += _mk(rule, keep, lambda evs: _ok_fail(evs))
 
     if skip or covered:
         covered = covered or {}
