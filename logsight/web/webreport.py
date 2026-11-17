@@ -78,6 +78,16 @@ def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고�
         h.append(f"<div class=analysis>분석 {escape(meta.get('mode', '-'))}"
                  + (f"({escape(meta.get('model'))})" if meta.get("model") else "") + f" · {badge} · "
                  f"출발지 {escape(', '.join(inc['src_ips'][:4]) or '-')}</div>")
+        if rep.get("injection"):
+            x = rep["injection"][0]
+            h.append(f"<p class=warn>로그에 AI 판정을 바꾸려는 문장이 있습니다({escape(str(x.get('ref')))}: "
+                     f"“{escape(str(x.get('text', '')))}”). 공격자가 넣은 글로 보고 그 지시는 따르지 않았습니다"
+                     + (f" — AI가 낸 '{escape(VERDICT_KO.get(rep['ai_said'], rep['ai_said']))}' 판정 대신 규칙 판정을 씁니다"
+                        if rep.get("ai_said") else "") + ".</p>")
+        elif rep.get("contested"):
+            c = rep["contested"]
+            h.append(f"<p class=warn>규칙과 의견 다름: 규칙은 '{escape(VERDICT_KO.get(c['rules'], c['rules']))}', "
+                     f"AI는 '{escape(VERDICT_KO.get(c['ai'], c['ai']))}'로 봤습니다. 근거 로그를 직접 확인하세요.</p>")
         h.append(f"<p class=summary>{escape(rep.get('summary', ''))}</p>")
 
         if rep.get("attack_flow"):

@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from urllib.parse import unquote_plus
 
-WEB_SOURCES = {"waf", "alb", "weblog", "apigw", "access"}
+WEB_SOURCES = {"waf", "alb", "weblog", "apigw", "access", "weberror"}  # 오류 로그 문장에도 요청 경로·인자가 찍힌다
 # 공격자가 값을 정할 수 있는 필드(이벤트 종류와 상관없이)
 UNTRUSTED_KEYS = ("ua", "userAgent", "params", "http_host")
 

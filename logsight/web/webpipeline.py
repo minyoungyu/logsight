@@ -19,7 +19,7 @@ from ..detect import RULES
 from .weblog import parse_access, parse_weberror, parse_auth
 from .webdetect import run_web_detections
 from .webscan import scan_webroot
-from .webanalyze import analyze_web, rule_verdict, VERDICT_KO
+from .webanalyze import analyze_web, rule_verdict, VERDICT_KO, VERDICT_RANK
 from .webprofile import SiteProfile
 from .expert import expert_report
 from .layman import layman_card
@@ -30,9 +30,6 @@ PARSERS = {
     "auth": parse_auth,
     "sshauth": parse_sshauth,
 }
-
-VERDICT_RANK = {"no_evidence": 0, "suspicious": 1, "likely_breached": 2, "breached": 3}
-
 
 def load_events(profile: SiteProfile) -> tuple[list[Event], list[dict]]:
     events: list[Event] = []

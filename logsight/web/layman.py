@@ -40,4 +40,5 @@ def layman_card(result: dict) -> dict:
         "n_incidents": result["n_incidents"],
         "now": _first_actions(result),
         "note": "자동 판정입니다. 중요한 결정 전에는 원본 로그와 상세 보고서를 함께 확인하세요.",
+        "injection": any(r["report"].get("injection") for r in result.get("results", [])),
     }
