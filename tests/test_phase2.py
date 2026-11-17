@@ -110,7 +110,8 @@ class Rollback(unittest.TestCase):
     def test_demo_checks_have_rollback(self):
         res = run_paths([str(ROOT / "samples" / "demo")], use_ai=False)
         for c in res["results"][0]["checks"]:
-            self.assertTrue(c["rollback"], c["id"])
+            if c["cli"]:  # 적용 명령이 있는 수정안(사람이 고치는 WEB_FIX_는 명령이 없다)
+                self.assertTrue(c["rollback"], c["id"])
 
 
 class DryRun(unittest.TestCase):

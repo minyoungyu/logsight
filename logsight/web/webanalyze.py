@@ -269,29 +269,29 @@ def _remediation(findings: list[dict]) -> list[dict]:
     out: list[dict] = []
     if "FILE_WEBSHELL" in rules or "WEBLOG_WEBSHELL_ACCESS" in rules or "WEBLOG_UPLOAD_EXEC" in rules:
         f = rules.get("FILE_WEBSHELL") or rules.get("WEBLOG_WEBSHELL_ACCESS") or rules["WEBLOG_UPLOAD_EXEC"]
-        out.append({"action": "웹셸 의심 파일 격리", "target": "file", "priority": "now",
+        out.append({"id": "WEB_FIX_WEBSHELL", "action": "웹셸 의심 파일 격리", "target": "file", "priority": "now",
                     "detail": "표시된 파일을 삭제하지 말고 먼저 복사해 보관한 뒤 서비스에서 분리하고, "
                               "업로드 폴더에서 스크립트 실행을 막는다.",
                     "evidence": f["evidence"][:6]})
     if "WEBLOG_AUTH_SUCCESS_AFTER_FAIL" in rules or "SSH_SUCCESS_AFTER_FAIL" in rules:
         f = rules.get("WEBLOG_AUTH_SUCCESS_AFTER_FAIL") or rules["SSH_SUCCESS_AFTER_FAIL"]
-        out.append({"action": "탈취 의심 계정 잠그고 비밀번호·키 교체", "target": "account", "priority": "now",
+        out.append({"id": "WEB_FIX_ACCOUNT", "action": "탈취 의심 계정 잠그고 비밀번호·키 교체", "target": "account", "priority": "now",
                     "detail": "해당 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다. 가능하면 다중 인증을 켠다.",
                     "evidence": f["evidence"][:6]})
     if "WEBLOG_SQLI" in rules:
-        out.append({"action": "SQL 인젝션 취약 코드 수정", "target": "app", "priority": "soon",
+        out.append({"id": "WEB_FIX_SQLI", "action": "SQL 인젝션 취약 코드 수정", "target": "app", "priority": "soon",
                     "detail": "해당 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
                     "evidence": rules["WEBLOG_SQLI"]["evidence"][:6]})
     if rules.keys() & {"WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION"}:
         f = next(rules[r] for r in ("WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION") if r in rules)
-        out.append({"action": "입력값 검증·경로 제한 적용", "target": "app", "priority": "soon",
+        out.append({"id": "WEB_FIX_INPUT", "action": "입력값 검증·경로 제한 적용", "target": "app", "priority": "soon",
                     "detail": "파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
                     "evidence": f["evidence"][:6]})
     if rules.keys() & {"WEBLOG_SCANNER", "WEBLOG_ENUM_404", "WEBLOG_AUTH_BRUTE", "SSH_BRUTE_FORCE"}:
-        out.append({"action": "비정상 출발지 차단·요청 제한", "target": "network", "priority": "soon",
+        out.append({"id": "WEB_FIX_RATE_LIMIT", "action": "비정상 출발지 차단·요청 제한", "target": "network", "priority": "soon",
                     "detail": "공격 출발지 IP를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
                     "evidence": []})
-    out.append({"action": "로그 보존 기간 늘리기", "target": "server", "priority": "later",
+    out.append({"id": "WEB_FIX_LOG_RETENTION", "action": "로그 보존 기간 늘리기", "target": "server", "priority": "later",
                 "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
                 "evidence": []})
     return out

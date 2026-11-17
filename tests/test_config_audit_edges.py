@@ -40,14 +40,16 @@ class ConfigAuditEdges(unittest.TestCase):
     def test_sample_produces_expected_checks(self):
         ids = {c["id"] for c in _checks(_run(BASE))}
         self.assertEqual(ids, {"SG_ADMIN_PORT_OPEN", "WAF_SQLI_COUNT", "IMDSV1_ENABLED",
-                               "IAM_OVERBROAD", "NACL_BLOCK_ATTACKER", "IAM_ROLE_SESSION_REVOKE"})
+                               "IAM_OVERBROAD", "NACL_BLOCK_ATTACKER", "IAM_ROLE_SESSION_REVOKE",
+                               "WEB_FIX_SQLI", "WEB_FIX_ACCOUNT"})
         for c in _checks(_run(BASE)):
             if any(not x.startswith("#") for x in c["cli"]) and c["id"] != "WAF_SQLI_COUNT":
                 self.assertTrue(c["rollback"], c["id"])  # 실행 명령이 있으면 되돌리기도 있다
 
     def test_malformed_json_does_not_crash(self):
         res = _run("{bad json")
-        self.assertFalse(_checks(res))
+        # 설정에서 나온 수정안은 없다. 코드·계정 수정(WEB_FIX_)은 설정 없이도 나온다
+        self.assertTrue(all(c["id"].startswith("WEB_FIX_") for c in _checks(res)))
         self.assertFalse(res["has_environment"])
         self.assertTrue(any("JSON으로 읽지 못했습니다" in a for a in res["assumptions"]))
 

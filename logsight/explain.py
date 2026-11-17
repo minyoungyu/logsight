@@ -398,6 +398,26 @@ def describe_finding(f: dict, inc: dict) -> str:
         "WEB_PATH_PROBE": f"{who}에서 없는 경로 {n}곳을 연달아 요청했습니다({_acts(evs, 2)} 등). 취약한 파일을 찾는 스캐너입니다.",
         "WEB_OBJECT_ENUM": f"{who}에서 같은 API의 번호만 바꿔 다른 사람의 데이터 {n}건을 열어 보려 했습니다(IDOR 탐색, 거부 {bad}건).",
         "GD_FINDING": f"GuardDuty 탐지: {f['title'].replace('GuardDuty: ', '')} ({f['detail']}).",
+        # 웹 공격 규칙(웹서버 점검과 같은 규칙). 응답이 정상(2xx·3xx)이면 '성공', 4xx·5xx면 '거부'로 센다
+        "WEBLOG_SCANNER": f"{who}에서 취약점 스캐너·자동 도구로 {n}건을 요청했습니다({_acts(evs, 2)} 등). "
+                          "공격 전 훑어보기입니다. 같은 IP의 다른 공격 요청이 성공했는지 보세요.",
+        "WEBLOG_ENUM_404": f"{who}에서 없는 경로를 {n}번 연달아 요청했습니다({_acts(evs, 2)} 등). 숨은 파일·관리 화면을 찾는 스캐너입니다.",
+        "WEBLOG_SENSITIVE_FILE": f"{who}에서 설정·비밀 파일(.env, .git 등)을 {n}번 열어 보려 했습니다({res}). "
+                                 "성공한 것이 있으면 그 파일의 비밀값을 모두 바꾸세요.",
+        "WEBLOG_TRAVERSAL": f"{who}에서 경로 조작(../)으로 서버 파일을 읽으려 한 요청이 {n}건 있었습니다({res}).",
+        "WEBLOG_RFI": f"{who}에서 외부 주소의 파일을 서버가 불러오게 하려 한 요청이 {n}건 있었습니다(원격 파일 포함, {res}).",
+        "WEBLOG_CMD_INJECTION": f"{who}에서 요청 값에 운영체제 명령을 끼워 넣은 요청이 {n}건 있었습니다({res}). "
+                                "성공했다면 서버에서 명령이 실행됐을 수 있습니다.",
+        "WEBLOG_XSS": f"{who}에서 페이지에 스크립트를 심으려 한 요청이 {n}건 있었습니다(XSS, {res}).",
+        "WEBLOG_SSRF": f"{who}에서 서버가 내부 주소(메타데이터 등)를 대신 요청하게 하려 했습니다({n}건, {res}).",
+        "WEBLOG_WEBSHELL_ACCESS": f"{who}에서 웹셸로 보이는 경로에 {n}번 접근했습니다({res}). "
+                                  "응답이 정상이면 서버에 웹셸이 이미 올라가 있을 수 있습니다.",
+        "WEBLOG_UPLOAD_EXEC": f"{who}에서 업로드 폴더 안의 스크립트를 {n}번 실행했습니다({res}). 올린 파일을 실행하는 단계입니다.",
+        "WEBLOG_AUTH_BRUTE": f"{who}에서 웹 로그인을 짧은 시간에 {n}번 시도했습니다(무차별 대입).",
+        "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": f"{who}에서 웹 로그인을 여러 번 실패한 뒤 성공했습니다({n}건). 비밀번호가 뚫렸을 수 있습니다.",
+        "WEBLOG_ADMIN_ACCESS": f"{who}에서 관리자 영역에 {n}번 들어갔습니다. 우리 관리자가 아니면 기본 계정이 뚫렸을 수 있습니다.",
+        "WEBLOG_EXPLOIT_5XX": f"{who}의 공격 요청 {n}건에 서버가 오류(500)로 응답했습니다. 취약한 코드가 실제로 건드려졌다는 신호입니다.",
+        "WEBLOG_LARGE_EXFIL": f"{who}의 공격 요청 {n}건에 서버가 유난히 큰 응답을 돌려줬습니다. 데이터가 빠져나갔을 수 있습니다.",
     }.get(r)
     if not t:  # 템플릿이 없는 규칙(웹서버 로그 규칙 등)도 같은 꼴로
         t = f"{who}에서 {f['title']}에 해당하는 요청이 {n}건 있었습니다({f['detail']})."

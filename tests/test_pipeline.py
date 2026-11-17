@@ -144,7 +144,8 @@ class DemoPipelineTests(unittest.TestCase):
         evs, _ = load_paths([DEMO / "cloudtrail.json", DEMO / "auth.log"])
         res = run(evs, {}, use_ai=False)
         self.assertGreaterEqual(res["n_incidents"], 1)
-        self.assertEqual(res["results"][0]["checks"], [])
+        # 설정이 없으면 설정 수정안은 없고, 사람이 고칠 계정 조치(WEB_FIX_)만 남는다
+        self.assertEqual({c["id"] for c in res["results"][0]["checks"]}, {"WEB_FIX_ACCOUNT"})
 
 
 class DetectionTests(unittest.TestCase):

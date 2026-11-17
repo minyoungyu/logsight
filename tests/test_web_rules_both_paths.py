@@ -106,5 +106,32 @@ class ProfileFromEnvTest(unittest.TestCase):
                       {f.rule for f in run_detections(evs, {"web": {"own_hosts": ["shop.example"]}})})
 
 
+class DownstreamTest(unittest.TestCase):
+    """웹 규칙이 걸린 사건이 설정 점검·수정안·문장까지 이어지는지."""
+
+    def _incident(self, lines, env):
+        from logsight.pipeline import run
+        return run(parse_weblog("\n".join(lines) + "\n", "access.log"), env, use_ai=False)["results"][0]
+
+    LINES = [f'203.0.113.7 - - [13/Jan/2026:05:01:{i:02d} +0000] '
+             f'"GET /view.php?page=../../../../etc/passwd&n={i} HTTP/1.1" 200 2100 "-" "Mozilla/5.0"'
+             for i in range(3)] + [
+        '203.0.113.7 - - [13/Jan/2026:05:02:00 +0000] "GET /uploads/x.php?cmd=id HTTP/1.1" 200 40 "-" "Mozilla/5.0"']
+
+    def test_no_waf_and_nacl_from_web_rules(self):
+        env = {"network_acls": [{"nacl_id": "acl-1", "entries": []}]}
+        ids = {c["id"] for c in self._incident(self.LINES, env)["checks"]}
+        self.assertIn("WEB_NO_WAF", ids)            # SQL 인젝션이 아니어도 웹 공격이면
+        self.assertIn("NACL_BLOCK_ATTACKER", ids)   # 공격 IP 차단 제안
+        self.assertIn("WEB_FIX_INPUT", ids)         # 웹서버 점검과 같은 코드 수정안
+        self.assertIn("WEB_FIX_WEBSHELL", ids)
+
+    def test_korean_sentence_for_web_rule(self):
+        flow = self._incident(self.LINES, {})["report"]["attack_flow"]
+        whats = " ".join(s["what"] for s in flow)
+        self.assertIn("경로 조작(../)", whats)
+        self.assertNotIn("에 해당하는 요청이", whats)  # 템플릿 없는 규칙의 기본 문장이 아님
+
+
 if __name__ == "__main__":
     unittest.main()
