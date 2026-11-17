@@ -118,8 +118,15 @@ def _trusted(ip: str | None, cidrs: list[str]) -> bool:
     return False
 
 
+# 관리자 영역 안에 있지만 누구나 부르는 곳: WordPress의 AJAX·폼 처리 창구(방문자 브라우저가 늘 부름), 정적 파일.
+# AIT-LDS 측정에서 /wp-admin/admin-ajax.php 정상 POST 475줄이 '관리자 접근'으로 잡혀 뺐다.
+ADMIN_PUBLIC = re.compile(r"(?i)/(?:admin-ajax|admin-post)\.php$|\.(?:css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|map)$")
+
+
 def _is_admin_path(path: str, prefixes: tuple[str, ...]) -> bool:
     p = path.lower()
+    if ADMIN_PUBLIC.search(p):
+        return False
     return any(p == x or p.startswith(x + "/") for x in prefixes)
 
 
@@ -200,6 +207,20 @@ def _oc(e: Event) -> str:
     return "success" if code < 400 else "client-error" if code < 500 else "server-error"
 
 
+def _private_object(path: str, query: str, patterns: list[str]) -> tuple[str, str] | None:
+    """(맞은 패턴, 객체 식별값) 또는 None. 패턴에 {id}가 있으면 그 자리 경로 조각이 식별값,
+    없으면 경로가 같을 때 쿼리 문자열이 식별값(/order.php?id=3)."""
+    p = path.rstrip("/") or "/"
+    for pat in patterns:
+        if "{id}" in pat:
+            segs, psegs = p.split("/"), pat.rstrip("/").split("/")
+            if len(segs) == len(psegs) and all(a == b or b == "{id}" for a, b in zip(segs, psegs)):
+                return pat, "/".join(a for a, b in zip(segs, psegs) if b == "{id}")
+        elif p == pat.rstrip("/") and query:
+            return pat, query
+    return None
+
+
 def _is_login_path(path: str, login_paths: list[str]) -> bool:
     """로그인 처리 경로인가. 프로필에 적은 경로이거나, 마지막 조각에 login이 든 경로
     (/login, /login.php, /admin/login.php, /wp-login.php, /user/login). 예전의 'login.php로 끝남'을 넓힌 것이다."""
@@ -229,7 +250,10 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     trusted = [t["cidr"] if isinstance(t, dict) else t for t in profile.trusted_ips]
     upload_dirs = tuple(profile.upload_dirs)
     sensitive = [s.lower() for s in profile.sensitive_files]
-    admin_prefixes = tuple(a.lower().rstrip("/") for a in profile.admin_paths if a.lower().startswith("/admin"))
+    # 관리자 영역: 프로필의 관리자 경로 중 로그인 화면이 아닌 것(/admin, /wp-admin, /manager/html …).
+    # 로그인 화면(/wp-login.php, /user/login)은 누구나 여는 곳이라 '관리자 영역 접근'으로 세지 않는다
+    admin_prefixes = tuple(a.lower().rstrip("/") for a in profile.admin_paths
+                           if "login" not in a.lower().rsplit("/", 1)[-1])
     own_hosts = [h.lower() for h in profile.own_hosts]
     findings: list[Finding] = []
 
@@ -309,7 +333,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             buckets["WEBLOG_EXPLOIT_5XX"][ip].append(e)
         # 공격 패턴 요청이 성공(2xx)하면서 응답이 유난히 크면 데이터 유출 의심
         if (matched or _is_admin_path(path, admin_prefixes)) and _oc(e) == "success" \
-                and _resp_bytes(e) >= 50_000:
+                and _resp_bytes(e) >= profile.large_response_bytes:
             buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)
 
     for rule, by_ip in buckets.items():
@@ -318,15 +342,20 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
         else:
             findings += _mk(rule, by_ip, lambda evs: _ok_fail(evs))
 
-    # --- 주문 번호 연속 열람(IDOR): 같은 IP가 서로 다른 주문 번호를 10개 이상 연속으로 열람
-    idor: dict[str, list[Event]] = defaultdict(list)
+    # --- 남의 객체 연속 열람(IDOR): 프로필의 private_object_paths(예: /order.php, /api/orders/{id})에서
+    # 같은 IP가 5분 안에 서로 다른 객체 10개 이상을 성공적으로 열람. 경로를 적지 않으면 끈다
+    # (상품 목록처럼 누구나 넘겨 보는 페이지와 구별할 수 없어서다)
+    idor: dict[tuple[str, str], list[Event]] = defaultdict(list)
     for e in access:
-        if e.extra.get("path") == "/order.php" and _oc(e) == "success":
-            idor[e.src_ip or "?"].append(e)
-    for ip, evs in idor.items():
-        for seg in _bursts(evs, timedelta(minutes=5), 10, key=lambda e: e.extra.get("query", "")):
-            findings.append(Finding("WEBLOG_IDOR_ENUM", seg,
-                                    f"5분 안에 주문 {len({e.extra.get('query') for e in seg})}건 열람", ip))
+        hit = _private_object(e.extra.get("path", ""), e.extra.get("query", ""), profile.private_object_paths)
+        if hit and _oc(e) == "success":
+            idor[(e.src_ip or "?", hit[0])].append(e)
+    for (ip, where), evs in idor.items():
+        for seg in _bursts(evs, timedelta(minutes=5), 10,
+                           key=lambda e: _private_object(e.extra.get("path", ""), e.extra.get("query", ""),
+                                                         profile.private_object_paths)[1]):
+            n = len({e.raw_ref for e in seg})
+            findings.append(Finding("WEBLOG_IDOR_ENUM", seg, f"5분 안에 {where}의 서로 다른 객체 {n}건 열람", ip))
 
     # --- 같은 API에서 객체 번호만 바꿔 가며 403/404를 연달아 받음: 남의 객체를 열어 보려는 IDOR 탐색
     # (예전 사후 분석의 WEB_OBJECT_ENUM). 경로 이름에 기대지 않는다. 막힌 시도라 심각도는 중간으로 둔다

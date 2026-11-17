@@ -94,6 +94,9 @@ def aws_rules(evs, env=None):
     return {f.rule for f in run_detections([e for e in evs if e], env or {})}
 
 
+PRIVATE = SiteProfile(private_object_paths=["/order.php"])  # 남의 것을 열면 안 되는 경로(프로필에 적음)
+
+
 def web_rules(lines, profile=None):
     evs = weblog.parse_access("\n".join(lines), "access.log")
     return {f.rule for f in webdetect.run_web_detections(evs, profile or SiteProfile())}
@@ -229,8 +232,8 @@ CASES = {
                     lambda: web_rules([acc(0, "/fetch.php?url=https://www.example.com/")])),
     "WEBLOG_OPEN_REDIRECT": (lambda: web_rules([acc(0, "/go?next=https://evil.example/")]),
                              lambda: web_rules([acc(0, "/go?next=/home")])),
-    "WEBLOG_IDOR_ENUM": (lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(10)]),
-                         lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(9)])),
+    "WEBLOG_IDOR_ENUM": (lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(10)], PRIVATE),
+                         lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(9)], PRIVATE)),
     "WEBLOG_ADMIN_FORGED": (lambda: web_rules([acc(0, "/admin/users")]),
                             lambda: web_rules([acc(0, "/admin/login.php", 302, method="POST"),
                                                acc(1, "/admin/users")])),

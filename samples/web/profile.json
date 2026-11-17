@@ -9,6 +9,7 @@
   },
   "login_paths": ["/login.php"],
   "upload_dirs": ["/uploads"],
+  "private_object_paths": ["/order.php"],
   "trusted_ips": [],
   "year": 2026
 }
