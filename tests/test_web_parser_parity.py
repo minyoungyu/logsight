@@ -65,5 +65,22 @@ class ParserParityTest(unittest.TestCase):
             self.assertEqual(_compact(e).get("http_status"), 200)
 
 
+class LineVariantsTest(unittest.TestCase):
+    """리뷰에서 찾은 경우: 첫 칸이 호스트 이름, 시간대 없음, 시스템 언어와 무관한 월 이름."""
+
+    def test_hostname_first_field_kept(self):
+        line = 'client.example.net - - [13/Jan/2026:05:00:00 +0900] "GET / HTTP/1.1" 200 5 "-" "x"\n'
+        for evs in (parse_weblog(line, "a.log"), parse_access(line, "a.log")):
+            self.assertEqual(len(evs), 1)
+            self.assertEqual(evs[0].src_ip, "client.example.net")
+            self.assertEqual(evs[0].ts.hour, 20)   # +0900 → UTC 전날 20시
+
+    def test_time_without_zone(self):
+        from logsight.normalize import parse_clf_time
+        self.assertEqual(parse_clf_time("13/Jan/2026:05:00:00").hour, 5)
+        self.assertIsNone(parse_clf_time("13/Foo/2026:05:00:00 +0000"))
+        self.assertIsNone(parse_clf_time("32/Jan/2026:05:00:00 +0000"))
+
+
 if __name__ == "__main__":
     unittest.main()

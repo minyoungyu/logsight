@@ -15,26 +15,7 @@ import re
 from datetime import datetime, timezone
 from urllib.parse import unquote_plus
 
-from ..normalize import Event, parse_web_line, web_extra
-
-_MONTHS = {m: i for i, m in enumerate(
-    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
-
-
-def _parse_clf_time(s: str) -> datetime:
-    """10/Oct/2026:13:55:36 +0000 형태의 접속 로그 시각을 UTC로."""
-    m = re.match(r"(\d{2})/(\w{3})/(\d{4}):(\d{2}):(\d{2}):(\d{2})\s*([+-]\d{4})?", s)
-    if not m:
-        raise ValueError(s)
-    day, mon, year, hh, mm, ss, tz = m.groups()
-    dt = datetime(int(year), _MONTHS[mon], int(day), int(hh), int(mm), int(ss),
-                  tzinfo=timezone.utc)
-    if tz:
-        sign = 1 if tz[0] == "+" else -1
-        off = sign * (int(tz[1:3]) * 3600 + int(tz[3:5]) * 60)
-        dt = datetime.fromtimestamp(dt.timestamp() - off, tz=timezone.utc)
-    return dt
-
+from ..normalize import _MONTHS, Event, parse_web_line, web_extra
 
 # ------------------------------------------------------------------ 접속 로그
 # Common/Combined Log Format. 줄 해석은 normalize.parse_web_line 하나로 한다(AWS 분석 경로와 같은 IP·필드).

@@ -345,12 +345,34 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
 # ------------------------------------------------------------------ 웹 서버 접속 로그(nginx/apache combined)
 # WAF 로그 대신 쓰는 무료 대안. 예:
 #   203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET /item?id=1 HTTP/1.1" 200 512 "-" "curl/8.0"
-_WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+(?:,\s*[\da-fA-F.:]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<ts>[^\]]+)\]\s+'
+_WEB = re.compile(r'^(?P<ip>[^\s,]+(?:,\s*[^\s,]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<ts>[^\]]+)\]\s+'
                   r'"(?P<req>[^"]*)"\s+(?P<status>\d{3}|-)\s+(?P<size>\S+)'
                   r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?'
                   r'(?:\s+"(?P<xff>[^"]*)")?')  # nginx 기본 'main' 형식의 마지막 칸 $http_x_forwarded_for
 # 첫 칸에 쉼표로 여러 IP가 오는 변형($proxy_add_x_forwarded_for를 첫 칸에 찍는 설정)도 받는다.
 # 그 값은 "요청이 가져온 X-Forwarded-For, 접속해 온 쪽" 순서라 맨 오른쪽만 믿을 수 있다(parse_web_line).
+# 첫 칸이 IP가 아닌 호스트 이름(Apache HostnameLookups On)이어도 버리지 않고 그대로 출발지로 쓴다.
+
+_MONTHS = {m: i for i, m in enumerate(
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+_CLF_TIME = re.compile(r"(\d{2})/(\w{3})/(\d{4}):(\d{2}):(\d{2}):(\d{2})(?:\s*([+-]\d{4}))?$")
+
+
+def parse_clf_time(s: str) -> datetime | None:
+    """10/Oct/2026:13:55:36 +0000 형태의 접속 로그 시각을 UTC로. 시간대가 없으면 UTC로 본다.
+    월 이름을 직접 읽어 시스템 언어 설정(strptime의 %b)에 흔들리지 않는다."""
+    m = _CLF_TIME.match(s.strip())
+    if not m or m[2] not in _MONTHS:
+        return None
+    day, _, year, hh, mm, ss, tz = m.groups()
+    try:
+        dt = datetime(int(year), _MONTHS[m[2]], int(day), int(hh), int(mm), int(ss), tzinfo=timezone.utc)
+    except ValueError:
+        return None
+    if tz:
+        sign = 1 if tz[0] == "+" else -1
+        dt -= sign * timedelta(hours=int(tz[1:3]), minutes=int(tz[3:5]))
+    return dt
 
 
 # 내부망 대역(RFC 1918, CGNAT, 루프백, 링크 로컬, IPv6 ULA). ipaddress의 is_private는 문서용 예약 대역까지
@@ -394,13 +416,9 @@ def parse_web_line(line: str) -> dict | None:
     m = _WEB.match(line)
     if not m:
         return None
-    try:
-        ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
-    except ValueError:
-        try:  # 시간대가 없는 변형
-            ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S").replace(tzinfo=timezone.utc)
-        except ValueError:
-            return None
+    ts = parse_clf_time(m["ts"])
+    if ts is None:
+        return None
     hosts = [h.strip() for h in m["ip"].split(",") if h.strip()]
     # 첫 칸이 목록이면 맨 오른쪽이 실제로 접속해 온 쪽이고, 그 앞은 요청이 가져온(위조 가능한) 값이다
     remote, carried = hosts[-1], hosts[:-1]
