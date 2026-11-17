@@ -471,7 +471,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         findings.append(Finding("WAF_BLOCKED", evs, f"{len(evs)}건 차단", ip))
 
     # --- SSH 인증 로그
-    ssh = [e for e in events if e.source == "sshauth"]
+    ssh = [e for e in events if e.source == "sshauth" and e.action not in ("sudo", "useradd")]  # 로그인 줄만
     by_ssrc: dict[str, list[Event]] = defaultdict(list)
     for e in ssh:
         by_ssrc[e.src_ip or ""].append(e)

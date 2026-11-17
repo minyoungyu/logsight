@@ -11,14 +11,9 @@
 """
 from __future__ import annotations
 
-import re
-from datetime import datetime, timezone
 from urllib.parse import unquote_plus
 
-from ..normalize import _MONTHS, Event, parse_web_line, web_extra
-
-# ------------------------------------------------------------------ 접속 로그
-# Common/Combined Log Format. 줄 해석은 normalize.parse_web_line 하나로 한다(AWS 분석 경로와 같은 IP·필드).
+from ..normalize import Event, parse_sshauth, parse_weberror, parse_web_line, web_extra  # noqa: F401
 
 
 def _status_outcome(status: str) -> str:
@@ -54,103 +49,13 @@ def parse_access(text: str, name: str = "access") -> list[Event]:
     return events
 
 
-# ------------------------------------------------------------------ 오류 로그
-# nginx:  2026/10/10 13:55:36 [error] 1234#0: *5 open() "..." failed ... client: 1.2.3.4
-# apache: [Sat Oct 10 13:55:36.123456 2026] [php:error] [pid 1234] [client 1.2.3.4:5678] msg
-_NGINX_ERR = re.compile(
-    r"^(?P<time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<level>\w+)\]\s+(?P<msg>.*)")
-_NGINX_CLIENT = re.compile(r"client:\s*(?P<ip>[\d.a-fA-F:]+)")
-_APACHE_ERR = re.compile(
-    r"^\[(?P<time>[^\]]+)\]\s+\[(?P<mod>[^\]]+)\]\s+(?:\[pid [^\]]+\]\s+)?"
-    r"(?:\[client (?P<ip>[0-9a-fA-F.:]+?)(?::\d+)?\]\s+)?(?P<msg>.*)")
 
 
-def parse_weberror(text: str, name: str = "weberror") -> list[Event]:
-    events: list[Event] = []
-    for i, line in enumerate(text.splitlines()):
-        line = line.strip()
-        if not line:
-            continue
-        ip = None
-        level = "error"
-        msg = line
-        ts = None
-        mn = _NGINX_ERR.match(line)
-        if mn:
-            try:
-                ts = datetime.strptime(mn["time"], "%Y/%m/%d %H:%M:%S").replace(tzinfo=timezone.utc)
-            except ValueError:
-                ts = None
-            level = mn["level"]
-            msg = mn["msg"]
-            cm = _NGINX_CLIENT.search(line)
-            ip = cm["ip"] if cm else None
-        else:
-            ma = _APACHE_ERR.match(line)
-            if ma:
-                level = ma["mod"].split(":")[-1] if ":" in ma["mod"] else ma["mod"]
-                msg = ma["msg"]
-                ip = ma["ip"]
-                for fmt in ("%a %b %d %H:%M:%S.%f %Y", "%a %b %d %H:%M:%S %Y"):
-                    try:
-                        ts = datetime.strptime(ma["time"], fmt).replace(tzinfo=timezone.utc)
-                        break
-                    except ValueError:
-                        continue
-        if ts is None:
-            continue
-        events.append(Event(
-            ts=ts, source="weberror", src_ip=ip,
-            action=msg[:300], outcome=level,
-            raw_ref=f"{name}:{i+1}",
-            extra={"level": level, "message": msg[:500], "raw": line[:500]},
-        ))
-    return events
-
-
-# ------------------------------------------------------------------ 리눅스 인증 로그
-# SSH 성공/실패는 기존 normalize.parse_sshauth 가 담당. 여기서는 그 외 권한 상승·계정 변화
-# (sudo, su, useradd, passwd)를 추가로 뽑아 하나의 "auth" 소스로 합친다.
-_SYSLOG_HEAD = re.compile(
-    r"^(?P<mon>\w{3})\s+(?P<day>\d+)\s+(?P<time>[\d:]+)\s+\S+\s+(?P<proc>[\w./-]+)(?:\[\d+\])?:\s+(?P<msg>.*)")
-_SSH_LINE = re.compile(
-    r"(?P<result>Failed|Accepted)\s+(?:password|publickey)\s+for\s+(?:invalid user\s+)?"
-    r"(?P<user>\S+)\s+from\s+(?P<ip>[\d.a-fA-F:]+)")
-_SUDO = re.compile(r"(?P<who>\S+)\s*:.*?COMMAND=(?P<cmd>.+)$")
-_USERADD = re.compile(r"new user: name=(?P<user>[^,]+)")
-
-
-def parse_auth(text: str, name: str = "auth", year: int = 2026) -> list[Event]:
-    events: list[Event] = []
-    for i, line in enumerate(text.splitlines()):
-        m = _SYSLOG_HEAD.match(line.strip())
-        if not m or m["mon"] not in _MONTHS:
-            continue
-        hh, mm, ss = (int(x) for x in m["time"].split(":"))
-        ts = datetime(year, _MONTHS[m["mon"]], int(m["day"]), hh, mm, ss, tzinfo=timezone.utc)
-        proc, msg = m["proc"], m["msg"]
-        ev = None
-        if "sshd" in proc:
-            sm = _SSH_LINE.search(msg)
-            if sm:
-                ev = Event(ts=ts, source="auth", src_ip=sm["ip"], actor=sm["user"], dst_port=22,
-                           action="ssh_login",
-                           outcome="success" if sm["result"] == "Accepted" else "failure",
-                           raw_ref=f"{name}:{i+1}", extra={"proc": "sshd", "raw": line.strip()[:300]})
-        elif "sudo" in proc:
-            su = _SUDO.search(msg)
-            if su:
-                ev = Event(ts=ts, source="auth", actor=su["who"], action="sudo",
-                           outcome="success", raw_ref=f"{name}:{i+1}",
-                           extra={"proc": "sudo", "command": su["cmd"][:200], "raw": line.strip()[:300]})
-        elif "useradd" in proc or "usermod" in proc:
-            ua = _USERADD.search(msg)
-            if ua:
-                ev = Event(ts=ts, source="auth", actor=ua["user"], action="useradd",
-                           outcome="success", raw_ref=f"{name}:{i+1}",
-                           extra={"proc": proc, "raw": line.strip()[:300]})
-        if ev is not None:
-            events.append(ev)
+def parse_auth(text: str, name: str = "auth", year: int | None = None) -> list[Event]:
+    """웹서버 점검의 auth 로그. 사후 분석과 같은 파서(normalize.parse_sshauth)를 쓰고 이름표만 auth로 둔다."""
+    events = parse_sshauth(text, name=name, year=year)
+    for e in events:
+        e.source = "auth"
     return events
 
 

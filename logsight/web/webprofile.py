@@ -15,7 +15,7 @@ profile.json) 하나만 바꾸면 된다. 코드에는 경로·IP를 박아 두�
   upload_dirs   업로드가 저장되는 URL 접두사(예: /uploads) — 업로드 뒤 실행 탐지용
   own_hosts     Referer 판단에 쓰는 우리 호스트 이름(이 밖의 Referer에서 온 관리자 요청은 CSRF 의심)
   since/until   분석 시간 범위(ISO, 선택) — 큰 로그에서 사고 구간만 보고 싶을 때
-  year          연도 없는 syslog 형식(auth.log)에 붙일 연도
+  year          연도 없는 syslog 형식(auth.log)에 붙일 연도(없으면 올해, 미래면 작년)
 """
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ class SiteProfile:
     own_hosts: list[str] = field(default_factory=lambda: ["127.0.0.1", "localhost"])
     since: str | None = None
     until: str | None = None
-    year: int = 2026
+    year: int | None = None  # 없으면 올해(미래가 되면 작년)로 본다. 사후 분석과 같은 규칙
 
     @classmethod
     def load(cls, path: str | Path) -> "SiteProfile":
