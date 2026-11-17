@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from logsight.detect import run_detections  # noqa: E402
+from logsight.detect import canonical_rule, run_detections  # noqa: E402
 from logsight.normalize import parse_cloudtrail  # noqa: E402
 
 BASE = ROOT / "reports" / "public" / "splunk_attack_data.json"
@@ -75,6 +75,7 @@ def main() -> int:
             memo[key] = target_rules(row["data"], row.get("targets", []), cache)
         now = memo[key]
         was = set(row.get("target_rules") or (row.get("rules", []) if not row.get("targets") else []))
+        was = {canonical_rule(r) for r in was}  # 예전 규칙 이름(WEB_SQLI_PATTERN 등)은 지금 이름으로
         if row.get("judgement") == OK:
             if was - now:
                 lost.append((row["detection"], sorted(was - now)))

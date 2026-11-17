@@ -393,15 +393,14 @@ def describe_finding(f: dict, inc: dict) -> str:
         "WAF_BLOCKED": f"{who}에서 보낸 공격 요청 {n}건을 WAF가 막았습니다.",
         "SSH_BRUTE_FORCE": f"{who}에서 SSH 비밀번호를 {n}번 틀렸습니다(무차별 대입).",
         "SSH_SUCCESS_AFTER_FAIL": f"{who}에서 SSH 비밀번호를 {bad}번 틀린 뒤 로그인에 성공했습니다. 비밀번호가 뚫렸을 수 있습니다.",
-        "WEB_SQLI_PATTERN": f"{who}에서 보낸 웹 요청 {n}건에 SQL 인젝션 문자열이 있었습니다(정상 응답 {ok}건, 오류·거부 {bad}건)."
-                            + _sqli_signal_sentence(f.get("detail", "")),
-        "WEB_PATH_PROBE": f"{who}에서 없는 경로 {n}곳을 연달아 요청했습니다({_acts(evs, 2)} 등). 취약한 파일을 찾는 스캐너입니다.",
-        "WEB_OBJECT_ENUM": f"{who}에서 같은 API의 번호만 바꿔 다른 사람의 데이터 {n}건을 열어 보려 했습니다(IDOR 탐색, 거부 {bad}건).",
+        "WEBLOG_SQLI": f"{who}에서 보낸 웹 요청 {n}건에 SQL 인젝션 문자열이 있었습니다(정상 응답 {ok}건, 오류·거부 {bad}건)."
+                       + _sqli_signal_sentence(f.get("detail", "")),
+        "WEBLOG_IDOR_ENUM": f"{who}에서 번호만 바꿔 다른 사람의 데이터 {n}건을 열어 보려 했습니다(IDOR 탐색, 성공 {ok}건, 거부 {bad}건).",
         "GD_FINDING": f"GuardDuty 탐지: {f['title'].replace('GuardDuty: ', '')} ({f['detail']}).",
         # 웹 공격 규칙(웹서버 점검과 같은 규칙). 응답이 정상(2xx·3xx)이면 '성공', 4xx·5xx면 '거부'로 센다
         "WEBLOG_SCANNER": f"{who}에서 취약점 스캐너·자동 도구로 {n}건을 요청했습니다({_acts(evs, 2)} 등). "
                           "공격 전 훑어보기입니다. 같은 IP의 다른 공격 요청이 성공했는지 보세요.",
-        "WEBLOG_ENUM_404": f"{who}에서 없는 경로를 {n}번 연달아 요청했습니다({_acts(evs, 2)} 등). 숨은 파일·관리 화면을 찾는 스캐너입니다.",
+        "WEBLOG_ENUM_404": f"{who}에서 없는 경로 {n}곳을 연달아 요청했습니다({_acts(evs, 2)} 등). 숨은 파일·관리 화면을 찾는 스캐너입니다.",
         "WEBLOG_SENSITIVE_FILE": f"{who}에서 설정·비밀 파일(.env, .git 등)을 {n}번 열어 보려 했습니다({res}). "
                                  "성공한 것이 있으면 그 파일의 비밀값을 모두 바꾸세요.",
         "WEBLOG_TRAVERSAL": f"{who}에서 경로 조작(../)으로 서버 파일을 읽으려 한 요청이 {n}건 있었습니다({res}).",

@@ -182,8 +182,8 @@ def parse_waf(text: str, name: str = "waf") -> list[Event]:
                   if g.get("nonTerminatingMatchingRules") or g.get("terminatingRule")]
         uri = req.get("uri", "")
         args = req.get("args", "")
-        ua = next((h.get("value", "") for h in req.get("headers") or []
-                   if str(h.get("name", "")).lower() == "user-agent"), "")
+        hdr = {str(h.get("name", "")).lower(): h.get("value", "") for h in req.get("headers") or []}
+        ua = hdr.get("user-agent", "")
         events.append(Event(
             ts=ts, source="waf",
             src_ip=req.get("clientIp"),
@@ -197,6 +197,9 @@ def parse_waf(text: str, name: str = "waf") -> list[Event]:
                 "labels": [lb.get("name") for lb in r.get("labels") or []],
                 "country": req.get("country"),
                 "ua": ua[:200],
+                # 웹 공격 규칙(web/webdetect)이 nginx·ALB 로그와 같은 이름으로 읽는 필드. WAF 로그에는 응답 코드가 없다
+                "method": req.get("httpMethod", ""), "path": uri or "/", "query": args,
+                "referer": str(hdr.get("referer", ""))[:300],
                 "web_acl": str(r.get("webaclId", "")).split("/")[-2:-1][0]
                 if r.get("webaclId") else None,
             },

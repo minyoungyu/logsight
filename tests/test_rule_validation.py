@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from logsight.detect import RULES, run_detections  # noqa: E402
-from logsight.normalize import (cloudtrail_record_to_event, parse_alb, parse_guardduty,  # noqa: E402
+from logsight.normalize import (cloudtrail_record_to_event, parse_guardduty,  # noqa: E402
                                 parse_sshauth, parse_vpcflow, parse_waf)
 from logsight.rulespec import SPEC  # noqa: E402
 from logsight.web import webdetect, weblog, webscan  # noqa: E402
@@ -193,12 +193,6 @@ CASES = {
     "SSH_SUCCESS_AFTER_FAIL": (
         lambda: aws_rules(parse_sshauth("\n".join([ssh(0, "fail"), ssh(1, "fail"), ssh(2, "ok")]), year=2026)),
         lambda: aws_rules(parse_sshauth("\n".join([ssh(0, "fail"), ssh(2, "ok")]), year=2026))),
-    "WEB_SQLI_PATTERN": (lambda: aws_rules(parse_alb(alb(0, "/item?id=1'%20or%201=1--", 200))),
-                         lambda: aws_rules(parse_alb(alb(0, "/item?id=1", 200)))),
-    "WEB_PATH_PROBE": (lambda: aws_rules(parse_alb("\n".join(alb(i, f"/p{i}x", 404) for i in range(20)))),
-                       lambda: aws_rules(parse_alb("\n".join(alb(i, f"/p{i}x", 404) for i in range(19))))),
-    "WEB_OBJECT_ENUM": (lambda: aws_rules(parse_alb("\n".join(alb(i, f"/api/jobs/job-{i}", 403) for i in range(5)))),
-                        lambda: aws_rules(parse_alb("\n".join(alb(i, f"/api/jobs/job-{i}", 403) for i in range(4))))),
     "GD_FINDING": (lambda: aws_rules(parse_guardduty(gd(5))),
                    lambda: aws_rules(parse_guardduty("{}"))),
     # --- 웹서버 로그

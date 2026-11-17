@@ -6,7 +6,8 @@
    "CT_INSTANCE_CRED_OUTSIDE": 1,
    "SSH_SUCCESS_AFTER_FAIL": 1,
    "VPC_REMOTE_ADMIN_EXPOSED": 1,
-   "WEB_SQLI_PATTERN": 1
+   "WEBLOG_EXPLOIT_5XX": 1,
+   "WEBLOG_SQLI": 1
   },
   "incidents": [
    {
@@ -17,7 +18,8 @@
      "CT_INSTANCE_CRED_OUTSIDE",
      "SSH_SUCCESS_AFTER_FAIL",
      "VPC_REMOTE_ADMIN_EXPOSED",
-     "WEB_SQLI_PATTERN"
+     "WEBLOG_EXPLOIT_5XX",
+     "WEBLOG_SQLI"
     ],
     "stages": [
      "initial-access",
@@ -33,10 +35,11 @@
   "rules": {
    "VPC_PORT_SCAN": 1,
    "VPC_REMOTE_ADMIN_EXPOSED": 1,
+   "WEBLOG_ENUM_404": 1,
+   "WEBLOG_EXPLOIT_5XX": 1,
    "WEBLOG_SCANNER": 1,
    "WEBLOG_SENSITIVE_FILE": 1,
-   "WEB_PATH_PROBE": 1,
-   "WEB_SQLI_PATTERN": 1
+   "WEBLOG_SQLI": 1
   },
   "incidents": [
    {
@@ -45,16 +48,17 @@
     "rules": [
      "VPC_PORT_SCAN",
      "VPC_REMOTE_ADMIN_EXPOSED",
+     "WEBLOG_ENUM_404",
+     "WEBLOG_EXPLOIT_5XX",
      "WEBLOG_SCANNER",
      "WEBLOG_SENSITIVE_FILE",
-     "WEB_PATH_PROBE",
-     "WEB_SQLI_PATTERN"
+     "WEBLOG_SQLI"
     ],
     "stages": [
      "discovery",
      "initial-access"
     ],
-    "severity": "medium"
+    "severity": "high"
    }
   ]
  },
@@ -69,10 +73,11 @@
    "VPC_REMOTE_ADMIN_EXPOSED": 2,
    "WAF_BLOCKED": 1,
    "WAF_SQLI_NOT_BLOCKED": 1,
-   "WEBLOG_SCANNER": 1,
+   "WEBLOG_ENUM_404": 1,
+   "WEBLOG_EXPLOIT_5XX": 2,
+   "WEBLOG_SCANNER": 2,
    "WEBLOG_SENSITIVE_FILE": 1,
-   "WEB_PATH_PROBE": 1,
-   "WEB_SQLI_PATTERN": 1
+   "WEBLOG_SQLI": 1
   },
   "incidents": [
    {
@@ -84,9 +89,12 @@
      "GD_FINDING",
      "SSH_SUCCESS_AFTER_FAIL",
      "VPC_REMOTE_ADMIN_EXPOSED",
-     "WAF_SQLI_NOT_BLOCKED"
+     "WAF_SQLI_NOT_BLOCKED",
+     "WEBLOG_EXPLOIT_5XX",
+     "WEBLOG_SCANNER"
     ],
     "stages": [
+     "discovery",
      "initial-access",
      "credential-access",
      "persistence"
@@ -99,16 +107,17 @@
     "rules": [
      "VPC_PORT_SCAN",
      "VPC_REMOTE_ADMIN_EXPOSED",
+     "WEBLOG_ENUM_404",
+     "WEBLOG_EXPLOIT_5XX",
      "WEBLOG_SCANNER",
      "WEBLOG_SENSITIVE_FILE",
-     "WEB_PATH_PROBE",
-     "WEB_SQLI_PATTERN"
+     "WEBLOG_SQLI"
     ],
     "stages": [
      "discovery",
      "initial-access"
     ],
-    "severity": "medium"
+    "severity": "high"
    },
    {
     "id": "INC-003",

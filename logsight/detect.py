@@ -44,10 +44,7 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WAF_BLOCKED":        ("T1190", "initial-access", "WAF가 공격 요청 차단", "low"),
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
-    "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
-    "WEB_PATH_PROBE":     ("T1595.003", "discovery", "없는 경로를 연속 요청(웹 스캐너)", "low"),
     "GD_FINDING":         ("GuardDuty", "other", "GuardDuty 탐지 결과", "medium"),
-    "WEB_OBJECT_ENUM":    ("T1530", "collection", "남의 객체 번호를 바꿔 가며 접근 시도(IDOR 탐색)", "medium"),
     # --- 웹서버 로그·파일 기반 규칙(logsight.web) ---
     "WEBLOG_SQLI":        ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "high"),
     "WEBLOG_TRAVERSAL":   ("T1190", "initial-access", "경로 조작·파일 열람(../, 민감 파일) 시도", "high"),
@@ -130,8 +127,6 @@ DESTROY_ONE = {"kms:ScheduleKeyDeletion", "kms:DisableKey", "backup:DeleteRecove
 DESTROY_BURST = {"s3:DeleteObject", "s3:DeleteObjects", "ec2:DeregisterImage", "ec2:DeleteSnapshot",
                  "s3:DeleteBucket"}
 ADMIN_PORTS = {22, 3389}
-_SQLI = re.compile(r"(?i)'\s*(or|and|union|select|;|--|#)|union\s+(all\s+)?select|"
-                   r"sleep\s*\(|benchmark\s*\(|information_schema|'\s*$")
 
 
 
@@ -151,12 +146,13 @@ def sqli_success_signal(attempts: list, events: list) -> str:
     sized = [e for e in ok if isinstance(e.extra.get("resp_bytes"), int)]
     if not sized:
         return "성공 판단 불가: 로그에 응답 크기가 없음"
+    from .web.webdetect import is_sqli  # 순환 import를 피해 여기서
     att = {id(e) for e in attempts}
     paths = {_path(e.action) for e in sized}
     base = [e.extra["resp_bytes"] for e in events
-            if id(e) not in att and e.source in ("alb", "weblog") and _path(e.action) in paths
+            if id(e) not in att and e.source in ("alb", "weblog", "access") and _path(e.action) in paths
             and str(e.extra.get("http_status", ""))[:1] == "2" and isinstance(e.extra.get("resp_bytes"), int)
-            and not _SQLI.search(unquote_plus((e.action or "").split("?", 1)[-1]))]
+            and not is_sqli(unquote_plus((e.action or "").split("?", 1)[-1]))]
     sizes = [e.extra["resp_bytes"] for e in sized]
     if base:
         ref = sorted(base)[len(base) // 2]
@@ -289,28 +285,31 @@ def _is_reply(e: Event) -> bool:
     return sp is not None and dp is not None and dp >= 32768 and sp < dp
 
 
-# AWS 분석에서 웹 규칙과 같은 행동을 보는 AWS 쪽 규칙. 같은 요청이 두 번 세지지 않게 한다.
-#   WEBLOG_SQLI는 항상 뺀다: WEB_SQLI_PATTERN이 같은 요청을 본다(WAF가 이미 잡은 것은 빼는 판단도 그쪽에 있다).
-#   나머지 둘은 같은 IP에 AWS 쪽 규칙이 이미 있을 때만 뺀다. 문턱이 달라(경로 20개 vs 404 15건,
-#   ALB 403/404 vs 주문 번호 열람) AWS 쪽이 놓친 것을 웹 규칙이 잡을 수 있기 때문이다.
-WEB_RULES_COVERED = frozenset({"WEBLOG_SQLI"})
-WEB_RULES_SAME_IP = {"WEBLOG_ENUM_404": "WEB_PATH_PROBE", "WEBLOG_IDOR_ENUM": "WEB_OBJECT_ENUM"}
+# 예전 규칙 이름 → 지금 이름. 같은 공격을 사후 분석과 웹서버 점검이 다른 이름으로 부르던 것을 하나로 합쳤다.
+# 저장해 둔 결과·측정 기준 파일을 읽을 때 쓴다(canonical_rule).
+RULE_ALIASES = {"WEB_SQLI_PATTERN": "WEBLOG_SQLI", "WEB_PATH_PROBE": "WEBLOG_ENUM_404",
+                "WEB_OBJECT_ENUM": "WEBLOG_IDOR_ENUM"}
+
+
+def canonical_rule(rule: str) -> str:
+    return RULE_ALIASES.get(rule, rule)
 
 
 def _web_rule_findings(events: list[Event], env: dict, prior: list[Finding]) -> list[Finding]:
-    web = [e for e in events if e.source in ("weblog", "alb")]
+    web = [e for e in events if e.source in ("weblog", "alb", "waf")]
     if not web:
         return []
     from .web.webdetect import run_web_detections  # web.webdetect가 이 모듈을 가져다 쓰므로 여기서 부른다
     from .web.webprofile import web_profile_from_env
     hosts_seen = {str(e.extra["http_host"]).lower() for e in web if e.extra.get("http_host")}
     profile = web_profile_from_env(env, hosts_seen)
-    skip = set(WEB_RULES_COVERED)
+    skip = set()
     # 우리 사이트 이름을 모르면 외부 Referer를 가릴 수 없다(정상 관리자 요청을 CSRF로 오인)
     if not hosts_seen and not (env.get("web") or {}).get("own_hosts"):
         skip.add("WEBLOG_CSRF_SUSPECT")
-    covered = {w: {f.key for f in prior if f.rule == a} for w, a in WEB_RULES_SAME_IP.items()}
-    return run_web_detections(web, profile, sources=("weblog", "alb"), skip=frozenset(skip),
+    # WAF가 SQL 인젝션을 알아보고도 통과시킨 IP는 WAF_SQLI_NOT_BLOCKED가 이미 센다
+    covered = {"WEBLOG_SQLI": {f.key for f in prior if f.rule == "WAF_SQLI_NOT_BLOCKED"}}
+    return run_web_detections(web, profile, sources=("weblog", "alb", "waf"), skip=frozenset(skip),
                               covered=covered, include_auth=False)
 
 
@@ -487,52 +486,8 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
 
-    # --- ALB·API Gateway: 같은 IP가 같은 API에서 객체 번호만 바꿔 가며 403/404를 연달아 받음.
-    # 남의 객체(작업·주문·파일)를 열어 보려는 IDOR 탐색이다. 웹서버 로그의 WEBLOG_IDOR_ENUM과 달리
-    # 경로 이름에 기대지 않고, 권한 거부·없음 응답이 서로 다른 번호에 몰리는지만 본다.
-    probes: dict[tuple[str, str], list[Event]] = defaultdict(list)
-    for e in events:
-        # http_status(정수)가 공통 필드다. elb_status(문자열)는 예전에 저장한 결과와 호환용
-        st = e.extra.get("http_status") or e.extra.get("elb_status")
-        if e.source == "alb" and e.action and str(st) in ("403", "404"):
-            r = _route(e.action)
-            if r:
-                probes[(e.src_ip or "?", r)].append(e)
-    for (ip, r), evs in probes.items():
-        for seg in _bursts(evs, timedelta(minutes=10), 5, key=lambda e: e.action):
-            findings.append(Finding("WEB_OBJECT_ENUM", seg,
-                                    f"10분 안에 {r} 객체 {len({e.action for e in seg})}개에 "
-                                    f"403/404 {len(seg)}건", ip))
-
-    # --- 웹 요청(WAF·ALB)의 SQL 인젝션 패턴 — WAF가 놓친 경우에도 잡기 위한 보조 규칙
-    web: dict[str, list[Event]] = defaultdict(list)
-    for e in events:
-        if e.source in ("waf", "alb", "weblog") and e.action and "?" in e.action \
-                and e.disposition != "blocked":  # WAF가 이미 막은 요청은 제외
-            q = unquote_plus(e.action.split("?", 1)[1])
-            if _SQLI.search(q) and "WAF_SQLI_NOT_BLOCKED" not in e.findings:
-                web[e.src_ip or ""].append(e)
-    for ip, evs in web.items():
-        if any(f.rule == "WAF_SQLI_NOT_BLOCKED" and f.key == ip for f in findings):
-            continue
-        findings.append(Finding("WEB_SQLI_PATTERN", evs,
-                                f"{_ok_fail(evs)} · {sqli_success_signal(evs, events)}", ip))
-
-    # --- 웹 경로 탐색: 한 IP가 5분 안에 서로 다른 경로 20개 이상에서 404/403
-    probe: dict[str, list[Event]] = defaultdict(list)
-    for e in events:
-        if e.source in ("alb", "weblog") and e.outcome == "failure" and \
-                str(e.extra.get("http_status")) in ("403", "404"):
-            probe[e.src_ip or ""].append(e)
-    for ip, evs in probe.items():
-        evs.sort(key=lambda e: e.ts)
-        for seg in _bursts(evs, timedelta(minutes=5), 20, key=lambda e: e.action):
-            findings.append(Finding("WEB_PATH_PROBE", seg,
-                                    f"5분 안에 서로 다른 경로 {len({e.action for e in seg})}개 404/403", ip))
-
-    # --- 웹서버 점검과 같은 웹 공격 규칙(스캐너·경로 조작·웹셸·명령 삽입 등)을 nginx·ALB 로그에도 돌린다.
-    # 위의 WEB_SQLI_PATTERN·WEB_PATH_PROBE·WEB_OBJECT_ENUM과 겹치는 것은 WEB_RULES_COVERED·WEB_RULES_SAME_IP를
-    # 따라 뺀다. SSH는 위의 SSH 규칙이 본다.
+    # --- 웹 공격 규칙(SQL 인젝션·스캐너·경로 조작·웹셸·IDOR 등): 웹서버 점검과 같은 코드(web/webdetect)로
+    # nginx·ALB·WAF 로그를 본다. SSH는 위의 SSH 규칙이 본다.
     findings += _web_rule_findings(events, env, findings)
 
     # --- GuardDuty 탐지 결과: 결과 하나가 탐지 하나. 같은 IP·인스턴스·키로 다른 로그와 엮인다

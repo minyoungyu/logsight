@@ -18,7 +18,7 @@ from datetime import timedelta
 from urllib.parse import parse_qsl, unquote_plus, urlparse
 
 from ..normalize import Event
-from ..detect import Finding, _bursts, _ok_fail
+from ..detect import Finding, _bursts, _ok_fail, _route, sqli_success_signal
 from .webprofile import SiteProfile
 
 # ------------------------------------------------------------------ 공격 패턴
@@ -33,10 +33,16 @@ SQLI_MISC = re.compile(
     r"(?i)\bsleep\s*\(|\bbenchmark\s*\(|\bwaitfor\s+delay\b|information_schema|"
     r"@@version|\bextractvalue\s*\(|\bupdatexml\s*\(")
 SQLI_SELECT = re.compile(r"(?i)\bselect\b.+\bfrom\b")
+# 사후 분석에서 쓰던 판단을 합친 것: 따옴표 바로 뒤의 SQL 키워드·주석·문장 끝(';'), 값 끝의 따옴표 하나
+# (sqlmap 등이 오류를 일으켜 보려고 처음 보내는 요청), 쌓은 질의(;select …), PostgreSQL의 pg_sleep
+SQLI_QUOTE = re.compile(r"(?i)'\s*(?:union\b|select\b|;|--|#)|'\s*(?:&|$)")
+SQLI_STACKED = re.compile(r"(?i);\s*(?:select|insert|update|delete|drop|exec|declare)\b|\bpg_sleep\s*\(")
 
 
 def is_sqli(text: str) -> bool:
-    if SQLI_UNION.search(text) or SQLI_TAUTOLOGY.search(text) or SQLI_MISC.search(text):
+    """SQL 인젝션 패턴. 사후 분석(WEBLOG_SQLI, 예전 WEB_SQLI_PATTERN)과 웹서버 점검이 같은 판단을 쓴다."""
+    if SQLI_UNION.search(text) or SQLI_TAUTOLOGY.search(text) or SQLI_MISC.search(text) \
+            or SQLI_QUOTE.search(text) or SQLI_STACKED.search(text):
         return True
     return bool(SQLI_SELECT.search(text) and SQLI_TAIL.search(text))
 
@@ -161,7 +167,7 @@ def _foreign_host(referer: str, own_hosts: list[str]) -> bool:
 
 # 웹 요청을 담는 로그 종류. access는 웹서버 점검(scan), weblog·alb는 AWS 분석(analyze·watch)에서 읽은 것이다.
 # 모두 normalize.parse_web_line과 같은 필드(method, path, query, http_status, resp_bytes, referer, ua)를 갖는다.
-WEB_REQUEST_SOURCES = ("access", "weblog", "alb")
+WEB_REQUEST_SOURCES = ("access", "weblog", "alb", "waf")
 
 
 def _status(e: Event) -> str:
@@ -228,6 +234,11 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     findings: list[Finding] = []
 
     access = [e for e in events if e.source in sources]
+    for e in access:  # 파서가 method·path·query를 따로 두지 않은 이벤트는 action("GET /p?q")에서 채운다
+        if "path" not in e.extra and e.action:
+            method, _, url = e.action.partition(" ")
+            path, _, query = url.partition("?")
+            e.extra.update(method=method, path=path or "/", query=query)
     # 오류 로그(weberror)는 사건 묶기에는 들어가지만 아직 이것만 보는 규칙은 없다
     auth = [e for e in events if e.source in ("auth", "sshauth")] if include_auth else []
 
@@ -236,6 +247,8 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     admin_pages: dict[str, list[Event]] = defaultdict(list)
 
     for e in access:
+        if e.disposition == "blocked":
+            continue  # WAF가 이미 막은 요청은 WAF_BLOCKED가 센다
         ip = e.src_ip or "?"
         target = _dec((e.extra.get("path", "") + "?" + e.extra.get("query", "")).rstrip("?"))
         ua = e.extra.get("ua", "")
@@ -300,7 +313,10 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             buckets["WEBLOG_LARGE_EXFIL"][ip].append(e)
 
     for rule, by_ip in buckets.items():
-        findings += _mk(rule, by_ip, lambda evs: _ok_fail(evs))
+        if rule == "WEBLOG_SQLI":  # 응답 크기로 본 성공 신호(코드 판단)를 함께 적는다
+            findings += _mk(rule, by_ip, lambda evs: f"{_ok_fail(evs)} · {sqli_success_signal(evs, access)}")
+        else:
+            findings += _mk(rule, by_ip, lambda evs: _ok_fail(evs))
 
     # --- 주문 번호 연속 열람(IDOR): 같은 IP가 서로 다른 주문 번호를 10개 이상 연속으로 열람
     idor: dict[str, list[Event]] = defaultdict(list)
@@ -312,6 +328,21 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             findings.append(Finding("WEBLOG_IDOR_ENUM", seg,
                                     f"5분 안에 주문 {len({e.extra.get('query') for e in seg})}건 열람", ip))
 
+    # --- 같은 API에서 객체 번호만 바꿔 가며 403/404를 연달아 받음: 남의 객체를 열어 보려는 IDOR 탐색
+    # (예전 사후 분석의 WEB_OBJECT_ENUM). 경로 이름에 기대지 않는다. 막힌 시도라 심각도는 중간으로 둔다
+    probes: dict[tuple[str, str], list[Event]] = defaultdict(list)
+    for e in access:
+        if _status(e) in ("403", "404") and not _trusted(e.src_ip, trusted):
+            r = _route(e.action or "")
+            if r:
+                probes[(e.src_ip or "?", r)].append(e)
+    for (ip, r), evs in probes.items():
+        for seg in _bursts(evs, timedelta(minutes=10), 5, key=lambda e: (e.action or "").split("?", 1)[0]):
+            findings.append(Finding("WEBLOG_IDOR_ENUM", seg,
+                                    f"10분 안에 {r} 객체 {len({(e.action or '').split('?', 1)[0] for e in seg})}개에 "
+                                    f"403/404 {len(seg)}건", ip,
+                                    override={"severity": "medium", "title": "남의 객체 번호를 바꿔 가며 접근 시도(IDOR 탐색)"}))
+
     # --- 로그인 기록 없이 관리자 페이지에 바로 들어감: 쿠키 위조 의심
     login_ips = {e.src_ip for e in access if e.extra.get("method") == "POST"
                  and _status(e) == "302" and _is_login_path(e.extra.get("path", ""), profile.login_paths)}
@@ -320,15 +351,16 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             findings.append(Finding("WEBLOG_ADMIN_FORGED", evs,
                                     f"이 IP의 로그인 기록 없이 관리자 페이지 {len(evs)}건 열람", ip))
 
-    # --- 404 열거(없는 경로 연속 탐색) — 자동 스캐너의 전형
+    # --- 없는 경로 연속 탐색(열거) — 자동 스캐너의 전형. 5분 안에 서로 다른 경로 15개 이상에서 404/403
+    # (예전 사후 분석의 WEB_PATH_PROBE는 20개, 웹서버 점검은 404만 봤다. 하나로 맞춤)
     enum: dict[str, list[Event]] = defaultdict(list)
     for e in access:
-        if _status(e) == "404" and not _trusted(e.src_ip, trusted):
+        if _status(e) in ("403", "404") and not _trusted(e.src_ip, trusted):
             enum[e.src_ip or "?"].append(e)
     for ip, evs in enum.items():
         for seg in _bursts(evs, timedelta(minutes=5), 15, key=lambda e: e.extra.get("path", e.raw_ref)):
             findings.append(Finding("WEBLOG_ENUM_404", seg,
-                                    f"5분 안에 404 {len(seg)}건, 경로 {len({e.extra.get('path') for e in seg})}종", ip))
+                                    f"5분 안에 404/403 {len(seg)}건, 경로 {len({e.extra.get('path') for e in seg})}종", ip))
 
     # --- 웹 로그인 무차별 대입: 로그인/관리자 경로로의 POST가 한 IP에서 몰릴 때
     # 로그인 경로를 따로 적지 않았으면 관리자 경로 중 "login"이 든 것만 앞부분으로 보고, 나머지는

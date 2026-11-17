@@ -54,8 +54,8 @@ class FreeAlternativeLogs(unittest.TestCase):
     def test_free_sample_pipeline(self):
         res = run_paths([str(ROOT / "samples" / "free")], use_ai=False)
         rules = {f["rule"] for r in res["results"] for f in r["incident"]["findings"]}
-        self.assertTrue({"VPC_PORT_SCAN", "VPC_REMOTE_ADMIN_EXPOSED", "WEB_PATH_PROBE",
-                         "WEB_SQLI_PATTERN"} <= rules, rules)
+        self.assertTrue({"VPC_PORT_SCAN", "VPC_REMOTE_ADMIN_EXPOSED", "WEBLOG_ENUM_404",
+                         "WEBLOG_SQLI"} <= rules, rules)
         checks = {c["id"] for r in res["results"] for c in r["checks"]}
         self.assertIn("SG_ADMIN_PORT_OPEN", checks)
         self.assertIn("WEB_NO_WAF", checks)

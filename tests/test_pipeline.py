@@ -130,7 +130,7 @@ class DemoPipelineTests(unittest.TestCase):
         r = self.res["results"][0]
         rules = {f["rule"] for f in r["incident"]["findings"]}
         self.assertTrue({"CT_INSTANCE_CRED_OUTSIDE", "SSH_SUCCESS_AFTER_FAIL",
-                         "WEB_SQLI_PATTERN"} <= rules)
+                         "WEBLOG_SQLI"} <= rules)
         checks = {c["id"] for c in r["checks"]}
         self.assertTrue({"SG_ADMIN_PORT_OPEN", "IMDSV1_ENABLED", "IAM_OVERBROAD"} <= checks)
         self.assertTrue(r["meta"]["validation"]["passed"])

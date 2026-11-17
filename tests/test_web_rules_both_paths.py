@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from logsight.detect import WEB_RULES_COVERED, WEB_RULES_SAME_IP, run_detections  # noqa: E402
+from logsight.detect import RULE_ALIASES, canonical_rule, run_detections  # noqa: E402
 from logsight.normalize import parse_alb, parse_weblog  # noqa: E402
 from logsight.web.webdetect import run_web_detections  # noqa: E402
 from logsight.web.weblog import parse_access  # noqa: E402
@@ -40,32 +40,54 @@ class SameLogSameRulesTest(unittest.TestCase):
         env = {"web": {"login_paths": ["/login.php"], "upload_dirs": ["/uploads"]}}
         cls.aws = {f.rule for f in run_detections(parse_weblog(text, SHOP_LOG.name), env)}
 
-    def test_web_rules_match_except_covered(self):
-        # 뺀 것: AWS 규칙이 대신 잡는 셋, 사이트 이름을 알아야 하는 CSRF(env에 own_hosts가 없으면 끔)
-        excluded = WEB_RULES_COVERED | {"WEBLOG_CSRF_SUSPECT"}
-        self.assertEqual(self.scan - excluded, {r for r in self.aws if r.startswith("WEBLOG_")} - excluded)
+    def test_web_rules_match(self):
+        # 같은 로그 → 같은 웹 규칙. CSRF만 다르다(사후 분석은 env에 사이트 이름이 없으면 끈다)
+        self.assertEqual(self.scan - {"WEBLOG_CSRF_SUSPECT"},
+                         {r for r in self.aws if r.startswith("WEBLOG_")} - {"WEBLOG_CSRF_SUSPECT"})
 
-    def test_covered_rules_come_from_aws_side(self):
-        self.assertTrue(self.aws.isdisjoint(WEB_RULES_COVERED))   # 같은 요청을 두 번 세지 않는다
-        self.assertIn("WEB_SQLI_PATTERN", self.aws)
-        self.assertIn("WEBLOG_SQLI", self.scan)
-
-    def test_web_rule_kept_when_aws_rule_misses(self):
-        # 이 로그의 스캐너는 404 경로 19개: WEB_PATH_PROBE(20개) 문턱 아래라 WEBLOG_ENUM_404가 대신 잡는다
-        self.assertNotIn("WEB_PATH_PROBE", self.aws)
+    def test_old_names_are_gone(self):
+        self.assertTrue(self.aws.isdisjoint(RULE_ALIASES))
+        self.assertIn("WEBLOG_SQLI", self.aws)
         self.assertIn("WEBLOG_ENUM_404", self.aws)
 
     def test_scanner_caught_in_analyze(self):
         self.assertIn("WEBLOG_SCANNER", self.aws)
 
+    def test_canonical_rule(self):
+        self.assertEqual(canonical_rule("WEB_SQLI_PATTERN"), "WEBLOG_SQLI")
+        self.assertEqual(canonical_rule("WEBLOG_XSS"), "WEBLOG_XSS")
 
-class SameIpDedupTest(unittest.TestCase):
-    def test_enum_404_dropped_when_path_probe_fired(self):
-        lines = [f'203.0.113.5 - - [13/Jan/2026:05:01:{i:02d} +0000] "GET /p{i}.php HTTP/1.1" 404 9 "-" "Mozilla/5.0"'
-                 for i in range(25)]
-        rules = {f.rule for f in run_detections(parse_weblog("\n".join(lines) + "\n", "access.log"), {})}
-        self.assertIn(WEB_RULES_SAME_IP["WEBLOG_ENUM_404"], rules)
-        self.assertNotIn("WEBLOG_ENUM_404", rules)
+
+class SqliOneJudgementTest(unittest.TestCase):
+    """예전에는 두 경로의 SQL 인젝션 판단이 달랐다. 이제 같은 요청은 두 경로에서 같은 결과."""
+    CASES = {"id=1'": True, "id=1 or 1=1": True, "id=1;select pg_sleep(5)--": True,
+             "id=1 union select null": True, "q=select color from menu": False, "q=O'Brien and sons": False}
+
+    def test_same_on_both_paths(self):
+        for q, want in self.CASES.items():
+            line = f'203.0.113.9 - - [13/Jan/2026:05:01:00 +0000] "GET /item?{q.replace(" ", "%20")} HTTP/1.1" 200 9 "-" "x"\n'
+            aws = "WEBLOG_SQLI" in {f.rule for f in run_detections(parse_weblog(line, "a.log"), {})}
+            scan = "WEBLOG_SQLI" in {f.rule for f in run_web_detections(parse_access(line, "a.log"))}
+            self.assertEqual((aws, scan), (want, want), q)
+
+
+class OldAwsCasesTest(unittest.TestCase):
+    """예전 사후 분석 규칙(WEB_PATH_PROBE·WEB_OBJECT_ENUM)이 잡던 ALB 예는 새 이름으로 계속 잡는다."""
+
+    def _rules(self, lines):
+        return {f.rule for f in run_detections(parse_alb("\n".join(lines)), {})}
+
+    def test_path_probe(self):
+        self.assertIn("WEBLOG_ENUM_404", self._rules([_alb(i, f"/p{i}x", 404) for i in range(15)]))
+        self.assertNotIn("WEBLOG_ENUM_404", self._rules([_alb(i, f"/p{i}x", 404) for i in range(14)]))
+
+    def test_object_enum(self):
+        fs = [f for f in run_detections(parse_alb("\n".join(_alb(i, f"/api/jobs/job-{i}", 403) for i in range(5))), {})
+              if f.rule == "WEBLOG_IDOR_ENUM"]
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0].severity, "medium")   # 막힌 시도는 중간
+        self.assertNotIn("WEBLOG_IDOR_ENUM",
+                         self._rules([_alb(i, f"/api/jobs/job-{i}", 403) for i in range(4)]))
 
 
 class AlbTest(unittest.TestCase):

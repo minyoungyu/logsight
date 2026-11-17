@@ -79,15 +79,15 @@ def _attacker_ips(inc: dict) -> list[str]:
 
 
 # 애플리케이션까지 들어온 웹 공격 요청(WAF가 막을 수 있는 종류). WEB_NO_WAF·NACL 차단의 근거가 된다
-WEB_ATTACK_RULES = ("WAF_SQLI_NOT_BLOCKED", "WEB_SQLI_PATTERN", "WEBLOG_SQLI", "WEBLOG_TRAVERSAL", "WEBLOG_RFI",
+WEB_ATTACK_RULES = ("WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI", "WEBLOG_TRAVERSAL", "WEBLOG_RFI",
                     "WEBLOG_CMD_INJECTION", "WEBLOG_XSS", "WEBLOG_SSRF", "WEBLOG_EXPLOIT_PROBE",
                     "WEBLOG_CODE_IN_HEADER", "WEBLOG_SENSITIVE_FILE")
 # 출발지 IP를 막을 근거가 되는 규칙(위의 웹 공격 + 스캐너·무차별 대입·웹셸 접근)
 BLOCK_IP_RULES = frozenset({"VPC_PORT_SCAN", "SSH_BRUTE_FORCE", "SSH_SUCCESS_AFTER_FAIL", "VPC_REMOTE_ADMIN_EXPOSED",
-                            "WEB_PATH_PROBE", "WEBLOG_SCANNER", "WEBLOG_ENUM_404", "WEBLOG_AUTH_BRUTE",
+                            "WEBLOG_SCANNER", "WEBLOG_ENUM_404", "WEBLOG_AUTH_BRUTE",
                             "WEBLOG_AUTH_SUCCESS_AFTER_FAIL", "WEBLOG_WEBSHELL_ACCESS", "WEBLOG_UPLOAD_EXEC",
                             *WEB_ATTACK_RULES})
-_WEB_KO = {"WAF_SQLI_NOT_BLOCKED": "SQL 인젝션", "WEB_SQLI_PATTERN": "SQL 인젝션", "WEBLOG_SQLI": "SQL 인젝션",
+_WEB_KO = {"WAF_SQLI_NOT_BLOCKED": "SQL 인젝션", "WEBLOG_SQLI": "SQL 인젝션",
            "WEBLOG_TRAVERSAL": "경로 조작", "WEBLOG_RFI": "원격 파일 포함", "WEBLOG_CMD_INJECTION": "명령 삽입",
            "WEBLOG_XSS": "XSS", "WEBLOG_SSRF": "SSRF", "WEBLOG_EXPLOIT_PROBE": "알려진 취약점 공격 문자열",
            "WEBLOG_CODE_IN_HEADER": "헤더 코드 삽입", "WEBLOG_SENSITIVE_FILE": "설정 파일 열람"}
@@ -98,7 +98,7 @@ def web_app_fixes(incident: dict) -> list[dict]:
     웹서버 점검(web/webanalyze._remediation)과 같은 내용을 수정안 형식으로 낸다. 방화벽 쪽(차단·요청 제한·
     로그 보존)은 위의 NACL·WAF 수정안이 맡으므로 뺀다. 환경 설정이 없어도 낸다."""
     from .web.webanalyze import _remediation
-    alias = {"WEB_SQLI_PATTERN": "WEBLOG_SQLI", "WAF_SQLI_NOT_BLOCKED": "WEBLOG_SQLI"}
+    alias = {"WAF_SQLI_NOT_BLOCKED": "WEBLOG_SQLI"}
     found: dict[str, dict] = {}
     for f in incident["findings"]:
         r = alias.get(f["rule"], f["rule"])
@@ -202,7 +202,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
         })
 
     # 3) WAF: SQLi 규칙 그룹이 COUNT 모드
-    ev = _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEB_SQLI_PATTERN")
+    ev = _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI")
     if ev:
         for acl in env.get("waf_web_acls", []):
             if not acl.get("name"):

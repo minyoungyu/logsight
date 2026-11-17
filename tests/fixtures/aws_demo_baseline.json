@@ -6,7 +6,8 @@
     "CT_INSTANCE_CRED_OUTSIDE",
     "SSH_SUCCESS_AFTER_FAIL",
     "VPC_REMOTE_ADMIN_EXPOSED",
-    "WEB_SQLI_PATTERN"
+    "WEBLOG_EXPLOIT_5XX",
+    "WEBLOG_SQLI"
    ],
    "severity": "high",
    "src_ips": [
@@ -22,7 +23,7 @@
   }
  ],
  "n_events": 11,
- "n_findings": 5,
+ "n_findings": 6,
  "n_flagged": 8,
  "n_incidents": 1,
  "rule_counts": {
@@ -42,7 +43,11 @@
    "events": 1,
    "findings": 1
   },
-  "WEB_SQLI_PATTERN": {
+  "WEBLOG_EXPLOIT_5XX": {
+   "events": 1,
+   "findings": 1
+  },
+  "WEBLOG_SQLI": {
    "events": 1,
    "findings": 1
   }
