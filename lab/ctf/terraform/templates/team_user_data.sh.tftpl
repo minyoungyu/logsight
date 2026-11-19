@@ -10,7 +10,8 @@ REGION='${region}'
 WEBROOT=/var/www/shop
 
 # 1) 패키지 (AL2023 저장소는 리전 S3에 있어 게이트웨이 엔드포인트로 받아진다)
-dnf -y install nginx php8.3-fpm php8.3-pdo php8.3-cli rsyslog gcc unzip openssl
+# AL2023은 버전 없는 패키지 이름을 쓴다(php8.3-* 는 없다). php-pdo 가 pdo_sqlite 를 포함한다.
+dnf -y install nginx php-fpm php-pdo php-cli php-mbstring rsyslog gcc unzip openssl
 systemctl enable --now rsyslog
 
 # auth 기록을 Ubuntu와 같은 /var/log/auth.log 로도 남긴다(LogSight 파서 호환). sudo·su가 여기에 남는다.
@@ -31,6 +32,8 @@ chown nginx:nginx "$WEBROOT/uploads" && chmod 0755 "$WEBROOT/uploads"
 chown root:nginx /var/lib/ctf && chmod 0750 /var/lib/ctf
 # 앱 DB(SQLite)는 nginx가 /var/lib/ctf/app 아래에 만든다. 플래그 파일(f1·f2)은 /var/lib/ctf에 root:nginx 0640.
 install -d -o nginx -g nginx -m 0750 /var/lib/ctf/app
+# PHP 세션 저장 경로: 기본값(/var/lib/php/session)은 nginx가 못 쓴다 → 관리자 로그인(F2) 세션이 안 남아 F3 업로드가 막힌다.
+install -d -o nginx -g nginx -m 0700 /var/lib/ctf/app/sessions
 echo ok > "$WEBROOT/health.txt"
 
 # F6 단서: 셸(F3 이후)에서 보이는 앱 설정. 버킷 이름과 리전(시드니)을 적어 둔다.
@@ -47,12 +50,18 @@ chmod 0644 /etc/ctf/app.ini
 POOL=/etc/php-fpm.d/www.conf
 sed -i 's/^user = .*/user = nginx/; s/^group = .*/group = nginx/' $POOL
 sed -i 's/^pm = .*/pm = static/; s/^pm.max_children = .*/pm.max_children = 16/' $POOL
+# listen/세션 경로를 명시한다(AL2023 기본 소켓 경로·소유자가 버전마다 달라 nginx 연결이 끊길 수 있다).
 cat >> $POOL <<'POOLCONF'
+listen = /run/php-fpm/www.sock
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
 security.limit_extensions = .php .phtml
 request_terminate_timeout = 30s
 php_admin_value[memory_limit] = 64M
 php_admin_value[upload_max_filesize] = 2M
 php_admin_value[post_max_size] = 3M
+php_admin_value[session.save_path] = /var/lib/ctf/app/sessions
 POOLCONF
 mkdir -p /etc/systemd/system/php-fpm.service.d
 printf '[Service]\nTasksMax=200\nCPUQuota=100%%\n' > /etc/systemd/system/php-fpm.service.d/limits.conf
