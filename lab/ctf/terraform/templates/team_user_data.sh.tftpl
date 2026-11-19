@@ -29,6 +29,8 @@ mkdir -p "$WEBROOT/uploads"
 chown -R root:root "$WEBROOT" && chmod -R a+rX "$WEBROOT"
 chown nginx:nginx "$WEBROOT/uploads" && chmod 0755 "$WEBROOT/uploads"
 chown root:nginx /var/lib/ctf && chmod 0750 /var/lib/ctf
+# 앱 DB(SQLite)는 nginx가 /var/lib/ctf/app 아래에 만든다. 플래그 파일(f1·f2)은 /var/lib/ctf에 root:nginx 0640.
+install -d -o nginx -g nginx -m 0750 /var/lib/ctf/app
 echo ok > "$WEBROOT/health.txt"
 
 # F6 단서: 셸(F3 이후)에서 보이는 앱 설정. 버킷 이름과 리전(시드니)을 적어 둔다.
