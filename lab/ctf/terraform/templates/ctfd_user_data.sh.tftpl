@@ -1,0 +1,29 @@
+#!/bin/bash
+# 점수판 CTFd (Amazon Linux 2023 + Docker). 팀 계정·문제·플래그는 대회 전날 운영진이 관리 화면/API로 넣는다.
+# 가입은 막고(Registration: Disabled) 팀 계정을 미리 만든다. 문제 설명·첨부에 플래그를 넣지 않는다(3-3).
+set -euxo pipefail
+exec > /var/log/ctf-bootstrap.log 2>&1
+
+fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
+
+dnf -y install docker
+systemctl enable --now docker
+
+mkdir -p /opt/ctfd/uploads /opt/ctfd/logs /opt/ctfd/data
+chown -R 1001:1001 /opt/ctfd  # CTFd 컨테이너 사용자
+SECRET=$(openssl rand -hex 32)
+docker run -d --name ctfd --restart unless-stopped \
+  -p 80:8000 \
+  -e SECRET_KEY="$SECRET" \
+  -e WORKERS=3 \
+  -e DATABASE_URL=sqlite:////var/ctfd/data/ctfd.db \
+  -e UPLOAD_FOLDER=/var/uploads \
+  -e LOG_FOLDER=/var/log/CTFd \
+  -e REVERSE_PROXY=false \
+  -v /opt/ctfd/data:/var/ctfd/data \
+  -v /opt/ctfd/uploads:/var/uploads \
+  -v /opt/ctfd/logs:/var/log/CTFd \
+  ${ctfd_image}
+
+echo "ctfd ready" > /var/log/ctf-ready
