@@ -331,6 +331,19 @@ ACCOUNT_CMD = re.compile(r"(?i)(?:^|/|\s)(?:useradd|adduser|newusers)\b|\busermo
                          r"|(?:^|/)passwd\s+root\b|/etc/sudoers")
 
 
+def _account_target(e: Event) -> str:
+    """만들어지거나 권한을 받은 계정 이름. useradd 줄은 그 사용자, sudo 명령은 명령의 마지막 인자(옵션 제외)."""
+    if e.action == "useradd":
+        return (e.actor or "?").strip()
+    cmd = e.extra.get("command", "")
+    if "/etc/sudoers" in cmd:
+        return "sudoers"
+    args = [a for a in cmd.split()[1:] if not a.startswith("-")]
+    if re.search(r"(?:^|/)usermod\b", cmd) and args:  # usermod -aG sudo bob → bob
+        return args[-1]
+    return args[-1] if args else "?"
+
+
 def host_auth_findings(events: list[Event]) -> list[Finding]:
     """서버 인증 로그(auth.log)의 sudo·su·계정 생성. 사후 분석과 웹서버 점검이 같이 쓴다."""
     host = [e for e in events if e.source in ("sshauth", "auth") and e.action in ("sudo", "su", "useradd")]
@@ -343,7 +356,7 @@ def host_auth_findings(events: list[Event]) -> list[Finding]:
         cmd = e.extra.get("command", "")
         svc = who.lower() in SERVICE_ACCOUNTS
         if e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
-            acct[who].append(e)
+            acct[_account_target(e)].append(e)
         if e.action in ("sudo", "su") and e.outcome == "success" and (svc or SHELL_ESCAPE.search(cmd)):
             esc[who].append(e)
         elif e.action in ("sudo", "su") and e.outcome == "failure":
@@ -360,8 +373,11 @@ def host_auth_findings(events: list[Event]) -> list[Finding]:
             continue
         for seg in _bursts(evs, timedelta(minutes=10), 3, key=lambda e: e.raw_ref):
             findings.append(Finding("HOST_PRIV_ESC_FAIL", seg, f"10분 안에 '{who}'의 sudo·su 실패 {len(seg)}건", who))
-    for who, evs in acct.items():
-        findings.append(Finding("HOST_ACCOUNT_CREATED", evs, f"'{who}' 계정 생성·권한 부여 {len(evs)}건", who))
+    for target, evs in acct.items():
+        by = sorted({(e.actor or "?").strip() for e in evs if e.action == "sudo"})
+        findings.append(Finding("HOST_ACCOUNT_CREATED", evs,
+                                f"'{target}' 계정 생성·권한 부여 {len(evs)}건" + (f"(실행: {', '.join(by)})" if by else ""),
+                                target))
     return findings
 
 
