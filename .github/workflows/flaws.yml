@@ -1,5 +1,5 @@
 name: flaws-dataset
-# flaws.cloud 공개 CloudTrail 데이터셋(약 194만 건)으로 LogSight 전체 파이프라인을 돌리고
+# flaws.cloud 공개 CloudTrail 데이터셋(약 194만 건)으로 LogFinder 전체 파이프라인을 돌리고
 # 보고서를 아티팩트로 남긴다. Actions 탭에서 수동 실행(workflow_dispatch).
 on:
   workflow_dispatch:

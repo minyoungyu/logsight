@@ -1,5 +1,5 @@
 """
-경보 연동: AWS 경보가 오면 LogSight 분석을 자동으로 돌린다.
+경보 연동: AWS 경보가 오면 LogFinder 분석을 자동으로 돌린다.
 
     AWS 계정                                    분석 서버(팀원 PC 또는 별도 서버)
     GuardDuty 결과 ─┐
@@ -26,6 +26,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+from . import PRODUCT_NAME
 from .analyze import STAGE_KO
 
 SEV_ORDER = {"low": 0, "medium": 1, "high": 2}
@@ -366,8 +367,9 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
 def summary_text(alert: Alert, result: dict, out: Path) -> str:
     """통지용 짧은 요약(문자 한 통·이메일 제목+본문에 들어갈 길이). 원본 로그·키는 넣지 않는다."""
     sev = {"high": "높음", "medium": "중간", "low": "낮음"}
-    lines = [f"[LogFinder] {sev[alert.severity]} 경보: {alert.title[:80]}",
-             f"시각 {alert.time.strftime('%m-%d %H:%M')} UTC, 계정 {alert.account or '-'} {alert.region}",
+    lines = [f"[{PRODUCT_NAME}] {sev[alert.severity]} 경보: {alert.title[:80]}",
+             f"시각 {alert.time.strftime('%m-%d %H:%M')} UTC "
+             f"(한국 {(alert.time + timedelta(hours=9)).strftime('%m-%d %H:%M')}), 계정 {alert.account or '-'} {alert.region}",
              f"이벤트 {result['n_events']:,}건 → 사건 {result['n_groups']:,}건"]
     for r in result.get("results", [])[:3]:
         inc = r["incident"]

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""AIT-LDS v2.0 라벨로 LogSight 웹 탐지를 잰다(규칙만, AI 호출 없음).
+"""AIT-LDS v2.0 라벨로 LogFinder 웹 탐지를 잰다(규칙만, AI 호출 없음).
 
   python scripts/public/fetch_ait.py --out data/public/ait
   python scripts/public/eval_ait.py --data data/public/ait --out reports/public/ait_russellmitchell.json
 
 두 가지로 잰다.
-  1) 줄 단위: 데이터셋이 공격으로 라벨한 로그 줄을 LogSight가 탐지 규칙으로 표시했는가.
+  1) 줄 단위: 데이터셋이 공격으로 라벨한 로그 줄을 LogFinder가 탐지 규칙으로 표시했는가.
      AIT 라벨이 줄 단위라서 이것이 주 지표다.
   2) IP 단위: scripts/ctf_evaluate.py와 같은 정답 형식(measure.score)으로 바꿔 잰다.
      이 데이터셋은 외부 사용자와 공격자가 같은 방화벽 NAT 주소를 쓰므로 IP 단위 숫자는
@@ -48,7 +48,7 @@ def host_profile(data: Path, host: str) -> SiteProfile:
 
 
 def load_labels(data: Path, host: str) -> dict[str, list[str]]:
-    """{파일이름:줄번호: [라벨...]} — LogSight raw_ref와 같은 꼴."""
+    """{파일이름:줄번호: [라벨...]} — LogFinder raw_ref와 같은 꼴."""
     out: dict[str, list[str]] = {}
     root = data / "labels" / host / "logs"
     for p in root.rglob("*"):
@@ -137,7 +137,7 @@ def pct(x) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="AIT-LDS v2.0 라벨로 LogSight 웹 탐지 재기")
+    ap = argparse.ArgumentParser(description="AIT-LDS v2.0 라벨로 LogFinder 웹 탐지 재기")
     ap.add_argument("--data", required=True, help="fetch_ait.py로 받은 폴더")
     ap.add_argument("--hosts", nargs="+", default=["intranet_server", "webserver", "cloud_share"])
     ap.add_argument("--out", help="결과 JSON 경로")

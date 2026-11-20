@@ -1,4 +1,4 @@
-"""Stratus 실행 시각(times.tsv)과 LogSight 결과(report.json)를 맞춰 기법별로 잡았는지 센다.
+"""Stratus 실행 시각(times.tsv)과 LogFinder 결과(report.json)를 맞춰 기법별로 잡았는지 센다.
 
 기법 실행 시간 [start - 1분, end + 5분] 안에 시작한 사건의 규칙을 그 기법의 결과로 본다.
 expected.tsv(실행 전에 고정한 예상)와 나란히 적는다. 예상과 다른 것이 이번 측정에서 배운 것이다.

@@ -177,6 +177,9 @@ def triage(incidents: list[dict], model: str | None = None, use_ai: bool = True,
 
 def _call_claude(payload: dict, model: str) -> tuple[dict, dict]:
     import anthropic
+    from .aisend import announce
+
+    announce("재검토", payload, model)  # 사양서 NFR-25: 보내기 전에 무엇을 얼마나 어디로
 
     client = anthropic.Anthropic()
     extra = {}

@@ -85,12 +85,12 @@ def summarize(rows: list[dict]) -> dict:
 def main(path: str) -> None:
     s = summarize(load(path))
     print(f"짝을 이룬 참가자 {s['n']}명" + (f" (뺀 사람: {', '.join(s['dropped'])})" if s["dropped"] else ""))
-    for c, name in (("logsight", "LogSight"), ("baseline", "기존 방식")):
+    for c, name in (("logsight", "LogFinder"), ("baseline", "기존 방식")):
         v = s[c]
         print(f"- {name}: 점수 평균 {v['score_mean']} / 중앙값 {v['score_median']}, 시간 중앙값 {v['minutes_median']}분, "
               f"정상 오지목 {v['false_accusations']}건")
     print(f"- 시나리오별 평균 점수: {s['scenario_mean']}")
-    print(f"- 사람별 점수 차이(LogSight−기존): {[x['d_score'] for x in s['people']]}, 중앙값 {s['d_score_median']}, "
+    print(f"- 사람별 점수 차이(LogFinder−기존): {[x['d_score'] for x in s['people']]}, 중앙값 {s['d_score_median']}, "
           f"같거나 높은 사람 {s['n_not_worse']}/{s['n']}, 부호 뒤집기 p={s['p_score']}")
     print(f"- 사람별 시간 차이(분): {[x['d_minutes'] for x in s['people']]}, 중앙값 {s['d_minutes_median']}, p={s['p_minutes']}")
     print(f"- 미리 정한 성공 기준 충족: {'예' if s['success'] else '아니오'}")

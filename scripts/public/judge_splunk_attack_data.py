@@ -66,7 +66,7 @@ for r in d["rows"]:
     c[j[0]] += 1
     if not r.get("duplicate_data"):
         cu[j[0]] += 1
-d["judgement_rule"] = ("맞게 탐지: LogSight 규칙이 그 행동 자체를 설명한다. 다른 이유로만 걸림: 같은 이벤트가 루트 사용·MFA 없는 로그인 "
+d["judgement_rule"] = ("맞게 탐지: LogFinder 규칙이 그 행동 자체를 설명한다. 다른 이유로만 걸림: 같은 이벤트가 루트 사용·MFA 없는 로그인 "
                        "같은 다른 규칙으로만 표시됐다. 놓침: 행동에 해당하는 표시가 없다. 판정은 측정 뒤 사람이 했고 이유를 행마다 적었다.")
 d["summary"] = {"by_detection": dict(c), "by_unique_dataset": dict(cu)}
 json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)

@@ -153,10 +153,10 @@ def main(argv: list[str] | None = None) -> int:
     ob.add_argument("--template-url", required=True, help="S3에 올린 logsight-onboard.yaml 주소(https)")
     ob.add_argument("--bus-arn", required=True, help="허브 스택 출력 IntakeBusArn")
     ob.add_argument("--archive-bucket", required=True, help="보관 버킷 이름")
-    ob.add_argument("--principal-arn", required=True, help="LogSight 분석 서버 역할 ARN")
+    ob.add_argument("--principal-arn", required=True, help="LogFinder 분석 서버 역할 ARN")
     ob.add_argument("--region", default="ap-northeast-2", help="고객의 주 리전")
     ob.add_argument("--vpc-id", default="", help="VPC Flow Logs를 켤 VPC(선택)")
-    ob.add_argument("--isolation", action="store_true", help="격리 전용 역할도 만들기(LogSight는 시험 모드로 시작)")
+    ob.add_argument("--isolation", action="store_true", help="격리 전용 역할도 만들기(LogFinder는 시험 모드로 시작)")
     ob.add_argument("--min-severity", default="MEDIUM", choices=["LOW", "MEDIUM", "HIGH"])
     ob.add_argument("--no-trail", action="store_true", help="보관용 CloudTrail을 만들지 않음(기존 추적이 있어 비용이 걱정될 때)")
     rp = sub.add_parser("respond", help="자동 격리: 기준선·확인·마감 처리·되돌리기")
@@ -249,6 +249,8 @@ def main(argv: list[str] | None = None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "report.html").write_text(render(result), encoding="utf-8")
+    from .selflog import record, summary_of
+    record(out, "analyze", files=[f["file"] for f in result.get("files", [])], result=summary_of(result))
     if args.dry_run:
         from .analyze import SYSTEM
         payload = {"model": args.model or "claude-haiku-5-5", "system": SYSTEM,
@@ -435,8 +437,16 @@ def _respond_cmd(args) -> int:
         import boto3
         session = boto3.Session(profile_name=args.profile, region_name=args.region)
     if args.action == "tick":
-        for r in rs.tick(cfg, args.out, session=session):
+        from .selflog import record
+        rows = rs.tick(cfg, args.out, session=session)
+        for r in rows:
             print(f"{r['alert']['id']}: {r['status']}")
+        record(args.out, f"respond tick ({cfg.mode})", result={"alerts": len(rows)},
+               actions=[{"alert": r["alert"]["id"], "status": r["status"], "deadline": r.get("deadline"),
+                         "approved_by": r.get("stopped_by") or f"설정 {args.config}(모드 {cfg.mode}, 마감까지 중지 없음)",
+                         "done": [{"op": a.get("op"), "id": a.get("id"),
+                                   "result": (a.get("outcome") or {}).get("result")}
+                                  for a in r.get("actions", []) if isinstance(a, dict)]} for r in rows])
         return 0
     for t in args.target:
         for a in rs.undo(t, session=session):
@@ -472,6 +482,8 @@ def _scan(args) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "report.html").write_text(render_web(result), encoding="utf-8")
+    from .selflog import record, summary_of
+    record(out, "scan", files=[f["file"] for f in result.get("files", [])], result=summary_of(result))
     print(f"판정: {result['overall_verdict_ko']}  "
           f"(이벤트 {result['n_events']:,} → 의심 {result['n_flagged']:,} → "
           f"탐지 {result['n_findings']:,} → 사건 {result['n_incidents']:,}, "

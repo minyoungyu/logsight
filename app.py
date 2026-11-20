@@ -1,5 +1,5 @@
 """
-LogSight 데모 웹앱 (FastAPI).
+LogFinder 데모 웹앱 (FastAPI).
 로그 파일을 올리면 형식 자동 판별 → 정규화 → 마스킹 → 탐지 → 사건 묶기 → 설정 점검 → 분석 → 보고서.
 실행: uvicorn app:app --reload  →  http://127.0.0.1:8000
 """
@@ -140,7 +140,9 @@ def _page() -> str:
     has_key = bool(os.environ.get("ANTHROPIC_API_KEY"))
     return (PAGE.replace("{css}", CONSOLE_CSS).replace("{bar}", _bar()).replace("{kinds}", escape(KINDS_KO))
             .replace("{noai}", "" if has_key else "checked")
-            .replace("{aikey}", "Claude API 키가 설정되어 있습니다." if has_key else
+            .replace("{aikey}", "Claude API 키가 설정되어 있습니다. AI를 켜면 공격으로 보이는 사건 상위 30개와 사건당 이벤트 "
+                     "최대 60건(비밀번호·토큰·키는 가림)을 Anthropic API로 보냅니다. 보내지 않으려면 아래를 체크하세요."
+                     if has_key else
                      "Claude API 키가 없어 규칙 기반 보고서를 만듭니다(서버에 ANTHROPIC_API_KEY 설정 시 AI 설명).")
             .replace("{samples}", "".join(f"<a href='/demo?sample={k}'><i></i><div><div class=k>{escape(k)}<span>→</span></div>"
                                           f"<small>{escape(v[0])}</small></div></a>" for k, v in SAMPLES.items())))

@@ -13,6 +13,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from ..briefing import pii_risk
 from ..normalize import Event, read_text, mask, parse_sshauth
 from ..correlate import build_incidents, group_repeats
 from ..explain import VERDICT_KO as ATTACK_KO, mark_known, rule_triage
@@ -114,7 +115,8 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         by_source[e.source] = by_source.get(e.source, 0) + 1
     out = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "site": {"name": profile.name, "stack": profile.stack, "webroot": profile.webroot},
+        "site": {"name": profile.name, "stack": profile.stack, "webroot": profile.webroot,
+                 "sensitive": list(profile.sensitive_files) + list(profile.private_object_paths)},
         "overall_verdict": overall,
         "overall_verdict_ko": VERDICT_KO.get(overall, overall),
         "files": stats,
@@ -128,9 +130,10 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         "n_known": n_known,
         "incident_index": [{**{k: i[k] for k in ("id", "start", "end", "severity", "stages", "src_ips", "n_events")},
                             "repeats": i.get("repeats", 1),
+                            "pii": bool(pii_risk([{"incident": i}])),
                             "attack_verdict": attack_v.get(i["id"], {}).get("verdict"),
                             "attack_verdict_ko": ATTACK_KO.get(attack_v.get(i["id"], {}).get("verdict"), "")}
-                           for i in groups[:50]],
+                           for i in groups[:200]],
         "rule_triage": rule_tri,
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),

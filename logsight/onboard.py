@@ -2,7 +2,7 @@
 고객 설치 링크: 고객이 AWS 콘솔에서 '스택 생성' 버튼 하나만 누르면 되도록 매개변수를 모두 채운 링크를 만든다.
 
 고객 계정에는 서버 설치 없이 계정 설정만 더한다(deploy/aws/logsight-onboard.yaml):
-경보를 LogSight 허브로 전달, CloudTrail을 LogSight 보관 버킷(다른 계정, 지우기 잠금)으로, 읽기 전용 역할,
+경보를 LogFinder 허브로 전달, CloudTrail을 LogFinder 보관 버킷(다른 계정, 지우기 잠금)으로, 읽기 전용 역할,
 고르면 격리 전용 역할. IAM 경보는 AWS가 us-east-1로만 보내므로 그 리전용 두 번째 링크(alerts-only)도 준다.
 ExternalId는 고객마다 새로 만든다(남의 계정 역할을 빌려 쓰는 혼동된 대리인 문제를 막는 AWS 권장 방식).
 """

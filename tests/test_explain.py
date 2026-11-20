@@ -139,7 +139,7 @@ class TemplateTests(unittest.TestCase):
         s = X.summarize(inc, {"verdict": "attack"}, checks)
         self.assertTrue(s.startswith("외부 공격으로 보입니다."))
         self.assertIn("UTC(한국 14:00)", s)
-        self.assertIn("먼저 고칠 설정: 보안그룹이 22번을 전체에 허용", s)
+        self.assertIn("먼저 할 일: 보안그룹이 22번을 전체에 허용", s)
         s = X.summarize(inc, {"verdict": "benign_activity", "reason": "목록과 일치"}, checks)
         self.assertTrue(s.startswith("정상 작업으로 보입니다.") and "목록과 일치" in s)
         self.assertNotIn("먼저 고칠", s)

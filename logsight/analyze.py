@@ -139,6 +139,9 @@ def analyze(incident: dict, checks: list[dict], model: str | None = None,
 
 def _call_claude(payload: dict, model: str) -> tuple[dict, dict]:
     import anthropic
+    from .aisend import announce
+
+    announce("설명", payload, model)  # 사양서 NFR-25: 보내기 전에 무엇을 얼마나 어디로
 
     client = anthropic.Anthropic()
     resp = client.messages.create(

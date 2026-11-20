@@ -9,7 +9,7 @@
   켜기가 지원되는 항목: CT_TRAIL, VPC_FLOW, GUARDDUTY (모두 되돌릴 수 있는 설정).
 - 권한이 없어 확인 못 한 항목은 "unknown"으로 표시하고 계속 진행한다.
 - 자격증명은 boto3 기본 체인(환경변수, ~/.aws, SSO, 인스턴스 역할)을 그대로 쓴다.
-  LogSight는 키를 저장하거나 외부로 보내지 않는다.
+  LogFinder는 키를 저장하거나 외부로 보내지 않는다.
 """
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ ITEMS: dict[str, dict[str, str]] = {
                "켜기 전의 일은 보지 않으므로 사고 전에 켜 둬야 한다.",
         "cost": "30일 무료 체험 후 사용량 과금(작은 계정은 월 몇 달러 수준, 추정). "
                 "그 위에서 여러 단계를 엮는 Extended Threat Detection은 GuardDuty 요금 외 추가 비용 없음.",
-        "alt": "켜 두기를 권한다. 경보가 울리면 GuardDuty 결과와 이 계정의 웹·서버 로그를 LogSight에 함께 넣어 "
+        "alt": "켜 두기를 권한다. 경보가 울리면 GuardDuty 결과와 이 계정의 웹·서버 로그를 LogFinder에 함께 넣어 "
                "어떻게 들어왔고 어디를 고칠지 확인한다.",
     },
     "IMDSV2": {

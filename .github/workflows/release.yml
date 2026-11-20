@@ -46,7 +46,7 @@ jobs:
             gh release upload "$TAG" dist/* sample-report.zip --clobber
           else
             gh release create "$TAG" dist/* sample-report.zip --target "$GITHUB_SHA" \
-              --title "LogSight $TAG (시험판)" --notes-file notes.md --prerelease
+              --title "LogFinder $TAG (시험판)" --notes-file notes.md --prerelease
           fi
       - uses: docker/login-action@v3
         with:

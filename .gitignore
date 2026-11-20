@@ -22,3 +22,4 @@ dist/
 build/
 *.egg-info/
 reports/e2e_demo/
+logsight_audit.jsonl

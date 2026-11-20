@@ -1,5 +1,5 @@
 """
-공방전 통합로그(Markdown 표)를 LogSight 입력 형식으로 바꾸고 가명 처리한다.
+공방전 통합로그(Markdown 표)를 LogFinder 입력 형식으로 바꾸고 가명 처리한다.
 
 입력 표의 출처별 처리
   event_history  → CloudTrail 레코드(cloudtrail.json)

@@ -2,7 +2,7 @@
 읽기 전용 수집기 (`python -m logsight collect ...`).
 
 1) environment: 보안그룹·NACL·WAF·인스턴스·IAM 역할·CloudTrail 설정을 읽어
-   LogSight가 쓰는 environment.json 형식으로 저장한다. 손으로 쓸 필요가 없어지고,
+   LogFinder가 쓰는 environment.json 형식으로 저장한다. 손으로 쓸 필요가 없어지고,
    실제 계정에서도 방화벽 수정안이 나오게 된다.
 2) cloudtrail-history: CloudTrail을 켜 두지 않았어도 AWS가 무료로 보관하는
    최근 90일 관리 이벤트(Event history)를 LookupEvents API로 내려받는다.

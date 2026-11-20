@@ -2,7 +2,7 @@
 
 시나리오마다 두 묶음을 만든다.
 - baseline/ : 원본 로그만(+ 있으면 GuardDuty 결과). '기존 방식' 조건
-- logsight/ : 같은 원본 로그 + LogSight 보고서(report.html, AI 없이 규칙 모드)
+- logsight/ : 같은 원본 로그 + LogFinder 보고서(report.html, AI 없이 규칙 모드)
 그리고 참가자 번호별 배정표(배정표.csv)와 비어 있는 응답 CSV를 만든다. 정답지는 묶음에 넣지 않는다.
 
     python scripts/study_prepare.py --scenario A=data/gongbang --scenario B=data/botsv3_aws \\

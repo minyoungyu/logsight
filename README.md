@@ -1,4 +1,4 @@
-# LogSight: AWS 침해사고 초동 분석 도구
+# LogFinder: AWS 침해사고 초동 분석 도구
 
 [![test](https://github.com/minyoungyu/logsight/actions/workflows/test.yml/badge.svg)](https://github.com/minyoungyu/logsight/actions/workflows/test.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.13-blue)
@@ -14,7 +14,7 @@
 
 작은 팀은 경보가 울려도 그날 안에 답을 내기 어렵다. 로그가 여러 형식으로 흩어져 있고, 자기 팀의 작업과 공격을 구분하지 못한다.
 
-| 지금 쓰는 것 | 못 해 주는 것 | LogSight |
+| 지금 쓰는 것 | 못 해 주는 것 | LogFinder |
 | --- | --- | --- |
 | GuardDuty | 경보는 주지만 WAF·ALB·웹서버·SSH 로그는 읽지 않는다 | 이 로그들과 CloudTrail·VPC Flow를 한 사건으로 엮는다 |
 | 채팅 AI에 로그 붙여넣기 | 여러 로그를 엮지 못하고, 근거 없는 문장을 만든다 | 공방전 같은 사건에서 공격 단계 5/6(채팅 AI 3/6, [예비 1회](docs/채팅AI_기준선_실험.md)). 문장마다 근거(파일:줄)를 코드로 대조 |
@@ -57,7 +57,7 @@ Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 �
 | Splunk BOTSv3(실제 AWS 계정) | 아니오 | 큰 사건 3개 중 2개 | [BOTSv3_측정](docs/BOTSv3_측정.md) |
 | 자체 웹서버 실습 환경 | 아니오(시나리오를 우리가 만듦) | 34/34 단계, 정상 트래픽 오탐 0건 | [lab/README](lab/README.md) |
 
-테스트 339개를 PR마다 Ubuntu·Windows × Python 3.10·3.13에서 돌린다(macOS는 직접 실행할 때). 규칙을 고칠 때마다 처음 보는 데이터에서 잡았던 16개를 계속 잡는지 CI가 다시 본다. 탐지 규칙 56개의 조건·사각지대·오탐은 [규칙_명세](docs/규칙_명세.md)에 있다.
+테스트 382개를 PR마다 Ubuntu·Windows × Python 3.10·3.13에서 돌린다(macOS는 직접 실행할 때). 규칙을 고칠 때마다 처음 보는 데이터에서 잡았던 16개를 계속 잡는지 CI가 다시 본다. 탐지 규칙 56개의 조건·사각지대·오탐은 [규칙_명세](docs/규칙_명세.md)에 있다.
 
 ## 어떻게 동작하나
 
@@ -80,7 +80,7 @@ Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 �
 
 ## 이것이 아닌 것
 
-- 24시간 감시 도구가 아니다. 감시는 GuardDuty에 맡기고, LogSight는 경보 다음을 맡는다.
+- 24시간 감시 도구가 아니다. 감시는 GuardDuty에 맡기고, LogFinder는 경보 다음을 맡는다.
 - 설정을 알아서 고치지 않는다. 수정 명령을 주고 적용은 사람이 한다(예외: 고르면 켜지는 자동 격리, 기본은 기록만 하는 시험 모드).
 - SIEM이 아니다. 로그를 오래 모아 검색하는 일은 하지 않는다.
 

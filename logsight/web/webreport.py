@@ -4,7 +4,9 @@ from __future__ import annotations
 from html import escape
 
 from ..analyze import STAGE_KO
-from ..report import CSS as REPORT_CSS, SEV_KO
+from .. import PRODUCT_NAME
+from .. import briefing as bf
+from ..report import CSS as REPORT_CSS, FILE_NOTE, SEV_KO, _conclusion, _glossary_card, _impact_card, _when
 from .webanalyze import VERDICT_KO
 
 VERDICT_CLASS = {"breached": "high", "likely_breached": "high",
@@ -32,7 +34,8 @@ def _refs(refs, inc_id: str) -> str:
     return "".join(f'<a class="ref" href="#{escape(inc_id)}-{escape(r)}">{escape(r)}</a>' for r in refs)
 
 
-def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고서") -> str:
+def render(result: dict, title: str | None = None) -> str:
+    title = title or f"{PRODUCT_NAME} 웹서버 침해 점검 보고서"
     site = result.get("site", {})
     v = result["overall_verdict"]
     vcls = VERDICT_CLASS.get(v, "low")
@@ -43,8 +46,9 @@ def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고�
     h = [f"<!doctype html><html lang=ko><meta charset=utf-8>"
          f"<meta name=viewport content='width=device-width,initial-scale=1'>"
          f"<title>{escape(title)}</title><style>{CSS}</style><div class='shell one'><main>"
-         f"<header class=top><div class=brand><span><b>LogFinder</b> 웹서버 침해 점검 보고서 · 문서번호 "
+         f"<header class=top><div class=brand><span><b>{PRODUCT_NAME}</b> 웹서버 침해 점검 보고서 · 문서번호 "
          f"<code>{doc_no}</code></span><span class=cls>내부 검토용</span></div><h1>{escape(title)}</h1>"
+         + _conclusion(result, *bf.actions(result)) + f"<div class='filenote small'>{escape(FILE_NOTE)}</div>"
          f"<div class=metaline><span>점검 대상</span><span>{target}</span>"
          f"<span>읽은 로그</span><span>이벤트 {result['n_events']:,}건 ({escape(srcs) or '없음'})</span>"
          f"<span>작성 일시</span><span><code>{escape(gen)}</code> · 처리 {result['timing']['total_s']}초</span></div></header>"]
@@ -57,20 +61,27 @@ def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고�
                        ("탐지 결과", f"{result['n_findings']:,}"),
                        ("사건", f"{result['n_incidents']:,}")):
         h.append(f"<div class=kpi><span>{label}</span><b>{val}</b></div>")
-    h.append("</div>")
+    h.append("</div><!--GLOSSARY-->")
 
     if not result["results"]:
         h.append("<div class=card>탐지된 사건이 없습니다. 분석한 로그 범위에서는 뚜렷한 공격 흔적을 "
                  "찾지 못했습니다. (로그 보관 기간이 짧으면 이미 지워졌을 수 있습니다.)</div>")
 
     if result["results"]:
-        h.append(f"<h2>사건 {len(result['results'])}건 자세히</h2>")
+        total = result.get("n_groups", len(result["results"]))
+        h.append(f"<h2>사건 {len(result['results'])}건 자세히</h2>" + (
+            f"<div class='small muted'>전체 사건 {total:,}건 중 판정이 무거운 {len(result['results'])}건입니다. "
+            "나머지는 아래 '나머지 사건'에 모두 있습니다.</div>" if total > len(result["results"]) else ""))
     for r in result["results"]:
         inc, rep, meta = r["incident"], r["report"], r["meta"]
         iv = rep.get("verdict", "suspicious")
+        name = bf.title(inc)
         h.append(f"<article class='inc' id={escape(inc['id'])}><div class=head><div class=row>"
                  f"<span class=id>{escape(inc['id'])}</span><span class='vd {'attack' if iv in ('breached', 'likely_breached') else 'risky_not_attack'}'>"
-                 f"{escape(VERDICT_KO.get(iv, iv))}</span>{_sev(rep.get('severity', inc['severity']))}</div></div>")
+                 f"{escape(VERDICT_KO.get(iv, iv))}</span>{_sev(rep.get('severity', inc['severity']))}</div>"
+                 + (f"<div class=ititle>{escape(name)}</div>" if name else "")
+                 + f"<div class=when>{_when(inc['start'], inc['end'])}</div></div>")
+        h.append(_impact_card(inc, result.get("site", {}).get("sensitive", ())))
         val = meta.get("validation", {})
         badge = ("<span class=ok>근거검증 통과</span>" if val.get("passed")
                  else f"<span class=warn>근거검증: 무효 {val.get('evidence_invalid', 0)}건, "
@@ -101,15 +112,19 @@ def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고�
             h.append("<h3>공격 흐름</h3><ol class=flow>")
             for step in rep["attack_flow"]:
                 h.append(f"<li><div class=flowhead><b>{escape(STAGE_KO.get(step['stage'], step['stage']))}</b>"
-                         f"<span class=tech>{escape(step.get('technique', ''))}</span>"
-                         f"<span class=muted>{escape(step.get('time', '')[:19])}</span></div>"
+                         + (f"<span class=muted>{_when(step['time'])}</span>" if step.get("time") else "") + "</div>"
                          f"<div class=what>{escape(step.get('what', ''))}</div>"
                          f"<div class=refs>{_refs(step.get('evidence', []), inc['id'])}</div></li>")
             h.append("</ol>")
+            pairs = list(dict.fromkeys((STAGE_KO.get(st["stage"], st["stage"]), st.get("technique"))
+                                       for st in rep["attack_flow"] if st.get("technique")))
+            if pairs:  # 사양서 FR-28: ATT&CK 번호는 전문가용으로 접어 둔다
+                h.append("<details class='expert small'><summary>전문가용: ATT&amp;CK 기법 번호</summary>"
+                         + ", ".join(f"{escape(a)} {escape(b)}" for a, b in pairs) + "</details>")
 
         if rep.get("remediation"):
             h.append("<h3>조치안</h3><div class=tablewrap><table>"
-                     "<tr><th>우선순위</th><th>대상</th><th>조치</th><th>설명</th><th>근거</th></tr>")
+                     "<tr><th>우선순위</th><th>종류</th><th>조치</th><th>설명</th><th>근거</th></tr>")
             order = {"now": 0, "soon": 1, "later": 2}
             for c in sorted(rep["remediation"], key=lambda x: order.get(x.get("priority"), 3)):
                 pr = c.get("priority", "later")
@@ -127,25 +142,55 @@ def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고�
         h.append("<details class=evidence><summary>근거 로그 보기 ("
                  f"{len(inc['events'])}건" + (f", {inc['omitted_events']}건 생략" if inc.get("omitted_events") else "")
                  + ")</summary><div class=tablewrap><table>"
-                 "<tr><th>ref</th><th>시각</th><th>출발지</th><th>동작</th><th>결과</th><th>규칙</th></tr>")
+                 "<tr><th>근거</th><th>시각</th><th>출발지</th><th>동작</th><th>결과</th><th>규칙</th></tr>")
         for e in inc["events"]:
             h.append(f"<tr id='{escape(inc['id'])}-{escape(e['ref'])}'><td><code>{escape(e['ref'])}</code></td>"
-                     f"<td>{escape(e.get('ts', '')[:19])}</td><td>{escape(str(e.get('src_ip') or '-'))}</td>"
+                     f"<td class=nw>{_when(e['ts']) if e.get('ts') else '-'}</td><td>{escape(str(e.get('src_ip') or '-'))}</td>"
                      f"<td>{escape(str(e.get('action') or '')[:80])}</td>"
                      f"<td>{escape(str(e.get('outcome') or ''))}</td>"
                      f"<td>{escape(', '.join(e.get('rules', [])))}</td></tr>")
         h.append("</table></div></details></article>")
 
+    h.append(_rest(result))
     h.append("<h2>탐지 규칙별 집계</h2><div class=tablewrap><table>"
              "<tr><th>규칙</th><th>설명</th><th>탐지</th><th>이벤트</th></tr>")
     for rid, c in result["rule_counts"].items():
         h.append(f"<tr><td><code>{escape(rid)}</code></td><td>{escape(c.get('title', ''))}</td>"
                  f"<td>{c['findings']}</td><td>{c['events']}</td></tr>")
     h.append("</table></div>")
-    h.append("<div class=sign><div>분석 · LogFinder (자동 생성)</div><div>검토자</div><div>승인</div></div>"
+    h.append(f"<div class=sign><div>분석 · {PRODUCT_NAME} (자동 생성)</div><div>검토자</div><div>승인</div></div>"
              "<p class='small muted' style='margin-top:18px'>이 보고서는 쌓여 있는 로그와 파일만 보고 자동으로 "
              "판단한 결과입니다. 조치(파일 삭제·계정 잠금 등)는 사람이 확인한 뒤 직접 적용하세요. "
              "웹 로그는 보통 요청 본문을 남기지 않아, 로그만으로 공격 성공을 단정하기 어려운 경우가 있습니다.</p>")
-    h.append(f"<footer><span>LogFinder · {doc_no}</span><span>근거 로그 위치를 판단마다 붙였습니다.</span></footer>"
+    h.append(f"<footer><span>{PRODUCT_NAME} · {doc_no}</span><span>근거 로그 위치를 판단마다 붙였습니다.</span></footer>"
              "</main></div></html>")
+    body = "".join(h)
+    return body.replace("<!--GLOSSARY-->", _glossary_card(body), 1)
+
+
+def _rest(result: dict) -> str:
+    """자세히 보이지 않은 나머지 사건 전부(사양서 FR-29). 같은 공격 판정·단계끼리 수를 먼저 보인다."""
+    from ..explain import VERDICT_KO as ATTACK_KO
+    shown = {r["incident"]["id"] for r in result["results"]}
+    rest = [i for i in result.get("incident_index", []) if i["id"] not in shown]
+    total = result.get("n_groups", len(result.get("incident_index", [])))
+    if not rest:
+        return ""
+    groups: dict[tuple, int] = {}
+    for i in rest:
+        k = (i.get("attack_verdict_ko") or "-", " → ".join(STAGE_KO.get(x, x) for x in i["stages"]))
+        groups[k] = groups.get(k, 0) + 1
+    h = [f"<h2 id=rest>나머지 사건 {len(rest):,}건</h2><div class='small muted'>"
+         + ", ".join(f"{escape(v)} · {escape(st)} {n}건" for (v, st), n in sorted(groups.items(), key=lambda x: -x[1]))
+         + "</div><div class='card tablewrap'><table><tr><th>ID</th><th>공격 판정</th><th>심각도</th><th>시작</th>"
+         "<th>단계</th><th>출발지</th><th>이벤트</th></tr>"]
+    for i in rest:
+        h.append(f"<tr><td>{escape(i['id'])}</td><td>{escape(i.get('attack_verdict_ko') or ATTACK_KO.get(i.get('attack_verdict'), '-'))}</td>"
+                 f"<td>{_sev(i['severity'])}</td><td class=nw>{_when(i['start'])}</td>"
+                 f"<td>{escape(' → '.join(STAGE_KO.get(x, x) for x in i['stages']))}</td>"
+                 f"<td>{escape(', '.join(i['src_ips'][:3]))}</td><td>{i['n_events']}</td></tr>")
+    h.append("</table></div>")
+    if total > len(result.get("incident_index", [])):
+        h.append(f"<div class='small warn'>사건이 {total:,}건이라 위 표는 앞의 {len(result['incident_index'])}건까지입니다. "
+                 "나머지는 report.json의 incident_index를 보세요.</div>")
     return "".join(h)

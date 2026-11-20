@@ -30,6 +30,7 @@ from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
 
+from . import PRODUCT_NAME
 from .analyze import STAGE_KO
 
 SEV_ORDER = {"low": 0, "medium": 1, "high": 2}
@@ -81,10 +82,23 @@ def build(alert: dict, result: dict, out: Path, response: dict | None = None) ->
     return msg
 
 
+def _kst(iso: str, fmt: str) -> str:
+    """'2026-10-30T01:20:00Z' → 한국 시간 문자열(사양서 NFR-23). 못 읽으면 빈 문자열."""
+    from datetime import datetime, timedelta, timezone
+    try:
+        d = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+    except ValueError:
+        return ""
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=timezone.utc)
+    return d.astimezone(timezone(timedelta(hours=9))).strftime(fmt)
+
+
 def text(msg: dict) -> str:
     a = msg["alert"]
-    lines = [f"[LogFinder] {msg['title']}",
-             f"시각 {a['time'][:16].replace('T', ' ')} UTC · 계정 {a.get('account') or '-'} {a.get('region') or ''}".rstrip(),
+    k = _kst(a["time"], "%m-%d %H:%M")
+    lines = [f"[{PRODUCT_NAME}] {msg['title']}",
+             f"시각 {a['time'][:16].replace('T', ' ')} UTC" + (f" (한국 {k})" if k else "") + f" · 계정 {a.get('account') or '-'} {a.get('region') or ''}".rstrip(),
              f"이벤트 {msg['counts']['events']:,}건 → 사건 {msg['counts']['incidents']:,}건"]
     for i in msg["incidents"]:
         lines.append(f"- {i['id']} [{SEV_KO.get(i['severity'], i['severity'])}] {' → '.join(STAGE_KO.get(x, x) for x in i['stages'])}"
@@ -94,7 +108,9 @@ def text(msg: dict) -> str:
         lines += [f"  {n}. {t}" for n, t in enumerate(msg["first_actions"][:3], 1)]
     iso = msg.get("auto_isolation")
     if iso:
-        lines.append(f"{iso['deadline'][11:16]} UTC까지 확인하지 않으면 외부에서 만든 {iso['count']}개를 격리"
+        dk = _kst(iso["deadline"], "%H:%M")
+        lines.append(f"{iso['deadline'][11:16]} UTC" + (f"(한국 {dk})" if dk else "") + "까지 확인하지 않으면"
+                     + f" 외부에서 만든 {iso['count']}개를 격리"
                      + (" (시험 모드: 기록만)" if iso["dry_run"] else "") + f". 확인: {iso['ack']}")
     lines.append(f"보고서: {msg['report_html']}")
     return "\n".join(lines)
@@ -110,7 +126,7 @@ def _post(url: str, body: bytes, headers: dict[str, str], tries: int = 3) -> dic
     last = None
     for n in range(tries):
         req = urllib.request.Request(url, data=body, method="POST",
-                                     headers={"Content-Type": "application/json", "User-Agent": "LogSight", **headers})
+                                     headers={"Content-Type": "application/json", "User-Agent": "LogFinder", **headers})
         try:
             with urllib.request.urlopen(req, timeout=10) as r:  # noqa: S310 - 사용자가 정한 주소
                 return {"ok": True, "status": r.status}
@@ -140,7 +156,7 @@ def send_discord(c: dict, msg: dict) -> dict:
     if not url:
         return {"ok": False, "error": "웹훅 주소 없음(url_env)"}
     color = {"high": 0xD93025, "medium": 0xF29900, "low": 0x5F6368}.get(msg["severity"], 0x5F6368)
-    body = {"username": "LogFinder", "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
+    body = {"username": PRODUCT_NAME, "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
             "embeds": [{"title": msg["title"][:250], "description": text(msg).split("\n", 1)[-1][:3900],  # 첫 줄=제목, 중복 빼기
                         "color": color}]}
     payload = json.dumps(body, ensure_ascii=False).encode()
@@ -179,15 +195,15 @@ def send_webhook(c: dict, msg: dict) -> dict:
 
 EMAIL_FOOTER = (
     "\n\n─────────────\n"
-    "이 메일은 귀사가 이용 중인 LogFinder 보안 분석이 AWS 보안 경보를 받아 자동으로 보낸 정보성 알림입니다. "
-    "광고가 아니며, 수신 담당자 변경은 LogFinder 설정(notify.json)에서 합니다.\n"
+    f"이 메일은 귀사가 이용 중인 {PRODUCT_NAME} 보안 분석이 AWS 보안 경보를 받아 자동으로 보낸 정보성 알림입니다. "
+    f"광고가 아니며, 수신 담당자 변경은 {PRODUCT_NAME} 설정(notify.json)에서 합니다.\n"
     "첨부한 보고서는 IP·키를 일부 가린(마스킹) 분석 결과이며, 원본 로그는 들어 있지 않습니다."
 )
 
 
 def email_message(c: dict, msg: dict) -> EmailMessage:
     m = EmailMessage()
-    m["Subject"] = f"[LogFinder 보안 경보·정보성] {msg['title'][:150]}"
+    m["Subject"] = f"[{PRODUCT_NAME} 보안 경보·정보성] {msg['title'][:150]}"
     m["From"] = c["from"]
     m["To"] = ", ".join(c["to"])
     body = [text(msg), "", "무슨 일이 있었나: 보고서의 '공격 흐름'과 '판정 이유'를 보세요.",
@@ -247,9 +263,9 @@ def send_all(channels: list[dict], msg: dict) -> list[dict]:
 
 def test_message() -> dict:
     """설정 확인용 시험 메시지(`logsight notify-test`)."""
-    alert: dict[str, Any] = {"id": "test", "source": "test", "title": "LogFinder 통지 시험입니다. 실제 경보가 아닙니다.",
+    alert: dict[str, Any] = {"id": "test", "source": "test", "title": f"{PRODUCT_NAME} 통지 시험입니다. 실제 경보가 아닙니다.",
                              "severity": "low", "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                              "account": "", "region": ""}
-    return {"title": "시험: LogFinder 통지 연결 확인", "severity": "high", "alert": alert,
+    return {"title": f"시험: {PRODUCT_NAME} 통지 연결 확인", "severity": "high", "alert": alert,
             "counts": {"events": 0, "incidents": 0}, "incidents": [], "first_actions": [],
             "report_dir": "-", "report_html": "-"}

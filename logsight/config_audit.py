@@ -104,11 +104,19 @@ def web_app_fixes(incident: dict) -> list[dict]:
         r = alias.get(f["rule"], f["rule"])
         found.setdefault(r, {"rule": r, "evidence": []})["evidence"] += f.get("evidence", [])
     sev = {"now": "high", "soon": "medium", "later": "low"}
-    return [{"id": x["id"], "target": x["target"], "resource": "(웹 애플리케이션)" if x["target"] == "app"
-             else "(서버)", "severity": sev.get(x["priority"], "low"), "title": x["action"],
+    return [{"id": x["id"], "target": x["target"], "resource": x.get("resource") or "로그에 이름 없음",
+             "severity": sev.get(x["priority"], "low"), "title": x["action"],
              "why": x["detail"], "evidence": x["evidence"][:10], "current": None, "proposed": None,
              "cli": [], "rollback": [], "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."}
-            for x in _remediation(list(found.values())) if x["target"] in ("app", "file", "account")]
+            for x in _remediation(list(found.values()), incident.get("events", [])) if x["target"] in ("app", "file", "account")]
+
+
+def _web_server_name(incident: dict) -> str:
+    """WAF가 없는 웹서버의 이름: 사건의 인스턴스 → 로그의 호스트 이름 → 공격받은 도메인."""
+    names = list(incident.get("instances") or [])
+    names += [e.get(k) for e in incident["events"] for k in ("host", "http_host") if e.get(k)]
+    names = list(dict.fromkeys(str(n) for n in names if n))
+    return ", ".join(names[:2]) if names else "웹서버(로그에 이름 없음)"
 
 
 def audit(incident: dict, env: dict) -> list[dict]:
@@ -202,7 +210,9 @@ def audit(incident: dict, env: dict) -> list[dict]:
         })
 
     # 3) WAF: SQLi 규칙 그룹이 COUNT 모드
-    ev = _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI")
+    # 근거는 WAF를 거친 로그(WAF·ALB)에서만 쓴다(사양서 FR-26: nginx 로그만으로 WAF 수정안을 내지 않음)
+    via_waf = {e["ref"] for e in incident["events"] if e.get("source") in ("waf", "alb")}
+    ev = [r for r in _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI") if r in via_waf]
     if ev:
         for acl in env.get("waf_web_acls", []):
             if not acl.get("name"):
@@ -252,7 +262,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
     if web_ev and not env.get("waf_web_acls"):
         kinds = "·".join(dict.fromkeys(_WEB_KO[f["rule"]] for f in incident["findings"] if f["rule"] in _WEB_KO))
         out.append({
-            "id": "WEB_NO_WAF", "target": "waf", "resource": "(웹 서버)",
+            "id": "WEB_NO_WAF", "target": "waf", "resource": _web_server_name(incident),
             "severity": "medium", "title": "웹 공격을 막는 장치(WAF)가 없음",
             "why": f"{kinds} 요청이 걸러지지 않고 애플리케이션까지 그대로 들어왔다.",
             "evidence": web_ev[:10], "current": None,

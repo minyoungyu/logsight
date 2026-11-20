@@ -598,7 +598,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         sev_n = e.extra.get("gd_severity", 0)
         sev = "high" if sev_n >= 7 else "medium" if sev_n >= 4 else "low"
         alias = [r for r in e.extra.get("gd_alias") or [] if r in RULES]
-        if alias:  # 같은 의미의 LogSight 규칙이 있으면 그 단계·기법·한국어 이름을 쓴다
+        if alias:  # 같은 의미의 LogFinder 규칙이 있으면 그 단계·기법·한국어 이름을 쓴다
             tech, stage, name, _ = RULES[alias[0]]
         else:
             tech, stage, name = "", GD_STAGE.get(typ.split(":")[0], "other"), e.extra.get("gd_title") or typ

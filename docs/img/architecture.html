@@ -40,7 +40,7 @@ h2{font-size:14px;margin:0 0 8px;color:#3a3a40;letter-spacing:.02em}
 .safe .card{border-color:#cfd8cf}
 </style>
 <div class="wrap">
-<h1>LogSight · AWS 침해사고 초동 분석 도구</h1>
+<h1>LogFinder · AWS 침해사고 초동 분석 도구</h1>
 <p class="sub">GuardDuty가 경보를 울린 다음, 흩어진 로그를 한 사건으로 엮어 침투 경로와 고칠 설정을 한국어로 보여 준다. 내 PC·서버에서 실행하고, AI는 선택이다.</p>
 
 <div class="lane use">
@@ -50,7 +50,7 @@ h2{font-size:14px;margin:0 0 8px;color:#3a3a40;letter-spacing:.02em}
  <div class="arr">→</div>
  <div class="step gd"><b>경보 · GuardDuty</b><span>24시간 감시는 GuardDuty가 맡는다. 경보 결과(JSON)를 그대로 입력으로 쓴다</span></div>
  <div class="arr">→</div>
- <div class="step"><b>로그 모으기 · 사용자</b><span>그 시간대의 CloudTrail·VPC Flow·ALB·WAF·서버 로그와 설정 스냅샷(collect). AWS 키는 LogSight에 주지 않음</span></div>
+ <div class="step"><b>로그 모으기 · 사용자</b><span>그 시간대의 CloudTrail·VPC Flow·ALB·WAF·서버 로그와 설정 스냅샷(collect). AWS 키는 LogFinder에 주지 않음</span></div>
  <div class="arr">→</div>
  <div class="step"><b>분석 · logsight analyze / 웹 업로드</b><span>폴더째 넣으면 형식 자동 판별. 아래 B의 8단계가 돈다</span></div>
  <div class="arr">→</div>
@@ -80,7 +80,7 @@ h2{font-size:14px;margin:0 0 8px;color:#3a3a40;letter-spacing:.02em}
   <div class="card"><b>규칙 검증 · CI</b><span>규칙 55개마다 걸려야 하는 예·걸리면 안 되는 예. 테스트 280개, 3개 OS × Python 2개 버전</span></div>
   <div class="card"><b>개발에 쓴 데이터</b><span>자체 실습 34/34 · 공방전 판정 6/7(정상 작업 목록) · BOTSv3 큰 사건 2/3</span></div>
   <div class="card"><b>처음 본 데이터</b><span><span class="big">31%</span> Splunk AWS 표본 16/52 · 웹서버 3/7. 규칙 고정 후 1회</span></div>
-  <div class="card"><b>사람 평가(준비 완료)</b><span>비전문가 8명, LogSight vs 원본 로그+GuardDuty 교차 비교</span></div>
+  <div class="card"><b>사람 평가(준비 완료)</b><span>비전문가 8명, LogFinder vs 원본 로그+GuardDuty 교차 비교</span></div>
   <div class="card"><b>고객 인터뷰(준비 완료)</b><span>가설 7개, 미리 정한 판단 기준, 10건 목표</span></div>
   <div class="card"><b>놓치는 것(공개)</b><span>Bedrock·ECR, KMS 랜섬웨어, 복제·DataSync, NACL, MFA 설정 변경, S3 접근 로그</span></div>
  </div>

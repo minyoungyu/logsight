@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  LogSight log archive (protection option 1). Deploy in a SEPARATE account from the one being
+  LogFinder log archive (protection option 1). Deploy in a SEPARATE account from the one being
   watched. CloudTrail, VPC Flow Logs and host log shippers write here; nobody in the watched
   account can delete or overwrite what was written, because the bucket lives elsewhere and
   S3 Object Lock keeps every object for RetentionDays.
@@ -16,7 +16,7 @@ Parameters:
   ReaderPrincipalArn:
     Type: String
     Default: ""
-    Description: Optional. LogSight analysis server role or user that may read the archive.
+    Description: Optional. LogFinder analysis server role or user that may read the archive.
   LockMode:
     Type: String
     Default: GOVERNANCE
