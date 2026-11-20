@@ -194,6 +194,9 @@ def _hold(report: dict, incident: dict, meta: dict) -> None:
 
 def _call_claude(payload: dict, model: str) -> tuple[dict, dict]:
     import anthropic
+    from ..aisend import announce
+
+    announce("웹서버 점검", payload, model)  # 사양서 NFR-25: 보내기 전에 무엇을 얼마나 어디로
 
     client = anthropic.Anthropic()
     resp = client.messages.create(
@@ -252,53 +255,104 @@ def rule_based(incident: dict) -> dict:
         "suspicious": "공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
         "no_evidence": "뚜렷한 침해 근거는 보이지 않는다.",
     }[verdict]
-    summary = (f"{incident['start'][:16].replace('T', ' ')}~{incident['end'][11:16]}(UTC) "
+    from ..explain import _span
+    summary = (f"{_span(incident['start'], incident['end'])} "
                f"{who}의 활동 {incident['n_events']}건이 하나로 이어진다. 흐름: {stages}. {verdict_line}")
-    remediation = _remediation(findings)
+    remediation = _remediation(findings, incident.get("events", []))
     return {
         "verdict": verdict, "summary": summary, "severity": sev, "confidence": "medium",
         "attack_flow": flow,
         "root_causes": [],
         "remediation": remediation,
-        "unknowns": ["규칙 기반 분석이라 실제 피해 범위와 공격 성공 여부는 사람이 확인해야 한다."
-                     " (웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.)"],
+        "unknowns": [_unknown_line(verdict)],
     }
 
 
-def _remediation(findings: list[dict]) -> list[dict]:
+def _unknown_line(verdict: str) -> str:
+    """판정과 어긋나지 않는 '확인할 점'(사양서 FR-26: '침해 확인' 옆에 '단정하기 어렵다'를 쓰지 않는다)."""
+    if verdict == "breached":
+        return ("침해의 직접 근거가 있어 침해로 판정했다. 다만 공격자가 서버에서 무엇을 더 했는지(읽은 파일, 바꾼 설정)는 "
+                "웹 로그에 남지 않으므로 서버를 직접 확인해야 한다.")
+    if verdict == "likely_breached":
+        return ("성공했을 가능성이 큰 근거가 있지만 웹 로그는 요청 본문과 응답 내용을 남기지 않아 확정하지 못했다. "
+                "응답 크기·서버 오류 로그와 DB 기록을 함께 확인한다.")
+    return ("규칙 기반 분석이라 공격이 성공했는지는 사람이 확인해야 한다. "
+            "웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다.")
+
+
+def _remediation(findings: list[dict], events: list[dict] = ()) -> list[dict]:
+    """조치안. 사건 이벤트에서 계정·파일·파라미터·IP 이름을 채운다(사양서 FR-24: 자리 표시 문구 금지)."""
+    from .. import outcome as oc
     rules = {f["rule"]: f for f in findings}
     out: list[dict] = []
+    events = list(events)
+    files, abused = oc.webshell_files(events)
+    accounts = oc.logged_in_accounts(events)
+    created = sorted({f.get("key") for f in findings if f["rule"] == "HOST_ACCOUNT_CREATED" and f.get("key")})
+    ips = oc.attacker_ips(events)
     if "FILE_WEBSHELL" in rules or "WEBLOG_WEBSHELL_ACCESS" in rules or "WEBLOG_UPLOAD_EXEC" in rules:
         f = rules.get("FILE_WEBSHELL") or rules.get("WEBLOG_WEBSHELL_ACCESS") or rules["WEBLOG_UPLOAD_EXEC"]
-        out.append({"id": "WEB_FIX_WEBSHELL", "action": "웹셸 의심 파일 격리", "target": "file", "priority": "now",
-                    "detail": "표시된 파일을 삭제하지 말고 먼저 복사해 보관한 뒤 서비스에서 분리하고, "
-                              "업로드 폴더에서 스크립트 실행을 막는다.",
+        if files:
+            res = ", ".join(files[:3])
+            detail = (f"{res} 파일을 삭제하지 말고 먼저 복사해 보관한 뒤 서비스에서 분리하고, "
+                      "업로드 폴더에서 스크립트 실행을 막는다.")
+        elif abused:
+            res = ", ".join(abused[:3])
+            detail = (f"{res}가 명령 실행에 악용됐다(앱 파일이므로 지우지 말 것). 이 파일이 사용자 입력으로 다른 파일을 "
+                      "읽거나 실행하지 못하게 코드를 고치고, 접속 로그처럼 공격자가 글을 남길 수 있는 파일을 포함하지 않게 한다.")
+        else:
+            res = "로그에 파일 경로 없음"
+            detail = "웹 루트에서 최근 바뀐 스크립트 파일을 찾아 복사해 보관한 뒤 서비스에서 분리한다."
+        out.append({"id": "WEB_FIX_WEBSHELL", "action": "웹셸 의심 파일 격리: " + res if files else
+                    ("악용된 앱 파일 고치기: " + res if abused else "웹셸 의심 파일 찾아 격리"),
+                    "target": "file", "priority": "now", "resource": res, "detail": detail,
                     "evidence": f["evidence"][:6]})
     if "WEBLOG_AUTH_SUCCESS_AFTER_FAIL" in rules or "SSH_SUCCESS_AFTER_FAIL" in rules:
         f = rules.get("WEBLOG_AUTH_SUCCESS_AFTER_FAIL") or rules["SSH_SUCCESS_AFTER_FAIL"]
-        out.append({"id": "WEB_FIX_ACCOUNT", "action": "탈취 의심 계정 잠그고 비밀번호·키 교체", "target": "account", "priority": "now",
-                    "detail": "해당 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다. 가능하면 다중 인증을 켠다.",
+        res = ", ".join(accounts[:3]) or "로그에 계정 이름 없음"
+        out.append({"id": "WEB_FIX_ACCOUNT", "action": f"탈취 의심 계정 잠그고 비밀번호·키 교체: {res}",
+                    "target": "account", "priority": "now", "resource": res,
+                    "detail": (f"{res} 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다" if accounts else
+                               "로그인에 성공한 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다")
+                              + (f"(공격 출발지 {', '.join(ips[:2])})" if ips else "") + ". 가능하면 다중 인증을 켠다.",
                     "evidence": f["evidence"][:6]})
     if rules.keys() & {"HOST_PRIV_ESC", "HOST_PRIV_ESC_FAIL", "HOST_ACCOUNT_CREATED"}:
         f = next(rules[r] for r in ("HOST_PRIV_ESC", "HOST_ACCOUNT_CREATED", "HOST_PRIV_ESC_FAIL") if r in rules)
-        out.append({"id": "WEB_FIX_PRIVESC", "action": "서버 sudo 권한 정리와 새 계정 잠금", "target": "account", "priority": "now",
-                    "detail": "웹 서비스 계정(www-data 등)의 sudo 권한과 NOPASSWD 줄을 sudoers에서 지우고(visudo), "
-                              "모르는 계정은 잠근다(usermod -L). root를 얻었을 수 있으므로 서버를 깨끗한 이미지로 다시 만드는 것을 검토한다.",
+        res = ", ".join(created[:3]) if created else "sudoers"
+        lock = (f"새로 생긴 계정 {', '.join(created[:3])}은 잠그고(usermod -L {created[0]}), " if created else
+                "모르는 계정은 잠그고(usermod -L), ")
+        out.append({"id": "WEB_FIX_PRIVESC", "action": "서버 sudo 권한 정리와 새 계정 잠금" + (f": {res}" if created else ""),
+                    "target": "account", "priority": "now", "resource": res,
+                    "detail": lock + "웹 서비스 계정(www-data 등)의 sudo 권한과 NOPASSWD 줄을 sudoers에서 지운다(visudo). "
+                              "root를 얻었을 수 있으므로 서버를 깨끗한 이미지로 다시 만드는 것을 검토한다.",
                     "evidence": f["evidence"][:6]})
     if "WEBLOG_SQLI" in rules:
-        out.append({"id": "WEB_FIX_SQLI", "action": "SQL 인젝션 취약 코드 수정", "target": "app", "priority": "soon",
-                    "detail": "해당 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+        where = oc.vulnerable_params(events, {"WEBLOG_SQLI", "WAF_SQLI_NOT_BLOCKED"})
+        res = ", ".join(where[:3]) or "로그에 경로 없음"
+        out.append({"id": "WEB_FIX_SQLI", "action": "SQL 인젝션 취약 코드 수정" + (f": {res}" if where else ""),
+                    "target": "app", "priority": "soon", "resource": res,
+                    "detail": (f"{res}의 파라미터를" if where else "공격 문자열이 들어간 파라미터를")
+                              + " 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
                     "evidence": rules["WEBLOG_SQLI"]["evidence"][:6]})
     if rules.keys() & {"WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION"}:
         f = next(rules[r] for r in ("WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION") if r in rules)
-        out.append({"id": "WEB_FIX_INPUT", "action": "입력값 검증·경로 제한 적용", "target": "app", "priority": "soon",
-                    "detail": "파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+        where = [w for w in oc.vulnerable_params(events, {"WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION"})
+                 if w.split("(")[0] not in files]  # 웹셸 자체에 넣은 명령은 앱 코드의 입력 검증 문제가 아니다
+        res = ", ".join(where[:3]) or "로그에 경로 없음"
+        out.append({"id": "WEB_FIX_INPUT", "action": "입력값 검증·경로 제한 적용" + (f": {res}" if where else ""),
+                    "target": "app", "priority": "soon", "resource": res,
+                    "detail": (f"{res}에서 " if where else "") +
+                              "파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
                     "evidence": f["evidence"][:6]})
     if rules.keys() & {"WEBLOG_SCANNER", "WEBLOG_ENUM_404", "WEBLOG_AUTH_BRUTE", "SSH_BRUTE_FORCE"}:
-        out.append({"id": "WEB_FIX_RATE_LIMIT", "action": "비정상 출발지 차단·요청 제한", "target": "network", "priority": "soon",
-                    "detail": "공격 출발지 IP를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
+        res = ", ".join(ips[:3]) or "로그에 IP 없음"
+        out.append({"id": "WEB_FIX_RATE_LIMIT", "action": "비정상 출발지 차단·요청 제한" + (f": {res}" if ips else ""),
+                    "target": "network", "priority": "soon", "resource": res,
+                    "detail": (f"공격 출발지 {res}를" if ips else "공격 출발지 IP를") +
+                              " 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
                     "evidence": []})
     out.append({"id": "WEB_FIX_LOG_RETENTION", "action": "로그 보존 기간 늘리기", "target": "server", "priority": "later",
+                "resource": "웹·인증 로그",
                 "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
                 "evidence": []})
     return out

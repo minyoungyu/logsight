@@ -2,7 +2,7 @@
 
 Splunk Security Content(https://github.com/splunk/security_content, Apache-2.0)의 탐지 규칙은
 각자 시험용 로그(attack_data)를 하나씩 가리킨다. 표본마다 "이 로그에는 이 행동이 들어 있다"는
-라벨이 붙은 셈이다. 이 스크립트는 AWS CloudTrail 표본마다 LogSight를 따로 돌려 무엇이 걸렸는지 적는다.
+라벨이 붙은 셈이다. 이 스크립트는 AWS CloudTrail 표본마다 LogFinder를 따로 돌려 무엇이 걸렸는지 적는다.
 
     git clone --depth 1 --filter=blob:none --sparse https://github.com/splunk/security_content sc
     (cd sc && git sparse-checkout set detections/cloud)
@@ -97,7 +97,7 @@ def main() -> None:
         key = tuple(sorted(row["data"]))
         row["duplicate_data"] = key in seen
         seen.add(key)
-        # 판정 기준: Splunk 규칙이 찾는 API 호출(eventName)을 LogSight 규칙이 표시했는가
+        # 판정 기준: Splunk 규칙이 찾는 API 호출(eventName)을 LogFinder 규칙이 표시했는가
         tg = set(f["targets"])
         present = sum(1 for e in evs if (e.action or "").split(":")[-1] in tg)
         hit_rules = sorted({fd.rule for fd in run_detections(copy.deepcopy(evs), {})

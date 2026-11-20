@@ -1,4 +1,4 @@
-"""LogSight 단위·통합 테스트.  실행: python -m unittest discover -s tests -v"""
+"""LogFinder 단위·통합 테스트.  실행: python -m unittest discover -s tests -v"""
 from __future__ import annotations
 
 import gzip

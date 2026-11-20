@@ -1,14 +1,16 @@
 """
-LogSight 데모 웹앱 (FastAPI).
+LogFinder 데모 웹앱 (FastAPI).
 로그 파일을 올리면 형식 자동 판별 → 정규화 → 마스킹 → 탐지 → 사건 묶기 → 설정 점검 → 분석 → 보고서.
 실행: uvicorn app:app --reload  →  http://127.0.0.1:8000
 """
 from __future__ import annotations
 
+import hmac
 import json
 import os
 from html import escape
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, File, Form, Request
 from fastapi import UploadFile as FUploadFile
@@ -40,6 +42,24 @@ SAMPLES = {
     "combined": ("8종을 한곳에(GuardDuty, WAF 포함)", ROOT / "combined"),
 }
 MAX_UPLOAD_MB = int(os.environ.get("LOGSIGHT_MAX_UPLOAD_MB", "200"))
+
+# 업로드 보호(사양서 NFR-19). 로그에는 내부 IP·계정 이름·요청 경로가 들어 있고, 분석은 AI 비용을 쓴다.
+# - LOGSIGHT_TOKEN이 없으면: 이 컴퓨터(127.0.0.1·::1)에서 온 업로드만 받는다.
+# - LOGSIGHT_TOKEN이 있으면: 그 값을 아는 사람만 올린다(주소 뒤 ?token=값 으로 한 번 열면 쿠키로 기억).
+#   역방향 프록시 뒤에서는 모든 요청이 127.0.0.1로 보이므로 반드시 토큰을 쓴다.
+# - 다른 사이트의 페이지가 몰래 업로드를 보내는 요청(Origin·Sec-Fetch-Site가 다른 곳)은 거부한다.
+# - 올린 파일은 메모리와 요청이 끝나면 지워지는 임시 폴더에서만 다루고 디스크에 남기지 않는다.
+TOKEN = os.environ.get("LOGSIGHT_TOKEN") or None
+LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "testclient"}  # testclient: FastAPI 시험 도구가 쓰는 이름
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "X-Frame-Options": "DENY",
+    # 보고서는 한 파일로 열리고 외부 리소스를 부르지 않는다(FR-12). 그 약속을 브라우저가 강제하게 한다
+    "Content-Security-Policy": ("default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; "
+                                "script-src 'unsafe-inline'; connect-src 'self'; form-action 'self'; "
+                                "frame-ancestors 'none'; base-uri 'none'"),
+}
 KINDS_KO = "CloudTrail, VPC Flow Logs, AWS WAF, ALB, GuardDuty, SSH auth.log, 서버 방화벽(kern.log), nginx/apache"
 
 CONSOLE_CSS = """:root{--bg:#0e1013;--p1:#15181c;--p2:#1b1f24;--ln:#2a2f36;--fg:#d7dbe0;--sub:#8b939d;--dim:#79818c;
@@ -120,7 +140,9 @@ def _page() -> str:
     has_key = bool(os.environ.get("ANTHROPIC_API_KEY"))
     return (PAGE.replace("{css}", CONSOLE_CSS).replace("{bar}", _bar()).replace("{kinds}", escape(KINDS_KO))
             .replace("{noai}", "" if has_key else "checked")
-            .replace("{aikey}", "Claude API 키가 설정되어 있습니다." if has_key else
+            .replace("{aikey}", "Claude API 키가 설정되어 있습니다. AI를 켜면 공격으로 보이는 사건 상위 30개와 사건당 이벤트 "
+                     "최대 60건(비밀번호·토큰·키는 가림)을 Anthropic API로 보냅니다. 보내지 않으려면 아래를 체크하세요."
+                     if has_key else
                      "Claude API 키가 없어 규칙 기반 보고서를 만듭니다(서버에 ANTHROPIC_API_KEY 설정 시 AI 설명).")
             .replace("{samples}", "".join(f"<a href='/demo?sample={k}'><i></i><div><div class=k>{escape(k)}<span>→</span></div>"
                                           f"<small>{escape(v[0])}</small></div></a>" for k, v in SAMPLES.items())))
@@ -162,6 +184,57 @@ class _Syslog:
     def __exit__(self, *a):
         normalize.SYSLOG.clear()
         normalize.SYSLOG.update(self.saved)
+
+
+def _same_origin(request: Request) -> bool:
+    if request.headers.get("sec-fetch-site", "same-origin") not in ("same-origin", "none"):
+        return False
+    origin = request.headers.get("origin")
+    if not origin or origin == "null":
+        return origin is None
+    return urlsplit(origin).netloc == request.headers.get("host", "")
+
+
+def _upload_refusal(request: Request) -> tuple[int, str] | None:
+    """업로드(POST)를 받지 않을 이유. 받아도 되면 None."""
+    if not _same_origin(request):
+        return 403, "다른 사이트에서 보낸 업로드는 받지 않습니다."
+    if TOKEN:
+        given = request.headers.get("x-logsight-token") or request.cookies.get("logsight_token") or ""
+        if not hmac.compare_digest(given.encode(), TOKEN.encode()):
+            return 401, "토큰이 필요합니다. 주소 뒤에 ?token=값 을 붙여 한 번 여세요."
+    elif (request.client.host if request.client else "") not in LOCAL_HOSTS:
+        return 403, ("이 컴퓨터에서만 올릴 수 있습니다. 다른 컴퓨터에서 쓰려면 서버를 LOGSIGHT_TOKEN과 함께 "
+                     "띄우세요.")
+    size = request.headers.get("content-length")
+    if size and size.isdigit() and int(size) > MAX_UPLOAD_MB * 1024 * 1024:
+        return 413, f"올린 파일이 {MAX_UPLOAD_MB}MB를 넘습니다. 기간을 나눠 올리거나 명령줄 도구를 쓰세요."
+    return None
+
+
+@app.middleware("http")
+async def _guard(request: Request, call_next):
+    if request.method not in ("GET", "HEAD", "OPTIONS"):
+        why = _upload_refusal(request)
+        if why:
+            code, msg = why
+            if request.url.path.startswith("/api/"):
+                resp = JSONResponse({"error": msg}, status_code=code)
+            else:
+                resp = _error(msg, code)
+            for k, v in SECURITY_HEADERS.items():
+                resp.headers[k] = v
+            return resp
+    token_q = request.query_params.get("token")
+    resp = await call_next(request)
+    if not request.url.path.startswith(("/docs", "/redoc")):  # API 문서 화면은 외부 스크립트를 쓴다
+        for k, v in SECURITY_HEADERS.items():
+            resp.headers.setdefault(k, v)
+    if request.method == "POST":
+        resp.headers["Cache-Control"] = "no-store"  # 분석 결과를 브라우저·프록시 캐시에 남기지 않는다
+    if TOKEN and token_q and hmac.compare_digest(token_q.encode(), TOKEN.encode()):
+        resp.set_cookie("logsight_token", TOKEN, httponly=True, samesite="strict")
+    return resp
 
 
 @app.get("/healthz")
@@ -316,13 +389,30 @@ def _profile_from_uploads(tmp: Path, files: dict[str, list]) -> SiteProfile:
     return SiteProfile(name="업로드한 서버", log_paths=log_paths, login_paths=["/login.php"])
 
 
-async def _collect(ups):
+class _TooBig(Exception):
+    pass
+
+
+async def _collect(ups, budget: list[int]):
+    """budget: [남은 바이트]. 여러 칸을 합쳐 MAX_UPLOAD_MB를 넘으면 멈춘다(Content-Length가 없을 때 대비)."""
     out = []
     for up in ups or []:
         data = await up.read()
+        budget[0] -= len(data)
+        if budget[0] < 0:
+            raise _TooBig
         if data:
             out.append((up.filename, data))
     return out
+
+
+async def _collect_all(access, weberror, auth) -> dict:
+    budget = [MAX_UPLOAD_MB * 1024 * 1024]
+    return {"access": await _collect(access, budget), "weberror": await _collect(weberror, budget),
+            "auth": await _collect(auth, budget)}
+
+
+TOO_BIG = f"올린 파일이 {MAX_UPLOAD_MB}MB를 넘습니다. 기간을 나눠 올리거나 명령줄 도구를 쓰세요."
 
 
 @app.post("/web/scan", response_class=HTMLResponse)
@@ -335,8 +425,10 @@ async def web_scan(
     if DEMO:
         return HTMLResponse(DEMO_MSG, status_code=403)
     import tempfile
-    files = {"access": await _collect(access), "weberror": await _collect(weberror),
-             "auth": await _collect(auth)}
+    try:
+        files = await _collect_all(access, weberror, auth)
+    except _TooBig:
+        return _error(TOO_BIG, 413)
     if not any(files.values()):
         return HTMLResponse("로그 파일을 하나 이상 올려 주세요.", status_code=400)
     with tempfile.TemporaryDirectory() as d:
@@ -355,8 +447,10 @@ async def api_web_scan(
     if DEMO:
         return JSONResponse({"error": DEMO_MSG}, status_code=403)
     import tempfile
-    files = {"access": await _collect(access), "weberror": await _collect(weberror),
-             "auth": await _collect(auth)}
+    try:
+        files = await _collect_all(access, weberror, auth)
+    except _TooBig:
+        return JSONResponse({"error": TOO_BIG}, status_code=413)
     if not any(files.values()):
         return JSONResponse({"error": "로그 파일이 필요합니다."}, status_code=400)
     with tempfile.TemporaryDirectory() as d:

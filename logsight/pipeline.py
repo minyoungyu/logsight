@@ -100,10 +100,28 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
                    "total_s": round(time.time() - t0, 2)},
         "has_environment": bool(env) and not env.get("_error"),
         "team": team_info,
+        "excluded_activity": excluded_summary(events),
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy")))
         + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]],
     }
+
+
+def excluded_summary(events: list[Event]) -> list[dict]:
+    """판정에서 뺀 활동(정상 작업 목록·우리 팀·trusted_ips)을 이름별로 센다(사양서 FR-32).
+    뺀 이벤트는 지우지 않으므로 사건 묶기와 흐름 그림에는 그대로 남는다."""
+    by: dict[str, dict] = {}
+    for e in events:
+        lab = e.extra.get("known")
+        if not lab:
+            continue
+        d = by.setdefault(str(lab), {"label": str(lab), "n": 0, "who": set()})
+        d["n"] += 1
+        w = (e.actor or e.src_ip or "").split("/")[-1]
+        if w and len(d["who"]) < 6:
+            d["who"].add(w)
+    return [{"label": d["label"], "n": d["n"], "who": sorted(d["who"])}
+            for d in sorted(by.values(), key=lambda d: -d["n"])]
 
 
 def _team(events: list[Event], env: dict) -> dict:
@@ -132,6 +150,11 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
     """결과 해석에 영향을 주는 가정을 보고서에 그대로 보여 준다."""
     from .normalize import SYSLOG
     out = []
+    csvs = [s["file"] for s in file_stats if s.get("kind") == "cloudtrail_csv"]
+    if csvs:
+        out.append("콘솔에서 내려받은 CloudTrail 이벤트 기록(CSV)을 읽었습니다. 이 형식에는 역할 세션 ARN·요청 파라미터가 "
+                   "빠져 있어 '서버 역할 키가 밖에서 쓰임' 같은 규칙은 걸리지 않습니다. 리전마다 따로 내려받아야 하고 "
+                   "IAM·STS 같은 전역 이벤트는 us-east-1에 있습니다. 가능하면 트레일의 JSON 로그를 쓰세요.")
     bad = [s["file"] for s in file_stats if not s.get("kind")]
     if bad:
         out.append(f"형식을 알 수 없어 건너뛴 파일 {len(bad)}개: {', '.join(map(str, bad[:5]))}"

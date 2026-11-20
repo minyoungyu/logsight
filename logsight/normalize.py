@@ -1,5 +1,5 @@
 """
-LogSight 공통 이벤트 스키마와 파서.
+LogFinder 공통 이벤트 스키마와 파서.
 서로 다른 AWS 로그(CloudTrail, VPC Flow Logs, AWS WAF, ALB 접속 로그, EC2 인증 로그)를
 하나의 공통 형식(Event)으로 바꾼다. OCSF를 참고한 최소 스키마.
 """
@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import gzip
 import io
+import os
 import ipaddress
 import json
 import re
@@ -593,8 +594,8 @@ def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
 
 # ------------------------------------------------------------------ Amazon GuardDuty 탐지 결과
 # get-findings 결과({"Findings":[...]}), S3 내보내기(JSON Lines), EventBridge 이벤트({"detail": {...}}) 모두 받는다.
-# GuardDuty가 탐지한 것을 LogSight가 쉬운 한국어 설명·수정안으로 바꾸는 용도("탐지는 AWS, 설명과 수정은 LogSight").
-GD_ALIAS = [  # 탐지 유형(부분 문자열) → 같은 의미의 LogSight 규칙(수정안 생성에 사용)
+# GuardDuty가 탐지한 것을 LogFinder가 쉬운 한국어 설명·수정안으로 바꾸는 용도("탐지는 AWS, 설명과 수정은 LogFinder").
+GD_ALIAS = [  # 탐지 유형(부분 문자열) → 같은 의미의 LogFinder 규칙(수정안 생성에 사용)
     ("InstanceCredentialExfiltration", "CT_INSTANCE_CRED_OUTSIDE"),
     ("SSHBruteForce", "SSH_BRUTE_FORCE"), ("RDPBruteForce", "SSH_BRUTE_FORCE"),
     ("PortProbeUnprotectedPort", "VPC_REMOTE_ADMIN_EXPOSED"), ("Recon:EC2/Portscan", "VPC_PORT_SCAN"),
@@ -841,8 +842,64 @@ def parse_cloudtrail(text: str, name: str = "cloudtrail") -> list[Event]:
     return list(iter_cloudtrail(text, name))
 
 
+# 콘솔 '이벤트 기록'에서 내려받은 CSV(사양서 FR-33). 트레일이 없어도 최근 90일 관리 이벤트를 볼 수 있지만,
+# 요청 파라미터·역할 세션 ARN 같은 필드가 빠지는 '정보가 빠진 형식'이라 일부 규칙은 걸리지 않는다.
+CT_CSV_COLS = ("Event time", "Event name")
+
+
+def is_cloudtrail_csv(head: str) -> bool:
+    first = head.lstrip("\ufeff").splitlines()[0] if head.strip() else ""
+    return all(c.lower() in first.lower() for c in CT_CSV_COLS) and "," in first
+
+
+def _csv_time(v: str) -> datetime | None:
+    v = (v or "").strip()
+    for f in (None, "%Y-%m-%d, %I:%M:%S %p", "%m/%d/%Y, %I:%M:%S %p", "%Y-%m-%d %H:%M:%S"):
+        try:
+            d = _iso(v) if f is None else datetime.strptime(v, f).replace(tzinfo=timezone.utc)
+            return d.astimezone(timezone.utc)
+        except ValueError:
+            continue
+    return None
+
+
+def parse_cloudtrail_csv(text: str, name: str = "cloudtrail.csv") -> list[Event]:
+    import csv
+    rows = csv.DictReader(text.lstrip("\ufeff").splitlines())
+    out: list[Event] = []
+    for i, r in enumerate(rows):
+        r = {(k or "").strip().lower(): (v or "").strip() for k, v in r.items()}
+        raw = r.get("cloudtrail event")
+        if raw:  # 원본 레코드 JSON이 들어 있으면 그것을 쓴다(빠지는 정보 없음)
+            try:
+                ev = cloudtrail_record_to_event(json.loads(raw), f"{name}:{i + 2}")
+            except (ValueError, TypeError):
+                ev = None
+            if ev:
+                out.append(ev)
+                continue
+        ts = _csv_time(r.get("event time", ""))
+        if not ts or not r.get("event name"):
+            continue
+        svc = r.get("event source", "").split(".")[0]
+        act = f"{svc}:{r['event name']}" if svc else r["event name"]
+        extra = {"csv_lossy": True}
+        if r.get("aws region"):
+            extra["awsRegion"] = r["aws region"]
+        if r.get("error code"):
+            extra["errorCode"] = r["error code"]
+        if r.get("resource name"):
+            extra["params"] = json.dumps({"name": r["resource name"][:200]}, ensure_ascii=False)
+        out.append(Event(ts=ts, source="cloudtrail", src_ip=r.get("source ip address") or None,
+                         actor=r.get("user name") or None, access_key=r.get("aws access key") or None,
+                         action=act, outcome="failure" if r.get("error code") else "success",
+                         raw_ref=f"{name}:{i + 2}", extra=extra))
+    return out
+
+
 PARSERS = {
     "cloudtrail": parse_cloudtrail,
+    "cloudtrail_csv": parse_cloudtrail_csv,
     "vpcflow": parse_vpcflow,
     "waf": parse_waf,
     "alb": parse_alb,
@@ -865,6 +922,8 @@ def read_text(path: Path) -> str:
 def detect_kind(name: str, text: str) -> str | None:
     """파일 이름과 내용 앞부분으로 로그 종류를 추정한다."""
     n = name.lower()
+    if is_cloudtrail_csv(text[:2000]):
+        return "cloudtrail_csv"
     for kind, keys in (("guardduty", ("guardduty",)), ("cloudtrail", ("cloudtrail",)), ("vpcflow", ("vpcflow", "flow")),
                        ("waf", ("waf",)), ("alb", ("alb", "elb")),
                        ("hostfw", ("hostfw", "iptables", "nftables", "ufw", "kern", "firewall")),
@@ -902,7 +961,7 @@ def _walk(paths: Iterable[Path]) -> Iterator[Path]:
         if p.is_dir():
             yield from sorted(x for x in p.rglob("*") if x.is_file()
                               and not x.name.startswith(".")
-                              and x.suffix.lower() in (".json", ".log", ".gz", ".txt", ".jsonl", ""))
+                              and x.suffix.lower() in (".json", ".log", ".gz", ".txt", ".jsonl", ".csv", ""))
         elif p.is_file():
             yield p
 
@@ -980,9 +1039,15 @@ def load_uploads(files: dict[str, tuple[str, bytes]]) -> tuple[list[Event], list
     """웹 업로드용: {필드명: (파일명, 내용)}."""
     events: list[Event] = []
     stats: list[dict] = []
+    limit = int(os.environ.get("LOGSIGHT_MAX_UNZIP_MB", "1024")) * 1024 * 1024
     for field_name, (fname, data) in files.items():
         if data[:2] == b"\x1f\x8b":
-            data = gzip.GzipFile(fileobj=io.BytesIO(data)).read()
+            # 압축 폭탄 방어(사양서 NFR-19): 풀면서 세다가 상한을 넘으면 그 파일은 읽지 않는다
+            data = gzip.GzipFile(fileobj=io.BytesIO(data)).read(limit + 1)
+            if len(data) > limit:
+                stats.append({"file": fname, "kind": None, "events": 0,
+                              "error": f"압축을 푼 크기가 {limit // (1024 * 1024)}MB를 넘어 읽지 않음"})
+                continue
         text = data.decode("utf-8-sig", "replace")
         k = field_name if field_name in PARSERS else detect_kind(fname, text)
         if not k:

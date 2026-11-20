@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""HTTP CSIC 2010 요청을 Apache 접속 로그 형식으로 바꿔 LogSight 웹 탐지를 잰다(규칙만).
+"""HTTP CSIC 2010 요청을 Apache 접속 로그 형식으로 바꿔 LogFinder 웹 탐지를 잰다(규칙만).
 
   python scripts/public/eval_csic.py --normal data/public/csic/normalTrafficTest.txt \
       --anomalous data/public/csic/anomalousTrafficTest.txt --out reports/public/csic2010.json
@@ -107,7 +107,7 @@ def pct(x) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="HTTP CSIC 2010으로 LogSight 웹 탐지 재기")
+    ap = argparse.ArgumentParser(description="HTTP CSIC 2010으로 LogFinder 웹 탐지 재기")
     ap.add_argument("--normal", required=True, nargs="+", help="정상 요청 파일(normalTraffic*.txt)")
     ap.add_argument("--anomalous", required=True, nargs="+", help="공격 요청 파일(anomalousTraffic*.txt)")
     ap.add_argument("--out", help="결과 JSON 경로")

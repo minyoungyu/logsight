@@ -1,7 +1,7 @@
 # CTF 로그로 탐지 성능 재기 (수집 가이드)
 
-동아리 CTF에서 서버 침투 과정의 로그를 모아, LogSight가 공격을 얼마나 잡는지 **독립된 정답**으로 잰다.
-공격 시나리오를 LogSight 규칙을 만든 사람이 아니라 CTF 운영자가 정하므로, 자체 시나리오 과적합을 줄일 수 있다.
+동아리 CTF에서 서버 침투 과정의 로그를 모아, LogFinder가 공격을 얼마나 잡는지 **독립된 정답**으로 잰다.
+공격 시나리오를 LogFinder 규칙을 만든 사람이 아니라 CTF 운영자가 정하므로, 자체 시나리오 과적합을 줄일 수 있다.
 
 ## 0. 먼저 지킬 것
 
@@ -18,7 +18,7 @@
 | 웹 오류 로그 | `/var/log/nginx/error.log` 또는 `/var/log/apache2/error.log` | 권장 | 로그 포이즈닝·경로 오류 흔적이 여기 남는다. |
 | 인증 로그 | `/var/log/auth.log`(Ubuntu) 또는 `/var/log/secure`(RHEL) | 권장 | SSH 무차별 대입·계정 탈취 판정에 쓴다. |
 | 웹 루트 사본 | 웹 루트 디렉터리 | 권장 | 웹셸 점검용. **원본을 건드리지 말고 사본을 만든다.** |
-| 애플리케이션 로그 | 앱이 따로 남긴 로그 | 참고 | **현재 LogSight는 읽지 못한다.** 이 로그에만 남는 공격은 사각지대로 따로 표시한다. |
+| 애플리케이션 로그 | 앱이 따로 남긴 로그 | 참고 | **현재 LogFinder는 읽지 못한다.** 이 로그에만 남는 공격은 사각지대로 따로 표시한다. |
 
 시작·종료 시각을 정확히 맞춘다. 서버 시각이 UTC인지 확인하고, 아니라면 `profile.json`의 `since`/`until`을 같은 시간대(ISO 형식, 예: `2026-10-25T10:00:00+09:00`)로 적는다.
 
@@ -36,7 +36,7 @@ sha256sum * > SHA256SUMS
 sudo rsync -a --exclude='*.log' /var/www/<사이트>/ ../webroot/
 ```
 
-- 로테이션된 파일(`access.log.1`, `.gz`)도 함께 넣는다. LogSight는 `.gz`를 읽는다.
+- 로테이션된 파일(`access.log.1`, `.gz`)도 함께 넣는다. LogFinder는 `.gz`를 읽는다.
 - 로그를 편집하거나 줄을 지우지 않는다. 필요하면 시간 범위만 `since`/`until`로 자른다.
 
 ## 3. 정답(ground truth) 기록
@@ -60,7 +60,7 @@ CTF 운영자가 **공격이 일어난 순간마다** 기록한다. 나중에 �
 
 - `attacker_ip`: 팀 단위로 같은 NAT를 쓰면 팀 IP를 적고, 팀 이름을 `team` 필드에 추가한다.
 - `detectable`: 접속 로그에 흔적이 남는 공격이면 `true`. 본문만 바뀌거나 앱 로그에만 남으면 `false`로 적는다. 이 항목이 재현율 분모를 정한다.
-- `expected_rules`: LogSight 규칙 ID로 적는다. 규칙 목록은 `python -m logsight rules`로 본다. 규칙 이름을 모르겠으면 `technique`만 적고 나중에 맞춘다.
+- `expected_rules`: LogFinder 규칙 ID로 적는다. 규칙 목록은 `python -m logsight rules`로 본다. 규칙 이름을 모르겠으면 `technique`만 적고 나중에 맞춘다.
 - 정상 트래픽(운영자 점검, 봇, 검색 엔진)도 `"malicious": false`로 적는다. 오탐을 재려면 이 항목이 필요하다.
 
 기록 파일 이름은 `data/ctf-2026-10/ground_truth.json`처럼 CTF 로그와 같은 폴더에 둔다.
@@ -110,6 +110,6 @@ python scripts/ctf_evaluate.py --profile data/ctf-2026-10/profile.json \
 
 ## 6. 알려진 한계
 
-- LogSight는 웹 서버 로그와 인증 로그만 읽는다. 앱 내부 로그와 DB 로그는 보지 못한다.
+- LogFinder는 웹 서버 로그와 인증 로그만 읽는다. 앱 내부 로그와 DB 로그는 보지 못한다.
 - 한 IP에 여러 참가자가 섞이면 탐지 IP로 사람을 구분할 수 없다. 팀별 IP를 따로 받는 것이 좋다.
 - 정답을 CTF 운영자가 쓰므로 기록 누락이 있을 수 있다. 누락된 공격은 재현율을 낮춘다(보수적인 방향).

@@ -307,7 +307,7 @@ class Responder:
                 continue
             if c.kind == "role" and (str(c.detail.get("path", "")).startswith("/aws-service-role/")
                                      or c.id.startswith("AWSServiceRole") or "logsight" in c.id.lower()):
-                skipped.append({"kind": c.kind, "id": c.id, "why": "AWS 서비스 역할 또는 LogSight 자신"})
+                skipped.append({"kind": c.kind, "id": c.id, "why": "AWS 서비스 역할 또는 LogFinder 자신"})
                 continue
             cands.append(action_for(c, self.cfg.deny_policy_arn))
         cands.sort(key=lambda a: ORDER.get(a["kind"], 9))
@@ -499,7 +499,7 @@ def tick(cfg: Config, out_root: str | Path, *, session=None, iam=None, ec2=None,
 
 
 def _write_undo(out_dir: Path, resp: dict) -> None:
-    lines = ["# LogSight 자동 격리 되돌리기. 한 번에: python -m logsight respond undo " + str(out_dir), ""]
+    lines = ["# LogFinder 자동 격리 되돌리기. 한 번에: python -m logsight respond undo " + str(out_dir), ""]
     for a in resp["actions"]:
         r = (a.get("outcome") or {}).get("result")
         lines.append(f"# {a['op']} {a['id']} → {r}")

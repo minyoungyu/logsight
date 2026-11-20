@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T16:33:10Z",
+ "generated_at": "2026-11-20T17:40:09Z",
  "files": [
   {
    "file": "samples/combined/alb.log",
@@ -53,10 +53,10 @@
   "vpcflow": 3,
   "waf": 2
  },
- "n_flagged": 57,
- "n_findings": 12,
+ "n_flagged": 59,
+ "n_findings": 17,
  "rule_counts": {
-  "WEB_PATH_PROBE": {
+  "WEBLOG_ENUM_404": {
    "findings": 1,
    "events": 22
   },
@@ -64,7 +64,11 @@
    "findings": 1,
    "events": 20
   },
-  "WEB_SQLI_PATTERN": {
+  "WEBLOG_SCANNER": {
+   "findings": 2,
+   "events": 6
+  },
+  "WEBLOG_SQLI": {
    "findings": 1,
    "events": 4
   },
@@ -75,6 +79,14 @@
   "CT_INSTANCE_CRED_OUTSIDE": {
    "findings": 1,
    "events": 3
+  },
+  "WEBLOG_SENSITIVE_FILE": {
+   "findings": 1,
+   "events": 3
+  },
+  "WEBLOG_EXPLOIT_5XX": {
+   "findings": 2,
+   "events": 2
   },
   "GD_FINDING": {
    "findings": 2,
@@ -101,8 +113,8 @@
  "n_groups": 3,
  "n_patterns": 3,
  "severity_counts": {
-  "high": 1,
-  "medium": 1,
+  "high": 2,
+  "medium": 0,
   "low": 1
  },
  "incident_index": [
@@ -111,8 +123,9 @@
    "start": "2026-01-13T04:10:00+00:00",
    "end": "2026-01-13T04:30:00+00:00",
    "severity": "high",
-   "score": 434,
+   "score": 469,
    "stages": [
+    "discovery",
     "initial-access",
     "credential-access",
     "persistence"
@@ -120,7 +133,7 @@
    "src_ips": [
     "203.0.113.9"
    ],
-   "n_events": 10,
+   "n_events": 11,
    "repeats": 1,
    "first_seen": "2026-01-13T04:10:00+00:00",
    "last_seen": "2026-01-13T04:30:00+00:00",
@@ -130,7 +143,9 @@
     "GD_FINDING",
     "SSH_SUCCESS_AFTER_FAIL",
     "VPC_REMOTE_ADMIN_EXPOSED",
-    "WAF_SQLI_NOT_BLOCKED"
+    "WAF_SQLI_NOT_BLOCKED",
+    "WEBLOG_EXPLOIT_5XX",
+    "WEBLOG_SCANNER"
    ],
    "verdict": "attack",
    "verdict_by": "rules"
@@ -139,8 +154,8 @@
    "id": "INC-002",
    "start": "2026-10-20T03:00:00+00:00",
    "end": "2026-10-20T03:10:20+00:00",
-   "severity": "medium",
-   "score": 299,
+   "severity": "high",
+   "score": 429,
    "stages": [
     "discovery",
     "initial-access"
@@ -148,15 +163,18 @@
    "src_ips": [
     "203.0.113.50"
    ],
-   "n_events": 46,
+   "n_events": 47,
    "repeats": 1,
    "first_seen": "2026-10-20T03:00:00+00:00",
    "last_seen": "2026-10-20T03:10:20+00:00",
    "rules": [
     "VPC_PORT_SCAN",
     "VPC_REMOTE_ADMIN_EXPOSED",
-    "WEB_PATH_PROBE",
-    "WEB_SQLI_PATTERN"
+    "WEBLOG_ENUM_404",
+    "WEBLOG_EXPLOIT_5XX",
+    "WEBLOG_SCANNER",
+    "WEBLOG_SENSITIVE_FILE",
+    "WEBLOG_SQLI"
    ],
    "verdict": "attack",
    "verdict_by": "rules"
@@ -193,13 +211,13 @@
      "guardduty_findings.json:2",
      "waf.log:1",
      "vpcflow.log:1",
+     "alb.log:2",
      "auth.log:1",
-     "auth.log:2",
-     "auth.log:3"
+     "auth.log:2"
     ],
     "verdict": "attack",
     "confidence": "high",
-    "reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 외부에서 관리 포트(22/3389) 접속 허용. 성공·허용 5건, 실패·차단 3건."
+    "reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건."
    },
    {
     "id": "INC-002",
@@ -213,7 +231,7 @@
     ],
     "verdict": "attack",
     "confidence": "high",
-    "reason": "여러 포트에 대한 접속 시도(포트 스캔), 외부에서 관리 포트(22/3389) 접속 허용, 없는 경로를 연속 요청(웹 스캐너). 성공·허용 6건, 실패·차단 40건."
+    "reason": "여러 포트에 대한 접속 시도(포트 스캔), 외부에서 관리 포트(22/3389) 접속 허용, 존재하지 않는 경로 연속 탐색(열거). 결과: 통과 4건, 허용 3건, 실패·차단 40건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."
    },
    {
     "id": "INC-003",
@@ -318,13 +336,13 @@
      "guardduty_findings.json:2",
      "waf.log:1",
      "vpcflow.log:1",
+     "alb.log:2",
      "auth.log:1",
-     "auth.log:2",
-     "auth.log:3"
+     "auth.log:2"
     ],
     "verdict": "attack",
     "confidence": "high",
-    "reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 외부에서 관리 포트(22/3389) 접속 허용. 성공·허용 5건, 실패·차단 3건."
+    "reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건."
    },
    {
     "id": "INC-002",
@@ -338,7 +356,7 @@
     ],
     "verdict": "attack",
     "confidence": "high",
-    "reason": "여러 포트에 대한 접속 시도(포트 스캔), 외부에서 관리 포트(22/3389) 접속 허용, 없는 경로를 연속 요청(웹 스캐너). 성공·허용 6건, 실패·차단 40건."
+    "reason": "여러 포트에 대한 접속 시도(포트 스캔), 외부에서 관리 포트(22/3389) 접속 허용, 존재하지 않는 경로 연속 탐색(열거). 결과: 통과 4건, 허용 3건, 실패·차단 40건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."
    },
    {
     "id": "INC-003",
@@ -448,8 +466,9 @@
     "start": "2026-01-13T04:10:00+00:00",
     "end": "2026-01-13T04:30:00+00:00",
     "severity": "high",
-    "score": 434,
+    "score": 469,
     "stages": [
+     "discovery",
      "initial-access",
      "credential-access",
      "persistence"
@@ -467,13 +486,14 @@
      "ubuntu"
     ],
     "sources": [
+     "alb",
      "cloudtrail",
      "guardduty",
      "sshauth",
      "vpcflow",
      "waf"
     ],
-    "n_events": 10,
+    "n_events": 11,
     "n_known": 0,
     "known_labels": [],
     "findings": [
@@ -508,6 +528,21 @@
       ]
      },
      {
+      "rule": "WEBLOG_SCANNER",
+      "technique": "T1595.002",
+      "stage": "discovery",
+      "title": "취약점 스캐너·자동 도구 탐지",
+      "severity": "low",
+      "detail": "1건(성공 1, 실패·거부 0)",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:20:00+00:00",
+      "last": "2026-01-13T04:20:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "waf.log:1"
+      ]
+     },
+     {
       "rule": "VPC_REMOTE_ADMIN_EXPOSED",
       "technique": "T1133",
       "stage": "initial-access",
@@ -520,6 +555,21 @@
       "n_events": 1,
       "evidence": [
        "vpcflow.log:1"
+      ]
+     },
+     {
+      "rule": "WEBLOG_EXPLOIT_5XX",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "공격 요청에 서버 오류(500) 응답 — 취약점 반응",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "203.0.113.9",
+      "first": "2026-01-13T04:20:30.100000+00:00",
+      "last": "2026-01-13T04:20:30.100000+00:00",
+      "n_events": 1,
+      "evidence": [
+       "alb.log:2"
       ]
      },
      {
@@ -621,6 +671,7 @@
       "disposition": "allowed",
       "src_ip": "203.0.113.9",
       "rules": [
+       "WEBLOG_SCANNER",
        "WAF_SQLI_NOT_BLOCKED"
       ],
       "counted_rules": [
@@ -642,6 +693,25 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 22,
+      "target_instance": "i-0abc123def456"
+     },
+     {
+      "ref": "alb.log:2",
+      "ts": "2026-01-13T04:20:30.100000+00:00",
+      "source": "alb",
+      "action": "GET /search?q=1%27",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "203.0.113.9",
+      "rules": [
+       "WEBLOG_EXPLOIT_5XX"
+      ],
+      "dst_ip": "10.0.1.10",
+      "dst_port": 80,
+      "ua": "curl/8.0",
+      "http_status": 500,
+      "http_host": "demo",
       "target_instance": "i-0abc123def456"
      },
      {
@@ -775,7 +845,7 @@
     ],
     "omitted_events": 0,
     "context": {
-     "n_events": 4,
+     "n_events": 3,
      "top_actions": [
       [
        "tcp/8080 REJECT",
@@ -788,15 +858,11 @@
       [
        "GET /login",
        1
-      ],
-      [
-       "GET /search?q=1%27",
-       1
       ]
      ],
      "sources": {
       "vpcflow": 2,
-      "alb": 2
+      "alb": 1
      }
     },
     "id": "INC-001",
@@ -906,6 +972,46 @@
      ]
     },
     {
+     "id": "IAM_ROLE_SESSION_REVOKE",
+     "target": "iam",
+     "resource": "ec2-app-role",
+     "severity": "high",
+     "title": "역할 ec2-app-role의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)",
+     "why": "인스턴스에서 빠져나간 임시 자격증명은 서버를 꺼도 세션 만료까지(기본 수 시간) 공격자 PC에서 계속 작동한다. 지금까지 발급된 세션을 끊어야 멈춘다.",
+     "evidence": [
+      "cloudtrail.json:1",
+      "cloudtrail.json:2",
+      "cloudtrail.json:3",
+      "guardduty_findings.json:1"
+     ],
+     "current": null,
+     "proposed": {
+      "Version": "2012-10-17",
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Action": "*",
+        "Resource": "*",
+        "Condition": {
+         "DateLessThan": {
+          "aws:TokenIssueTime": "2026-11-20T17:40:09Z"
+         }
+        }
+       }
+      ]
+     },
+     "cli": [
+      "# 위 proposed를 policy.json으로 저장(aws:TokenIssueTime=2026-11-20T17:40:09Z=지금 UTC, 그 이전 발급 세션만 거부)",
+      "aws iam put-role-policy --role-name ec2-app-role --policy-name AWSRevokeOlderSessions --policy-document file://policy.json",
+      "# 같은 역할을 쓰는 정상 앱도 잠깐 끊긴다(인스턴스 프로필이 남아 있으면 재시작 때 새 자격증명을 받는다).",
+      "# 다음 할 일(복구): 새 역할로 인스턴스 프로필을 교체(스왑)한 뒤, 확인되면 이 거부 정책을 뗀다."
+     ],
+     "caution": "같은 역할을 쓰는 운영 앱도 끊기므로 사람이 판단해 실행한다. 되돌리기는 거부 정책을 떼는 것이다.",
+     "rollback": [
+      "aws iam delete-role-policy --role-name ec2-app-role --policy-name AWSRevokeOlderSessions"
+     ]
+    },
+    {
      "id": "IAM_OVERBROAD",
      "target": "iam",
      "resource": "ec2-app-role",
@@ -961,6 +1067,24 @@
      ]
     },
     {
+     "id": "WEB_FIX_ACCOUNT",
+     "target": "account",
+     "resource": "ubuntu",
+     "severity": "high",
+     "title": "탈취 의심 계정 잠그고 비밀번호·키 교체: ubuntu",
+     "why": "ubuntu 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다(공격 출발지 203.0.113.9). 가능하면 다중 인증을 켠다.",
+     "evidence": [
+      "auth.log:1",
+      "auth.log:2",
+      "auth.log:3"
+     ],
+     "current": null,
+     "proposed": null,
+     "cli": [],
+     "rollback": [],
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+    },
+    {
      "id": "NACL_BLOCK_ATTACKER",
      "target": "nacl",
      "resource": "acl-0default00000001",
@@ -971,13 +1095,13 @@
       "guardduty_findings.json:2",
       "waf.log:1",
       "vpcflow.log:1",
+      "alb.log:2",
       "auth.log:1",
       "auth.log:2",
       "auth.log:3",
       "cloudtrail.json:1",
       "cloudtrail.json:2",
-      "cloudtrail.json:3",
-      "guardduty_findings.json:1"
+      "cloudtrail.json:3"
      ],
      "current": {
       "entries": 1
@@ -990,18 +1114,34 @@
      "cli": [
       "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.9/32"
      ],
-     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다.",
+     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해 첫 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
      "rollback": [
       "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
      ]
+    },
+    {
+     "id": "WEB_FIX_SQLI",
+     "target": "app",
+     "resource": "/item(id)",
+     "severity": "medium",
+     "title": "SQL 인젝션 취약 코드 수정: /item(id)",
+     "why": "/item(id)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+     "evidence": [
+      "waf.log:1"
+     ],
+     "current": null,
+     "proposed": null,
+     "cli": [],
+     "rollback": [],
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
     }
    ],
    "report": {
-    "summary": "외부 공격으로 보입니다. 01-13 04:10~04:30 UTC(한국 13:10~13:30), 출발지 203.0.113.9: GuardDuty: SSH 비밀번호 연속 실패(무차별 대입) → SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW) → 외부에서 관리 포트(22/3389) 접속 허용 → 연속 실패 뒤 SSH 로그인 성공. 성공하거나 통과된 시도가 5건 있어 실제 피해가 있었는지 확인해야 합니다. 먼저 고칠 설정: 보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용(아래 수정안).",
+    "summary": "외부 공격으로 보입니다. 01-13 04:10~04:30 UTC(한국 13:10~13:30), 출발지 203.0.113.9: GuardDuty: SSH 비밀번호 연속 실패(무차별 대입) → SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW) → 취약점 스캐너·자동 도구 탐지 → 외부에서 관리 포트(22/3389) 접속 허용. 공격이 성공한 근거가 3건 있어 피해 범위를 확인해야 합니다(결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건). 먼저 할 일: 역할 ec2-app-role의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)(아래 수정안).",
     "severity": "high",
     "confidence": "high",
     "verdict": "attack",
-    "verdict_reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 외부에서 관리 포트(22/3389) 접속 허용. 성공·허용 5건, 실패·차단 3건.",
+    "verdict_reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건.",
     "attack_flow": [
      {
       "stage": "credential-access",
@@ -1022,12 +1162,30 @@
       ]
      },
      {
+      "stage": "discovery",
+      "technique": "T1595.002",
+      "time": "2026-01-13T04:20:00+00:00",
+      "what": "203.0.113.9에서 취약점 스캐너·자동 도구로 1건을 요청했습니다(GET /item?id=1%27%20OR%201%3D1-- 등). 공격 전 훑어보기입니다. 같은 IP의 다른 공격 요청이 성공했는지 보세요.",
+      "evidence": [
+       "waf.log:1"
+      ]
+     },
+     {
       "stage": "initial-access",
       "technique": "T1133",
       "time": "2026-01-13T04:20:00+00:00",
       "what": "203.0.113.9에서 관리 포트(22)로 접속한 것이 1건 허용됐습니다. 관리 포트가 인터넷에 열려 있다는 뜻입니다.",
       "evidence": [
        "vpcflow.log:1"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-01-13T04:20:30.100000+00:00",
+      "what": "203.0.113.9의 공격 요청 1건에 서버가 오류(500)로 응답했습니다. 취약한 코드가 실제로 건드려졌다는 신호입니다.",
+      "evidence": [
+       "alb.log:2"
       ]
      },
      {
@@ -1101,6 +1259,16 @@
       ]
      },
      {
+      "setting": "역할 ec2-app-role의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)",
+      "why": "인스턴스에서 빠져나간 임시 자격증명은 서버를 꺼도 세션 만료까지(기본 수 시간) 공격자 PC에서 계속 작동한다. 지금까지 발급된 세션을 끊어야 멈춘다.",
+      "evidence": [
+       "cloudtrail.json:1",
+       "cloudtrail.json:2",
+       "cloudtrail.json:3",
+       "guardduty_findings.json:1"
+      ]
+     },
+     {
       "setting": "역할 ec2-app-role의 권한이 과도(와일드카드)",
       "why": "탈취된 자격증명으로 필요 이상의 자원 조회·변경이 가능했다.",
       "evidence": [
@@ -1111,15 +1279,31 @@
       ]
      },
      {
+      "setting": "탈취 의심 계정 잠그고 비밀번호·키 교체: ubuntu",
+      "why": "ubuntu 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다(공격 출발지 203.0.113.9). 가능하면 다중 인증을 켠다.",
+      "evidence": [
+       "auth.log:1",
+       "auth.log:2",
+       "auth.log:3"
+      ]
+     },
+     {
       "setting": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
       "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
       "evidence": [
        "guardduty_findings.json:2",
        "waf.log:1",
        "vpcflow.log:1",
+       "alb.log:2",
        "auth.log:1",
-       "auth.log:2",
-       "auth.log:3"
+       "auth.log:2"
+      ]
+     },
+     {
+      "setting": "SQL 인젝션 취약 코드 수정: /item(id)",
+      "why": "/item(id)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+      "evidence": [
+       "waf.log:1"
       ]
      }
     ],
@@ -1146,6 +1330,13 @@
       "priority": "now"
      },
      {
+      "check_id": "IAM_ROLE_SESSION_REVOKE",
+      "target": "iam",
+      "resource": "ec2-app-role",
+      "change": "역할 ec2-app-role의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)",
+      "priority": "now"
+     },
+     {
       "check_id": "IAM_OVERBROAD",
       "target": "iam",
       "resource": "ec2-app-role",
@@ -1153,10 +1344,24 @@
       "priority": "now"
      },
      {
+      "check_id": "WEB_FIX_ACCOUNT",
+      "target": "account",
+      "resource": "ubuntu",
+      "change": "탈취 의심 계정 잠그고 비밀번호·키 교체: ubuntu",
+      "priority": "now"
+     },
+     {
       "check_id": "NACL_BLOCK_ATTACKER",
       "target": "nacl",
       "resource": "acl-0default00000001",
       "change": "서브넷 NACL에 공격 IP 203.0.113.9 차단 규칙 추가",
+      "priority": "soon"
+     },
+     {
+      "check_id": "WEB_FIX_SQLI",
+      "target": "app",
+      "resource": "/item(id)",
+      "change": "SQL 인젝션 취약 코드 수정: /item(id)",
       "priority": "soon"
      }
     ],
@@ -1167,13 +1372,13 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 9501,
-    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
+    "payload_chars": 11825,
     "validation": {
-     "evidence_total": 31,
+     "evidence_total": 41,
      "evidence_invalid": 0,
      "steps_without_evidence": 0,
      "unknown_check_ids": [],
+     "ai_new_changes": [],
      "passed": true
     }
    }
@@ -1182,8 +1387,8 @@
    "incident": {
     "start": "2026-10-20T03:00:00+00:00",
     "end": "2026-10-20T03:10:20+00:00",
-    "severity": "medium",
-    "score": 299,
+    "severity": "high",
+    "score": 429,
     "stages": [
      "discovery",
      "initial-access"
@@ -1199,7 +1404,7 @@
      "hostfw",
      "weblog"
     ],
-    "n_events": 46,
+    "n_events": 47,
     "n_known": 0,
     "known_labels": [],
     "findings": [
@@ -1253,12 +1458,12 @@
       ]
      },
      {
-      "rule": "WEB_PATH_PROBE",
+      "rule": "WEBLOG_ENUM_404",
       "technique": "T1595.003",
       "stage": "discovery",
-      "title": "없는 경로를 연속 요청(웹 스캐너)",
+      "title": "존재하지 않는 경로 연속 탐색(열거)",
       "severity": "low",
-      "detail": "5분 안에 서로 다른 경로 22개 404/403",
+      "detail": "5분 안에 404/403 22건, 경로 22종",
       "key": "203.0.113.50",
       "first": "2026-10-20T03:05:00+00:00",
       "last": "2026-10-20T03:06:45+00:00",
@@ -1287,12 +1492,48 @@
       ]
      },
      {
-      "rule": "WEB_SQLI_PATTERN",
+      "rule": "WEBLOG_SENSITIVE_FILE",
+      "technique": "T1083",
+      "stage": "discovery",
+      "title": "설정·비밀 파일 접근 시도(.env 등)",
+      "severity": "medium",
+      "detail": "3건(성공 0, 실패·거부 3)",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:05:05+00:00",
+      "last": "2026-10-20T03:05:30+00:00",
+      "n_events": 3,
+      "evidence": [
+       "nginx_access.log:2",
+       "nginx_access.log:6",
+       "nginx_access.log:7"
+      ]
+     },
+     {
+      "rule": "WEBLOG_SCANNER",
+      "technique": "T1595.002",
+      "stage": "discovery",
+      "title": "취약점 스캐너·자동 도구 탐지",
+      "severity": "low",
+      "detail": "5건(성공 4, 실패·거부 1)",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:09:00+00:00",
+      "last": "2026-10-20T03:10:20+00:00",
+      "n_events": 5,
+      "evidence": [
+       "nginx_access.log:23",
+       "nginx_access.log:24",
+       "nginx_access.log:25",
+       "nginx_access.log:26",
+       "nginx_access.log:27"
+      ]
+     },
+     {
+      "rule": "WEBLOG_SQLI",
       "technique": "T1190",
       "stage": "initial-access",
       "title": "웹 요청에 SQL 인젝션 패턴",
-      "severity": "medium",
-      "detail": "4건(성공 3, 실패·거부 1)",
+      "severity": "high",
+      "detail": "4건(성공 3, 실패·거부 1) · 성공 근거 없음: 2xx 3건 모두 평소 응답(812바이트)과 크기가 비슷함(같은 페이지로 보임)",
       "key": "203.0.113.50",
       "first": "2026-10-20T03:09:20+00:00",
       "last": "2026-10-20T03:10:20+00:00",
@@ -1302,6 +1543,21 @@
        "nginx_access.log:25",
        "nginx_access.log:26",
        "nginx_access.log:27"
+      ]
+     },
+     {
+      "rule": "WEBLOG_EXPLOIT_5XX",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "공격 요청에 서버 오류(500) 응답 — 취약점 반응",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "203.0.113.50",
+      "first": "2026-10-20T03:09:20+00:00",
+      "last": "2026-10-20T03:09:20+00:00",
+      "n_events": 1,
+      "evidence": [
+       "nginx_access.log:24"
       ]
      }
     ],
@@ -1637,7 +1893,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1652,7 +1908,8 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1667,7 +1924,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1682,7 +1939,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1697,7 +1954,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1712,7 +1969,8 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1727,7 +1985,8 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1742,7 +2001,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1757,7 +2016,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1772,7 +2031,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1787,7 +2046,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1802,7 +2061,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1817,7 +2076,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1832,7 +2091,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1847,7 +2106,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1862,7 +2121,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1877,7 +2136,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1892,7 +2151,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1907,7 +2166,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1922,7 +2181,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1937,7 +2196,7 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
@@ -1952,10 +2211,25 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_PATH_PROBE"
+       "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
       "http_status": 404
+     },
+     {
+      "ref": "nginx_access.log:23",
+      "ts": "2026-10-20T03:09:00+00:00",
+      "source": "weblog",
+      "action": "GET /item?id=1",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "203.0.113.50",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ],
+      "ua": "sqlmap/1.8",
+      "http_status": 200
      },
      {
       "ref": "nginx_access.log:24",
@@ -1967,7 +2241,9 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_SQLI_PATTERN"
+       "WEBLOG_SQLI",
+       "WEBLOG_EXPLOIT_5XX",
+       "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
       "http_status": 500
@@ -1982,7 +2258,8 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_SQLI_PATTERN"
+       "WEBLOG_SQLI",
+       "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
       "http_status": 200
@@ -1997,7 +2274,8 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_SQLI_PATTERN"
+       "WEBLOG_SQLI",
+       "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
       "http_status": 200
@@ -2012,7 +2290,8 @@
       "disposition": "none",
       "src_ip": "203.0.113.50",
       "rules": [
-       "WEB_SQLI_PATTERN"
+       "WEBLOG_SQLI",
+       "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
       "http_status": 200
@@ -2020,16 +2299,9 @@
     ],
     "omitted_events": 0,
     "context": {
-     "n_events": 1,
-     "top_actions": [
-      [
-       "GET /item?id=1",
-       1
-      ]
-     ],
-     "sources": {
-      "weblog": 1
-     }
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
     },
     "id": "INC-002",
     "repeats": 1,
@@ -2084,41 +2356,6 @@
      ]
     },
     {
-     "id": "WAF_SQLI_COUNT",
-     "target": "waf",
-     "resource": "logsight-demo-acl",
-     "severity": "high",
-     "title": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
-     "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
-     "evidence": [
-      "nginx_access.log:24",
-      "nginx_access.log:25",
-      "nginx_access.log:26",
-      "nginx_access.log:27"
-     ],
-     "current": {
-      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
-      "OverrideAction": {
-       "Count": {}
-      }
-     },
-     "proposed": {
-      "Name": "AWS-AWSManagedRulesSQLiRuleSet",
-      "OverrideAction": {
-       "None": {}
-      }
-     },
-     "cli": [
-      "aws wafv2 get-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 > acl.json",
-      "# acl.json의 Rules에서 위 규칙의 OverrideAction을 {\"None\": {}}로 바꾼 뒤",
-      "aws wafv2 update-web-acl --scope REGIONAL --name logsight-demo-acl --id a1b2c3d4-5678-90ab-cdef-EXAMPLE11111 --lock-token <LockToken> --default-action Allow={} --rules file://rules.json --visibility-config <기존 값>"
-     ],
-     "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
-     "rollback": [
-      "# 변경 전에 저장한 acl.json의 Rules로 update-web-acl을 다시 실행(LockToken은 새로 받기)"
-     ]
-    },
-    {
      "id": "NACL_BLOCK_ATTACKER",
      "target": "nacl",
      "resource": "acl-0default00000001",
@@ -2148,18 +2385,37 @@
      "cli": [
       "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.50/32"
      ],
-     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다.",
+     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해 첫 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
      "rollback": [
       "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
      ]
+    },
+    {
+     "id": "WEB_FIX_SQLI",
+     "target": "app",
+     "resource": "/item(id)",
+     "severity": "medium",
+     "title": "SQL 인젝션 취약 코드 수정: /item(id)",
+     "why": "/item(id)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+     "evidence": [
+      "nginx_access.log:24",
+      "nginx_access.log:25",
+      "nginx_access.log:26",
+      "nginx_access.log:27"
+     ],
+     "current": null,
+     "proposed": null,
+     "cli": [],
+     "rollback": [],
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
     }
    ],
    "report": {
-    "summary": "외부 공격으로 보입니다. 10-20 03:00~03:10 UTC(한국 12:00~12:10), 출발지 203.0.113.50: 여러 포트에 대한 접속 시도(포트 스캔) → 외부에서 관리 포트(22/3389) 접속 허용 → 없는 경로를 연속 요청(웹 스캐너) → 웹 요청에 SQL 인젝션 패턴. 성공하거나 통과된 시도가 6건 있어 실제 피해가 있었는지 확인해야 합니다. 먼저 고칠 설정: 보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용(아래 수정안).",
-    "severity": "medium",
+    "summary": "외부 공격으로 보입니다. 10-20 03:00~03:10 UTC(한국 12:00~12:10), 출발지 203.0.113.50: 여러 포트에 대한 접속 시도(포트 스캔) → 외부에서 관리 포트(22/3389) 접속 허용 → 존재하지 않는 경로 연속 탐색(열거) → 설정·비밀 파일 접근 시도(.env 등). 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 보이지 않습니다(결과: 통과 4건, 허용 3건, 실패·차단 40건). 먼저 할 일: 보안그룹 web-sg이 22번 포트를 0.0.0.0/0에 허용(아래 수정안).",
+    "severity": "high",
     "confidence": "high",
     "verdict": "attack",
-    "verdict_reason": "여러 포트에 대한 접속 시도(포트 스캔), 외부에서 관리 포트(22/3389) 접속 허용, 없는 경로를 연속 요청(웹 스캐너). 성공·허용 6건, 실패·차단 40건.",
+    "verdict_reason": "여러 포트에 대한 접속 시도(포트 스캔), 외부에서 관리 포트(22/3389) 접속 허용, 존재하지 않는 경로 연속 탐색(열거). 결과: 통과 4건, 허용 3건, 실패·차단 40건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다.",
     "attack_flow": [
      {
       "stage": "discovery",
@@ -2190,7 +2446,7 @@
       "stage": "discovery",
       "technique": "T1595.003",
       "time": "2026-10-20T03:05:00+00:00",
-      "what": "203.0.113.50에서 없는 경로 22곳을 연달아 요청했습니다(GET /admin, GET /.env 등). 취약한 파일을 찾는 스캐너입니다.",
+      "what": "203.0.113.50에서 없는 경로 22곳을 연달아 요청했습니다(GET /admin, GET /.env 등). 숨은 파일·관리 화면을 찾는 스캐너입니다.",
       "evidence": [
        "nginx_access.log:1",
        "nginx_access.log:2",
@@ -2203,15 +2459,48 @@
       ]
      },
      {
+      "stage": "discovery",
+      "technique": "T1083",
+      "time": "2026-10-20T03:05:05+00:00",
+      "what": "203.0.113.50에서 설정·비밀 파일(.env, .git 등)을 3번 열어 보려 했습니다(성공 0건, 거부 3건). 성공한 것이 있으면 그 파일의 비밀값을 모두 바꾸세요.",
+      "evidence": [
+       "nginx_access.log:2",
+       "nginx_access.log:6",
+       "nginx_access.log:7"
+      ]
+     },
+     {
+      "stage": "discovery",
+      "technique": "T1595.002",
+      "time": "2026-10-20T03:09:00+00:00",
+      "what": "203.0.113.50에서 취약점 스캐너·자동 도구로 5건을 요청했습니다(GET /item?id=1, GET /item?id=1%27 등). 공격 전 훑어보기입니다. 같은 IP의 다른 공격 요청이 성공했는지 보세요.",
+      "evidence": [
+       "nginx_access.log:23",
+       "nginx_access.log:24",
+       "nginx_access.log:25",
+       "nginx_access.log:26",
+       "nginx_access.log:27"
+      ]
+     },
+     {
       "stage": "initial-access",
       "technique": "T1190",
       "time": "2026-10-20T03:09:20+00:00",
-      "what": "203.0.113.50에서 보낸 웹 요청 4건에 SQL 인젝션 문자열이 있었습니다(정상 응답 3건, 오류·거부 1건).",
+      "what": "203.0.113.50에서 보낸 웹 요청 4건에 SQL 인젝션 문자열이 있었습니다(정상 응답 3건, 오류·거부 1건). 응답 크기로 본 판단: 성공 근거 없음: 2xx 3건 모두 평소 응답(812바이트)과 크기가 비슷함(같은 페이지로 보임).",
       "evidence": [
        "nginx_access.log:24",
        "nginx_access.log:25",
        "nginx_access.log:26",
        "nginx_access.log:27"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-10-20T03:09:20+00:00",
+      "what": "203.0.113.50의 공격 요청 1건에 서버가 오류(500)로 응답했습니다. 취약한 코드가 실제로 건드려졌다는 신호입니다.",
+      "evidence": [
+       "nginx_access.log:24"
       ]
      }
     ],
@@ -2229,16 +2518,6 @@
       ]
      },
      {
-      "setting": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
-      "why": "SQL 인젝션을 탐지하고도 차단하지 않아 요청이 서버까지 도달했다.",
-      "evidence": [
-       "nginx_access.log:24",
-       "nginx_access.log:25",
-       "nginx_access.log:26",
-       "nginx_access.log:27"
-      ]
-     },
-     {
       "setting": "서브넷 NACL에 공격 IP 203.0.113.50 차단 규칙 추가",
       "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
       "evidence": [
@@ -2248,6 +2527,16 @@
        "hostfw_kern.log:4",
        "hostfw_kern.log:5",
        "hostfw_kern.log:6"
+      ]
+     },
+     {
+      "setting": "SQL 인젝션 취약 코드 수정: /item(id)",
+      "why": "/item(id)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+      "evidence": [
+       "nginx_access.log:24",
+       "nginx_access.log:25",
+       "nginx_access.log:26",
+       "nginx_access.log:27"
       ]
      }
     ],
@@ -2260,17 +2549,17 @@
       "priority": "now"
      },
      {
-      "check_id": "WAF_SQLI_COUNT",
-      "target": "waf",
-      "resource": "logsight-demo-acl",
-      "change": "WAF logsight-demo-acl의 AWS-AWSManagedRulesSQLiRuleSet 규칙이 COUNT(기록만) 모드",
-      "priority": "now"
-     },
-     {
       "check_id": "NACL_BLOCK_ATTACKER",
       "target": "nacl",
       "resource": "acl-0default00000001",
       "change": "서브넷 NACL에 공격 IP 203.0.113.50 차단 규칙 추가",
+      "priority": "soon"
+     },
+     {
+      "check_id": "WEB_FIX_SQLI",
+      "target": "app",
+      "resource": "/item(id)",
+      "change": "SQL 인젝션 취약 코드 수정: /item(id)",
       "priority": "soon"
      }
     ],
@@ -2281,13 +2570,13 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 18031,
-    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
+    "payload_chars": 21194,
     "validation": {
-     "evidence_total": 37,
+     "evidence_total": 46,
      "evidence_invalid": 0,
      "steps_without_evidence": 0,
      "unknown_check_ids": [],
+     "ai_new_changes": [],
      "passed": true
     }
    }
@@ -2387,23 +2676,29 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 1005,
-    "note": "ANTHROPIC_API_KEY가 없어 규칙 기반 분석으로 생성",
+    "payload_chars": 1054,
     "validation": {
      "evidence_total": 1,
      "evidence_invalid": 0,
      "steps_without_evidence": 0,
      "unknown_check_ids": [],
+     "ai_new_changes": [],
      "passed": true
     }
    }
   }
  ],
  "timing": {
-  "detect_correlate_s": 0.01,
-  "total_s": 0.01
+  "detect_correlate_s": 0.02,
+  "total_s": 0.02
  },
  "has_environment": true,
+ "team": {
+  "proposed": [],
+  "confirmed": [],
+  "excluded": []
+ },
+ "excluded_activity": [],
  "assumptions": [
   "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 올해(미래면 작년)로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
  ]

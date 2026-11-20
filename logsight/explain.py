@@ -262,7 +262,10 @@ def verdict_for(inc: dict) -> dict:
     what = ", ".join(list(dict.fromkeys(f["title"] for f in inc["findings"]))[:3])
     if success:
         conf = "high" if len(inc["stages"]) >= 2 else "medium"
-        tail = f"성공·허용 {success}건, 실패·차단 {blocked}건."
+        from .outcome import counts, phrase
+        c = counts(evs)
+        tail = (f"결과: {phrase(c)}." + ("" if c["success"] else
+                " 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."))
     else:
         conf = "low"
         tail = f"보이는 시도 {blocked}건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
@@ -465,12 +468,20 @@ def summarize(inc: dict, verdict: dict | None, checks: list[dict]) -> str:
     parts = [head, f"{_span(inc['start'], inc['end'])}, 출발지 {who}: {steps}."]
     if v == "attack":
         if ok:
-            parts.append(f"성공하거나 통과된 시도가 {ok}건 있어 실제 피해가 있었는지 확인해야 합니다.")
+            from .outcome import counts, phrase
+            c = counts(evs)
+            if c["success"]:
+                parts.append(f"공격이 성공한 근거가 {c['success']}건 있어 피해 범위를 확인해야 합니다"
+                             f"(결과: {phrase(c)}).")
+            else:
+                parts.append(f"연결 허용·요청 통과는 있지만 공격이 성공한 근거는 보이지 않습니다(결과: {phrase(c)}).")
         elif blocked:
             parts.append(f"보이는 시도 {len(evs)}건은 모두 막히거나 실패했습니다(올린 로그 범위 안에서).")
     elif v in ("benign_activity", "unclear", "risky_not_attack"):
         parts.append((verdict or {}).get("reason", ""))
     if checks and v in ("attack", "risky_not_attack"):
-        top = sorted(checks, key=lambda c: {"high": 0, "medium": 1, "low": 2}.get(c["severity"], 3))[0]
-        parts.append(f"먼저 고칠 설정: {top['title']}(아래 수정안).")
+        from .outcome import PHASE  # 번지는 것 막기 → 들어온 길 닫기 → 원인 고치기(첫 화면 '먼저 할 일'과 같은 순서)
+        top = sorted(checks, key=lambda c: (PHASE.get(c.get("id"), 2),
+                                            {"high": 0, "medium": 1, "low": 2}.get(c["severity"], 3)))[0]
+        parts.append(f"먼저 할 일: {top['title']}(아래 수정안).")
     return " ".join(p for p in parts if p)

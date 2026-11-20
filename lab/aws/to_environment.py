@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LogSight AWS 랩 — 설정 스냅샷(environment.json) 생성기.
+"""LogFinder AWS 랩 — 설정 스냅샷(environment.json) 생성기.
 
 `aws` CLI(본인 PC의 자격증명)로 Project=LogSight 태그가 붙은 자원의 설정을 읽어
 config_audit 가 쓰는 environment.json 형식으로 저장한다. describe 결과만 읽고 아무것도 바꾸지 않는다.
@@ -109,7 +109,7 @@ def build(region: str) -> dict:
                           "needed_resources": ["arn:aws:s3:::<필요한 버킷>/*"]})
 
     return {
-        "_comment": "LogSight AWS 랩에서 aws describe-* 로 자동 수집한 설정 스냅샷. 손으로 만든 샘플이 아니다.",
+        "_comment": "LogFinder AWS 랩에서 aws describe-* 로 자동 수집한 설정 스냅샷. 손으로 만든 샘플이 아니다.",
         "account_id": account,
         "region": region,
         "trusted_ips": [],  # 관리자 사무실/본인 IP 가 있으면 [{"cidr":"x.x.x.x/32","label":"관리자"}] 로 채운다

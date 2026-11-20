@@ -23,7 +23,7 @@ from logsight.web.webprofile import SiteProfile  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="정답 파일과 LogSight 판정을 대조해 재현율·오탐률을 낸다")
+    ap = argparse.ArgumentParser(description="정답 파일과 LogFinder 판정을 대조해 재현율·오탐률을 낸다")
     ap.add_argument("--profile", required=True, help="사이트 프로필 profile.json")
     ap.add_argument("--truth", required=True, help="정답 파일(ground_truth.json)")
     ap.add_argument("--out", help="결과를 저장할 JSON 경로")

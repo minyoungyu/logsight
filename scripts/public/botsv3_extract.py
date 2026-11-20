@@ -18,7 +18,7 @@ import re
 import sys
 from pathlib import Path
 
-# Splunk sourcetype -> 출력 파일 이름(LogSight가 내용으로 종류를 알아낸다)
+# Splunk sourcetype -> 출력 파일 이름(LogFinder가 내용으로 종류를 알아낸다)
 OUTPUTS = {
     "aws:cloudtrail": "cloudtrail.json",
     "aws:cloudwatchlogs:vpcflow": "vpcflow.log",

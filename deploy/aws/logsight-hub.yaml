@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  LogSight hub (deploy in the LOGSIGHT-operated account, not in a customer account).
+  LogFinder hub (deploy in the LOGSIGHT-operated account, not in a customer account).
   Customer accounts forward security alerts to this event bus; a rule puts them on one SQS
   queue that `logsight watch` reads. Each alert keeps the customer's account id, so one
   analysis server serves many customers. Deploy logsight-log-archive.yaml in this same
@@ -14,7 +14,7 @@ Parameters:
   ConsumerRoleName:
     Type: String
     Default: ""
-    Description: Optional. IAM role of the LogSight analysis server to attach the queue read policy to.
+    Description: Optional. IAM role of the LogFinder analysis server to attach the queue read policy to.
 
 Conditions:
   HasRole: !Not [!Equals [!Ref ConsumerRoleName, ""]]
@@ -85,7 +85,7 @@ Resources:
   ConsumerPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: LogSight analysis server - read alerts from the hub queue.
+      Description: LogFinder analysis server - read alerts from the hub queue.
       Roles: !If [HasRole, [!Ref ConsumerRoleName], !Ref AWS::NoValue]
       PolicyDocument:
         Version: "2012-10-17"

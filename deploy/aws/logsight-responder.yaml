@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  LogSight automatic isolation role (option A). It can only: deactivate access keys, attach or detach
+  LogFinder automatic isolation role (option A). It can only: deactivate access keys, attach or detach
   the AWS managed AWSDenyAll policy on users and roles, and close security group ingress rules.
   It cannot delete anything, create anything, or attach any other policy. Reopening a closed
   security group rule (undo) is left to a human's own credentials on purpose.

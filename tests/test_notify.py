@@ -136,6 +136,11 @@ class Notify(unittest.TestCase):
         self.assertIn("초기 침투", summary)
         self.assertNotIn("initial-access", summary)
 
+    def test_times_have_kst(self):  # 사양서 NFR-23: 통지 시각도 UTC와 한국 시간을 함께
+        r = self.run_alert([{"type": "discord", "url_env": "T_DISCORD"}])
+        summary = (Path(r["out"]) / "summary.txt").read_text(encoding="utf-8")
+        self.assertRegex(summary, r"UTC \(한국 \d\d-\d\d \d\d:\d\d\)")
+
     def test_slack_mentions_escaped(self):
         msg = nt.test_message()
         msg["title"] = "<!channel> 경보"

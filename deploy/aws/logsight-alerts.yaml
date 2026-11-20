@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  LogSight alert hookup. Sends GuardDuty findings, CloudWatch alarms and risky API calls
+  LogFinder alert hookup. Sends GuardDuty findings, CloudWatch alarms and risky API calls
   to an SQS queue that `python -m logsight watch` reads. Nothing here changes existing resources:
-  it only adds a queue, EventBridge rules and a read policy for the LogSight analysis server.
+  it only adds a queue, EventBridge rules and a read policy for the LogFinder analysis server.
 
 Parameters:
   MinGuardDutySeverity:
@@ -32,7 +32,7 @@ Parameters:
   ConsumerRoleName:
     Type: String
     Default: ""
-    Description: Optional. Existing IAM role of the analysis server (e.g. the LogSight read-only role) to attach the policy to.
+    Description: Optional. Existing IAM role of the analysis server (e.g. the LogFinder read-only role) to attach the policy to.
 
 Conditions:
   SevHigh: !Equals [!Ref MinGuardDutySeverity, HIGH]
@@ -67,7 +67,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Name: !Sub ${AWS::StackName}-guardduty
-      Description: GuardDuty findings to LogSight
+      Description: GuardDuty findings to LogFinder
       EventPattern:
         source: [aws.guardduty]
         detail-type: [GuardDuty Finding]
@@ -85,7 +85,7 @@ Resources:
     Condition: UseAlarms
     Properties:
       Name: !Sub ${AWS::StackName}-alarms
-      Description: CloudWatch alarms entering ALARM to LogSight
+      Description: CloudWatch alarms entering ALARM to LogFinder
       EventPattern:
         source: [aws.cloudwatch]
         detail-type: [CloudWatch Alarm State Change]
@@ -103,7 +103,7 @@ Resources:
     Condition: UseApi
     Properties:
       Name: !Sub ${AWS::StackName}-risky-api
-      Description: Log tampering, persistence and permission changes to LogSight
+      Description: Log tampering, persistence and permission changes to LogFinder
       EventPattern:
         detail-type: [AWS API Call via CloudTrail]
         detail:
@@ -153,7 +153,7 @@ Resources:
   ConsumerPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: LogSight analysis server - read alerts from the queue and read log files. No write access to anything else.
+      Description: LogFinder analysis server - read alerts from the queue and read log files. No write access to anything else.
       Roles: !If [HasRole, [!Ref ConsumerRoleName], !Ref AWS::NoValue]
       PolicyDocument:
         Version: "2012-10-17"

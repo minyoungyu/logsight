@@ -19,6 +19,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from html import escape
 
+from .outcome import kind as kind_of
+
 KST = timezone(timedelta(hours=9))
 COLS = ["src", "entry", "cred", "svc"]
 COL_KO = {"src": "출발지", "entry": "들어온 곳", "cred": "쓴 권한", "svc": "건드린 AWS 서비스"}
@@ -80,12 +82,13 @@ def build(incidents: list[dict]) -> dict:
     def edge(a, b, kind, label, e):
         k = (a, b, kind)
         ed = edges.setdefault(k, {"src": a, "dst": b, "kind": kind, "label": label, "n": 0, "ok": 0, "fail": 0,
-                                  "blocked": 0, "refs": [], "first": e["ts"], "last": e["ts"], "acts": defaultdict(int)})
+                                  "blocked": 0, "pass": 0, "allowed": 0, "refs": [], "first": e["ts"], "last": e["ts"], "acts": defaultdict(int)})
         ed["n"] += 1
         if e.get("disposition") == "blocked":
             ed["blocked"] += 1
         elif e.get("status") == "success":
-            ed["ok"] += 1
+            k2 = kind_of(e)  # 사양서 FR-26: 성공·통과·허용을 나눠 센다
+            ed["ok" if k2 == "success" else k2 if k2 in ("pass", "allowed") else "ok"] += 1
         elif e.get("status") == "failure":
             ed["fail"] += 1
         ed["refs"].append(e["ref"])
@@ -217,14 +220,18 @@ def _result(ed: dict) -> tuple[str, str]:
     parts = []
     if ed["ok"]:
         parts.append(f"성공 {ed['ok']}")
+    if ed.get("pass"):
+        parts.append(f"통과 {ed['pass']}")
+    if ed.get("allowed"):
+        parts.append(f"허용 {ed['allowed']}")
     if ed["fail"]:
         parts.append(f"실패 {ed['fail']}")
     if ed["blocked"]:
         parts.append(f"차단 {ed['blocked']}")
-    rest = ed["n"] - ed["ok"] - ed["fail"] - ed["blocked"]
+    rest = ed["n"] - ed["ok"] - ed["fail"] - ed["blocked"] - ed.get("pass", 0) - ed.get("allowed", 0)
     if rest:
         parts.append(f"결과 없음 {rest}")
-    cls = "ok" if ed["ok"] else "no"
+    cls = "ok" if ed["ok"] or ed.get("pass") or ed.get("allowed") else "no"
     return " · ".join(parts), cls
 
 
@@ -427,7 +434,7 @@ def figure(incidents: list[dict], link: bool = True, width: int = 1000) -> str:
             + (f"(비슷한 이벤트 {g['omitted']}건은 생략된 대표 이벤트 기준)" if g["omitted"] else "")
             + ("." if v["passed"] else f". 확인 필요: {', '.join(v['missing'] + v['unknown_refs'])}"))
     return (f"<div class=graphwrap>{svg(g, width)}</div><div class=graphnote>"
-            "<span><i></i>성공·허용이 있음</span><span><i class=no></i>모두 실패·차단</span>"
+            "<span><i></i>성공·통과·허용이 있음</span><span><i class=no></i>모두 실패·차단</span>"
             "<span><i class=lk></i>로그에 적힌 소속(서버에 붙은 역할)</span><span>번호는 처음 일어난 순서</span></div>"
             + steps_table(g, {e["ref"]: i["id"] for i in incidents for e in i["events"]} if link else None)
             + f"<div class='small {'ok' if v['passed'] else 'warn'}' style='margin-top:6px'>{escape(note)}</div>")

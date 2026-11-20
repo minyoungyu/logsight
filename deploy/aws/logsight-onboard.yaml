@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  LogSight onboarding (deploy in the CUSTOMER account with one "Create stack" click; the
+  LogFinder onboarding (deploy in the CUSTOMER account with one "Create stack" click; the
   onboarding link fills every parameter). Nothing is installed on any server. It only adds
-  account settings: (1) forward security alerts to the LogSight hub, (2) a CloudTrail trail
-  writing to the LogSight archive (another account, Object Lock, the customer cannot delete it
+  account settings: (1) forward security alerts to the LogFinder hub, (2) a CloudTrail trail
+  writing to the LogFinder archive (another account, Object Lock, the customer cannot delete it
   and neither can an attacker in the customer account), (3) optional VPC Flow Logs to the
-  archive, (4) a read-only role for LogSight, (5) optionally the isolate-only role.
+  archive, (4) a read-only role for LogFinder, (5) optionally the isolate-only role.
   Existing resources are not changed. Deleting this stack removes everything it added
   (logs already in the archive stay until retention ends).
 
@@ -19,17 +19,17 @@ Parameters:
       (deploy a second time in us-east-1, where AWS delivers IAM events such as CreateAccessKey).
   HubBusArn:
     Type: String
-    Description: LogSight intake event bus (filled by the link).
+    Description: LogFinder intake event bus (filled by the link).
   ArchiveBucketName:
     Type: String
-    Description: LogSight archive bucket (filled by the link).
+    Description: LogFinder archive bucket (filled by the link).
   LogSightPrincipalArn:
     Type: String
-    Description: LogSight analysis server role that may assume the roles below (filled by the link).
+    Description: LogFinder analysis server role that may assume the roles below (filled by the link).
   ExternalId:
     Type: String
     MinLength: 16
-    Description: Customer-specific id LogSight must present (filled by the link).
+    Description: Customer-specific id LogFinder must present (filled by the link).
   MinGuardDutySeverity:
     Type: String
     Default: MEDIUM
@@ -49,7 +49,7 @@ Parameters:
     Type: String
     Default: "false"
     AllowedValues: ["true", "false"]
-    Description: true creates the isolate-only role. LogSight still starts in test mode (record only) until you agree to enforce.
+    Description: true creates the isolate-only role. LogFinder still starts in test mode (record only) until you agree to enforce.
 
 Conditions:
   Full: !Equals [!Ref Part, full]
@@ -63,7 +63,7 @@ Resources:
   ForwarderRole:
     Type: AWS::IAM::Role
     Properties:
-      Description: Lets EventBridge forward alerts to the LogSight hub bus. Nothing else.
+      Description: Lets EventBridge forward alerts to the LogFinder hub bus. Nothing else.
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -83,7 +83,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Name: logsight-guardduty
-      Description: GuardDuty findings to LogSight
+      Description: GuardDuty findings to LogFinder
       EventPattern:
         source: [aws.guardduty]
         detail-type: [GuardDuty Finding]
@@ -100,7 +100,7 @@ Resources:
     Condition: Full
     Properties:
       Name: logsight-alarms
-      Description: CloudWatch alarms entering ALARM to LogSight
+      Description: CloudWatch alarms entering ALARM to LogFinder
       EventPattern:
         source: [aws.cloudwatch]
         detail-type: [CloudWatch Alarm State Change]
@@ -113,7 +113,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Name: logsight-risky-api
-      Description: Log tampering, persistence and permission changes to LogSight
+      Description: Log tampering, persistence and permission changes to LogFinder
       EventPattern:
         detail-type: [AWS API Call via CloudTrail]
         detail:
@@ -170,7 +170,7 @@ Resources:
     Condition: Full
     Properties:
       RoleName: logsight-reader
-      Description: LogSight reads settings (who has which keys, open ports, logging on/off). Read-only.
+      Description: LogFinder reads settings (who has which keys, open ports, logging on/off). Read-only.
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -188,7 +188,7 @@ Resources:
     Condition: MakeResponder
     Properties:
       RoleName: logsight-responder
-      Description: LogSight isolate-only - deactivate keys, attach AWSDenyAll, close ingress rules. Never deletes.
+      Description: LogFinder isolate-only - deactivate keys, attach AWSDenyAll, close ingress rules. Never deletes.
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
