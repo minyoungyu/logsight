@@ -62,7 +62,7 @@ class SqliSuccessSignal(unittest.TestCase):
 
     def test_rule_detail_carries_signal(self):
         evs = _log([812, 812, 812], normal=[812, 815, 810])
-        fs = [f for f in detect(evs) if f.rule == "WEB_SQLI_PATTERN"]
+        fs = [f for f in detect(evs) if f.rule == "WEBLOG_SQLI"]
         self.assertEqual(len(fs), 1)
         self.assertIn("성공 근거 없음", fs[0].detail)
 
@@ -70,7 +70,7 @@ class SqliSuccessSignal(unittest.TestCase):
         """samples/combined의 INC-002: 응답이 모두 평소와 같은 812바이트 → 성공 근거 없음."""
         res = run_paths([str(ROOT / "samples" / "combined")], use_ai=False)
         details = [f["detail"] for r in res["results"] for f in r["incident"]["findings"]
-                   if f["rule"] == "WEB_SQLI_PATTERN"]
+                   if f["rule"] == "WEBLOG_SQLI"]
         self.assertTrue(any("성공 근거 없음" in d for d in details), details)
 
 

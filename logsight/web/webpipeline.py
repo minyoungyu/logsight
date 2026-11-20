@@ -14,7 +14,8 @@ from datetime import datetime
 from pathlib import Path
 
 from ..normalize import Event, read_text, mask, parse_sshauth
-from ..correlate import build_incidents
+from ..correlate import build_incidents, group_repeats
+from ..explain import VERDICT_KO as ATTACK_KO, mark_known, rule_triage
 from ..detect import RULES
 from .weblog import parse_access, parse_weberror, parse_auth
 from .webdetect import run_web_detections
@@ -81,14 +82,23 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
     events.extend(file_events)
 
     findings = run_web_detections(events, profile) + file_findings
+    # 사후 분석과 같은 처리 단계: 정상 작업 목록 표시 → 사건 묶기 → 반복 사건 접기 → 규칙 재검토(공격 축 판정)
+    n_known = mark_known(events, {"trusted_ips": profile.trusted_ips, "known_activity": profile.known_activity})
     mask(events)  # 보고서·AI로 나가기 전 민감정보 마스킹
     incidents = build_incidents(events, findings, window_min=window_min)
+    groups = group_repeats(incidents)  # 같은 모양으로 되풀이된 사건은 대표 하나로
+    rule_tri = rule_triage(groups, events)
+    attack_v = {x["id"]: x for x in rule_tri["incidents"]}
     t_detect = time.time() - t0
 
     profile_dict = profile.to_dict()
     results = []
-    for inc in incidents[:top]:
+    for inc in groups[:top]:
         out = analyze_web(inc, profile_dict, model=model, use_ai=use_ai)
+        # 두 축: 침해 판정(웹서버 점검, '뚫렸는가')과 공격 판정(사후 분석과 같은 규칙, '공격인가')
+        av = attack_v.get(inc["id"], {})
+        out["report"]["attack_verdict"] = av.get("verdict")
+        out["report"]["attack_verdict_reason"] = av.get("reason")
         results.append({"incident": inc, **out})
 
     # 전체 판정 = 사건들 중 가장 심각한 판정
@@ -114,8 +124,14 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         "n_findings": len(findings),
         "rule_counts": _rule_counts(findings),
         "n_incidents": len(incidents),
-        "incident_index": [{k: i[k] for k in ("id", "start", "end", "severity", "stages",
-                                              "src_ips", "n_events")} for i in incidents[:50]],
+        "n_groups": len(groups),
+        "n_known": n_known,
+        "incident_index": [{**{k: i[k] for k in ("id", "start", "end", "severity", "stages", "src_ips", "n_events")},
+                            "repeats": i.get("repeats", 1),
+                            "attack_verdict": attack_v.get(i["id"], {}).get("verdict"),
+                            "attack_verdict_ko": ATTACK_KO.get(attack_v.get(i["id"], {}).get("verdict"), "")}
+                           for i in groups[:50]],
+        "rule_triage": rule_tri,
         "results": results,
         "timing": {"detect_correlate_s": round(t_detect, 2),
                    "total_s": round(time.time() - t0, 2)},

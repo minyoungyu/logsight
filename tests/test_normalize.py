@@ -132,7 +132,7 @@ class CombinedRun(SyslogYear):
         for r in self.res["results"]:
             for e in r["incident"]["events"]:
                 if e["source"] == "waf" and e["disposition"] == "blocked":
-                    self.assertNotIn("WEB_SQLI_PATTERN", e["rules"])
+                    self.assertNotIn("WEBLOG_SQLI", e["rules"])
 
     def test_assumptions_shown(self):
         self.assertTrue(any("UTC" in a for a in self.res["assumptions"]))

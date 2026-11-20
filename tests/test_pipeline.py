@@ -130,7 +130,7 @@ class DemoPipelineTests(unittest.TestCase):
         r = self.res["results"][0]
         rules = {f["rule"] for f in r["incident"]["findings"]}
         self.assertTrue({"CT_INSTANCE_CRED_OUTSIDE", "SSH_SUCCESS_AFTER_FAIL",
-                         "WEB_SQLI_PATTERN"} <= rules)
+                         "WEBLOG_SQLI"} <= rules)
         checks = {c["id"] for c in r["checks"]}
         self.assertTrue({"SG_ADMIN_PORT_OPEN", "IMDSV1_ENABLED", "IAM_OVERBROAD"} <= checks)
         self.assertTrue(r["meta"]["validation"]["passed"])
@@ -144,7 +144,8 @@ class DemoPipelineTests(unittest.TestCase):
         evs, _ = load_paths([DEMO / "cloudtrail.json", DEMO / "auth.log"])
         res = run(evs, {}, use_ai=False)
         self.assertGreaterEqual(res["n_incidents"], 1)
-        self.assertEqual(res["results"][0]["checks"], [])
+        # 설정이 없으면 설정 수정안은 없고, 사람이 고칠 계정 조치(WEB_FIX_)만 남는다
+        self.assertEqual({c["id"] for c in res["results"][0]["checks"]}, {"WEB_FIX_ACCOUNT"})
 
 
 class DetectionTests(unittest.TestCase):

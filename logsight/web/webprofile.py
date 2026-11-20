@@ -14,8 +14,12 @@ profile.json) 하나만 바꾸면 된다. 코드에는 경로·IP를 박아 두�
   login_paths   로그인 처리 경로(POST) — 로그인 성공/실패 판단용
   upload_dirs   업로드가 저장되는 URL 접두사(예: /uploads) — 업로드 뒤 실행 탐지용
   own_hosts     Referer 판단에 쓰는 우리 호스트 이름(이 밖의 Referer에서 온 관리자 요청은 CSRF 의심)
+  private_object_paths  남의 것을 열면 안 되는 객체 경로(예: /order.php, /api/orders/{id}).
+                같은 IP가 여기서 서로 다른 번호를 짧은 시간에 많이 열면 IDOR 의심. 비우면 이 판단은 끈다
+  large_response_bytes  공격 요청의 응답이 이보다 크면 유출 의심(기본 50000바이트)
+  known_activity  정상 작업 목록(사후 분석 environment.json과 같은 형식). 맞는 이벤트는 '정상 작업'으로 표시
   since/until   분석 시간 범위(ISO, 선택) — 큰 로그에서 사고 구간만 보고 싶을 때
-  year          연도 없는 syslog 형식(auth.log)에 붙일 연도
+  year          연도 없는 syslog 형식(auth.log)에 붙일 연도(없으면 올해, 미래면 작년)
 """
 from __future__ import annotations
 
@@ -40,9 +44,13 @@ class SiteProfile:
         ".env", "config.php", "wp-config.php", "database.yml", "settings.py",
         "id_rsa", ".git/config", "composer.json"])
     own_hosts: list[str] = field(default_factory=lambda: ["127.0.0.1", "localhost"])
+    private_object_paths: list[str] = field(default_factory=list)
+    # 정상 작업 목록(사후 분석의 environment.json known_activity와 같은 형식): [{"label", "ips"|"actors"}]
+    known_activity: list[dict] = field(default_factory=list)
+    large_response_bytes: int = 50_000
     since: str | None = None
     until: str | None = None
-    year: int = 2026
+    year: int | None = None  # 없으면 올해(미래가 되면 작년)로 본다. 사후 분석과 같은 규칙
 
     @classmethod
     def load(cls, path: str | Path) -> "SiteProfile":
@@ -67,3 +75,32 @@ class SiteProfile:
             if files:
                 out[kind] = files
         return out
+
+
+# 사이트 프로필 중 AWS 분석(analyze·watch)이 env에서 가져와 쓰는 필드
+_ENV_WEB_FIELDS = ("admin_paths", "login_paths", "upload_dirs", "sensitive_files", "own_hosts",
+                   "private_object_paths")
+
+
+def web_profile_from_env(env: dict | None, hosts_seen: set[str] | frozenset[str] = frozenset()) -> SiteProfile:
+    """AWS 분석에서 웹 규칙을 돌릴 때 쓰는 프로필. 웹서버 점검의 profile.json 대신 env(environment.json)를 읽는다.
+
+    trusted_ips는 env의 것을 그대로, own_hosts에는 인스턴스 IP·DNS 이름과 로그에 보인 Host(ALB)를 더한다.
+    env["web"]이 있으면 admin_paths·login_paths·upload_dirs·sensitive_files·own_hosts를 거기서 덮어쓴다
+    (own_hosts는 더한다)."""
+    env = env or {}
+    p = SiteProfile(name="AWS 웹")
+    p.trusted_ips = list(env.get("trusted_ips", []))
+    web = env.get("web") or {}
+    for k in _ENV_WEB_FIELDS:
+        if k != "own_hosts" and isinstance(web.get(k), list):
+            setattr(p, k, [str(x) for x in web[k]])
+    hosts = set(p.own_hosts) | {str(h).lower() for h in web.get("own_hosts") or []} | set(hosts_seen)
+    for inst in env.get("instances", []):
+        for k in ("public_ip", "private_ip", "private_dns", "public_dns"):
+            if inst.get(k):
+                hosts.add(str(inst[k]).lower())
+    p.own_hosts = sorted(h for h in hosts if h)
+    if isinstance(web.get("large_response_bytes"), int):
+        p.large_response_bytes = web["large_response_bytes"]
+    return p

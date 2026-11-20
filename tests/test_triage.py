@@ -107,7 +107,7 @@ def test_object_enum_on_api_logs():
     normal = [_alb("198.18.9.9", "/api/jobs/job-7/download", "404", i * 20) for i in range(6)]
     normal += [_alb("198.18.9.8", f"/static/x{i}.js", "404", i * 20) for i in range(6)]
     fs = run_detections(probe + normal)
-    hits = [f for f in fs if f.rule == "WEB_OBJECT_ENUM"]
+    hits = [f for f in fs if f.rule == "WEBLOG_IDOR_ENUM"]
     assert len(hits) == 1 and hits[0].key == "198.18.7.2" and len(hits[0].events) == 5
 
 

@@ -31,7 +31,8 @@ class CombinedGraph(unittest.TestCase):
         inc = self.incs["INC-001"]
         g = G.build([inc])
         kinds = sorted(e["kind"] for e in g["edges"])
-        self.assertEqual(kinds, ["call", "call", "net", "ssh", "use", "web"])
+        # 웹: WAF 로그의 SQL 인젝션 통과, ALB 로그의 따옴표 요청에 500 응답(WEBLOG_EXPLOIT_5XX)
+        self.assertEqual(kinds, ["call", "call", "net", "ssh", "use", "web", "web"])
         # GuardDuty 결과는 선이 아니라 노드 표시
         self.assertTrue(any("GuardDuty" in m["text"] for ms in g["marks"].values() for m in ms))
         self.assertFalse(any("guardduty" in r.lower() for e in g["edges"] for r in e["refs"]))

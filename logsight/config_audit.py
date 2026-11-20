@@ -78,10 +78,44 @@ def _attacker_ips(inc: dict) -> list[str]:
     return [ip for ip in inc.get("src_ips", [])]
 
 
+# 애플리케이션까지 들어온 웹 공격 요청(WAF가 막을 수 있는 종류). WEB_NO_WAF·NACL 차단의 근거가 된다
+WEB_ATTACK_RULES = ("WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI", "WEBLOG_TRAVERSAL", "WEBLOG_RFI",
+                    "WEBLOG_CMD_INJECTION", "WEBLOG_XSS", "WEBLOG_SSRF", "WEBLOG_EXPLOIT_PROBE",
+                    "WEBLOG_CODE_IN_HEADER", "WEBLOG_SENSITIVE_FILE")
+# 출발지 IP를 막을 근거가 되는 규칙(위의 웹 공격 + 스캐너·무차별 대입·웹셸 접근)
+BLOCK_IP_RULES = frozenset({"VPC_PORT_SCAN", "SSH_BRUTE_FORCE", "SSH_SUCCESS_AFTER_FAIL", "VPC_REMOTE_ADMIN_EXPOSED",
+                            "WEBLOG_SCANNER", "WEBLOG_ENUM_404", "WEBLOG_AUTH_BRUTE",
+                            "WEBLOG_AUTH_SUCCESS_AFTER_FAIL", "WEBLOG_WEBSHELL_ACCESS", "WEBLOG_UPLOAD_EXEC",
+                            *WEB_ATTACK_RULES})
+_WEB_KO = {"WAF_SQLI_NOT_BLOCKED": "SQL 인젝션", "WEBLOG_SQLI": "SQL 인젝션",
+           "WEBLOG_TRAVERSAL": "경로 조작", "WEBLOG_RFI": "원격 파일 포함", "WEBLOG_CMD_INJECTION": "명령 삽입",
+           "WEBLOG_XSS": "XSS", "WEBLOG_SSRF": "SSRF", "WEBLOG_EXPLOIT_PROBE": "알려진 취약점 공격 문자열",
+           "WEBLOG_CODE_IN_HEADER": "헤더 코드 삽입", "WEBLOG_SENSITIVE_FILE": "설정 파일 열람"}
+
+
+def web_app_fixes(incident: dict) -> list[dict]:
+    """웹 규칙이 걸린 사건의 애플리케이션·서버 쪽 수정(웹셸 격리, 계정 잠금, 취약 코드 수정, 입력값 검증).
+    웹서버 점검(web/webanalyze._remediation)과 같은 내용을 수정안 형식으로 낸다. 방화벽 쪽(차단·요청 제한·
+    로그 보존)은 위의 NACL·WAF 수정안이 맡으므로 뺀다. 환경 설정이 없어도 낸다."""
+    from .web.webanalyze import _remediation
+    alias = {"WAF_SQLI_NOT_BLOCKED": "WEBLOG_SQLI"}
+    found: dict[str, dict] = {}
+    for f in incident["findings"]:
+        r = alias.get(f["rule"], f["rule"])
+        found.setdefault(r, {"rule": r, "evidence": []})["evidence"] += f.get("evidence", [])
+    sev = {"now": "high", "soon": "medium", "later": "low"}
+    return [{"id": x["id"], "target": x["target"], "resource": "(웹 애플리케이션)" if x["target"] == "app"
+             else "(서버)", "severity": sev.get(x["priority"], "low"), "title": x["action"],
+             "why": x["detail"], "evidence": x["evidence"][:10], "current": None, "proposed": None,
+             "cli": [], "rollback": [], "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."}
+            for x in _remediation(list(found.values())) if x["target"] in ("app", "file", "account")]
+
+
 def audit(incident: dict, env: dict) -> list[dict]:
     """사건 + 환경 설정 → 원인 설정과 수정안 목록."""
+    web_fixes = web_app_fixes(incident)
     if not env or env.get("_error"):
-        return []
+        return web_fixes
     out: list[dict] = []
     trusted = [t["cidr"] if isinstance(t, dict) else t for t in env.get("trusted_ips", [])]
     admin_cidr = trusted[0] if trusted else "<관리자 IP>/32"
@@ -137,9 +171,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
                 })
 
     # 2) NACL: 공격 IP 임시 차단
-    if attackers and env.get("network_acls") and rules_in_inc & {
-            "VPC_PORT_SCAN", "SSH_BRUTE_FORCE", "WAF_SQLI_NOT_BLOCKED", "SSH_SUCCESS_AFTER_FAIL",
-            "VPC_REMOTE_ADMIN_EXPOSED", "WEB_SQLI_PATTERN"}:
+    if attackers and env.get("network_acls") and rules_in_inc & BLOCK_IP_RULES:
         nacl, by_subnet = _incident_nacl(env, inst_ids)
     else:
         nacl, by_subnet = None, False
@@ -170,7 +202,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
         })
 
     # 3) WAF: SQLi 규칙 그룹이 COUNT 모드
-    ev = _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEB_SQLI_PATTERN")
+    ev = _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI")
     if ev:
         for acl in env.get("waf_web_acls", []):
             if not acl.get("name"):
@@ -198,21 +230,6 @@ def audit(incident: dict, env: dict) -> list[dict]:
                         ],
                         "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
                     })
-        if env and not env.get("waf_web_acls"):
-            # WAF가 없는 계정: 유료 WAF와 무료 대안을 같이 제시
-            out.append({
-                "id": "WEB_NO_WAF", "target": "waf", "resource": "(웹 서버)",
-                "severity": "medium", "title": "웹 공격을 막는 장치(WAF)가 없음",
-                "why": "SQL 인젝션 요청이 걸러지지 않고 애플리케이션까지 그대로 들어왔다.",
-                "evidence": ev[:10], "current": None,
-                "proposed": {"options": [
-                    "무료: 서버에 ModSecurity + OWASP Core Rule Set 설치(nginx/apache)",
-                    "유료: AWS WAF + AWSManagedRulesSQLiRuleSet (월 약 5달러 + 규칙·요청 과금)",
-                    "공통: 애플리케이션 쿼리를 파라미터 바인딩으로 수정(근본 해결)"]},
-                "cli": ["# Ubuntu + nginx 예: sudo apt install libnginx-mod-http-modsecurity modsecurity-crs",
-                        "# 처음엔 SecRuleEngine DetectionOnly로 오탐 확인 후 On으로 전환"],
-                "caution": "WAF는 보조 수단이다. 취약한 쿼리 자체를 고쳐야 한다.",
-            })
         if not any(c["id"] == "WAF_SQLI_COUNT" for c in out) and env.get("waf_web_acls") \
                 and env["waf_web_acls"][0].get("name"):
             acl = env["waf_web_acls"][0]
@@ -229,6 +246,24 @@ def audit(incident: dict, env: dict) -> list[dict]:
                     "cli": ["# get-web-acl → Rules에 위 규칙 추가 → update-web-acl"],
                     "caution": "COUNT로 먼저 배포해 오탐을 확인한 뒤 차단으로 바꾼다.",
                 })
+
+    # WAF가 없는 계정: 웹 공격 요청이 애플리케이션까지 들어왔으면 유료 WAF와 무료 대안을 같이 제시
+    web_ev = _has_rule(incident, *WEB_ATTACK_RULES)
+    if web_ev and not env.get("waf_web_acls"):
+        kinds = "·".join(dict.fromkeys(_WEB_KO[f["rule"]] for f in incident["findings"] if f["rule"] in _WEB_KO))
+        out.append({
+            "id": "WEB_NO_WAF", "target": "waf", "resource": "(웹 서버)",
+            "severity": "medium", "title": "웹 공격을 막는 장치(WAF)가 없음",
+            "why": f"{kinds} 요청이 걸러지지 않고 애플리케이션까지 그대로 들어왔다.",
+            "evidence": web_ev[:10], "current": None,
+            "proposed": {"options": [
+                "무료: 서버에 ModSecurity + OWASP Core Rule Set 설치(nginx/apache)",
+                "유료: AWS WAF + AWSManagedRulesCommonRuleSet·SQLiRuleSet (월 약 5달러 + 규칙·요청 과금)",
+                "공통: 입력값을 그대로 쿼리·경로·명령에 넣는 코드를 고친다(근본 해결)"]},
+            "cli": ["# Ubuntu + nginx 예: sudo apt install libnginx-mod-http-modsecurity modsecurity-crs",
+                    "# 처음엔 SecRuleEngine DetectionOnly로 오탐 확인 후 On으로 전환"],
+            "caution": "WAF는 보조 수단이다. 취약한 코드 자체를 고쳐야 한다.",
+        })
 
     # 4) 인스턴스: IMDSv1 허용 + 역할 자격증명 외부 사용
     ev = _has_rule(incident, "CT_INSTANCE_CRED_OUTSIDE", "CT_INSTANCE_CRED_MULTI_IP")
@@ -342,6 +377,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
                     "# EventBridge 규칙: eventName in [StopLogging, DeleteTrail] → SNS 알림"],
             "caution": "조직(Organizations)을 쓰면 SCP로 중지를 막는다.",
         })
+    out += web_fixes
     for c in out:
         c["rollback"] = rollback(c["cli"])
     sev = {"high": 0, "medium": 1, "low": 2}

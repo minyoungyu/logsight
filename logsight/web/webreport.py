@@ -88,6 +88,13 @@ def render(result: dict, title: str = "LogFinder 웹서버 침해 점검 보고�
             c = rep["contested"]
             h.append(f"<p class=warn>규칙과 의견 다름: 규칙은 '{escape(VERDICT_KO.get(c['rules'], c['rules']))}', "
                      f"AI는 '{escape(VERDICT_KO.get(c['ai'], c['ai']))}'로 봤습니다. 근거 로그를 직접 확인하세요.</p>")
+        if rep.get("attack_verdict"):  # 사후 분석과 같은 규칙으로 본 공격 판정(두 번째 축)
+            from ..explain import VERDICT_KO as ATTACK_KO
+            rep_n = inc.get("repeats", 1)
+            h.append(f"<p class=muted>공격 판정(사후 분석과 같은 기준): "
+                     f"<b>{escape(ATTACK_KO.get(rep['attack_verdict'], rep['attack_verdict']))}</b> — "
+                     f"{escape(rep.get('attack_verdict_reason') or '')}"
+                     + (f" · 같은 모양 사건 {rep_n}번 반복(대표 하나만 보임)" if rep_n > 1 else "") + "</p>")
         h.append(f"<p class=summary>{escape(rep.get('summary', ''))}</p>")
 
         if rep.get("attack_flow"):

@@ -119,6 +119,15 @@ SPEC: dict[str, dict] = {
         "fp": ["MFA 장치를 바꾸는 직원의 정상 작업(끄고 새로 등록)"],
         "first": "누가 바꿨는지 확인하고 MFA를 다시 켠다. 본인이 아니면 그 계정의 비밀번호와 키를 바꾼다.",
     },
+    "CT_CONSOLE_BRUTE": {
+        "logs": "CloudTrail(signin)",
+        "when": "같은 IP 또는 같은 사용자의 콘솔 로그인 실패(responseElements.ConsoleLogin=Failure) 10분 안에 5건 이상. "
+                "그 뒤 30분 안에 성공이 있으면 심각도 높음",
+        "blind": ["IP와 사용자를 모두 바꿔 가며 천천히 시도하는 분산 대입",
+                  "없는 사용자 이름의 실패는 AWS가 이름을 가려(HIDDEN_DUE_TO_SECURITY_REASONS) IP로만 묶임"],
+        "fp": ["비밀번호를 잊은 직원의 반복 실패"],
+        "first": "그 사용자에게 MFA를 켜고 비밀번호를 바꾼다. 성공한 로그인 뒤 무엇을 했는지 같은 사건에서 본다.",
+    },
     "CT_CONSOLE_NO_MFA": {
         "logs": "CloudTrail",
         "when": "ConsoleLogin 성공이고 MFAUsed가 No",
@@ -233,27 +242,33 @@ SPEC: dict[str, dict] = {
         "fp": ["오타 두 번 뒤 정상 로그인"],
         "first": "그 계정으로 무엇을 했는지 셸 기록을 보고, 모르는 IP면 계정 비밀번호와 키를 바꾼다.",
     },
-    # ------------------------------------------------------------------ ALB·WAF 웹 요청
-    "WEB_SQLI_PATTERN": {
-        "logs": "ALB·WAF·웹서버 로그",
-        "when": "쿼리 문자열에 SQL 인젝션 패턴(따옴표+OR/UNION SELECT/sleep( 등), WAF가 막지 않은 요청",
-        "blind": ["POST 본문의 인젝션은 로그에 없어 보지 않음"],
-        "fp": ["따옴표가 든 검색어"],
-        "first": "같은 IP 요청의 응답 코드·크기를 보고, 해당 페이지의 입력 처리를 점검한다.",
+    # ------------------------------------------------------------------ 서버(auth.log) 권한 상승·계정
+    "HOST_PRIV_ESC": {
+        "logs": "서버 인증 로그(auth.log, secure)",
+        "when": "sudo·su 성공 1건 이상인데 (1) 실행한 계정이 웹 서비스 계정(www-data, apache, nginx, nobody 등)이거나 "
+                "(2) sudo 명령이 root 셸을 여는 모양(find -exec, python -c, tar --checkpoint-action, chmod +s, "
+                "/etc/shadow·sudoers 덮어쓰기 등). 계정별로 묶음",
+        "blind": ["웹셸이 sudo 없이 커널 취약점 등으로 권한을 올리면 auth.log에 남지 않음",
+                  "목록에 없는 이름으로 웹 서비스를 돌리는 서버(예: 직접 만든 app 계정)",
+                  "sudo vim 안에서 :!sh 처럼 실행 뒤에 셸로 빠지는 경우는 명령 줄만으로는 보이지 않음(서비스 계정이면 잡힘)"],
+        "fp": ["배포 스크립트가 웹 서비스 계정으로 sudo를 쓰도록 만든 서버. 그 계정을 우리 팀으로 확인하면 판정에서 빠짐",
+               "관리자가 일부러 find -exec를 sudo로 쓰는 정리 작업"],
+        "first": "그 계정의 sudo 권한(sudoers의 NOPASSWD 줄)을 바로 지우고, 같은 시각 웹 로그에서 웹셸 요청을 찾는다.",
     },
-    "WEB_PATH_PROBE": {
-        "logs": "ALB·웹서버 로그",
-        "when": "같은 IP가 5분 안에 서로 다른 경로 20개 이상에서 403/404",
-        "blind": ["느린 스캐너"],
-        "fp": ["깨진 링크가 많은 사이트를 도는 검색엔진 봇"],
-        "first": "급하지 않다. 같은 IP가 200으로 성공한 경로가 있는지 본다.",
+    "HOST_PRIV_ESC_FAIL": {
+        "logs": "서버 인증 로그(auth.log, secure)",
+        "when": "sudo 거부(NOT in sudoers, 비밀번호 틀림)·su 실패. 웹 서비스 계정은 1건부터, 다른 계정은 10분 안에 3건 이상",
+        "blind": ["권한이 없는 걸 미리 확인하고(sudo -l) 시도하지 않는 공격자"],
+        "fp": ["비밀번호를 세 번 틀린 관리자"],
+        "first": "그 계정이 왜 sudo를 시도했는지 본다. 웹 서비스 계정이면 웹셸이 이미 있다고 보고 웹 루트를 점검한다.",
     },
-    "WEB_OBJECT_ENUM": {
-        "logs": "ALB·API Gateway 로그",
-        "when": "같은 IP가 같은 API의 서로 다른 객체 번호 5개 이상에 10분 안에 403/404",
-        "blind": ["남의 객체 열람에 성공(200)한 경우는 거부가 없어 보지 않음"],
-        "fp": ["지워진 객체 링크를 여러 번 누른 사용자"],
-        "first": "같은 IP가 200을 받은 객체 번호가 있는지 보고, 그 API의 권한 검사를 점검한다.",
+    "HOST_ACCOUNT_CREATED": {
+        "logs": "서버 인증 로그(auth.log, secure)",
+        "when": "useradd 기록 1건, 또는 sudo로 실행한 useradd·adduser·usermod -aG sudo|wheel·passwd root·sudoers 수정 1건",
+        "blind": ["/etc/passwd를 직접 고쳐 계정을 만드는 경우(파일 무결성 점검이 필요)",
+                  "SSH 키만 authorized_keys에 넣어 두는 지속성"],
+        "fp": ["새 직원 계정을 만드는 정상 작업. 우리 팀 확인이나 정상 작업 목록으로 내림"],
+        "first": "모르는 계정이면 잠그고(usermod -L), 그 계정의 authorized_keys와 sudo 권한을 확인한다.",
     },
     "GD_FINDING": {
         "logs": "GuardDuty 결과(콘솔 내보내기·EventBridge)",
@@ -264,11 +279,12 @@ SPEC: dict[str, dict] = {
     },
     # ------------------------------------------------------------------ 웹서버 로그(웹 모듈)
     "WEBLOG_SQLI": {
-        "logs": "웹서버 접근 로그",
-        "when": "디코드한 경로+쿼리에 UNION SELECT, 따옴표 뒤 항상-참 조건, sleep(·information_schema 등, "
-                "또는 따옴표·주석과 함께 SELECT…FROM",
+        "logs": "웹서버 접근 로그·ALB·WAF(예전 사후 분석 이름 WEB_SQLI_PATTERN)",
+        "when": "디코드한 경로+쿼리에 UNION SELECT, 따옴표 뒤 항상-참 조건·SQL 키워드·주석, 값 끝의 따옴표, "
+                "쌓은 질의(;select), sleep(·pg_sleep(·information_schema 등, 또는 따옴표·주석과 함께 SELECT…FROM. "
+                "WAF가 막은 요청과 WAF_SQLI_NOT_BLOCKED가 이미 센 IP는 뺀다. 응답 크기로 본 성공 신호를 함께 적는다",
         "blind": ["POST 본문 인젝션", "이중 인코딩을 넘는 난독화"],
-        "fp": ["따옴표 없는 일반 문장은 잡지 않도록 좁혀 둠"],
+        "fp": ["따옴표 없는 일반 문장은 잡지 않도록 좁혀 둠", "값 끝이 따옴표인 검색어(rock')"],
         "first": "응답 코드와 크기로 성공 여부를 보고, 해당 페이지의 쿼리를 매개변수화한다.",
     },
     "WEBLOG_TRAVERSAL": {
@@ -307,8 +323,8 @@ SPEC: dict[str, dict] = {
         "first": "급하지 않다. 같은 IP의 공격 패턴 요청이 성공했는지 본다.",
     },
     "WEBLOG_ENUM_404": {
-        "logs": "웹서버 접근 로그",
-        "when": "같은 IP가 5분 안에 서로 다른 경로 15개 이상에서 404(신뢰 IP 제외)",
+        "logs": "웹서버 접근 로그·ALB·WAF(예전 사후 분석 이름 WEB_PATH_PROBE)",
+        "when": "같은 IP가 5분 안에 서로 다른 경로 15개 이상에서 404/403(신뢰 IP 제외)",
         "blind": ["느린 열거"],
         "fp": ["검색엔진 봇이 옛 링크를 도는 경우"],
         "first": "급하지 않다. 같은 IP가 200을 받은 경로를 본다.",
@@ -357,8 +373,11 @@ SPEC: dict[str, dict] = {
     },
     "WEBLOG_ADMIN_ACCESS": {
         "logs": "웹서버 접근 로그 + 사이트 프로필(admin_paths·trusted_ips)",
-        "when": "신뢰 IP가 아닌 곳에서 /admin 아래 경로에 2xx, 또는 관리자 로그인 302",
-        "blind": ["관리자 경로가 /admin으로 시작하지 않으면 보지 않음"],
+        "when": "신뢰 IP가 아닌 곳에서 관리자 영역(admin_paths 중 로그인 화면이 아닌 것: /admin, /wp-admin, "
+                "/manager/html 등) 아래 경로에 2xx, 또는 관리자 로그인 302. trusted_ips를 적지 않았으면 "
+                "공인 IP이거나, 내부망 IP는 같은 IP에 다른 공격 신호가 있을 때만",
+        "blind": ["admin_paths에 적지 않은 관리자 경로",
+                  "trusted_ips가 비었을 때, 내부망에서 다른 공격 신호 없이 도난 계정으로 들어온 관리자 접근"],
         "fp": ["재택 관리자. trusted_ips에 넣는다"],
         "first": "그 IP가 관리자 것인지 확인하고, 아니면 관리자 비밀번호와 세션을 바꾼다.",
     },
@@ -377,11 +396,13 @@ SPEC: dict[str, dict] = {
         "first": "리다이렉트 대상을 허용 목록으로 제한한다.",
     },
     "WEBLOG_IDOR_ENUM": {
-        "logs": "웹서버 접근 로그",
-        "when": "같은 IP가 5분 안에 /order.php에 서로 다른 쿼리로 10건 이상 성공",
-        "blind": ["/order.php 경로에만 맞춰져 있어 다른 사이트에서는 거의 동작하지 않음(일반화는 WEB_OBJECT_ENUM)"],
-        "fp": ["주문 목록을 넘겨 보는 관리자"],
-        "first": "그 페이지의 소유자 확인 로직을 점검한다.",
+        "logs": "웹서버 접근 로그·ALB·WAF(예전 사후 분석 이름 WEB_OBJECT_ENUM)",
+        "when": "(1) 같은 IP가 5분 안에 사이트 프로필·env의 private_object_paths(예: /order.php, /api/orders/{id})에서 "
+                "서로 다른 객체 10건 이상 성공 열람(높음, 경로를 적지 않으면 끔), 또는 "
+                "(2) 같은 IP가 같은 API의 서로 다른 객체 번호 5개 이상에 10분 안에 403/404(막힌 시도라 중간)",
+        "blind": ["(1)은 private_object_paths를 적어야 동작", "(2)는 남의 객체 열람에 성공(200)한 경우를 보지 않음"],
+        "fp": ["주문 목록을 넘겨 보는 관리자", "지워진 객체 링크를 여러 번 누른 사용자"],
+        "first": "같은 IP가 200을 받은 객체 번호가 있는지 보고, 그 페이지·API의 소유자 확인 로직을 점검한다.",
     },
     "WEBLOG_ADMIN_FORGED": {
         "logs": "웹서버 접근 로그",
@@ -426,8 +447,8 @@ SPEC: dict[str, dict] = {
         "first": "같은 시각 웹 오류 로그를 보고 어떤 코드가 깨졌는지 확인한다.",
     },
     "WEBLOG_LARGE_EXFIL": {
-        "logs": "웹서버 접근 로그",
-        "when": "공격 패턴 요청 또는 관리자 경로 요청이 200이고 응답 50,000바이트 이상",
+        "logs": "웹서버 접근 로그 + 사이트 프로필(large_response_bytes)",
+        "when": "공격 패턴 요청 또는 관리자 경로 요청이 200이고 응답이 large_response_bytes(기본 50,000바이트) 이상",
         "blind": ["작게 나눠 여러 번 가져가는 유출"],
         "fp": ["원래 큰 관리자 페이지(대시보드)"],
         "first": "그 응답에 어떤 데이터가 담겼는지 같은 요청을 재현해 확인한다.",

@@ -453,7 +453,9 @@ def _incident(r: dict, verdicts: dict) -> str:
             h.append("<div class='muted small'>AI 제안 · 코드가 만든 적용 명령이 아님(직접 확인 후 적용)</div>")
         if rc:  # 원인 설명을 같은 카드에 붙여 '왜 → 무엇을 바꾸나'를 한곳에서 본다
             h.append(f"<div class=why>{escape(rc['why'])}</div>{_refs(rc.get('evidence', []), iid)}")
-        if c:
+        if c and not c.get("cli"):  # 코드·계정을 사람이 고치는 수정안(웹 애플리케이션): 명령 없음
+            h.append(f"<div class='muted small'>주의: {escape(c['caution'])}</div>")
+        elif c:
             h.append("<details><summary>현재 설정과 제안, 적용·되돌리기 명령 보기</summary>"
                      f"<pre>현재: {escape(json.dumps(c['current'], ensure_ascii=False, indent=1))}\n"
                      f"제안: {escape(json.dumps(c['proposed'], ensure_ascii=False, indent=1))}</pre>"

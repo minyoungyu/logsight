@@ -44,10 +44,11 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WAF_BLOCKED":        ("T1190", "initial-access", "WAF가 공격 요청 차단", "low"),
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
-    "WEB_SQLI_PATTERN":   ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "medium"),
-    "WEB_PATH_PROBE":     ("T1595.003", "discovery", "없는 경로를 연속 요청(웹 스캐너)", "low"),
+    "HOST_PRIV_ESC":      ("T1548.003", "privilege-escalation", "서버 권한 상승(웹 서비스 계정의 sudo·su, 셸 탈출 명령)", "high"),
+    "HOST_PRIV_ESC_FAIL": ("T1548.003", "privilege-escalation", "sudo·su 거부·연속 실패(권한 상승 시도)", "medium"),
+    "HOST_ACCOUNT_CREATED": ("T1136.001", "persistence", "서버에 새 계정 생성·관리자 그룹 추가", "medium"),
+    "CT_CONSOLE_BRUTE":   ("T1110", "credential-access", "AWS 콘솔 로그인 연속 실패(무차별 대입)", "medium"),
     "GD_FINDING":         ("GuardDuty", "other", "GuardDuty 탐지 결과", "medium"),
-    "WEB_OBJECT_ENUM":    ("T1530", "collection", "남의 객체 번호를 바꿔 가며 접근 시도(IDOR 탐색)", "medium"),
     # --- 웹서버 로그·파일 기반 규칙(logsight.web) ---
     "WEBLOG_SQLI":        ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "high"),
     "WEBLOG_TRAVERSAL":   ("T1190", "initial-access", "경로 조작·파일 열람(../, 민감 파일) 시도", "high"),
@@ -130,8 +131,6 @@ DESTROY_ONE = {"kms:ScheduleKeyDeletion", "kms:DisableKey", "backup:DeleteRecove
 DESTROY_BURST = {"s3:DeleteObject", "s3:DeleteObjects", "ec2:DeregisterImage", "ec2:DeleteSnapshot",
                  "s3:DeleteBucket"}
 ADMIN_PORTS = {22, 3389}
-_SQLI = re.compile(r"(?i)'\s*(or|and|union|select|;|--|#)|union\s+(all\s+)?select|"
-                   r"sleep\s*\(|benchmark\s*\(|information_schema|'\s*$")
 
 
 
@@ -151,12 +150,13 @@ def sqli_success_signal(attempts: list, events: list) -> str:
     sized = [e for e in ok if isinstance(e.extra.get("resp_bytes"), int)]
     if not sized:
         return "성공 판단 불가: 로그에 응답 크기가 없음"
+    from .web.webdetect import is_sqli  # 순환 import를 피해 여기서
     att = {id(e) for e in attempts}
     paths = {_path(e.action) for e in sized}
     base = [e.extra["resp_bytes"] for e in events
-            if id(e) not in att and e.source in ("alb", "weblog") and _path(e.action) in paths
+            if id(e) not in att and e.source in ("alb", "weblog", "access") and _path(e.action) in paths
             and str(e.extra.get("http_status", ""))[:1] == "2" and isinstance(e.extra.get("resp_bytes"), int)
-            and not _SQLI.search(unquote_plus((e.action or "").split("?", 1)[-1]))]
+            and not is_sqli(unquote_plus((e.action or "").split("?", 1)[-1]))]
     sizes = [e.extra["resp_bytes"] for e in sized]
     if base:
         ref = sorted(base)[len(base) // 2]
@@ -289,6 +289,98 @@ def _is_reply(e: Event) -> bool:
     return sp is not None and dp is not None and dp >= 32768 and sp < dp
 
 
+# 예전 규칙 이름 → 지금 이름. 같은 공격을 사후 분석과 웹서버 점검이 다른 이름으로 부르던 것을 하나로 합쳤다.
+# 저장해 둔 결과·측정 기준 파일을 읽을 때 쓴다(canonical_rule).
+RULE_ALIASES = {"WEB_SQLI_PATTERN": "WEBLOG_SQLI", "WEB_PATH_PROBE": "WEBLOG_ENUM_404",
+                "WEB_OBJECT_ENUM": "WEBLOG_IDOR_ENUM"}
+
+
+def canonical_rule(rule: str) -> str:
+    return RULE_ALIASES.get(rule, rule)
+
+
+def _web_rule_findings(events: list[Event], env: dict, prior: list[Finding]) -> list[Finding]:
+    web = [e for e in events if e.source in ("weblog", "alb", "waf")]
+    if not web:
+        return []
+    from .web.webdetect import run_web_detections  # web.webdetect가 이 모듈을 가져다 쓰므로 여기서 부른다
+    from .web.webprofile import web_profile_from_env
+    hosts_seen = {str(e.extra["http_host"]).lower() for e in web if e.extra.get("http_host")}
+    profile = web_profile_from_env(env, hosts_seen)
+    skip = set()
+    # 우리 사이트 이름을 모르면 외부 Referer를 가릴 수 없다(정상 관리자 요청을 CSRF로 오인)
+    if not hosts_seen and not (env.get("web") or {}).get("own_hosts"):
+        skip.add("WEBLOG_CSRF_SUSPECT")
+    # WAF가 SQL 인젝션을 알아보고도 통과시킨 IP는 WAF_SQLI_NOT_BLOCKED가 이미 센다
+    covered = {"WEBLOG_SQLI": {f.key for f in prior if f.rule == "WAF_SQLI_NOT_BLOCKED"}}
+    return run_web_detections(web, profile, sources=("weblog", "alb", "waf"), skip=frozenset(skip),
+                              covered=covered, include_auth=False)
+
+
+# 웹 서비스가 도는 계정. 이 계정이 sudo·su를 쓰는 일은 정상 운영에서 거의 없다(웹셸에서 권한을 올리는 모습)
+SERVICE_ACCOUNTS = frozenset({"www-data", "apache", "nginx", "httpd", "http", "wwwrun", "nobody", "daemon",
+                              "tomcat", "php-fpm", "lighttpd"})
+# sudo로 실행했을 때 root 셸을 여는 명령(GTFOBins에서 흔한 것). 관리자가 일상적으로 쓰는 모양과 겹치지 않는 것만
+SHELL_ESCAPE = re.compile(
+    r"(?i)(?:\bfind\b.*\s-exec\b|\b(?:python[\d.]*|perl|ruby|php|lua|node)\s+-[ecr]\b|"
+    r"\btar\b.*--checkpoint-action|\bzip\b.*\s-TT?\b|\bawk\b.*system\s*\(|\benv\s+/bin/(?:ba|da)?sh\b|"
+    r"\b(?:cp|tee|dd|mv)\b.*/etc/(?:passwd|shadow|sudoers)|\bchmod\b.*(?:u?\+s\b|\s[4-7][0-7]{3}\s)|"
+    r"\bnmap\b.*--(?:interactive|script)|/bin/(?:ba|da|z)?sh\s+-p\b)")
+# 새 계정 만들기·관리자 그룹에 넣기·root 비밀번호 바꾸기
+ACCOUNT_CMD = re.compile(r"(?i)(?:^|/|\s)(?:useradd|adduser|newusers)\b|\busermod\b.*-a?G\s*\S*\b(?:sudo|wheel|admin|root)\b"
+                         r"|(?:^|/)passwd\s+root\b|/etc/sudoers")
+
+
+def _account_target(e: Event) -> str:
+    """만들어지거나 권한을 받은 계정 이름. useradd 줄은 그 사용자, sudo 명령은 명령의 마지막 인자(옵션 제외)."""
+    if e.action == "useradd":
+        return (e.actor or "?").strip()
+    cmd = e.extra.get("command", "")
+    if "/etc/sudoers" in cmd:
+        return "sudoers"
+    args = [a for a in cmd.split()[1:] if not a.startswith("-")]
+    if re.search(r"(?:^|/)usermod\b", cmd) and args:  # usermod -aG sudo bob → bob
+        return args[-1]
+    return args[-1] if args else "?"
+
+
+def host_auth_findings(events: list[Event]) -> list[Finding]:
+    """서버 인증 로그(auth.log)의 sudo·su·계정 생성. 사후 분석과 웹서버 점검이 같이 쓴다."""
+    host = [e for e in events if e.source in ("sshauth", "auth") and e.action in ("sudo", "su", "useradd")]
+    findings: list[Finding] = []
+    esc: dict[str, list[Event]] = defaultdict(list)
+    fail: dict[str, list[Event]] = defaultdict(list)
+    acct: dict[str, list[Event]] = defaultdict(list)
+    for e in host:
+        who = (e.actor or "?").strip()
+        cmd = e.extra.get("command", "")
+        svc = who.lower() in SERVICE_ACCOUNTS
+        if e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
+            acct[_account_target(e)].append(e)
+        if e.action in ("sudo", "su") and e.outcome == "success" and (svc or SHELL_ESCAPE.search(cmd)):
+            esc[who].append(e)
+        elif e.action in ("sudo", "su") and e.outcome == "failure":
+            fail[who].append(e)
+    for who, evs in esc.items():
+        cmds = ", ".join(sorted({(e.extra.get("command") or f"su → {e.extra.get('target_user', 'root')}")[:60]
+                                 for e in evs})[:3])
+        why = "웹 서비스 계정" if who.lower() in SERVICE_ACCOUNTS else "셸 탈출 명령"
+        findings.append(Finding("HOST_PRIV_ESC", evs, f"{why} '{who}'의 권한 상승 {len(evs)}건: {cmds}", who))
+    for who, evs in fail.items():
+        evs.sort(key=lambda e: e.ts)
+        if who.lower() in SERVICE_ACCOUNTS:  # 서비스 계정은 한 번의 시도도 의미가 있다
+            findings.append(Finding("HOST_PRIV_ESC_FAIL", evs, f"웹 서비스 계정 '{who}'의 sudo·su 시도 {len(evs)}건 거부", who))
+            continue
+        for seg in _bursts(evs, timedelta(minutes=10), 3, key=lambda e: e.raw_ref):
+            findings.append(Finding("HOST_PRIV_ESC_FAIL", seg, f"10분 안에 '{who}'의 sudo·su 실패 {len(seg)}건", who))
+    for target, evs in acct.items():
+        by = sorted({(e.actor or "?").strip() for e in evs if e.action == "sudo"})
+        findings.append(Finding("HOST_ACCOUNT_CREATED", evs,
+                                f"'{target}' 계정 생성·권한 부여 {len(evs)}건" + (f"(실행: {', '.join(by)})" if by else ""),
+                                target))
+    return findings
+
+
 def run_detections(events: list[Event], env: dict | None = None) -> list[Finding]:
     """모든 규칙을 돌려 Finding 목록을 만들고, 해당 이벤트에 규칙 ID를 붙인다."""
     env = env or {}
@@ -349,6 +441,35 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             singles[("CT_INSTANCE_CRED_OUTSIDE", e.instance_id)].append(e)
     for (rule, key), evs in singles.items():
         findings.append(Finding(rule, evs, _ok_fail(evs), key))
+
+    # --- CloudTrail: 콘솔 로그인 연속 실패(같은 IP 또는 같은 사용자). 실패 뒤 성공하면 높음으로 올린다
+    logins = sorted((e for e in ct if e.action == "signin:ConsoleLogin"), key=lambda e: e.ts)
+    for keyf in (lambda e: e.src_ip or "", lambda e: e.actor or ""):
+        groups: dict[str, list[Event]] = defaultdict(list)
+        for e in logins:
+            if keyf(e):
+                groups[keyf(e)].append(e)
+        for key, evs in groups.items():
+            fails = [e for e in evs if e.outcome == "failure"]
+            for seg in _bursts(fails, timedelta(minutes=10), 5, key=lambda e: e.raw_ref):
+                after = [e for e in evs if e.outcome == "success" and timedelta(0) < e.ts - seg[-1].ts <= timedelta(minutes=30)]
+                if after:
+                    findings.append(Finding("CT_CONSOLE_BRUTE", seg + after[:1],
+                                            f"10분 안에 실패 {len(seg)}건 뒤 로그인 성공", key,
+                                            override={"severity": "high", "title": "콘솔 로그인 연속 실패 뒤 성공(비밀번호 탈취 의심)"}))
+                else:
+                    findings.append(Finding("CT_CONSOLE_BRUTE", seg, f"10분 안에 실패 {len(seg)}건", key))
+    # 같은 실패 묶음이 IP와 사용자 양쪽에서 두 번 잡히면 하나만 남긴다
+    seen_cb: set[frozenset] = set()
+    dedup: list[Finding] = []
+    for f in findings:
+        if f.rule == "CT_CONSOLE_BRUTE":
+            k = frozenset(e.raw_ref for e in f.events)
+            if k in seen_cb:
+                continue
+            seen_cb.add(k)
+        dedup.append(f)
+    findings = dedup
 
     # --- CloudTrail: 같은 인스턴스 세션 자격증명이 서로 다른 공인 IP에서 사용
     by_inst: dict[str, list[Event]] = defaultdict(list)
@@ -446,7 +567,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         findings.append(Finding("WAF_BLOCKED", evs, f"{len(evs)}건 차단", ip))
 
     # --- SSH 인증 로그
-    ssh = [e for e in events if e.source == "sshauth"]
+    ssh = [e for e in events if e.source == "sshauth" and e.action not in ("sudo", "useradd")]  # 로그인 줄만
     by_ssrc: dict[str, list[Event]] = defaultdict(list)
     for e in ssh:
         by_ssrc[e.src_ip or ""].append(e)
@@ -462,48 +583,12 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
 
-    # --- ALB·API Gateway: 같은 IP가 같은 API에서 객체 번호만 바꿔 가며 403/404를 연달아 받음.
-    # 남의 객체(작업·주문·파일)를 열어 보려는 IDOR 탐색이다. 웹서버 로그의 WEBLOG_IDOR_ENUM과 달리
-    # 경로 이름에 기대지 않고, 권한 거부·없음 응답이 서로 다른 번호에 몰리는지만 본다.
-    probes: dict[tuple[str, str], list[Event]] = defaultdict(list)
-    for e in events:
-        # http_status(정수)가 공통 필드다. elb_status(문자열)는 예전에 저장한 결과와 호환용
-        st = e.extra.get("http_status") or e.extra.get("elb_status")
-        if e.source == "alb" and e.action and str(st) in ("403", "404"):
-            r = _route(e.action)
-            if r:
-                probes[(e.src_ip or "?", r)].append(e)
-    for (ip, r), evs in probes.items():
-        for seg in _bursts(evs, timedelta(minutes=10), 5, key=lambda e: e.action):
-            findings.append(Finding("WEB_OBJECT_ENUM", seg,
-                                    f"10분 안에 {r} 객체 {len({e.action for e in seg})}개에 "
-                                    f"403/404 {len(seg)}건", ip))
+    # --- 서버 권한 상승·계정 생성(auth.log의 sudo·su·useradd)
+    findings += host_auth_findings(events)
 
-    # --- 웹 요청(WAF·ALB)의 SQL 인젝션 패턴 — WAF가 놓친 경우에도 잡기 위한 보조 규칙
-    web: dict[str, list[Event]] = defaultdict(list)
-    for e in events:
-        if e.source in ("waf", "alb", "weblog") and e.action and "?" in e.action \
-                and e.disposition != "blocked":  # WAF가 이미 막은 요청은 제외
-            q = unquote_plus(e.action.split("?", 1)[1])
-            if _SQLI.search(q) and "WAF_SQLI_NOT_BLOCKED" not in e.findings:
-                web[e.src_ip or ""].append(e)
-    for ip, evs in web.items():
-        if any(f.rule == "WAF_SQLI_NOT_BLOCKED" and f.key == ip for f in findings):
-            continue
-        findings.append(Finding("WEB_SQLI_PATTERN", evs,
-                                f"{_ok_fail(evs)} · {sqli_success_signal(evs, events)}", ip))
-
-    # --- 웹 경로 탐색: 한 IP가 5분 안에 서로 다른 경로 20개 이상에서 404/403
-    probe: dict[str, list[Event]] = defaultdict(list)
-    for e in events:
-        if e.source in ("alb", "weblog") and e.outcome == "failure" and \
-                str(e.extra.get("http_status")) in ("403", "404"):
-            probe[e.src_ip or ""].append(e)
-    for ip, evs in probe.items():
-        evs.sort(key=lambda e: e.ts)
-        for seg in _bursts(evs, timedelta(minutes=5), 20, key=lambda e: e.action):
-            findings.append(Finding("WEB_PATH_PROBE", seg,
-                                    f"5분 안에 서로 다른 경로 {len({e.action for e in seg})}개 404/403", ip))
+    # --- 웹 공격 규칙(SQL 인젝션·스캐너·경로 조작·웹셸·IDOR 등): 웹서버 점검과 같은 코드(web/webdetect)로
+    # nginx·ALB·WAF 로그를 본다. SSH는 위의 SSH 규칙이 본다.
+    findings += _web_rule_findings(events, env, findings)
 
     # --- GuardDuty 탐지 결과: 결과 하나가 탐지 하나. 같은 IP·인스턴스·키로 다른 로그와 엮인다
     for e in events:

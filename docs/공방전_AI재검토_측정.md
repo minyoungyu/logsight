@@ -1,5 +1,7 @@
 # 클라우드 공방전 로그 AI 재검토 측정
 
+> **규칙 이름(2026-11-17)**: 이 문서의 `WEB_SQLI_PATTERN`·`WEB_PATH_PROBE`·`WEB_OBJECT_ENUM`은 지금 `WEBLOG_SQLI`·`WEBLOG_ENUM_404`·`WEBLOG_IDOR_ENUM`이다. 사후 분석과 웹서버 점검이 같은 공격을 다른 이름으로 부르던 것을 하나로 합쳤다(측정 결과는 이름만 바뀌고 같음). 옛 이름은 `detect.RULE_ALIASES`로 읽는다.
+
 측정일 2026-10-26 · 모델 claude-opus-5-5(모든 회차를 같은 모델이 응답) · 데이터와 정답지는 [규칙만 측정](공방전_로그_측정.md)과 같다.
 
 ## 한눈에 보기

@@ -54,7 +54,8 @@ class Event:
 
 # 원본마다 다른 결과 표현을 공통 값으로(OCSF의 status/disposition 개념을 단순화)
 _STATUS = {"success": "success", "accept": "success", "allow": "success", "count": "success",
-           "failure": "failure", "reject": "failure", "block": "failure", "detected": "unknown"}
+           "failure": "failure", "reject": "failure", "block": "failure", "detected": "unknown",
+           "client-error": "failure", "server-error": "failure"}  # 뒤의 둘: 웹서버 점검의 접속 로그
 _DISPOSITION = {"accept": "allowed", "allow": "allowed", "count": "allowed", "reject": "blocked",
                 "block": "blocked", "detected": "detected"}
 
@@ -181,8 +182,8 @@ def parse_waf(text: str, name: str = "waf") -> list[Event]:
                   if g.get("nonTerminatingMatchingRules") or g.get("terminatingRule")]
         uri = req.get("uri", "")
         args = req.get("args", "")
-        ua = next((h.get("value", "") for h in req.get("headers") or []
-                   if str(h.get("name", "")).lower() == "user-agent"), "")
+        hdr = {str(h.get("name", "")).lower(): h.get("value", "") for h in req.get("headers") or []}
+        ua = hdr.get("user-agent", "")
         events.append(Event(
             ts=ts, source="waf",
             src_ip=req.get("clientIp"),
@@ -196,6 +197,9 @@ def parse_waf(text: str, name: str = "waf") -> list[Event]:
                 "labels": [lb.get("name") for lb in r.get("labels") or []],
                 "country": req.get("country"),
                 "ua": ua[:200],
+                # 웹 공격 규칙(web/webdetect)이 nginx·ALB 로그와 같은 이름으로 읽는 필드. WAF 로그에는 응답 코드가 없다
+                "method": req.get("httpMethod", ""), "path": uri or "/", "query": args,
+                "referer": str(hdr.get("referer", ""))[:300],
                 "web_acl": str(r.get("webaclId", "")).split("/")[-2:-1][0]
                 if r.get("webaclId") else None,
             },
@@ -232,25 +236,93 @@ def parse_alb(text: str, name: str = "alb") -> list[Event]:
                 outcome="success" if f[8].startswith(("2", "3")) else "failure",
                 raw_ref=f"{name}:{i+1}",
                 extra={"http_status": int(f[8]) if f[8].isdigit() else None, "http_host": u.hostname, "ua": f[13].strip('"') if len(f) > 13 else "",
-                       "resp_bytes": int(f[11]) if f[11].isdigit() else None},
+                       "resp_bytes": int(f[11]) if f[11].isdigit() else None,
+                       # 웹 공격 규칙(web/webdetect)이 nginx 로그와 같은 이름으로 읽는 필드. ALB 로그에는 Referer가 없다
+                       "method": method, "path": u.path or "/", "query": u.query, "referer": ""},
             ))
         except (ValueError, IndexError):
             continue
     return events
 
 
-# ------------------------------------------------------------------ EC2 리눅스 인증 로그
-_SSH = re.compile(
-    r'^(?P<mon>\w{3})\s+(?P<day>\d+)\s+(?P<time>[\d:]+)\s+(?P<host>\S+)\s+sshd\[\d+\]:\s+'
-    r'(?P<result>Failed|Accepted)\s+(?:password|publickey)\s+for\s+(?:invalid user\s+)?'
-    r'(?P<user>\S+)\s+from\s+(?P<ip>[\d.a-fA-F:]+)\s+port\s+(?P<port>\d+)'
-)
+# ------------------------------------------------------------------ 웹서버 오류 로그(nginx·Apache)
+# nginx:  2026/10/10 13:55:36 [error] 1234#0: *5 open() "..." failed ... client: 1.2.3.4
+# apache: [Sat Oct 10 13:55:36.123456 2026] [php:error] [pid 1234] [client 1.2.3.4:5678] msg
+_NGINX_ERR = re.compile(
+    r"^(?P<time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<level>\w+)\]\s+(?P<msg>.*)")
+_NGINX_CLIENT = re.compile(r"client:\s*(?P<ip>[\d.a-fA-F:]+)")
+_APACHE_ERR = re.compile(
+    r"^\[(?P<time>[^\]]+)\]\s+\[(?P<mod>[^\]]+)\]\s+(?:\[pid [^\]]+\]\s+)?"
+    r"(?:\[client (?P<ip>[0-9a-fA-F.:]+?)(?::\d+)?\]\s+)?(?P<msg>.*)")
+
+
+def parse_weberror(text: str, name: str = "weberror") -> list[Event]:
+    events: list[Event] = []
+    for i, line in enumerate(text.splitlines()):
+        line = line.strip()
+        if not line:
+            continue
+        ip = None
+        level = "error"
+        msg = line
+        ts = None
+        mn = _NGINX_ERR.match(line)
+        if mn:
+            try:
+                ts = datetime.strptime(mn["time"], "%Y/%m/%d %H:%M:%S").replace(tzinfo=timezone.utc)
+            except ValueError:
+                ts = None
+            level = mn["level"]
+            msg = mn["msg"]
+            cm = _NGINX_CLIENT.search(line)
+            ip = cm["ip"] if cm else None
+        else:
+            ma = _APACHE_ERR.match(line)
+            if ma:
+                level = ma["mod"].split(":")[-1] if ":" in ma["mod"] else ma["mod"]
+                msg = ma["msg"]
+                ip = ma["ip"]
+                for fmt in ("%a %b %d %H:%M:%S.%f %Y", "%a %b %d %H:%M:%S %Y"):
+                    try:
+                        ts = datetime.strptime(ma["time"], fmt).replace(tzinfo=timezone.utc)
+                        break
+                    except ValueError:
+                        continue
+        if ts is None:
+            continue
+        events.append(Event(
+            ts=ts, source="weberror", src_ip=ip,
+            action=msg[:300], outcome=level,
+            raw_ref=f"{name}:{i+1}",
+            extra={"level": level, "message": msg[:500], "raw": line[:500]},
+        ))
+    return events
+
+
+# ------------------------------------------------------------------ 리눅스 인증 로그(auth.log, secure)
+# 사후 분석·경보 분석·웹서버 점검이 모두 이 파서를 쓴다. 줄 머리는 두 형식을 받는다:
+#   Nov 17 04:40:36 host sshd[123]: ...                        (전통 syslog, 연도 없음)
+#   2026-11-17T04:40:36.123456+00:00 host sshd[123]: ...       (rsyslog RFC 3339, Debian 12 이후 기본)
+_AUTH_HEAD = re.compile(
+    r"^(?:\d{4}-\d\d-\d\dT[\d:.]+(?:Z|[+-]\d\d:?\d\d)?|\w{3}\s+\d+\s+\d\d:\d\d:\d\d)\s+"
+    r"(?P<host>\S+)\s+(?P<proc>[\w./-]+)(?:\[(?P<pid>\d+)\])?:\s+(?P<msg>.*)$")
+_SSH_RESULT = re.compile(
+    r"^(?P<result>Failed|Accepted)\s+(?:password|publickey|keyboard-interactive/pam)\s+for\s+"
+    r"(?:invalid user\s+)?(?P<user>\S+)\s+from\s+(?P<ip>[\d.a-fA-F:]+)(?:\s+port\s+(?P<port>\d+))?")
 # 키 인증만 허용한 서버는 "Failed password" 없이 이 줄만 남는다(없는 사용자 이름으로 접속 시도)
-_SSH_INVALID = re.compile(
-    r'^(?P<mon>\w{3})\s+(?P<day>\d+)\s+(?P<time>[\d:]+)\s+(?P<host>\S+)\s+sshd\[(?P<pid>\d+)\]:\s+'
-    r'Invalid user\s+(?P<user>\S*)\s+from\s+(?P<ip>[\d.a-fA-F:]+)(?:\s+port\s+(?P<port>\d+))?'
-)
-_SSH_PID = re.compile(r'sshd\[(\d+)\]:\s+Failed\s')
+_SSH_INVALID = re.compile(r"^Invalid user\s+(?P<user>\S*)\s+from\s+(?P<ip>[\d.a-fA-F:]+)(?:\s+port\s+(?P<port>\d+))?")
+_SUDO = re.compile(r"(?P<who>\S+)\s*:.*?COMMAND=(?P<cmd>.+)$")
+_SUDO_TARGET = re.compile(r"\bUSER=(?P<target>[^\s;]+)")
+# sudo가 거부한 줄: "www-data : user NOT in sudoers ; ... COMMAND=..." / "3 incorrect password attempts ; ..."
+_SUDO_DENIED = re.compile(r"(?i)NOT in sudoers|incorrect password attempt|command not allowed|a password is required")
+# su: "(to root) www-data on pts/0", "Successful su for root by www-data", "FAILED su for root by www-data",
+#     "pam_unix(su:session): session opened for user root(uid=0) by www-data(uid=33)"
+_SU_TO = re.compile(r"^\(to (?P<target>[^)]+)\)\s+(?P<who>\S+)\s+on\b")
+_SU_RESULT = re.compile(r"^(?P<result>Successful|FAILED) su for (?P<target>\S+) by (?P<who>\S+)")
+_SU_PAM_OPEN = re.compile(r"pam_unix\(su(?:-l)?:session\): session opened for user (?P<target>[^\s(]+)"
+                          r"(?:\(uid=\d+\))? by (?P<who>[^\s(]*)")
+_SU_PAM_FAIL = re.compile(r"pam_unix\(su(?:-l)?:auth\): authentication failure;.*?\bruser=(?P<who>\S*).*?\buser=(?P<target>\S+)")
+_USERADD = re.compile(r"new user: name=(?P<user>[^,]+)")
 _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
@@ -265,27 +337,78 @@ def _host_ip(host: str) -> str | None:
 
 
 def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> list[Event]:
+    """SSH 로그인 성공·실패(action=ssh_login)와 sudo·계정 생성(action=sudo|useradd)을 읽는다.
+    year: 연도 없는 syslog 줄에 붙일 연도. 없으면 올해(미래가 되면 작년)로 본다."""
     events = []
-    lines = text.splitlines()
-    failed_pids = {m.group(1) for m in map(_SSH_PID.search, lines) if m}
-    for i, line in enumerate(lines):
-        m = _SSH.search(line)
+    heads = [(i, line.strip(), _AUTH_HEAD.match(line.strip())) for i, line in enumerate(text.splitlines())]
+    # 같은 접속(pid)의 "Failed password" 줄이 있으면 "Invalid user" 줄은 세지 않는다(한 시도를 두 번 셈)
+    failed_pids = {m["pid"] for _, _, m in heads if m and m["pid"] and m["msg"].startswith("Failed ")}
+    su_seen: set[str] = set()
+    for i, line, m in heads:
         if not m:
-            m = _SSH_INVALID.search(line)
-            if m and m["pid"] in failed_pids:
-                continue  # 같은 접속의 "Failed password" 줄로 이미 센다
-        if not m or m["mon"] not in _MONTHS:
             continue
-        hh, mm, ss = (int(x) for x in m["time"].split(":"))
-        ts = _syslog_dt(_MONTHS[m["mon"]], int(m["day"]), hh, mm, ss, year)
-        events.append(Event(
-            ts=ts, source="sshauth", src_ip=m["ip"], actor=m["user"], dst_port=22,
-            dst_ip=_host_ip(m["host"]), action="ssh_login",
-            outcome="success" if "result" in m.groupdict() and m["result"] == "Accepted" else "failure",
-            raw_ref=f"{name}:{i+1}",
-            extra={"raw": line.strip()[:300], "host": m["host"]},
-        ))
+        proc, msg = m["proc"], m["msg"]
+        base = {"raw": line[:300], "host": m["host"]}
+        ev = None
+        if proc.startswith("sshd"):
+            r = _SSH_RESULT.match(msg)
+            if not r:
+                r = _SSH_INVALID.match(msg)
+                if r and m["pid"] in failed_pids:
+                    continue
+            if r:
+                ev = Event(ts=None, source="sshauth", src_ip=r["ip"], actor=r["user"], dst_port=22,
+                           dst_ip=_host_ip(m["host"]), action="ssh_login",
+                           outcome="success" if r.groupdict().get("result") == "Accepted" else "failure",
+                           raw_ref=f"{name}:{i+1}", extra=base)
+        elif proc == "sudo":
+            r = _SUDO.search(msg)
+            if r:
+                t = _SUDO_TARGET.search(msg)
+                ev = Event(ts=None, source="sshauth", actor=r["who"], action="sudo",
+                           outcome="failure" if _SUDO_DENIED.search(msg) else "success",
+                           dst_ip=_host_ip(m["host"]), raw_ref=f"{name}:{i+1}",
+                           extra=base | {"command": r["cmd"][:200], "target_user": t["target"] if t else "root"})
+        elif proc in ("su", "su-l"):
+            # 한 번의 su가 여러 줄을 남기므로 pid마다 첫 결과 줄 하나만 쓴다
+            key = m["pid"] or f"line{i}"
+            if key in su_seen:
+                continue
+            r = _SU_TO.match(msg) or _SU_RESULT.match(msg) or _SU_PAM_OPEN.search(msg)
+            ok = bool(r) and not (r.groupdict().get("result") == "FAILED")
+            if not r:
+                r = _SU_PAM_FAIL.search(msg)
+            if r:
+                su_seen.add(key)
+                ev = Event(ts=None, source="sshauth", actor=(r["who"] or "?").strip(), action="su",
+                           outcome="success" if ok else "failure", dst_ip=_host_ip(m["host"]),
+                           raw_ref=f"{name}:{i+1}", extra=base | {"target_user": r["target"]})
+        elif proc in ("useradd", "usermod"):
+            r = _USERADD.search(msg)
+            if r:
+                ev = Event(ts=None, source="sshauth", actor=r["user"], action="useradd", outcome="success",
+                           dst_ip=_host_ip(m["host"]), raw_ref=f"{name}:{i+1}", extra=base)
+        if ev is not None:
+            ev.ts = _line_ts(line, year)
+            if ev.ts is not None:
+                events.append(ev)
+    _link_sessions(events)
     return events
+
+
+def _link_sessions(events: list[Event], window: timedelta = timedelta(hours=12)) -> None:
+    """sudo·su·useradd 줄에는 IP가 없다. 같은 서버에서 같은 사용자가 직전에 SSH로 로그인했으면 그 IP를 붙여
+    'SSH 대입 → 로그인 → 권한 상승·계정 생성'이 한 사건으로 묶이게 한다. 추정이므로 extra에 표시한다."""
+    last: dict[tuple[str, str], Event] = {}
+    for e in sorted(events, key=lambda x: x.ts):
+        k = (e.extra.get("host", ""), (e.actor or "").strip())
+        if e.action == "ssh_login" and e.outcome == "success":
+            last[k] = e
+        elif e.action in ("sudo", "su") and not e.src_ip:
+            s = last.get(k)
+            if s and timedelta(0) <= e.ts - s.ts <= window:
+                e.src_ip = s.src_ip
+                e.extra["src_ip_from"] = f"같은 사용자의 직전 SSH 로그인({s.raw_ref})"
 
 
 # ------------------------------------------------------------------ 서버 방화벽 로그(iptables/nftables/ufw)
@@ -344,10 +467,34 @@ def parse_hostfw(text: str, name: str = "hostfw", year: int | None = None) -> li
 # ------------------------------------------------------------------ 웹 서버 접속 로그(nginx/apache combined)
 # WAF 로그 대신 쓰는 무료 대안. 예:
 #   203.0.113.5 - - [01/Nov/2026:10:00:00 +0000] "GET /item?id=1 HTTP/1.1" 200 512 "-" "curl/8.0"
-_WEB = re.compile(r'^(?P<ip>[\da-fA-F.:]+)\s+\S+\s+\S+\s+\[(?P<ts>[^\]]+)\]\s+'
-                  r'"(?P<req>[^"]*)"\s+(?P<status>\d{3})\s+(?P<size>\S+)'
+_WEB = re.compile(r'^(?P<ip>[^\s,]+(?:,\s*[^\s,]+)*)\s+\S+\s+(?P<user>\S+)\s+\[(?P<ts>[^\]]+)\]\s+'
+                  r'"(?P<req>[^"]*)"\s+(?P<status>\d{3}|-)\s+(?P<size>\S+)'
                   r'(?:\s+"(?P<ref>[^"]*)"\s+"(?P<ua>[^"]*)")?'
                   r'(?:\s+"(?P<xff>[^"]*)")?')  # nginx 기본 'main' 형식의 마지막 칸 $http_x_forwarded_for
+# 첫 칸에 쉼표로 여러 IP가 오는 변형($proxy_add_x_forwarded_for를 첫 칸에 찍는 설정)도 받는다.
+# 그 값은 "요청이 가져온 X-Forwarded-For, 접속해 온 쪽" 순서라 맨 오른쪽만 믿을 수 있다(parse_web_line).
+# 첫 칸이 IP가 아닌 호스트 이름(Apache HostnameLookups On)이어도 버리지 않고 그대로 출발지로 쓴다.
+
+_MONTHS = {m: i for i, m in enumerate(
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+_CLF_TIME = re.compile(r"(\d{2})/(\w{3})/(\d{4}):(\d{2}):(\d{2}):(\d{2})(?:\s*([+-]\d{4}))?$")
+
+
+def parse_clf_time(s: str) -> datetime | None:
+    """10/Oct/2026:13:55:36 +0000 형태의 접속 로그 시각을 UTC로. 시간대가 없으면 UTC로 본다.
+    월 이름을 직접 읽어 시스템 언어 설정(strptime의 %b)에 흔들리지 않는다."""
+    m = _CLF_TIME.match(s.strip())
+    if not m or m[2] not in _MONTHS:
+        return None
+    day, _, year, hh, mm, ss, tz = m.groups()
+    try:
+        dt = datetime(int(year), _MONTHS[m[2]], int(day), int(hh), int(mm), int(ss), tzinfo=timezone.utc)
+    except ValueError:
+        return None
+    if tz:
+        sign = 1 if tz[0] == "+" else -1
+        dt -= sign * timedelta(hours=int(tz[1:3]), minutes=int(tz[3:5]))
+    return dt
 
 
 # 내부망 대역(RFC 1918, CGNAT, 루프백, 링크 로컬, IPv6 ULA). ipaddress의 is_private는 문서용 예약 대역까지
@@ -381,28 +528,65 @@ def _client_ip(remote: str, xff: str | None) -> tuple[str, dict]:
     return remote, {"behind_proxy": True}  # 프록시 뒤인데 실제 IP를 알 수 없음
 
 
+def parse_web_line(line: str) -> dict | None:
+    """nginx·Apache 접속 로그 한 줄 → 공통 웹 요청 필드. 두 파서(이 모듈의 parse_weblog, 웹서버 점검의
+    web/weblog.parse_access)가 같이 쓴다. 같은 줄이면 어느 경로로 읽어도 같은 IP·필드가 나온다.
+
+    반환: ts, src_ip, ip_extra(proxy_ip·behind_proxy), user, method, path, query, uri, proto,
+          status(문자열, 없으면 "-"), http_status(정수 또는 None), resp_bytes(정수), referer, ua
+    """
+    m = _WEB.match(line)
+    if not m:
+        return None
+    ts = parse_clf_time(m["ts"])
+    if ts is None:
+        return None
+    hosts = [h.strip() for h in m["ip"].split(",") if h.strip()]
+    # 첫 칸이 목록이면 맨 오른쪽이 실제로 접속해 온 쪽이고, 그 앞은 요청이 가져온(위조 가능한) 값이다
+    remote, carried = hosts[-1], hosts[:-1]
+    xff = ", ".join([*carried, *([m["xff"]] if m["xff"] and m["xff"] != "-" else [])]) or None
+    src, ip_extra = _client_ip(remote, xff)
+    # 요청 줄 "METHOD URI PROTO": URI에 (비정상) 공백이 있어도 잃지 않도록 첫 토큰과 마지막 HTTP/x만 뗀다
+    req = (m["req"] or "").split(" ")
+    method = req[0] if req and req[0] else "-"
+    proto = ""
+    if len(req) >= 3 and req[-1].upper().startswith("HTTP/"):
+        proto, uri = req[-1], " ".join(req[1:-1])
+    else:
+        uri = " ".join(req[1:]) if len(req) > 1 else ""
+    path, _, query = uri.partition("?")
+    st = m["status"]
+    size = m["size"]
+    return {"ts": ts, "src_ip": src, "ip_extra": ip_extra,
+            "user": m["user"] if m["user"] not in ("-", "") else None,
+            "method": method, "uri": uri, "path": path, "query": query, "proto": proto,
+            "status": st, "http_status": int(st) if st.isdigit() else None,
+            "resp_bytes": int(size) if size.isdigit() else 0,
+            "referer": (m["ref"] or "")[:300], "ua": (m["ua"] or "")[:300]}
+
+
+def web_extra(w: dict) -> dict:
+    """공통 웹 요청 필드를 Event.extra로. 규칙·보고서·AI가 모두 이 이름을 쓴다."""
+    out = dict(w["ip_extra"])
+    out.update({"method": w["method"], "path": w["path"], "query": w["query"], "proto": w["proto"],
+                "http_status": w["http_status"], "resp_bytes": w["resp_bytes"],
+                "referer": w["referer"], "ua": w["ua"]})
+    return out
+
+
 def parse_weblog(text: str, name: str = "weblog") -> list[Event]:
     events = []
     for i, line in enumerate(text.splitlines()):
-        m = _WEB.match(line.strip())
-        if not m:
+        w = parse_web_line(line.strip())
+        if not w:
             continue
-        try:
-            ts = datetime.strptime(m["ts"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
-        except ValueError:
-            continue
-        req = m["req"].split(" ")
-        st = m["status"]
-        src, extra = _client_ip(m["ip"], m["xff"])
-        extra.update({"http_status": int(st), "ua": (m["ua"] or "")[:200]})
-        if m["size"].isdigit():
-            extra["resp_bytes"] = int(m["size"])  # 응답 크기: 공격 성공 신호 판단에 쓴다
+        st = w["http_status"]
         events.append(Event(
-            ts=ts, source="weblog", src_ip=src,
-            action=(f"{req[0]} {req[1]}" if len(req) > 1 else m["req"])[:300],
-            outcome="success" if st[0] in "23" else "failure",
+            ts=w["ts"], source="weblog", src_ip=w["src_ip"],
+            action=f"{w['method']} {w['uri']}"[:300],
+            outcome="success" if st and str(st)[0] in "23" else "failure",
             raw_ref=f"{name}:{i+1}",
-            extra=extra,
+            extra=web_extra(w),
         ))
     return events
 
@@ -575,6 +759,12 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     return flags
 
 
+def _console_failed(r: dict) -> bool:
+    """콘솔 로그인 실패는 errorCode 없이 responseElements.ConsoleLogin = "Failure"로만 남는다."""
+    re_ = r.get("responseElements")
+    return isinstance(re_, dict) and str(re_.get("ConsoleLogin", "")).lower() == "failure"
+
+
 def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
     try:
         ts = _iso(r["eventTime"])
@@ -615,7 +805,7 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
         instance_id=m.group(1) if m else None,
         access_key=sys.intern(key) if isinstance(key, str) else None,
         action=sys.intern(act),
-        outcome="failure" if r.get("errorCode") else "success",
+        outcome="failure" if r.get("errorCode") or _console_failed(r) else "success",
         raw_ref=ref,
         extra=extra,
     )
@@ -659,6 +849,7 @@ PARSERS = {
     "sshauth": parse_sshauth,
     "hostfw": parse_hostfw,
     "weblog": parse_weblog,
+    "weberror": parse_weberror,
     "guardduty": parse_guardduty,
 }
 
@@ -677,6 +868,7 @@ def detect_kind(name: str, text: str) -> str | None:
     for kind, keys in (("guardduty", ("guardduty",)), ("cloudtrail", ("cloudtrail",)), ("vpcflow", ("vpcflow", "flow")),
                        ("waf", ("waf",)), ("alb", ("alb", "elb")),
                        ("hostfw", ("hostfw", "iptables", "nftables", "ufw", "kern", "firewall")),
+                       ("weberror", ("error",)),
                        ("weblog", ("nginx", "apache", "httpd", "access", "weblog")),
                        ("sshauth", ("auth", "secure", "ssh"))):
         if any(k in n for k in keys):
@@ -692,6 +884,8 @@ def detect_kind(name: str, text: str) -> str | None:
         return "hostfw"
     if "sshd[" in head:
         return "sshauth"
+    if _NGINX_ERR.match(head) or _APACHE_ERR.match(head):
+        return "weberror"
     if _WEB.match(head.splitlines()[0] if head else ""):
         return "weblog"
     first = head.splitlines()[0] if head else ""

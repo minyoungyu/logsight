@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from logsight.detect import RULES, run_detections  # noqa: E402
-from logsight.normalize import (cloudtrail_record_to_event, parse_alb, parse_guardduty,  # noqa: E402
+from logsight.normalize import (cloudtrail_record_to_event, parse_guardduty,  # noqa: E402
                                 parse_sshauth, parse_vpcflow, parse_waf)
 from logsight.rulespec import SPEC  # noqa: E402
 from logsight.web import webdetect, weblog, webscan  # noqa: E402
@@ -94,6 +94,9 @@ def aws_rules(evs, env=None):
     return {f.rule for f in run_detections([e for e in evs if e], env or {})}
 
 
+PRIVATE = SiteProfile(private_object_paths=["/order.php"])  # 남의 것을 열면 안 되는 경로(프로필에 적음)
+
+
 def web_rules(lines, profile=None):
     evs = weblog.parse_access("\n".join(lines), "access.log")
     return {f.rule for f in webdetect.run_web_detections(evs, profile or SiteProfile())}
@@ -110,6 +113,27 @@ def file_rules(content, rel="shell.php"):
 
 INST_ENV = {"instances": [{"instance_id": "i-0abc", "public_ip": "203.0.113.10", "private_ip": "10.0.0.5"}]}
 TRUST_ENV = {"trusted_ips": ["192.0.2.0/24"]}
+
+
+def host(i, msg, proc="sudo"):
+    """auth.log의 sudo·su·useradd 줄(합성)."""
+    ts = (T0 + timedelta(seconds=i * 10)).strftime("%b %d %H:%M:%S")
+    return f"{ts} web {proc}[{300 + i}]: {msg}"
+
+
+def host_rules(lines):
+    return aws_rules(parse_sshauth("\n".join(lines), year=2026))
+
+
+def sudo(who, cmd, denied=False):
+    mid = "user NOT in sudoers ; " if denied else ""
+    return f"{who} : {mid}TTY=pts/0 ; PWD=/var/www ; USER=root ; COMMAND={cmd}"
+
+
+def console(i, ok, ip=ATK):
+    return ct(i, "ConsoleLogin", "signin", ip=ip, sec=30,
+              responseElements={"ConsoleLogin": "Success" if ok else "Failure"},
+              additionalEventData={"MFAUsed": "Yes"})
 
 
 def burst(name, n, src="iam", err=None, sec=60, **kw):
@@ -193,12 +217,14 @@ CASES = {
     "SSH_SUCCESS_AFTER_FAIL": (
         lambda: aws_rules(parse_sshauth("\n".join([ssh(0, "fail"), ssh(1, "fail"), ssh(2, "ok")]), year=2026)),
         lambda: aws_rules(parse_sshauth("\n".join([ssh(0, "fail"), ssh(2, "ok")]), year=2026))),
-    "WEB_SQLI_PATTERN": (lambda: aws_rules(parse_alb(alb(0, "/item?id=1'%20or%201=1--", 200))),
-                         lambda: aws_rules(parse_alb(alb(0, "/item?id=1", 200)))),
-    "WEB_PATH_PROBE": (lambda: aws_rules(parse_alb("\n".join(alb(i, f"/p{i}x", 404) for i in range(20)))),
-                       lambda: aws_rules(parse_alb("\n".join(alb(i, f"/p{i}x", 404) for i in range(19))))),
-    "WEB_OBJECT_ENUM": (lambda: aws_rules(parse_alb("\n".join(alb(i, f"/api/jobs/job-{i}", 403) for i in range(5)))),
-                        lambda: aws_rules(parse_alb("\n".join(alb(i, f"/api/jobs/job-{i}", 403) for i in range(4))))),
+    "HOST_PRIV_ESC": (lambda: host_rules([host(0, sudo("www-data", "/usr/bin/find . -exec /bin/sh -p ; -quit"))]),
+                      lambda: host_rules([host(0, sudo("ubuntu", "/usr/bin/systemctl restart nginx"))])),
+    "HOST_PRIV_ESC_FAIL": (lambda: host_rules([host(i, sudo("dev", "/bin/bash", denied=True)) for i in range(3)]),
+                           lambda: host_rules([host(i, sudo("dev", "/bin/bash", denied=True)) for i in range(2)])),
+    "HOST_ACCOUNT_CREATED": (lambda: host_rules([host(0, sudo("root", "/usr/sbin/useradd -m svc"))]),
+                             lambda: host_rules([host(0, sudo("root", "/usr/sbin/userdel old"))])),
+    "CT_CONSOLE_BRUTE": (lambda: aws_rules([console(i, False) for i in range(5)]),
+                         lambda: aws_rules([console(i, False) for i in range(4)] + [console(5, True)])),
     "GD_FINDING": (lambda: aws_rules(parse_guardduty(gd(5))),
                    lambda: aws_rules(parse_guardduty("{}"))),
     # --- 웹서버 로그
@@ -235,8 +261,8 @@ CASES = {
                     lambda: web_rules([acc(0, "/fetch.php?url=https://www.example.com/")])),
     "WEBLOG_OPEN_REDIRECT": (lambda: web_rules([acc(0, "/go?next=https://evil.example/")]),
                              lambda: web_rules([acc(0, "/go?next=/home")])),
-    "WEBLOG_IDOR_ENUM": (lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(10)]),
-                         lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(9)])),
+    "WEBLOG_IDOR_ENUM": (lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(10)], PRIVATE),
+                         lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(9)], PRIVATE)),
     "WEBLOG_ADMIN_FORGED": (lambda: web_rules([acc(0, "/admin/users")]),
                             lambda: web_rules([acc(0, "/admin/login.php", 302, method="POST"),
                                                acc(1, "/admin/users")])),
