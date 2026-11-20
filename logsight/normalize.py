@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import gzip
 import io
+import os
 import ipaddress
 import json
 import re
@@ -980,9 +981,15 @@ def load_uploads(files: dict[str, tuple[str, bytes]]) -> tuple[list[Event], list
     """웹 업로드용: {필드명: (파일명, 내용)}."""
     events: list[Event] = []
     stats: list[dict] = []
+    limit = int(os.environ.get("LOGSIGHT_MAX_UNZIP_MB", "1024")) * 1024 * 1024
     for field_name, (fname, data) in files.items():
         if data[:2] == b"\x1f\x8b":
-            data = gzip.GzipFile(fileobj=io.BytesIO(data)).read()
+            # 압축 폭탄 방어(사양서 NFR-19): 풀면서 세다가 상한을 넘으면 그 파일은 읽지 않는다
+            data = gzip.GzipFile(fileobj=io.BytesIO(data)).read(limit + 1)
+            if len(data) > limit:
+                stats.append({"file": fname, "kind": None, "events": 0,
+                              "error": f"압축을 푼 크기가 {limit // (1024 * 1024)}MB를 넘어 읽지 않음"})
+                continue
         text = data.decode("utf-8-sig", "replace")
         k = field_name if field_name in PARSERS else detect_kind(fname, text)
         if not k:

@@ -23,7 +23,10 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -r requirements.txt httpx pytest pytest-cov "moto[ec2,s3,cloudtrail,iam,wafv2,elbv2,guardduty,sts,sqs]>=5"
       # pytest는 unittest 형식과 함수 형식 시험을 모두 돈다(unittest discover는 함수 형식을 건너뛴다)
+      # 건너뛴 테스트가 있으면 실패로 본다(사양서 NFR-21). moto·httpx는 위에서 설치하므로 건너뛸 이유가 없다
       - run: python -m pytest --cov --cov-report=term
+        env:
+          LOGSIGHT_NO_SKIP: "1"
       - run: python -m logsight analyze samples/demo --out reports/ci --no-ai
       - run: python -m logsight analyze samples/free --out reports/ci-free --no-ai
       - run: python -m logsight analyze samples/combined --out reports/ci-combined --no-ai --year 2026

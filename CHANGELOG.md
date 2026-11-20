@@ -5,6 +5,12 @@
 ## 미출시
 
 ### 추가
+- 사양서 v2(`docs/사양서.md`): 제품 목적에서 출발해 성공 기준 S1~S7, 기능 우선순위(필수·권장·선택)를 넣고 미달 항목을 ⬜로 적는다. 새 요구사항 NFR-19(웹 업로드 보안)·NFR-20(판정 정확도)·NFR-21(건너뛴 테스트는 통과로 세지 않음)·FR-22.
+- `scripts/verdict_eval.py`: 정답을 붙인 시나리오 36개(공격 20, 공격처럼 보이지만 아닌 것 16)로 판정 재현율·정밀도를 잰다. 지금 95%·95%(개발 데이터). 테스트가 90%·80% 하한을 지킨다.
+- `scripts/checklist_run.py`: pytest 결과 파일에서 체크리스트 자동 TC의 결과를 만든다. 건너뛴 테스트는 미실시로 센다.
+- `tests/conftest.py`: `LOGSIGHT_NO_SKIP=1`이면 건너뛴 테스트를 실패로 본다. CI test 작업이 이 값으로 돈다.
+- `scripts/study_prepare.py`, `docs/사용자평가/진행_대본.md`: 사용자 평가 자료 묶음(기존 방식·LogSight), 교차 배정표, 빈 응답 파일, 진행 대본과 동의서.
+- 웹 업로드 보호(`app.py`): `LOGSIGHT_TOKEN`이 없으면 이 컴퓨터에서 온 업로드만 받고, 있으면 토큰(헤더 또는 `?token=`으로 한 번 연 뒤의 쿠키)을 요구한다. 다른 사이트에서 보낸 업로드(Origin·Sec-Fetch-Site)를 거부하고, 업로드 크기 상한을 세 경로(`/analyze`, `/web/scan`, `/api/web/scan`) 모두에, 압축 해제 크기 상한(`LOGSIGHT_MAX_UNZIP_MB`, 기본 1024)을 웹 업로드에 둔다. 모든 화면에 CSP(외부 리소스 차단)·nosniff·프레임 금지 헤더, 분석 결과에 `Cache-Control: no-store`.
 - 서버 권한 상승·계정 생성 탐지(auth.log): `HOST_PRIV_ESC`(웹 서비스 계정의 sudo·su, sudo로 root 셸을 여는 명령 — find -exec, python -c, tar --checkpoint-action 등), `HOST_PRIV_ESC_FAIL`(sudo 거부·su 실패), `HOST_ACCOUNT_CREATED`(useradd, sudo로 한 계정 생성·관리자 그룹 추가). 사후 분석과 웹서버 점검이 같은 코드로 본다. sudo·su 줄은 같은 서버·같은 사용자의 직전 SSH 로그인 IP를 붙여 한 사건으로 묶고, 추정임을 `src_ip_from`에 적는다. 웹서버 점검 수정안에 `WEB_FIX_PRIVESC`(sudo 권한 정리·계정 잠금).
 - `CT_CONSOLE_BRUTE`: AWS 콘솔 로그인 10분 안 실패 5건 이상(IP별·사용자별). 30분 안에 성공이 이어지면 심각도 높음.
 - 사양서(`docs/사양서.md`), 외부 제품 비교(`docs/사양서_외부비교.md`), 사양서 기반 테스트 체크리스트(`docs/테스트_체크리스트.md`), 코드 프리즈 판단(`docs/코드프리즈_판단.md`). `scripts/spec_trace.py`가 요구사항 ↔ 테스트 케이스 ↔ 테스트 코드 추적이 끊기지 않았는지 확인하고 테스트가 이를 강제한다.
