@@ -361,5 +361,36 @@ class CommonParamFalsePositiveTests(unittest.TestCase):
             self.assertIn("WEBLOG_RFI", self._rules(f"/fetch.php?url=http://{host}/internal", p2), host)
 
 
+class AdminAndBackupFalsePositiveTests(unittest.TestCase):
+    """AIT fox 정상 트래픽에서 확인한 두 경우: WebDAV 파일 작업, 공격 신호와 먼 내부망 관리자 접근."""
+
+    @staticmethod
+    def _line(ip, ts, method, path, st=200, ua="Mozilla/5.0"):
+        return f'{ip} - - [{ts} +0000] "{method} {path} HTTP/1.1" {st} 900 "-" "{ua}"'
+
+    def _findings(self, lines):
+        return webdetect.run_web_detections(weblog.parse_access("\n".join(lines)), SiteProfile())
+
+    def test_webdav_upload_is_not_backup_leak(self):
+        for m in ("PUT", "PROPFIND", "DELETE"):
+            fs = self._findings([self._line("10.0.0.5", "10/Oct/2026:13:55:40", m, "/remote.php/dav/files/kim/a.zip", 201)])
+            self.assertNotIn("WEBLOG_BACKUP_LEAK", {f.rule for f in fs}, m)
+        fs = self._findings([self._line("10.0.0.5", "10/Oct/2026:13:55:40", "GET", "/backup.zip")])
+        self.assertIn("WEBLOG_BACKUP_LEAK", {f.rule for f in fs})
+
+    def test_private_admin_access_only_near_attack_signal(self):
+        scan = [self._line("10.0.0.7", f"10/Oct/2026:12:00:{i:02d}", "GET", f"/x{i}", 404, "sqlmap/1.7")
+                for i in range(3)]
+        near = self._line("10.0.0.7", "10/Oct/2026:12:30:00", "GET", "/wp-admin/edit.php")
+        far = self._line("10.0.0.7", "12/Oct/2026:09:00:00", "GET", "/wp-admin/edit.php")
+        fs = self._findings(scan + [near, far])
+        adm = [f for f in fs if f.rule == "WEBLOG_ADMIN_ACCESS"]
+        self.assertEqual(len(adm), 1)
+        self.assertEqual([e.ts.day for e in adm[0].events], [10])
+        # 공인 IP는 시각과 관계없이 알린다
+        fs = self._findings([far.replace("10.0.0.7", "203.0.113.9")])
+        self.assertIn("WEBLOG_ADMIN_ACCESS", {f.rule for f in fs})
+
+
 if __name__ == "__main__":
     unittest.main()

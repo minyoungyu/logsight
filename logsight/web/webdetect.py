@@ -13,6 +13,7 @@ import base64
 import binascii
 import ipaddress
 import re
+from bisect import bisect_left
 from collections import defaultdict
 from datetime import timedelta
 from urllib.parse import parse_qsl, unquote_plus, urlparse
@@ -64,6 +65,10 @@ SSRF_TARGET = re.compile(
     r"169\.254\.169\.254|10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)")
 # 외부 사이트로 보내는 리다이렉트 인자(열린 리다이렉트)
 REDIRECT_TARGET = re.compile(r"(?i)[?&](?:next|return|redirect|continue|to)=https?://")
+# 웹 요청 중 응답 본문으로 파일을 내려받는 방식(백업 파일 유출 판단에 쓴다)
+_READ_METHODS = frozenset({"GET", "POST", "-", ""})
+# 내부망 IP의 관리자 접근을 같은 IP의 다른 공격 신호와 묶어 볼 시간 폭
+ADMIN_SIGNAL_SPAN = timedelta(hours=1)
 # 백업·덤프 파일 이름
 BACKUP_NAME = re.compile(r"(?i)(?:backup|dump|\.sql|\.bak|\.old|\.zip|\.tar\.gz|/\.git/)")
 RFI = re.compile(r"(?i)=\s*(?:https?|ftp)://([^/?#&\s:]*)")
@@ -309,6 +314,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
         trusted_ip = _trusted(e.src_ip, trusted)
 
         matched = False
+        method = e.extra.get("method", "")
         if is_sqli(target):
             buckets["WEBLOG_SQLI"][ip].append(e); matched = True
         if TRAVERSAL.search(target):
@@ -326,14 +332,16 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             buckets["WEBLOG_WEBSHELL_ACCESS"][ip].append(e); matched = True
         if any(s in target.lower() for s in sensitive) or "/.git/" in path.lower():
             buckets["WEBLOG_SENSITIVE_FILE"][ip].append(e)
-        method = e.extra.get("method", "")
         if SSRF_TARGET.search(target):
             buckets["WEBLOG_SSRF"][ip].append(e); matched = True
         if REDIRECT_TARGET.search(target):
             buckets["WEBLOG_OPEN_REDIRECT"][ip].append(e)
         if EXPLOIT_PROBE.search(ua) or EXPLOIT_PROBE.search(e.extra.get("referer", "")):
             buckets["WEBLOG_EXPLOIT_PROBE"][ip].append(e)
-        if _oc(e) == "success" and BACKUP_NAME.search(path) and not path.endswith("/"):
+        # 내려받기(GET·POST)만 유출로 본다. WebDAV로 자기 파일을 올리고(PUT) 살피고(PROPFIND) 지우는(DELETE)
+        # 것은 백업 파일 노출이 아니다(Nextcloud 사용자의 unit.zip 업로드가 걸린 것을 AIT fox에서 확인).
+        if _oc(e) == "success" and method in _READ_METHODS and BACKUP_NAME.search(path) \
+                and not path.endswith("/"):
             buckets["WEBLOG_BACKUP_LEAK"][ip].append(e); matched = True
         if method == "GET" and _oc(e) == "success" and path.endswith("/") \
                 and path.lower().startswith(upload_dirs):
@@ -485,9 +493,33 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     # (스캐너·탐색·인젝션·무차별 대입·쿠키 위조 등)가 있는 것만 알린다. 사무실·VPN의 관리자가 내부망에서
     # 관리 화면을 쓰는 것은 평소 모습이라서다.
     # 공격 패턴 없이 관리자 화면에서 받은 큰 응답(대용량 유출 의심)도 같은 조건을 따른다.
-    signal_ips = {f.key for f in findings}
+    # 내부망 IP는 다른 공격 신호 앞뒤 ADMIN_SIGNAL_SPAN 안의 관리자 접근만 본다. NAT·VPN 주소 하나를
+    # 공격자와 직원이 같이 쓰면, 며칠 전후 직원의 평소 관리 작업까지 공격처럼 걸리기 때문이다.
+    # 관리자 접근 요청 자체에서 나온 신호(로그인 기록 없는 관리자 페이지 등)는 '다른' 신호로 치지 않는다
+    admin_ids = {id(e) for evs in admin_access.values() for e in evs}
+    signal_ts: dict[str, list] = defaultdict(list)
+    for f in findings:
+        signal_ts[f.key] += [e.ts for e in f.events if id(e) not in admin_ids]
+
+    for ts in signal_ts.values():
+        ts.sort()
+
+    def _near_signal(ip: str, evs: list[Event]) -> list[Event]:
+        if trusted or not _private(ip):
+            return evs
+        ts = signal_ts.get(ip)
+        if not ts:
+            return []
+        out = []
+        for e in evs:
+            i = bisect_left(ts, e.ts)  # 가장 가까운 신호 시각은 i-1 또는 i
+            near = [ts[j] for j in (i - 1, i) if 0 <= j < len(ts)]
+            if any(abs(e.ts - t) <= ADMIN_SIGNAL_SPAN for t in near):
+                out.append(e)
+        return out
+
     for rule, by_ip in (("WEBLOG_ADMIN_ACCESS", admin_access), ("WEBLOG_LARGE_EXFIL", admin_large)):
-        keep = {ip: evs for ip, evs in by_ip.items() if trusted or not _private(ip) or ip in signal_ips}
+        keep = {ip: kept for ip, evs in by_ip.items() if (kept := _near_signal(ip, evs))}
         for f in findings:  # 같은 IP의 대용량 응답 결과가 이미 있으면 그 결과에 합친다
             if f.rule == rule and f.key in keep:
                 f.events = sorted({id(e): e for e in f.events + keep.pop(f.key)}.values(), key=lambda e: e.ts)

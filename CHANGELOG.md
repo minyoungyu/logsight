@@ -38,6 +38,7 @@
 - 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
 
 ### 고침
+- 정상 웹 요청 오탐 줄이기(사양서 S7): 백업 파일 노출은 내려받는 요청(GET·POST)만 보고 WebDAV PUT·PROPFIND·DELETE는 뺀다. 내부망 IP의 관리자 접근은 같은 IP의 다른 공격 신호 앞뒤 1시간 안의 것만 알린다(관리자 접근 요청 자체의 신호는 빼고 셈). AIT fox 0.136% → 0.029%, wheeler 0.065% → 0.021%, 재현율 그대로(둘 다 개발 점수, `docs/공개데이터셋_독립측정.md` 2-2).
 - 웹셸 접근(`WEBLOG_WEBSHELL_ACCESS`): 숫자만 있는 명령 인자 값(`c=0`, `run=1`)은 명령으로 보지 않는다. WordPress 관리 화면의 `load-scripts.php?c=0`·`load-styles.php?c=0`이 걸리던 오탐이다.
 - 원격 파일 포함(`WEBLOG_RFI`): 인자 값의 주소가 우리 사이트 이름(`own_hosts`)이면 뺀다. `/wp-login.php?redirect_to=https://우리사이트/wp-admin/` 같은 정상 이동이 걸리던 오탐이다. localhost·루프백·내부망 IP는 우리 것이어도 SSRF 표적이라 계속 잡는다.
 - 측정(AIT-LDS, 줄 단위 오탐): 이미 본 shaw 173→1, wilson 1,528→584, harrison 1,243→441, wardbeck 1,289→282. 처음 보는 wheeler 143→139. 재현율은 모두 같다. 저장소 샘플·공방전·Splunk 회귀 결과 같음.

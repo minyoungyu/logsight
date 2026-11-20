@@ -1,0 +1,1448 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "ait_fox",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS ait_fox/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "intranet.price.fox.org",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.1",
+      "kind": "access",
+      "events": 1911
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+      "kind": "access",
+      "events": 412922
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.3",
+      "kind": "access",
+      "events": 3471
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.4",
+      "kind": "access",
+      "events": 2017
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.5",
+      "kind": "access",
+      "events": 2685
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+      "kind": "weberror",
+      "events": 1338
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.2",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 5
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 5
+     }
+    ],
+    "lines": 428991,
+    "parsed_lines": 424368,
+    "attack_lines": 412189,
+    "tp": 410591,
+    "fn": 1598,
+    "fp": 191,
+    "tn": 16611,
+    "recall": 0.9961231376868378,
+    "precision": 0.9995350331806164,
+    "false_positive_rate": 0.01136769432210451,
+    "f1": 0.9978261688443457,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 407351,
+      "flagged": 405803,
+      "line_recall": 0.9961998374865901,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 407351
+     },
+     "wpscan": {
+      "lines": 4794,
+      "flagged": 4764,
+      "line_recall": 0.9937421777221527,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 4794
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 17,
+      "flagged": 17,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 17
+     },
+     "attacker_change_user": {
+      "lines": 5,
+      "flagged": 1,
+      "line_recall": 0.2,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 1
+     },
+     "escalated_command": {
+      "lines": 8,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_ADMIN_ACCESS": 187,
+     "WEBLOG_LARGE_EXFIL": 11,
+     "WEBLOG_UPLOAD_EXEC": 4,
+     "WEBLOG_CMD_INJECTION": 1
+    },
+    "fp_by_ip": {
+     "172.17.130.196": 113,
+     "10.35.35.118": 78
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 410492,
+     "WEBLOG_IDOR_ENUM": 20470,
+     "WEBLOG_SCANNER": 4770,
+     "WEBLOG_SENSITIVE_FILE": 372,
+     "WEBLOG_ADMIN_ACCESS": 41,
+     "WEBLOG_UPLOAD_EXEC": 28,
+     "WEBLOG_LARGE_EXFIL": 21,
+     "WEBLOG_CMD_INJECTION": 13,
+     "HOST_PRIV_ESC": 1
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1015",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1021",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1049",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1162",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:129",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1293",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1337",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:152",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1537",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1586",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1653",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1698",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1727",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1735",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1755",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1787",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1807",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1840",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:1868",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:255",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:300",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:342",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:83",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:906",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:949",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.1:982",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:291",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:337",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:369",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:395",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:411836",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:411878",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:411922",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:411950",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:411961",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:412006",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:412406",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:412448",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:412471",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:412572",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:350",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:351",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:352",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:353",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:354",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:355",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:356",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:357",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:358",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:359",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:360",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:10011",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:10017",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:10081",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:108925",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:110695",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:111637",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:111901",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:114028",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.price.fox.org-access.log.2:114873",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 7,
+     "truth_attack_ips": 1,
+     "flagged_ips": 3,
+     "unknown_flagged_ips": 1
+    },
+    "recall": 1.0,
+    "precision": 0.5,
+    "false_positive_rate": 0.14285714285714285,
+    "f1": 0.6666666666666666,
+    "missed": [],
+    "false_positives": [
+     "10.35.35.118"
+    ],
+    "unknown_flagged": [
+     "www-data"
+    ],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.17.130.196",
+      "malicious": true
+     },
+     {
+      "ip": "10.35.32.164",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.33.116",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.33.144",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.35.118",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.35.202",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.35.206",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS ait_fox/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.price.fox.org",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "mail.price.fox.org",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/cloud.price.fox.org-access.log.1",
+      "kind": "access",
+      "events": 9537
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/cloud.price.fox.org-access.log.2",
+      "kind": "access",
+      "events": 5616
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/cloud.price.fox.org-access.log.3",
+      "kind": "access",
+      "events": 7874
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/cloud.price.fox.org-access.log.4",
+      "kind": "access",
+      "events": 9405
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/cloud.price.fox.org-access.log.5",
+      "kind": "access",
+      "events": 7854
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/mail.price.fox.org-access.log.1",
+      "kind": "access",
+      "events": 12868
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/mail.price.fox.org-access.log.2",
+      "kind": "access",
+      "events": 9454
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/mail.price.fox.org-access.log.3",
+      "kind": "access",
+      "events": 12376
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/mail.price.fox.org-access.log.4",
+      "kind": "access",
+      "events": 10207
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/mail.price.fox.org-access.log.5",
+      "kind": "access",
+      "events": 9434
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 1123
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 727
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 1122
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 826
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-access.log.5",
+      "kind": "access",
+      "events": 792
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/cloud.price.fox.org-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/mail.price.fox.org-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 25
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/apache2/proxy-error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 100003,
+    "parsed_lines": 99255,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 19,
+    "tn": 99984,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.00018999430017099488,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_SCANNER": 12,
+     "WEBLOG_BACKUP_LEAK": 7
+    },
+    "fp_by_ip": {
+     "172.17.130.196": 11,
+     "192.168.130.77": 6,
+     "10.35.32.164": 2
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "cloud.price.fox.org-access.log.1:2738",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.price.fox.org-access.log.1:2739",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.price.fox.org-access.log.1:3805",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.price.fox.org-access.log.1:9529",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.price.fox.org-access.log.1:9530",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.price.fox.org-access.log.3:7210",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.price.fox.org-access.log.3:7211",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:179",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:180",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:181",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:182",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:183",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:184",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:186",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:187",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:188",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:189",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:191",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:192",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 10,
+     "truth_attack_ips": 0,
+     "flagged_ips": 3,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.3,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "10.35.32.164",
+     "172.17.130.196",
+     "192.168.130.77"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.35.32.164",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.33.116",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.33.144",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.35.118",
+      "malicious": false
+     },
+     {
+      "ip": "10.35.35.202",
+      "malicious": false
+     },
+     {
+      "ip": "172.17.130.196",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.128.107",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.130.77",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.130.84",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS ait_fox/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4",
+     "other_vhosts_access.log.5"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 9610
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 5667
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 7916
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 9484
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/other_vhosts_access.log.5",
+      "kind": "access",
+      "events": 7917
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_fox/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 46977,
+    "parsed_lines": 40606,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 13,
+    "tn": 46964,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.00027673116631543094,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_BACKUP_LEAK": 7,
+     "WEBLOG_SCANNER": 6
+    },
+    "fp_by_ip": {
+     "172.17.130.37": 7,
+     "172.17.130.196": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "other_vhosts_access.log.1:2755",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:2756",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:3831",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:9602",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:9603",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:841",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:842",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:843",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:844",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:847",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:848",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:7251",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:7252",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 3,
+     "truth_attack_ips": 0,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.6666666666666666,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "172.17.130.196",
+     "172.17.130.37"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.17.130.196",
+      "malicious": false
+     },
+     {
+      "ip": "172.17.130.37",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  }
+ }
+}
