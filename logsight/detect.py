@@ -378,6 +378,9 @@ def host_auth_findings(events: list[Event]) -> list[Finding]:
         findings.append(Finding("HOST_ACCOUNT_CREATED", evs,
                                 f"'{target}' 계정 생성·권한 부여 {len(evs)}건" + (f"(실행: {', '.join(by)})" if by else ""),
                                 target))
+    return findings
+
+
 NET_SOURCES = ("vpcflow", "hostfw")
 # 요청 하나가 사용자 한 명의 행동인 로그(웹·엣지·인증). 사설 IP도 그 사용자를 가리킨다
 APP_SOURCES = frozenset({"weblog", "access", "weberror", "auth", "sshauth", "alb", "waf"})
