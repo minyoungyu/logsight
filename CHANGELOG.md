@@ -35,8 +35,12 @@
 - `tests/test_nfr.py`: 1만 건 처리 시간·메모리와 같은 입력 같은 결과(비기능 요구사항).
 - `scripts/demo_e2e_moto.py`: 가짜 AWS에서 경보 → 대기열 → 로그 주입 → 보고서 → 디스코드 → 자동 격리 예고까지 끝에서 끝까지 실행.
 - `docs/시연_실계정.md`: 실제 AWS 계정에서 EC2 없이 경보 → 디스코드를 보여 주는 시연 절차와 정리 방법.
+- 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
 
 ### 고침
+- 웹셸 접근(`WEBLOG_WEBSHELL_ACCESS`): 숫자만 있는 명령 인자 값(`c=0`, `run=1`)은 명령으로 보지 않는다. WordPress 관리 화면의 `load-scripts.php?c=0`·`load-styles.php?c=0`이 걸리던 오탐이다.
+- 원격 파일 포함(`WEBLOG_RFI`): 인자 값의 주소가 우리 사이트 이름(`own_hosts`)이면 뺀다. `/wp-login.php?redirect_to=https://우리사이트/wp-admin/` 같은 정상 이동이 걸리던 오탐이다. localhost·루프백·내부망 IP는 우리 것이어도 SSRF 표적이라 계속 잡는다.
+- 측정(AIT-LDS, 줄 단위 오탐): 이미 본 shaw 173→1, wilson 1,528→584, harrison 1,243→441, wardbeck 1,289→282. 처음 보는 wheeler 143→139. 재현율은 모두 같다. 저장소 샘플·공방전·Splunk 회귀 결과 같음.
 - 경로 조작 판단이 변형 인코딩을 놓치던 것을 고쳤다. UTF-8 과잉 길이(`%c0%ae`), IIS 유니코드(`%u002e`), 전각 문자(`．／`), 이중 인코딩을 먼저 원래 글자로 바꾼다. `file=/etc/shadow`처럼 `../` 없이 절대 경로로 읽는 요청도 경로 조작으로 본다.
 - sudo가 거부한 줄(`user NOT in sudoers`, 비밀번호 틀림)을 성공으로 읽던 것을 고쳤다. su 줄(`(to root)`, `Successful/FAILED su`, pam_unix su)도 읽는다.
 - 실패한 콘솔 로그인(errorCode 없이 `responseElements.ConsoleLogin = Failure`)을 성공으로 읽어 'MFA 없는 콘솔 로그인'으로 내던 것을 고쳤다.
@@ -64,8 +68,13 @@
   - 관리자 영역을 `/admin`으로 시작하는 경로만 보던 것을, `admin_paths` 중 로그인 화면이 아닌 것 전부(`/wp-admin`, `/manager/html` 등)로 넓혔다. 누구나 부르는 `admin-ajax.php`·`admin-post.php`와 정적 파일은 뺀다(AIT 측정에서 정상 요청 475줄이 걸려 확인). 관리자 화면이 부르는 CSS·JS 묶음(`load-scripts.php`·`load-styles.php`)도 뺀다. `trusted_ips`를 적지 않은 사이트에서는 내부망 IP의 관리자 영역 접근과 관리자 화면의 큰 응답을, 같은 IP에 다른 공격 신호가 있을 때만 알린다(사무실·VPN 관리자와 구분할 근거가 없어서다. 공인 IP는 전과 같이 알린다. 처음 보는 AIT 테스트베드 shaw·wilson에서 정상 관리 작업 169줄·1,367줄이 걸려 확인).
   - 유출 의심 응답 크기(50,000바이트)를 `large_response_bytes`로 바꿀 수 있게 했다.
 - 웹서버 점검도 사후 분석과 같은 처리 단계를 거친다: 정상 작업 목록(프로필 `known_activity`, `trusted_ips`)에 맞는 이벤트 표시, 같은 모양으로 되풀이된 사건은 대표 하나로 접기(`repeats`), 규칙 재검토. 사건마다 침해 판정('뚫렸는가')과 함께 사후 분석과 같은 기준의 공격 판정('공격인가', `attack_verdict`)을 보고서에 나란히 보인다. 샘플·AIT 측정 결과는 같다.
+- 서버 방화벽(ufw) 로그: `[UFW AUDIT]` 줄을 허용으로 읽던 것, `logging full`에서 서버 응답이 포트 스캔 사건이 되던 것, ufw가 기록 없이 버리는 139·445 등을 허용으로 읽던 것을 고쳤다.
+- 공격자가 사내(사설) IP일 때 사건이 요청마다 흩어지던 것을 고쳤다. AIT-LDS 공격 시간대(3시간 반)에서 사건 7,627개가 2개로 줄고, 웹 경로 대입과 같은 IP의 VPC Flow 포트 스캔이 한 사건(탐색 → 초기 침투)으로 엮인다. nginx·Apache 로그의 사설 IP를 연결고리로 쓰고, VPC Flow·서버 방화벽의 사설 IP는 웹·서버 로그에서 의심 행동이 잡힌 IP만 그 앞뒤 6시간 안에서 탐지·엮기에 쓴다. 로드밸런서·프록시처럼 여러 사용자가 함께 쓰는 사내 주소는 연결고리에서 빼고 보고서에 적는다(설정 `shared_ips`로도 지정). 근거: `docs/사내IP_엮기_측정.md`.
 - 디스코드 카드 본문 첫 줄에 제목이 한 번 더 나오던 것을 뺐다.
 - 디스코드·슬랙·이메일 통지와 경보 요약(summary.txt)에 공격 단계가 영어 코드(initial-access 등)로 나가던 것을 한국어(초기 침투 등)로 바꿨다.
+- Apache `vhost_combined` 형식(줄 앞에 `가상호스트:포트`, Debian·Ubuntu의 other_vhosts_access.log) 줄이 통째로 버려지던 것을 읽도록 고쳤다. 공개 데이터 AIT-LDS의 Apache 로그 12.7~26.6%가 이 형식이었다. 가상호스트는 `extra.vhost`에 남긴다. 웹서버 점검 경로(`web/weblog.py`)도 같다.
+- VPC Flow 사용자 지정 형식을 파일의 필드 이름 머리줄 순서대로 읽는다. 머리줄이 없으면 기본 형식(14칸)으로 보되, 값이 맞지 않는 줄은 시각 1970년·IP가 아닌 출발지로 잘못 만들지 않고 못 읽은 줄로 센다. `vpc-id`·`subnet-id`·`instance-id`·`pkt-srcaddr` 등은 `extra`에 남긴다(인스턴스 ID는 연결고리로 쓰지 않음).
+- 접속 로그·VPC Flow에서 형식이 맞지 않아 버린 줄 수를 파일별 처리 결과(`files[].unparsed`)와 보고서의 "이렇게 해석했습니다"에 표시한다. 전에는 조용히 버려졌다.
 
 ## 0.4.2 (시험판) - 2026-11-06
 

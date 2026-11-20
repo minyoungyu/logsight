@@ -192,3 +192,107 @@ class SshHost(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ApacheVhost(unittest.TestCase):
+    """Apache vhost_combined(줄 앞에 '가상호스트:포트')도 읽는다. 전에는 줄이 통째로 버려졌다(AIT 데이터 12.7~26.6%)."""
+    LINE = ('cloud.dmz.example.com:443 203.0.113.68 - - [23/Jan/2022:06:25:19 +0000] '
+            '"GET /ocs/v2.php?format=json HTTP/1.1" 200 4912 "-" "Mozilla/5.0"')
+
+    def test_vhost_line_is_parsed(self):
+        e = normalize.parse_weblog(self.LINE)[0]
+        self.assertEqual(e.src_ip, "203.0.113.68")
+        self.assertEqual(e.extra["vhost"], "cloud.dmz.example.com:443")
+        self.assertEqual(e.action, "GET /ocs/v2.php?format=json")
+        self.assertEqual(e.extra["http_status"], 200)
+
+    def test_vhost_variants(self):
+        for vhost in ("localhost:80", "10.0.0.1:8080", "[2001:db8::5]:443"):
+            e = normalize.parse_weblog(self.LINE.replace("cloud.dmz.example.com:443", vhost))
+            self.assertEqual([x.src_ip for x in e], ["203.0.113.68"], vhost)
+        e = normalize.parse_weblog(self.LINE.replace("203.0.113.68", "2001:db8::9"))[0]
+        self.assertEqual(e.src_ip, "2001:db8::9")
+
+    def test_plain_ipv6_client_is_not_taken_as_vhost(self):
+        for ip in ("2001:db8::1", "fe80::1", "::1"):
+            line = f'{ip} - - [23/Jan/2022:06:25:19 +0000] "GET / HTTP/1.1" 404 1 "-" "x"'
+            e = normalize.parse_weblog(line)[0]
+            self.assertEqual(e.src_ip, ip)
+            self.assertNotIn("vhost", e.extra)
+
+    def test_detected_without_filename_hint(self):
+        self.assertEqual(normalize.detect_kind("other_vhosts.txt", self.LINE), "weblog")
+
+    def test_web_path_parser_too(self):
+        from logsight.web.weblog import parse_access
+        e = parse_access(self.LINE)[0]
+        self.assertEqual(e.src_ip, "203.0.113.68")
+        self.assertEqual(e.extra["vhost"], "cloud.dmz.example.com:443")
+        self.assertEqual(e.extra["path"], "/ocs/v2.php")
+
+
+class VpcFlowCustom(unittest.TestCase):
+    """VPC Flow 사용자 지정 형식: 머리줄이 있으면 그 순서로 읽고, 없으면 틀리게 읽지 말고 못 읽은 줄로 센다."""
+    HDR = ("version vpc-id subnet-id instance-id interface-id account-id type srcaddr dstaddr srcport dstport "
+           "pkt-srcaddr pkt-dstaddr protocol bytes packets start end action tcp-flags log-status")
+    ROW = ("5 vpc-1 subnet-1 i-0abc eni-1 111122223333 IPv4 203.0.113.4 10.0.0.1 40000 22 "
+           "203.0.113.4 10.0.0.1 6 60 1 1700000000 1700000060 REJECT 2 OK")
+
+    def test_header_order_is_used(self):
+        evs, bad = normalize._run_parser("vpcflow", f"{self.HDR}\n{self.ROW}\n", "f")
+        self.assertEqual(bad, {})
+        e = evs[0]
+        self.assertEqual((e.src_ip, e.dst_ip, e.dst_port), ("203.0.113.4", "10.0.0.1", 22))
+        self.assertEqual(e.ts.timestamp(), 1700000000)
+        self.assertEqual((e.action, e.outcome, e.disposition), ("tcp/22 REJECT", "reject", "blocked"))
+        self.assertEqual(e.extra["src_port"], 40000)
+        self.assertEqual(e.extra["vpc_id"], "vpc-1")
+        self.assertEqual(e.extra["instance_id"], "i-0abc")
+        self.assertIsNone(e.instance_id)  # 흐름 로그의 인스턴스 ID는 연결고리로 쓰지 않는다
+
+    def test_header_with_underscores_and_nodata(self):
+        hdr = "account_id action srcaddr dstaddr dstport protocol start log_status"
+        text = (f"{hdr}\n1 ACCEPT 203.0.113.4 10.0.0.1 443 6 1700000000 OK\n"
+                "1 - - - - - 1700000000 NODATA\n")
+        evs, bad = normalize._run_parser("vpcflow", text, "f")
+        self.assertEqual([e.action for e in evs], ["tcp/443 ACCEPT"])
+        self.assertEqual(bad, {})
+        self.assertEqual(normalize.detect_kind("x.txt", text), "vpcflow")
+
+    def test_headerless_custom_is_counted_not_misread(self):
+        for row in (self.ROW, "203.0.113.4 10.0.0.1 5 22 6 1 1 1700000000 1700000060 ACCEPT OK eni-1 1 2"):
+            evs, bad = normalize._run_parser("vpcflow", row + "\n", "f")
+            self.assertEqual(evs, [])  # 1970년 시각, IP가 아닌 출발지를 만들지 않는다
+            self.assertEqual(bad["count"], 1)
+
+    def test_default_format_unchanged(self):
+        text = ("version account-id interface-id srcaddr dstaddr srcport dstport protocol packets bytes "
+                "start end action log-status\n2 1 eni-1 1.2.3.4 10.0.0.1 5 22 6 1 1 1700000000 1700000060 ACCEPT OK\n"
+                "2 1 eni-1 - - - - - - - 1700000000 1700000060 - NODATA\n")
+        evs, bad = normalize._run_parser("vpcflow", text, "f")
+        self.assertEqual([(e.action, e.ts.timestamp()) for e in evs], [("tcp/22 ACCEPT", 1700000000)])
+        self.assertEqual(bad, {})
+
+
+class UnparsedLinesReported(unittest.TestCase):
+    """못 읽은 줄은 파일별 처리 결과와 보고서의 '이렇게 해석했습니다'에 드러난다."""
+    def test_load_and_report(self):
+        import tempfile
+        from logsight.pipeline import run
+        good = '203.0.113.5 - - [13/Jan/2026:04:20:10 +0000] "GET / HTTP/1.1" 200 5 "-" "curl"'
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "access.log").write_text(f"{good}\nthis is not a log line\n{good}\n")
+            Path(d, "vpcflow.log").write_text(VpcFlowCustom.ROW + "\n")
+            events, stats = load_paths([Path(d)])
+        by = {Path(s["file"]).name: s for s in stats}
+        self.assertEqual((by["access.log"]["events"], by["access.log"]["unparsed"]), (2, 1))
+        self.assertEqual((by["vpcflow.log"]["events"], by["vpcflow.log"]["unparsed"]), (0, 1))
+        res = run(events, {}, file_stats=stats, use_ai=False)
+        notes = " ".join(res["assumptions"])
+        self.assertIn("access.log: 3줄 중 1줄", notes)
+        self.assertIn("머리줄", notes)
+        self.assertIn("access.log: 3줄 중 1줄", render(res))
+
+    def test_uploads_report_unparsed(self):
+        _, stats = normalize.load_uploads({"vpcflow": ("f.log", (VpcFlowCustom.ROW + "\n").encode())})
+        self.assertEqual(stats[0]["unparsed"], 1)
