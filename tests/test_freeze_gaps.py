@@ -84,7 +84,12 @@ class HostPrivEsc(unittest.TestCase):
         sudo_ev = [e for e in evs if e.action == "sudo"][0]
         self.assertEqual(sudo_ev.src_ip, ATK)
         self.assertIn("src_ip_from", sudo_ev.extra)
-        self.assertIn("HOST_ACCOUNT_CREATED", rules_of(run_detections(evs, {})))
+        f = [x for x in run_detections(evs, {}) if x.rule == "HOST_ACCOUNT_CREATED"]
+        self.assertEqual(len(f), 1)
+        # 만들어진 계정(svc)을 적는다. 명령을 실행한 root를 '생성된 계정'으로 적으면 읽는 사람이 오해한다(모의 사용자 시험에서 발견)
+        self.assertEqual(f[0].key, "svc")
+        self.assertIn("'svc'", f[0].detail)
+        self.assertIn("실행: root", f[0].detail)
 
     def test_scan_engine_sees_host_rules(self):  # TC-DET-HOST-06: 웹서버 점검 엔진도 같은 규칙
         evs = parse_sshauth(line(0, "sudo", "nginx : TTY=unknown ; PWD=/ ; USER=root ; COMMAND=/usr/bin/python3 -c 'import os'"),
