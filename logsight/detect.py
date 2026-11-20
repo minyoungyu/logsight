@@ -15,6 +15,7 @@ from functools import lru_cache
 from datetime import timedelta
 from urllib.parse import unquote_plus, urlsplit
 
+from .netaddr import is_internal
 from .normalize import Event, S3_PUBLIC_CALLS
 
 # 규칙 ID -> (ATT&CK 기법, 전술(단계), 한국어 이름, 기본 심각도)
@@ -214,13 +215,11 @@ class Finding:
                 "evidence": [e.raw_ref for e in self.events[:20]]}
 
 
-@lru_cache(maxsize=65536)
 def _is_private(ip: str | None) -> bool:
+    """사내 주소인가(없으면 사내로 본다). 기준은 netaddr 한 곳(설정의 VPC 대역 포함)."""
     if not ip:
         return True
-    return ip.startswith(("10.", "192.168.", "127.")) or (
-        ip.startswith("172.") and ip.split(".")[1].isdigit()
-        and 16 <= int(ip.split(".")[1]) <= 31)
+    return is_internal(ip)
 
 
 @lru_cache(maxsize=65536)

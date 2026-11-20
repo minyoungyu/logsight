@@ -17,6 +17,9 @@ import fnmatch
 import ipaddress
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
+
+from .netaddr import is_public
 
 KST = timezone(timedelta(hours=9))
 
@@ -66,6 +69,23 @@ def _entries(env: dict) -> list[dict]:
 def _ip_match(ip: str | None, cidrs: list[str]) -> bool:
     if not ip or not cidrs:
         return False
+    return _ip_match_t(ip, tuple(cidrs))
+
+
+@lru_cache(maxsize=65536)
+def _ip_match_t(ip: str, cidrs: tuple) -> bool:
+    """IP·대역 해석은 이벤트 수십만 건마다 반복되므로 결과를 기억한다(서버가 수만 대인 계정에서 병목이었다)."""
+    try:
+        a = ipaddress.ip_address(ip)
+    except ValueError:
+        return False
+    for c in cidrs:
+        try:
+            if a in ipaddress.ip_network(c, strict=False):
+                return True
+        except ValueError:
+            continue
+    return False
     try:
         a = ipaddress.ip_address(ip)
     except ValueError:
@@ -198,11 +218,7 @@ def _inc_rules(inc: dict) -> set[str]:
 
 
 def _public(ip: str | None) -> bool:
-    try:
-        a = ipaddress.ip_address(ip or "")
-    except ValueError:
-        return False
-    return not any(a in ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
+    return is_public(ip)
 
 
 def verdict_for(inc: dict) -> dict:

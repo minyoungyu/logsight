@@ -164,10 +164,8 @@ def run_checks(session=None, region: str | None = None) -> dict[str, Any]:
             out.append(_item("CT_VALIDATION", OK, "무결성 검증 켜짐", names))
 
     def flow():
-        vpcs = [v["VpcId"] for v in ec2.describe_vpcs().get("Vpcs", [])]
-        logs = ec2.describe_flow_logs().get("FlowLogs", [])
-        covered = {f.get("ResourceId") for f in logs}
-        missing = [v for v in vpcs if v not in covered]
+        vpcs = _vpc_ids(ec2)
+        missing = _flow_missing(ec2, vpcs)
         if not vpcs:
             out.append(_item("VPC_FLOW", INFO, "VPC가 없음"))
         elif missing:
@@ -181,7 +179,8 @@ def run_checks(session=None, region: str | None = None) -> dict[str, Any]:
 
     def waf():
         w = s.client("wafv2", region_name=region)
-        acls = w.list_web_acls(Scope="REGIONAL").get("WebACLs", [])
+        from .aws_collect import _waf_acls
+        acls = _waf_acls(w)
         if not acls:
             out.append(_item("WAF_LOGGING", INFO, "WAF 웹 ACL이 없음(WAF 미사용)"))
             return
@@ -252,7 +251,8 @@ def run_checks(session=None, region: str | None = None) -> dict[str, Any]:
 
     def sgs():
         bad = []
-        for g in ec2.describe_security_groups().get("SecurityGroups", []):
+        for g in (x for page in ec2.get_paginator("describe_security_groups").paginate()
+                  for x in page.get("SecurityGroups", [])):
             for p in g.get("IpPermissions", []):
                 lo, hi = p.get("FromPort"), p.get("ToPort")
                 all_ports = p.get("IpProtocol") == "-1"
@@ -355,16 +355,16 @@ def apply(ids: list[str], session=None, region: str | None = None) -> list[dict]
             elif id_ == "VPC_FLOW":
                 _ensure_bucket(s, region, bucket, account)
                 ec2 = s.client("ec2", region_name=region)
-                vpcs = [v["VpcId"] for v in ec2.describe_vpcs().get("Vpcs", [])]
-                covered = {f.get("ResourceId") for f in ec2.describe_flow_logs().get("FlowLogs", [])}
-                todo = [v for v in vpcs if v not in covered]
+                todo = _flow_missing(ec2, _vpc_ids(ec2))
                 bad = []
                 if todo:
                     # 버킷 루트로 보내면 AWSLogs/<계정>/vpcflowlogs/ 아래에 쌓인다(CloudTrail과 경로가 겹치지 않음)
-                    r = ec2.create_flow_logs(ResourceType="VPC", ResourceIds=todo, TrafficType="ALL",
-                                             LogDestinationType="s3", LogDestination=f"arn:aws:s3:::{bucket}")
-                    bad = [f"{u.get('ResourceId')}: {u.get('Error', {}).get('Message')}"
-                           for u in r.get("Unsuccessful") or []]
+                    # 한 번에 넘기는 자원 수를 작게 나눈다(VPC가 수백 개인 계정)
+                    for i in range(0, len(todo), 25):
+                        r = ec2.create_flow_logs(ResourceType="VPC", ResourceIds=todo[i:i + 25], TrafficType="ALL",
+                                                 LogDestinationType="s3", LogDestination=f"arn:aws:s3:::{bucket}")
+                        bad += [f"{u.get('ResourceId')}: {u.get('Error', {}).get('Message')}"
+                                for u in r.get("Unsuccessful") or []]
                 results.append({"id": id_, "ok": not bad,
                                 "detail": ("실패 " + "; ".join(bad)) if bad else
                                 f"Flow Logs 켬: {', '.join(todo) or '이미 모두 켜짐'}"})
@@ -391,3 +391,22 @@ def format_text(res: dict) -> str:
             if it["can_apply"]:
                 lines.append(f"    → 자동으로 켜려면: python -m logsight check --apply {it['id']}")
     return "\n".join(lines)
+
+
+def _vpc_ids(ec2) -> list[str]:
+    return [v["VpcId"] for page in ec2.get_paginator("describe_vpcs").paginate() for v in page.get("Vpcs", [])]
+
+
+def _flow_missing(ec2, vpcs: list[str]) -> list[str]:
+    """Flow Logs가 빠진 VPC. VPC 단위로 켠 것뿐 아니라 VPC의 모든 서브넷에 서브넷 단위로 켠 것도 켜진 것으로 본다
+    (서브넷이 많은 조직은 서브넷 단위로 켜는 경우가 많다. 그걸 '없음'으로 보고 VPC 단위로 또 켜면 비용이 두 번 든다)."""
+    covered = {f.get("ResourceId") for page in ec2.get_paginator("describe_flow_logs").paginate()
+               for f in page.get("FlowLogs", [])}
+    missing = [v for v in vpcs if v not in covered]
+    if not missing or not any(str(r).startswith("subnet-") for r in covered):
+        return missing
+    subs: dict[str, list[str]] = {}
+    for page in ec2.get_paginator("describe_subnets").paginate(Filters=[{"Name": "vpc-id", "Values": missing}]):
+        for sn in page.get("Subnets", []):
+            subs.setdefault(sn.get("VpcId"), []).append(sn["SubnetId"])
+    return [v for v in missing if not subs.get(v) or not all(x in covered for x in subs[v])]

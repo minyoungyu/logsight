@@ -50,22 +50,93 @@ def _sg_cmd(verb: str, gid: str, r: dict, cidr: str | None = None) -> str:
     return f"aws ec2 {verb}-security-group-ingress --group-id {gid} --ip-permissions '{_perm(r, c)}'"
 
 
+def _resources(env: dict) -> dict[str, dict]:
+    """서버 ID → 보안그룹·서브넷·VPC. EC2 인스턴스와 네트워크 인터페이스(ENI: RDS·ALB·Lambda 등)를 함께 본다.
+    인스턴스에 ENI가 여러 개면 보안그룹·서브넷을 합친다."""
+    out: dict[str, dict] = {}
+
+    def put(rid, sgs, subnet, vpc):
+        r = out.setdefault(rid, {"security_groups": set(), "subnets": set(), "vpc_id": vpc})
+        r["security_groups"] |= set(sgs or [])
+        if subnet:
+            r["subnets"].add(subnet)
+        r["vpc_id"] = r["vpc_id"] or vpc
+
+    for i in env.get("instances", []):
+        if i.get("instance_id"):
+            put(i["instance_id"], i.get("security_groups"), i.get("subnet_id"), i.get("vpc_id"))
+    for n in env.get("network_interfaces", []):
+        rid = n.get("instance_id") or n.get("eni_id")
+        if rid:
+            put(rid, n.get("security_groups"), n.get("subnet_id"), n.get("vpc_id"))
+    return out
+
+
 def _incident_sgs(env: dict, inst_ids: set) -> set | None:
-    """사건 서버에 붙은 보안그룹. 서버와 보안그룹의 연결을 모르면 None(전체를 본다)."""
-    sgs = {g for i in env.get("instances", []) if i.get("instance_id") in inst_ids
-           for g in i.get("security_groups", [])}
+    """사건 서버에 붙은 보안그룹. 사건 서버를 모르거나 서버와 보안그룹의 연결을 모르면 None(전체를 본다)."""
+    res = _resources(env)
+    sgs = {g for i in inst_ids for g in res.get(i, {}).get("security_groups", ())}
     return sgs or None
 
 
-def _incident_nacl(env: dict, inst_ids: set) -> tuple[dict | None, bool]:
-    """사건 서버의 서브넷에 붙은 NACL. (NACL, 서브넷으로 확인했는지)"""
+def _incident_nacls(env: dict, inst_ids: set) -> tuple[list[dict], str]:
+    """사건 서버들이 있는 모든 서브넷의 NACL. 서버가 서브넷 여러 곳에 걸치면 NACL도 여러 개다.
+    반환: (NACL 목록, 근거) 근거 = "subnet"(서브넷으로 확인) | "only"(계정에 NACL이 하나뿐) | "unknown"(못 찾음)"""
     nacls = [n for n in env.get("network_acls", []) if n.get("nacl_id")]
-    subnets = {i.get("subnet_id") for i in env.get("instances", [])
-               if i.get("instance_id") in inst_ids and i.get("subnet_id")}
-    for n in nacls:
-        if subnets & set(n.get("subnet_ids", [])):
-            return n, True
-    return (nacls[0] if nacls else None), False
+    res = _resources(env)
+    subnets = {sn for i in inst_ids for sn in res.get(i, {}).get("subnets", ())}
+    hit = [n for n in nacls if subnets & set(n.get("subnet_ids", []))]
+    if hit:
+        return hit, "subnet"
+    if len(nacls) == 1:
+        return nacls, "only"
+    # NACL이 여러 개인데 사건 서버의 서브넷을 모르면 고르지 않는다(예전엔 첫 NACL을 골라 엉뚱한 서브넷을 막았다)
+    return [], "unknown"
+
+
+MAX_SAME = 5  # 같은 종류 수정안을 이보다 많이 내면 하나로 묶는다(서브넷·보안그룹이 수천 개인 계정)
+
+
+def _collapse(checks: list[dict], cid: str, what: str) -> list[dict]:
+    """같은 id의 수정안이 MAX_SAME개를 넘으면 하나로 묶는다. 수천 개를 나열하면 보고서와 AI 입력이 커지고
+    사람도 검토할 수 없다. 앞의 MAX_SAME개 명령만 싣고 나머지는 자원 목록으로 남긴다."""
+    same = [c for c in checks if c["id"] == cid]
+    if len(same) <= MAX_SAME:
+        return checks
+    head = same[0]
+    resources = list(dict.fromkeys(c["resource"] for c in same))
+    merged = {**head,
+              "resource": f"{resources[0]} 외 {len(resources) - 1}개",
+              "resources": resources,
+              "title": f"{what} {len(resources)}개: {head['title']} 등",
+              "evidence": list(dict.fromkeys(r for c in same for r in c.get("evidence", [])))[:10],
+              "cli": [x for c in same[:MAX_SAME] for x in c["cli"]]
+              + [f"# 나머지 {len(same) - MAX_SAME}개도 같은 방식으로 고친다(대상 목록은 resources)"],
+              "caution": head.get("caution", "") + f" 같은 문제가 {what} {len(resources)}개에 있어 하나로 묶었다. "
+                         "한꺼번에 적용하기 전에 몇 개로 먼저 확인한다."}
+    out, done = [], False
+    for c in checks:
+        if c["id"] != cid:
+            out.append(c)
+        elif not done:
+            out.append(merged)
+            done = True
+    return out
+
+
+def _zone(env: dict, res: dict, rid: str) -> str:
+    """서버가 있는 서브넷이 퍼블릭(인터넷 게이트웨이 경로 있음)인지 프라이빗인지. 모르면 빈 문자열."""
+    pub = {sn["subnet_id"]: sn.get("public") for sn in env.get("subnets", []) if sn.get("subnet_id")}
+    kinds = {pub.get(sn) for sn in res.get(rid, {}).get("subnets", ())} - {None}
+    if not kinds:
+        return ""
+    return "퍼블릭 서브넷" if True in kinds else "프라이빗 서브넷"
+
+
+def _own_sources(incident: dict) -> dict[str, str]:
+    """사건의 출발지 중 우리 서버인 것 {IP: 서버 ID}. 우리 서버가 다른 서버를 공격했다면 그 서버가 침해된 것이다."""
+    return {e["src_ip"]: e["src_instance"] for e in incident.get("events", [])
+            if e.get("src_ip") and e.get("src_instance")}
 
 
 def _has_rule(inc: dict, *rules: str) -> list[str]:
@@ -113,7 +184,13 @@ def web_app_fixes(incident: dict) -> list[dict]:
 
 def _web_server_name(incident: dict) -> str:
     """WAF가 없는 웹서버의 이름: 사건의 인스턴스 → 로그의 호스트 이름 → 공격받은 도메인."""
-    names = list(incident.get("instances") or [])
+    web = [e for e in incident["events"] if e.get("source") in ("weblog", "access", "alb", "waf")]
+    names = [e["target_instance"] for e in web if e.get("target_instance")]  # 웹 로그가 가리키는 서버를 먼저
+    names += [e.get(k) for e in web for k in ("host", "http_host") if e.get(k)]
+    if names:  # 내부 확산으로 엮인 다른 서버(DB 등)는 웹서버가 아니다
+        names = list(dict.fromkeys(str(n) for n in names))
+        return ", ".join(names[:2])
+    names += list(incident.get("instances") or [])
     names += [e.get(k) for e in incident["events"] for k in ("host", "http_host") if e.get(k)]
     names = list(dict.fromkeys(str(n) for n in names if n))
     return ", ".join(names[:2]) if names else "웹서버(로그에 이름 없음)"
@@ -136,6 +213,7 @@ def audit(incident: dict, env: dict) -> list[dict]:
     ev = _has_rule(incident, "SSH_BRUTE_FORCE", "SSH_SUCCESS_AFTER_FAIL",
                    "VPC_REMOTE_ADMIN_EXPOSED", "VPC_PORT_SCAN")
     linked = _incident_sgs(env, inst_ids)
+    n_sg_before = len(out)
     for sg in env.get("security_groups", []):
         if not sg.get("group_id") or (linked is not None and sg["group_id"] not in linked):
             continue  # 사건 서버에 붙지 않은 보안그룹은 이 사건의 원인이 아니다
@@ -178,15 +256,61 @@ def audit(incident: dict, env: dict) -> list[dict]:
                     "caution": "애플리케이션 서버의 보안그룹만 참조하도록 바꾼다.",
                 })
 
-    # 2) NACL: 공격 IP 임시 차단
-    if attackers and env.get("network_acls") and rules_in_inc & BLOCK_IP_RULES:
-        nacl, by_subnet = _incident_nacl(env, inst_ids)
+    if linked is None and not inst_ids:
+        for c in out[n_sg_before:]:
+            c["caution"] += (" 공격 대상 서버를 설정에서 찾지 못해 계정 전체 보안그룹에서 찾은 것이다. "
+                             "사건과 관계없는 보안그룹일 수 있으니 대상 서버를 먼저 확인한다.")
+    out = _collapse(_collapse(out, "SG_ADMIN_PORT_OPEN", "보안그룹"), "SG_DB_PORT_OPEN", "보안그룹")
+
+    # 2) 우리 서버가 출발지: 침해된 서버로 보고 격리(내부 확산). 사설 IP를 NACL로 막으면 정상 통신까지 끊기고
+    #    침해된 서버는 다른 경로로 계속 움직인다
+    own = _own_sources(incident) if rules_in_inc & BLOCK_IP_RULES else {}
+    res = _resources(env)
+    for ip, rid in list(own.items())[:5]:
+        r = res.get(rid, {})
+        sgs = sorted(r.get("security_groups", ()))
+        is_ec2 = rid.startswith("i-")
+        victims = sorted({e.get("target_instance") for e in incident["events"]
+                          if e.get("src_ip") == ip and e.get("target_instance") and e.get("target_instance") != rid})
+        src_z = _zone(env, res, rid)
+        path = (f"{src_z + '의 ' if src_z else ''}{rid}에서 "
+                + ", ".join(f"{(_zone(env, res, v) + '의 ') if _zone(env, res, v) else ''}{v}" for v in victims[:3])
+                + "(으)로") if victims else ""
+        out.append({
+            "id": "ISOLATE_COMPROMISED_SERVER", "target": "instance", "resource": rid, "severity": "high",
+            "title": f"우리 서버 {rid}({ip})에서 다른 서버로 공격이 나감: 침해된 서버로 보고 격리",
+            "why": "공격 출발지가 우리 서버다. 이 서버가 먼저 침해되어 다른 서버로 넘어가는 중(내부 확산)으로 보인다"
+                   + (f": {path} 공격이 나갔다" if path else "") + ". "
+                   "출발지 IP를 NACL로 막으면 그 서브넷의 정상 통신까지 끊기므로 서버 자체를 격리한다.",
+            "evidence": [e["ref"] for e in incident["events"] if e.get("src_ip") == ip][:10],
+            "current": {"security_groups": sgs, "subnets": sorted(r.get("subnets", ())), "vpc_id": r.get("vpc_id")},
+            "proposed": {"security_groups": ["(들어오고 나가는 규칙이 없는 격리 그룹)"]},
+            "cli": ([f"aws ec2 create-snapshot --volume-id <{rid}의 EBS 볼륨 ID> --description 'LogSight 격리 전 증거 보존'",
+                     f"aws ec2 create-security-group --group-name logsight-isolate-{rid} "
+                     f"--description 'LogSight isolation' --vpc-id {r.get('vpc_id') or '<VPC ID>'}",
+                     "aws ec2 revoke-security-group-egress --group-id <위에서 만든 그룹 ID> --ip-permissions "
+                     "'[{\"IpProtocol\":\"-1\",\"IpRanges\":[{\"CidrIp\":\"0.0.0.0/0\"}]}]'",
+                     f"aws ec2 modify-instance-attribute --instance-id {rid} --groups <위에서 만든 그룹 ID>"
+                     + (f"  # 원래 그룹: {' '.join(sgs)}" if sgs else "")] if is_ec2 else []),
+            "caution": ("격리하면 이 서버의 서비스가 멈춘다. 격리 전 디스크 스냅샷으로 증거를 남기고, "
+                        "이 서버의 역할(IAM) 키도 함께 무효화한다." if is_ec2 else
+                        "EC2가 아닌 자원(네트워크 인터페이스)이라 명령을 만들지 않았다. 자원 종류에 맞게 사람이 격리한다."),
+        })
+
+    # 3) NACL: 공격 IP 임시 차단. 사건 서버가 있는 서브넷마다(서브넷 여러 곳에 걸친 공격)
+    ext = [ip for ip in attackers if ip not in own]
+    if ext and env.get("network_acls") and rules_in_inc & BLOCK_IP_RULES:
+        nacls, how = _incident_nacls(env, inst_ids)
     else:
-        nacl, by_subnet = None, False
-    if nacl:
+        nacls, how = [], ""
+    ev_refs = [e["ref"] for e in incident["events"] if e.get("src_ip") in ext][:10]
+    base_caution = ("NACL 규칙 수에는 한도(기본 20개)가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 "
+                    "근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 "
+                    "그 규칙이 먼저 적용되니 번호를 확인한다.")
+    for nacl in nacls:
         used = {_int(x.get("rule_number"), 0) for x in nacl.get("entries", [])}
         cmds, n = [], 50
-        for ip in attackers[:5]:
+        for ip in ext[:5]:
             while n in used:
                 n += 1
             used.add(n)
@@ -196,20 +320,33 @@ def audit(incident: dict, env: dict) -> list[dict]:
         out.append({
             "id": "NACL_BLOCK_ATTACKER", "target": "nacl", "resource": nacl["nacl_id"],
             "severity": "medium",
-            "title": f"서브넷 NACL에 공격 IP {', '.join(attackers[:5])} 차단 규칙 추가",
+            "title": f"서브넷 NACL에 공격 IP {', '.join(ext[:5])} 차단 규칙 추가",
             "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
-            "evidence": [e["ref"] for e in incident["events"] if e.get("src_ip") in attackers][:10],
-            "current": {"entries": len(nacl.get("entries", []))},
-            "proposed": {"deny": [f"{ip}/32" for ip in attackers[:5]]},
+            "evidence": ev_refs,
+            "current": {"entries": len(nacl.get("entries", [])), "subnets": nacl.get("subnet_ids", [])[:10]},
+            "proposed": {"deny": [f"{ip}/32" for ip in ext[:5]]},
             "cli": cmds,
-            "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 "
-                       "근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 "
-                       "그 규칙이 먼저 적용되니 번호를 확인한다."
-                       + ("" if by_subnet else " 사건 서버의 서브넷을 설정에서 찾지 못해 첫 NACL로 적었다. "
-                          "서버가 있는 서브넷의 NACL인지 확인한다."),
+            "caution": base_caution + (" 사건 서버의 서브넷을 설정에서 찾지 못해, 계정에 하나뿐인 NACL로 적었다. "
+                                       "서버가 있는 서브넷의 NACL인지 확인한다."
+                                       if how == "only" else ""),
         })
+    if ext and how == "unknown":
+        out.append({
+            "id": "NACL_BLOCK_ATTACKER", "target": "nacl", "resource": "(서버가 있는 서브넷의 NACL 확인 필요)",
+            "severity": "medium",
+            "title": f"공격 IP {', '.join(ext[:5])} 차단: 서버가 있는 서브넷의 NACL에 거부 규칙 추가",
+            "why": "보안그룹은 허용만 할 수 있어 특정 IP를 거부하려면 NACL 거부 규칙이 필요하다.",
+            "evidence": ev_refs, "current": None, "proposed": {"deny": [f"{ip}/32" for ip in ext[:5]]},
+            "cli": ["# 공격받은 서버의 서브넷 NACL ID를 확인한 뒤(aws ec2 describe-network-acls "
+                    "--filters Name=association.subnet-id,Values=<서브넷 ID>):"]
+            + [f"# aws ec2 create-network-acl-entry --network-acl-id <NACL ID> --ingress --rule-number <빈 번호> "
+               f"--protocol -1 --rule-action deny --cidr-block {ip}/32" for ip in ext[:5]],
+            "caution": base_caution + " 공격 대상 서버의 서브넷을 설정에서 찾지 못했다. NACL이 여러 개라 "
+                       "임의로 고르지 않았다(엉뚱한 서브넷을 막게 된다). collect environment로 다시 수집하면 찾는다.",
+        })
+    out = _collapse(out, "NACL_BLOCK_ATTACKER", "NACL")
 
-    # 3) WAF: SQLi 규칙 그룹이 COUNT 모드
+    # 4) WAF: SQLi 규칙 그룹이 COUNT 모드
     # 근거는 WAF를 거친 로그(WAF·ALB)에서만 쓴다(사양서 FR-26: nginx 로그만으로 WAF 수정안을 내지 않음)
     via_waf = {e["ref"] for e in incident["events"] if e.get("source") in ("waf", "alb")}
     ev = [r for r in _has_rule(incident, "WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI") if r in via_waf]
@@ -405,6 +542,8 @@ _RB = [  # (찾을 패턴, 되돌리는 명령 만들기)
      lambda m: f"aws ec2 delete-network-acl-entry --network-acl-id {m[1]} {m[2]} --rule-number {m[3]}"),
     (re.compile(r"aws ec2 modify-instance-metadata-options --instance-id (\S+) --http-tokens required(.*)"),
      lambda m: f"aws ec2 modify-instance-metadata-options --instance-id {m[1]} --http-tokens optional{m[2]}"),
+    (re.compile(r"aws ec2 modify-instance-attribute --instance-id (\S+) --groups \S+ .*# 원래 그룹: (.+)$"),
+     lambda m: f"aws ec2 modify-instance-attribute --instance-id {m[1]} --groups {m[2].strip()}"),
     (re.compile(r"aws iam update-access-key (.*)--status Inactive"),
      lambda m: f"aws iam update-access-key {m[1]}--status Active"),
     (re.compile(r"aws cloudtrail update-trail --name (\S+) --is-multi-region-trail --enable-log-file-validation"),
