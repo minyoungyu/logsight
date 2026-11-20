@@ -1,0 +1,1488 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "ait_wheeler",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS ait_wheeler/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "intranet.flores.wheeler.biz",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-access.log.1",
+      "kind": "access",
+      "events": 433194
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-access.log.2",
+      "kind": "access",
+      "events": 1880
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-access.log.3",
+      "kind": "access",
+      "events": 2069
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-access.log.4",
+      "kind": "access",
+      "events": 1686
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-access.log.5",
+      "kind": "access",
+      "events": 2091
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-error.log.1",
+      "kind": "weberror",
+      "events": 1335
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-error.log.2",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/apache2/intranet.flores.wheeler.biz-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 4
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 1
+     }
+    ],
+    "lines": 443039,
+    "parsed_lines": 442276,
+    "attack_lines": 432906,
+    "tp": 431293,
+    "fn": 1613,
+    "fp": 139,
+    "tn": 9994,
+    "recall": 0.9962740179161296,
+    "precision": 0.9996778171299301,
+    "false_positive_rate": 0.013717556498569032,
+    "f1": 0.9979730151861887,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 426178,
+      "flagged": 424600,
+      "line_recall": 0.996297321776347,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 426178
+     },
+     "wpscan": {
+      "lines": 6695,
+      "flagged": 6679,
+      "line_recall": 0.9976101568334578,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 6695
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 7,
+      "flagged": 7,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 7
+     },
+     "attacker_change_user": {
+      "lines": 4,
+      "flagged": 1,
+      "line_recall": 0.25,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 1
+     },
+     "escalated_command": {
+      "lines": 8,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_ADMIN_ACCESS": 138,
+     "WEBLOG_ADMIN_FORGED": 31,
+     "WEBLOG_LARGE_EXFIL": 1,
+     "WEBLOG_CMD_INJECTION": 1,
+     "WEBLOG_UPLOAD_EXEC": 1
+    },
+    "fp_by_ip": {
+     "10.38.243.125": 108,
+     "192.168.2.226": 31
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 431189,
+     "WEBLOG_IDOR_ENUM": 21257,
+     "WEBLOG_SCANNER": 6685,
+     "WEBLOG_SENSITIVE_FILE": 276,
+     "WEBLOG_ADMIN_ACCESS": 41,
+     "WEBLOG_UPLOAD_EXEC": 18,
+     "WEBLOG_LARGE_EXFIL": 11,
+     "WEBLOG_AUTH_BRUTE": 10,
+     "WEBLOG_CMD_INJECTION": 3,
+     "HOST_PRIV_ESC": 1
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:113",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:431744",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:431754",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:431765",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:431827",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:431838",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:431860",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432043",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432119",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432195",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432207",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432216",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432227",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432238",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432247",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432257",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432313",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432483",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432495",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432513",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432637",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432676",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:432824",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:433031",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:433104",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:433112",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:70",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:84",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:105",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:1328",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:1505",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:1556",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:158",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:1623",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:175",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:1792",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:186",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:203",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:220",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.2:230",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:76",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:77",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:78",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:79",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:80",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:81",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:82",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:83",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log:84",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:85",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:107021",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:108853",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:109831",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:110107",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:112298",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:113174",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:11396",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:114925",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:115036",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.flores.wheeler.biz-access.log.1:115059",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 8,
+     "truth_attack_ips": 1,
+     "flagged_ips": 3,
+     "unknown_flagged_ips": 1
+    },
+    "recall": 1.0,
+    "precision": 0.5,
+    "false_positive_rate": 0.125,
+    "f1": 0.6666666666666666,
+    "missed": [],
+    "false_positives": [
+     "192.168.2.226"
+    ],
+    "unknown_flagged": [
+     "www-data"
+    ],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.38.243.125",
+      "malicious": true
+     },
+     {
+      "ip": "192.168.0.242",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.0.91",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.1.213",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.2.114",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.2.157",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.2.226",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.3.138",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS ait_wheeler/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.flores.wheeler.biz",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "mail.flores.wheeler.biz",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/cloud.flores.wheeler.biz-access.log.1",
+      "kind": "access",
+      "events": 12708
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/cloud.flores.wheeler.biz-access.log.2",
+      "kind": "access",
+      "events": 17125
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/cloud.flores.wheeler.biz-access.log.3",
+      "kind": "access",
+      "events": 14314
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/cloud.flores.wheeler.biz-access.log.4",
+      "kind": "access",
+      "events": 11971
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/cloud.flores.wheeler.biz-access.log.5",
+      "kind": "access",
+      "events": 15866
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/mail.flores.wheeler.biz-access.log.1",
+      "kind": "access",
+      "events": 19126
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/mail.flores.wheeler.biz-access.log.2",
+      "kind": "access",
+      "events": 22119
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/mail.flores.wheeler.biz-access.log.3",
+      "kind": "access",
+      "events": 21398
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/mail.flores.wheeler.biz-access.log.4",
+      "kind": "access",
+      "events": 18013
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/mail.flores.wheeler.biz-access.log.5",
+      "kind": "access",
+      "events": 20261
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 1867
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 2266
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 2134
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 1598
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-access.log.5",
+      "kind": "access",
+      "events": 1882
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/cloud.flores.wheeler.biz-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/mail.flores.wheeler.biz-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 25
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/apache2/proxy-error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 183436,
+    "parsed_lines": 182688,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 21,
+    "tn": 183415,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.00011448134499225889,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_SCANNER": 12,
+     "WEBLOG_BACKUP_LEAK": 9,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "10.38.243.125": 15,
+     "172.27.181.218": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.3:1790",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.3:1796",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.3:1804",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.3:5486",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.3:5487",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.4:9007",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.4:9008",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.5:12817",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.flores.wheeler.biz-access.log.5:12818",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:149",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:150",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:151",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:152",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:153",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:154",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:158",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:159",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:160",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:163",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:164",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:165",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 9,
+     "truth_attack_ips": 0,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.2222222222222222,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "10.38.243.125",
+     "172.27.181.218"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.38.243.125",
+      "malicious": false
+     },
+     {
+      "ip": "172.27.181.218",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.0.242",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.0.91",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.1.213",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.2.157",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.2.226",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.3.138",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS ait_wheeler/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4",
+     "other_vhosts_access.log.5"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 12825
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 17334
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 14426
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 12068
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/other_vhosts_access.log.5",
+      "kind": "access",
+      "events": 16021
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "/home/user/logsight/data/public/ait_wheeler/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 77758,
+    "parsed_lines": 72686,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 15,
+    "tn": 77743,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.00019290619614702024,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_BACKUP_LEAK": 9,
+     "WEBLOG_SCANNER": 6,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "10.38.243.24": 9,
+     "10.38.243.125": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "other_vhosts_access.log.1:818",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:819",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:820",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:823",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:825",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:827",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:1811",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:1817",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:1825",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:5543",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.3:5544",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.4:9083",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.4:9084",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.5:12948",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.5:12949",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 3,
+     "truth_attack_ips": 0,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.6666666666666666,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "10.38.243.125",
+     "10.38.243.24"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.38.243.125",
+      "malicious": false
+     },
+     {
+      "ip": "10.38.243.24",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  }
+ }
+}

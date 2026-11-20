@@ -378,9 +378,10 @@ SPEC: dict[str, dict] = {
         "logs": "웹서버 접근 로그 + 사이트 프로필(admin_paths·trusted_ips)",
         "when": "신뢰 IP가 아닌 곳에서 관리자 영역(admin_paths 중 로그인 화면이 아닌 것: /admin, /wp-admin, "
                 "/manager/html 등) 아래 경로에 2xx, 또는 관리자 로그인 302. trusted_ips를 적지 않았으면 "
-                "공인 IP이거나, 내부망 IP는 같은 IP에 다른 공격 신호가 있을 때만",
+                "공인 IP이거나, 내부망 IP는 같은 IP의 다른 공격 신호 앞뒤 1시간 안일 때만",
         "blind": ["admin_paths에 적지 않은 관리자 경로",
-                  "trusted_ips가 비었을 때, 내부망에서 다른 공격 신호 없이 도난 계정으로 들어온 관리자 접근"],
+                  "trusted_ips가 비었을 때, 내부망에서 다른 공격 신호 없이 도난 계정으로 들어온 관리자 접근",
+                  "trusted_ips가 비었을 때, 내부망 IP가 공격 신호와 1시간 넘게 떨어져 관리자 화면에 들어온 것"],
         "fp": ["재택 관리자. trusted_ips에 넣는다"],
         "first": "그 IP가 관리자 것인지 확인하고, 아니면 관리자 비밀번호와 세션을 바꾼다.",
     },
@@ -423,8 +424,9 @@ SPEC: dict[str, dict] = {
     },
     "WEBLOG_BACKUP_LEAK": {
         "logs": "웹서버 접근 로그",
-        "when": "backup·dump·.sql·.bak·.zip·.tar.gz·/.git/ 경로가 200으로 응답",
-        "blind": ["다른 이름의 백업 파일"],
+        "when": "backup·dump·.sql·.bak·.zip·.tar.gz·/.git/ 경로를 내려받는 요청(GET·POST)이 200으로 응답. "
+                "WebDAV로 올리기·살피기·지우기(PUT·PROPFIND·DELETE)는 빼고 본다",
+        "blind": ["다른 이름의 백업 파일", "WebDAV COPY·MOVE로 공개 경로에 옮긴 뒤 내려받으면 내려받는 요청만 잡힌다"],
         "fp": ["일부러 내려받게 한 압축 파일"],
         "first": "그 파일을 웹 루트에서 치우고, 안에 든 비밀번호·키를 모두 바꾼다.",
     },
