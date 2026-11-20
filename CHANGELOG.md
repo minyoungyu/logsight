@@ -33,6 +33,9 @@
 - 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
 
 ### 고침
+- 웹셸 접근(`WEBLOG_WEBSHELL_ACCESS`): 숫자만 있는 명령 인자 값(`c=0`, `run=1`)은 명령으로 보지 않는다. WordPress 관리 화면의 `load-scripts.php?c=0`·`load-styles.php?c=0`이 걸리던 오탐이다.
+- 원격 파일 포함(`WEBLOG_RFI`): 인자 값의 주소가 우리 사이트 이름(`own_hosts`)이면 뺀다. `/wp-login.php?redirect_to=https://우리사이트/wp-admin/` 같은 정상 이동이 걸리던 오탐이다. localhost·루프백·내부망 IP는 우리 것이어도 SSRF 표적이라 계속 잡는다.
+- 측정(AIT-LDS, 줄 단위 오탐): 이미 본 shaw 173→1, wilson 1,528→584, harrison 1,243→441, wardbeck 1,289→282. 처음 보는 wheeler 143→139. 재현율은 모두 같다. 저장소 샘플·공방전·Splunk 회귀 결과 같음.
 - 경로 조작 판단이 변형 인코딩을 놓치던 것을 고쳤다. UTF-8 과잉 길이(`%c0%ae`), IIS 유니코드(`%u002e`), 전각 문자(`．／`), 이중 인코딩을 먼저 원래 글자로 바꾼다. `file=/etc/shadow`처럼 `../` 없이 절대 경로로 읽는 요청도 경로 조작으로 본다.
 - sudo가 거부한 줄(`user NOT in sudoers`, 비밀번호 틀림)을 성공으로 읽던 것을 고쳤다. su 줄(`(to root)`, `Successful/FAILED su`, pam_unix su)도 읽는다.
 - 실패한 콘솔 로그인(errorCode 없이 `responseElements.ConsoleLogin = Failure`)을 성공으로 읽어 'MFA 없는 콘솔 로그인'으로 내던 것을 고쳤다.

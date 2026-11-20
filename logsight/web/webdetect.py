@@ -66,7 +66,7 @@ SSRF_TARGET = re.compile(
 REDIRECT_TARGET = re.compile(r"(?i)[?&](?:next|return|redirect|continue|to)=https?://")
 # 백업·덤프 파일 이름
 BACKUP_NAME = re.compile(r"(?i)(?:backup|dump|\.sql|\.bak|\.old|\.zip|\.tar\.gz|/\.git/)")
-RFI = re.compile(r"(?i)=\s*(?:https?|ftp)://")
+RFI = re.compile(r"(?i)=\s*(?:https?|ftp)://([^/?#&\s:]*)")
 CMDI = re.compile(
     r"(?i)(?:;\s*(?:id|ls|cat|whoami|uname|wget|curl|nc|bash|sh)\b|\|\s*(?:id|ls|cat|nc|sh|bash)\b|"
     r"`[^`]+`|\$\([^)]+\)|&&\s*(?:cat|id|whoami|wget|curl)\b|%0a|\bwget\s+http|\bcurl\s+http)")
@@ -155,7 +155,8 @@ def _shell_param_hit(path: str, query: str) -> bool:
         return False
     for m in SHELL_PARAM.finditer("?" + query):
         value = unquote_plus(m.group(1)).strip()
-        if value and not HASH_LIKE.match(value):
+        # 숫자만 있는 값(c=0, run=1)은 켜고 끄는 옵션이지 명령이 아니다(WordPress load-scripts.php?c=0 등)
+        if value and not value.isdigit() and not HASH_LIKE.match(value):
             return True
     return False
 
@@ -184,6 +185,14 @@ def _in_upload_dir(path: str, upload_dirs: tuple[str, ...]) -> bool:
     if p.startswith(upload_dirs):
         return True
     return "/uploads/" in p or "/upload/" in p
+
+
+def _remote_url(target: str, own_hosts: list[str]) -> bool:
+    """인자 값으로 바깥 주소(http://, ftp://)를 넘겼는가. 우리 사이트 이름으로 돌아오는 값
+    (/wp-login.php?redirect_to=https://우리사이트/wp-admin/)은 정상 이동이라 뺀다.
+    localhost·루프백·내부망 IP는 우리 것이어도 빼지 않는다(서버가 자기 내부를 부르게 하는 SSRF 표적이다)."""
+    site = {h for h in own_hosts if h != "localhost" and not _private(h)}
+    return any(m.group(1).lower() not in site for m in RFI.finditer(target))
 
 
 def _foreign_host(referer: str, own_hosts: list[str]) -> bool:
@@ -304,7 +313,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             buckets["WEBLOG_SQLI"][ip].append(e); matched = True
         if TRAVERSAL.search(target):
             buckets["WEBLOG_TRAVERSAL"][ip].append(e); matched = True
-        if RFI.search(target):
+        if _remote_url(target, own_hosts):
             buckets["WEBLOG_RFI"][ip].append(e); matched = True
         if CMDI.search(target) or _decoded_command(e.extra.get("query", "")):
             buckets["WEBLOG_CMD_INJECTION"][ip].append(e); matched = True
