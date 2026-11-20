@@ -60,6 +60,39 @@ def _other_keys(e: Event):
         yield ("actor", e.actor)
 
 
+PIVOT_LOOKBACK = timedelta(hours=6)
+
+
+def _link_pivots(flagged: list[Event], findings: list[Finding], events: list[Event], uf) -> None:
+    """내부 확산 엮기: 우리 서버 X가 다른 서버를 공격하기(출발지 = X) 전 몇 시간 안에 X를 노린 심각한 공격이
+    있었으면, 그 공격으로 X가 침해된 것으로 보고 두 흐름을 한 사건으로 잇는다.
+    예: 외부 IP가 퍼블릭 서브넷 웹서버에 SQL 인젝션 → 웹서버가 프라이빗 서브넷 DB에 SSH 무차별 대입.
+    웹 로그(nginx)에는 대상 서버가 안 적히므로 같은 공격자 IP의 VPC Flow 기록(공격자 → X)으로 대상을 찾는다.
+    대상 서버만 같다고 다 잇지는 않는다(여러 스캐너가 한 서버를 두드리면 뭉치므로): 심각도 높은 탐지만,
+    그리고 X에서 실제로 공격이 나간 경우에만 잇는다."""
+    pivots: dict[str, list[int]] = defaultdict(list)  # 서버 → 그 서버가 출발지인 의심 이벤트(시간순)
+    for i, e in enumerate(flagged):
+        if e.extra.get("src_instance"):
+            pivots[e.extra["src_instance"]].append(i)
+    if not pivots:
+        return
+    high = {id(e) for f in findings if f.severity == "high" for e in f.events}
+    touched: dict[str, set] = defaultdict(set)  # 외부 IP → 그 IP가 건드린 (내부 확산의 출발) 서버
+    for e in events:
+        t = e.extra.get("target_instance") or e.instance_id
+        if t in pivots and e.src_ip and not e.extra.get("src_instance"):
+            touched[e.src_ip].add(t)
+    for j, e in enumerate(flagged):
+        if id(e) not in high or e.extra.get("src_instance"):
+            continue
+        targets = {e.extra.get("target_instance"), e.instance_id} | touched.get(e.src_ip, set())
+        for x in targets & pivots.keys():
+            ts = [flagged[p].ts for p in pivots[x]]
+            k = bisect_left(ts, e.ts)
+            if k < len(ts) and ts[k] - e.ts <= PIVOT_LOOKBACK:
+                uf.union(j, pivots[x][k])
+
+
 def _split_long(evs: list[Event], max_span: timedelta) -> list[list[Event]]:
     """몇 시간씩 끊임없이 이어지는 활동은 max_span 단위 사건으로 나눈다(보고서 가독성)."""
     chunks, cur = [], []
@@ -87,10 +120,14 @@ def build_incidents(events: list[Event], findings: list[Finding],
     for i, e in enumerate(flagged):
         for k in keys_of(e):
             idx_by_key[k].append(i)
+        if e.extra.get("src_instance") and ("inst", e.extra["src_instance"]) not in keys_of(e):
+            # 출발지가 우리 서버: 그 서버가 한 일(서브넷을 넘는 스캔·로그인, 그 서버 역할 키의 API 호출)을 한 축으로
+            idx_by_key[("inst", e.extra["src_instance"])].append(i)
     for idxs in idx_by_key.values():
         for a, b in zip(idxs, idxs[1:]):
             if flagged[b].ts - flagged[a].ts <= win:
                 uf.union(a, b)
+    _link_pivots(flagged, findings, events, uf)
 
     # 맥락 이벤트(표시 없음)를 키로 색인
     ctx_by_key: dict[tuple, list[Event]] = defaultdict(list)
@@ -150,7 +187,8 @@ def build_incidents(events: list[Event], findings: list[Finding],
             "stages": stages,
             "src_ips": sorted({e.src_ip for e in evs if e.src_ip and _is_ip(e.src_ip)}),
             "instances": sorted({e.instance_id for e in evs if e.instance_id}
-                                | {e.extra["target_instance"] for e in evs if e.extra.get("target_instance")}),
+                                | {e.extra["target_instance"] for e in evs if e.extra.get("target_instance")}
+                                | {e.extra["src_instance"] for e in evs if e.extra.get("src_instance")}),
             "actors": sorted({e.actor for e in evs if e.actor}),
             "sources": sorted({e.source for e in evs}),
             "n_events": len(evs),
@@ -234,6 +272,7 @@ def _compact(e: Event) -> dict:
             d[k] = v
     for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion",
               "http_status", "http_host", "host", "proxy_ip", "target_instance",
+              "src_instance", "target_ambiguous", "target_inferred", "interface",
               "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_count", "gd_last_seen", "known"):
         v = e.extra.get(k)
         if v:

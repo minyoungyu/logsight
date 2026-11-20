@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Iterable, Iterator
 from urllib.parse import urlsplit
 
+from .netaddr import is_internal
+
 
 @dataclass(slots=True)
 class Event:
@@ -608,18 +610,9 @@ def parse_clf_time(s: str) -> datetime | None:
     return dt
 
 
-# 내부망 대역(RFC 1918, CGNAT, 루프백, 링크 로컬, IPv6 ULA). ipaddress의 is_private는 문서용 예약 대역까지
-# 사설로 보므로 직접 정한다.
-_INTERNAL = [ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10",
-                                               "127.0.0.0/8", "169.254.0.0/16", "::1/128", "fc00::/7", "fe80::/10")]
-
-
 def _private(ip: str) -> bool:
-    try:
-        a = ipaddress.ip_address(ip)
-    except ValueError:
-        return False
-    return any(a in n for n in _INTERNAL if n.version == a.version)
+    """사내 주소인가(기준은 netaddr 한 곳: RFC 1918·CGNAT·루프백·링크 로컬·IPv6 ULA + 설정의 VPC 대역)."""
+    return is_internal(ip)
 
 
 def _client_ip(remote: str, xff: str | None) -> tuple[str, dict]:

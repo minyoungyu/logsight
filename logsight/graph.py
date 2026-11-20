@@ -14,11 +14,11 @@
 """
 from __future__ import annotations
 
-import ipaddress
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from html import escape
 
+from .netaddr import is_public
 from .outcome import kind as kind_of
 
 KST = timezone(timedelta(hours=9))
@@ -36,12 +36,7 @@ GD_KO = {"SSHBruteForce": "SSH 무차별 대입", "InstanceCredentialExfiltratio
 
 
 def _public(ip: str | None) -> bool:
-    try:
-        a = ipaddress.ip_address(ip or "")
-    except ValueError:
-        return False
-    return not any(a in ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",
-                                                            "127.0.0.0/8"))
+    return is_public(ip)
 
 
 def _role(actor: str | None) -> tuple[str, str | None] | None:

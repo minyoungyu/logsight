@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from collections import defaultdict
 import time
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from .config_audit import audit
 from .correlate import build_incidents, group_repeats
 from .detect import run_detections, shared_private_ips
 from .explain import mark_known, rule_triage
+from .netaddr import set_vpc_cidrs
 from .normalize import Event, load_paths
 from .guard import hold
 from .triage import reorder, triage
@@ -38,6 +40,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     """preview=True면 Claude를 부르지 않고, 보낼 내용(마스킹 후)을 결과에 ai_payload로 담는다."""
     t0 = time.time()
     env = env or {}
+    set_vpc_cidrs(env)  # 고객 VPC 대역도 사내로 본다(모든 모듈이 같은 기준)
     enrich(events, env)
     n_known = mark_known(events, env)  # 설정의 정상 작업 목록과 맞는 이벤트 표시(지우지 않음)
     findings = run_detections(events, env)
@@ -103,10 +106,19 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "excluded_activity": excluded_summary(events),
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy")))
+        + _ambiguous_note(events)
         + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]]
         + [f"사내 IP {ip}는 여러 사용자가 함께 쓰는 주소로 보여 사건을 엮는 연결고리에서 뺐습니다({why})."
            for ip, why in sorted(shared_private_ips(events, env).items())[:5]],
     }
+
+
+def _ambiguous_note(events: list[Event]) -> list[str]:
+    n = sum(1 for e in events if e.extra.get("target_ambiguous"))
+    if not n:
+        return []
+    return [f"네트워크 기록 {n:,}건은 같은 IP를 쓰는 서버가 여러 VPC에 있어 대상 서버를 정하지 못했습니다. "
+            "python -m logsight collect environment로 네트워크 인터페이스(ENI)까지 수집하면 정확히 찾습니다."]
 
 
 def excluded_summary(events: list[Event]) -> list[dict]:
@@ -188,6 +200,10 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
                    "python -m logsight collect environment로 만들 수 있습니다.")
     elif not env.get("trusted_ips"):
         out.append("관리자 IP(trusted_ips)가 비어 있어 수정안의 허용 IP가 자리표시로 나옵니다.")
+    if env and not env.get("_error") and len(env.get("network_acls", [])) > 1 and not env.get("subnets"):
+        out.append("설정 스냅샷에 서브넷·VPC 정보가 없어 서버가 퍼블릭·프라이빗 서브넷 중 어디 있는지 구분하지 못했고, "
+                   "VPC끼리 같은 사설 대역을 쓰면 대상 서버를 고르지 못할 수 있습니다. "
+                   "python -m logsight collect environment로 다시 만들면 서브넷·라우팅·네트워크 인터페이스까지 담깁니다.")
     if proxied:
         out.append(f"웹서버 로그 {proxied:,}줄은 내부 IP(사내 사용자이거나 ALB·프록시)에서 왔고 X-Forwarded-For에 "
                    "실제 사용자 IP가 없어 내부 IP로 분석했습니다. ALB·프록시 뒤라면 nginx 로그 형식 끝에 "
@@ -207,25 +223,101 @@ def _rule_counts(findings) -> dict:
 
 
 def enrich(events: list[Event], env: dict) -> None:
-    """설정 스냅샷의 인스턴스 목록으로 네트워크·웹 로그의 대상 IP를 인스턴스 ID로 바꿔 적는다.
-    사건 묶기 연결고리로는 쓰지 않는다(여러 스캐너가 같은 서버를 두드리면 한 사건으로 뭉치므로).
+    """설정 스냅샷으로 네트워크·웹 로그의 대상(그리고 출발지)을 서버로 바꿔 적는다.
+    - target_instance: 이 이벤트가 향한 우리 서버(EC2 인스턴스 ID, EC2가 아니면 ENI ID: RDS·ALB·Lambda 등)
+    - src_instance: 출발지가 우리 서버(침해된 서버에서 다른 서브넷으로 넘어가는 내부 확산을 엮는 데 쓴다)
+    - target_ambiguous: 같은 IP를 쓰는 서버가 여러 VPC에 있어 고르지 못함(VPC마다 10.0.0.0/16을 쓰는 조직)
+
+    VPC Flow 로그의 interface-id(ENI)를 먼저 본다. ENI는 VPC가 하나라 IP가 겹쳐도 서버를 정확히 고를 수 있다.
+    대상 서버는 사건 묶기 연결고리로 쓰지 않는다(여러 스캐너가 같은 서버를 두드리면 한 사건으로 뭉치므로).
     보고서·수정안에서 "어느 서버가 대상이었나"를 보여 주는 용도."""
-    ip2inst, host2inst = {}, {}
+    by_ip: dict[str, list[tuple[str, str | None]]] = {}
+    host2inst: dict[str, str] = {}
+    enis: dict[str, dict] = {}
+
+    def add(ip, rid, vpc):
+        if ip and (rid, vpc) not in by_ip.setdefault(ip, []):
+            by_ip[ip].append((rid, vpc))
+
     for inst in env.get("instances", []):
         for k in ("private_ip", "public_ip"):
-            if inst.get(k):
-                ip2inst[inst[k]] = inst["instance_id"]
+            add(inst.get(k), inst["instance_id"], inst.get("vpc_id"))
         for k in ("name", "private_dns"):  # 서버 로그의 호스트 이름(web1, ip-10-0-1-10.ec2.internal)
             if inst.get(k):
                 host2inst[inst[k].split(".")[0].lower()] = inst["instance_id"]
-    if not ip2inst and not host2inst:
+    for n in env.get("network_interfaces", []):
+        rid = n.get("instance_id") or n.get("eni_id")
+        if not rid:
+            continue
+        enis[n.get("eni_id")] = n
+        for ip in list(n.get("private_ips") or []) + [n.get("public_ip")]:
+            add(ip, rid, n.get("vpc_id"))
+    if not by_ip and not host2inst:
         return
+
+    memo: dict[tuple, tuple] = {}
+
+    def resolve(ip, vpc):
+        """IP → (서버, 고르지 못한 후보 목록)"""
+        k = (ip, vpc)
+        if k not in memo:
+            memo[k] = _resolve(ip, vpc)
+        return memo[k]
+
+    def _resolve(ip, vpc):
+        cands = by_ip.get(ip) or []
+        if vpc:
+            same = [c for c in cands if c[1] in (vpc, None)]
+            cands = same or cands
+        ids = sorted({c[0] for c in cands})
+        if len(ids) == 1:
+            return ids[0], None
+        return None, (ids or None)
+
     for e in events:
+        eni = enis.get(e.extra.get("interface")) if e.extra.get("interface") else None
+        vpc = eni.get("vpc_id") if eni else None
+        if eni and e.src_ip in (eni.get("private_ips") or []):
+            src = eni.get("instance_id") or eni.get("eni_id")
+        else:
+            src = resolve(e.src_ip, vpc)[0] if e.src_ip else None
+        if src:
+            e.extra["src_instance"] = src
         if e.instance_id:
             continue
-        inst = ip2inst.get(e.dst_ip) or host2inst.get(str(e.extra.get("host", "")).split(".")[0].lower())
+        if eni and e.dst_ip in (eni.get("private_ips") or []):
+            inst, amb = eni.get("instance_id") or eni.get("eni_id"), None
+        else:
+            inst, amb = resolve(e.dst_ip, vpc) if e.dst_ip else (None, None)
+        inst = inst or host2inst.get(str(e.extra.get("host", "")).split(".")[0].lower())
         if inst:
             e.extra["target_instance"] = inst
+        elif amb and len(amb) > 1:
+            e.extra["target_ambiguous"] = amb[:5]
+    _infer_web_targets(events)
+
+
+# 서버 한 대의 로그인 웹서버 로그만. ALB·WAF 로그는 여러 서버 앞에 있어 서버 하나로 정하지 않는다
+WEB_LOGS = ("weblog", "access")
+WEB_PORTS = (80, 443, 8080, 8443)
+
+
+def _infer_web_targets(events: list[Event]) -> None:
+    """웹 로그(nginx·Apache)에는 어느 서버의 로그인지 적혀 있지 않다. 같은 출발지 IP의 VPC Flow 기록이
+    우리 서버 한 대의 웹 포트로만 갔으면 그 서버를 대상으로 적는다(target_inferred). 여러 대면 정하지 않는다."""
+    web_to: dict[str, set] = defaultdict(set)
+    for e in events:
+        t = e.extra.get("target_instance")
+        if t and e.source in ("vpcflow", "hostfw") and e.dst_port in WEB_PORTS and e.src_ip:
+            web_to[e.src_ip].add(t)
+    if not web_to:
+        return
+    for e in events:
+        if e.source in WEB_LOGS and not e.instance_id and not e.extra.get("target_instance"):
+            t = web_to.get(e.src_ip)
+            if t and len(t) == 1:
+                e.extra["target_instance"] = next(iter(t))
+                e.extra["target_inferred"] = "같은 IP의 VPC Flow 기록"
 
 
 def run_paths(paths: list[str], env_path: str | None = None, *, since=None, until=None,

@@ -99,15 +99,30 @@ SYSTEM = (
 )
 
 
+MAX_CHECKS = 20
+MAX_LIST = 30  # 사건의 IP·서버·주체 목록(서버 수천 대를 훑은 스캐너도 AI 입력이 커지지 않게)
+
+
+def _capped(inc: dict) -> dict:
+    for k in ("src_ips", "instances", "actors"):
+        if len(inc.get(k) or []) > MAX_LIST:
+            inc[f"{k}_total"] = len(inc[k])
+            inc[k] = inc[k][:MAX_LIST]
+    return inc
+
+
 def build_payload(incident: dict, checks: list[dict]) -> dict:
     """AI에 넘길 최소 입력."""
     return {
-        "incident": {k: incident[k] for k in (
+        "incident": _capped({k: incident[k] for k in (
             "id", "start", "end", "severity", "stages", "src_ips", "instances", "actors",
-            "n_events", "omitted_events", "findings", "context")},
+            "n_events", "omitted_events", "findings", "context")}),
         "events": fence(incident["events"]),
+        # 수정안이 아주 많아도(보안그룹·NACL 수천 개) AI 입력이 커지지 않게 상한을 둔다. 같은 종류는
+        # config_audit에서 이미 하나로 묶고, 그래도 넘치면 심각도순 앞의 것만 보낸다
         "config_checks": [{k: c[k] for k in ("id", "target", "resource", "title", "why",
-                                             "severity", "evidence")} for c in checks],
+                                             "severity", "evidence")} for c in checks[:MAX_CHECKS]],
+        **({"config_checks_omitted": len(checks) - MAX_CHECKS} if len(checks) > MAX_CHECKS else {}),
         "rule_catalog": {r: {"technique": v[0], "stage": v[1], "title": v[2]}
                          for r, v in RULES.items()
                          if r in {f["rule"] for f in incident["findings"]}},

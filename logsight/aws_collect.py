@@ -9,7 +9,7 @@
    추적(trail)을 만들 필요가 없는 무료 대안이다. 단 API가 초당 2회로 제한돼 느리고,
    데이터 이벤트(S3 객체 읽기 등)는 들어 있지 않다.
 
-필요 권한(읽기 전용): ec2:Describe*, wafv2:List*/Get*, iam:Get*/List*,
+필요 권한(읽기 전용): ec2:Describe*(VPC·서브넷·라우팅 테이블·ENI 포함), wafv2:List*/Get*, iam:Get*/List*,
 cloudtrail:DescribeTrails/LookupEvents, sts:GetCallerIdentity.
 AWS 관리형 정책 SecurityAudit 또는 ReadOnlyAccess로 충분하다.
 """
@@ -34,7 +34,7 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
         "_comment": "logsight collect environment 로 자동 생성. trusted_ips(관리자 IP)는 직접 채우세요.",
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "region": region, "trusted_ips": [], "instances": [], "security_groups": [],
-        "network_acls": [], "waf_web_acls": [], "iam_roles": [], "iam_users": [], "cloudtrail": {},
+        "network_acls": [], "vpcs": [], "subnets": [], "network_interfaces": [], "waf_web_acls": [], "iam_roles": [], "iam_users": [], "cloudtrail": {},
     }
 
     def guard(name, fn):
@@ -67,6 +67,7 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
                         "name": next((t["Value"] for t in i.get("Tags", []) if t.get("Key") == "Name"), None),
                         "security_groups": [g["GroupId"] for g in i.get("SecurityGroups", [])],
                         "subnet_id": i.get("SubnetId"),
+                        "vpc_id": i.get("VpcId"),
                         "instance_profile": prof_name,
                         "iam_role": prof_name,  # 아래 IAM 단계에서 실제 역할 이름으로 바꾼다
                         "imds": "required" if i.get("MetadataOptions", {}).get("HttpTokens") == "required"
@@ -96,7 +97,8 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
                                                "vpc_id": g.get("VpcId"), "ingress": ingress})
 
     def nacls():
-        for n in ec2.describe_network_acls().get("NetworkAcls", []):
+        for n in (x for page in ec2.get_paginator("describe_network_acls").paginate()
+                  for x in page.get("NetworkAcls", [])):
             env["network_acls"].append({
                 "nacl_id": n["NetworkAclId"], "vpc_id": n.get("VpcId"),
                 "subnet_ids": [a["SubnetId"] for a in n.get("Associations", []) if a.get("SubnetId")],
@@ -105,9 +107,12 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
                              "action": e.get("RuleAction")} for e in n.get("Entries", [])],
             })
 
+    def vpcs():
+        _network(ec2, env)
+
     def waf():
         w = s.client("wafv2", region_name=region)
-        for a in w.list_web_acls(Scope="REGIONAL").get("WebACLs", []):
+        for a in _waf_acls(w):
             got = w.get_web_acl(Name=a["Name"], Scope="REGIONAL", Id=a["Id"])
             acl = got["WebACL"]
             rules = []
@@ -157,10 +162,70 @@ def export_environment(session=None, region: str | None = None) -> dict[str, Any
                                  "s3_bucket": t.get("S3BucketName")}
 
     for name, fn in (("sts", account), ("ec2:instances", instances), ("ec2:security_groups", sgs),
-                     ("ec2:nacls", nacls), ("wafv2", waf), ("iam", iam), ("cloudtrail", trail)):
+                     ("ec2:nacls", nacls),
+                     ("ec2:vpcs_subnets_enis", vpcs), ("wafv2", waf), ("iam", iam), ("cloudtrail", trail)):
         guard(name, fn)
     env["_errors"] = errors
     return env
+
+
+def _waf_acls(w) -> list[dict]:
+    """list_web_acls는 boto3 페이지 넘김기가 없어 NextMarker로 직접 넘긴다(한 번에 최대 100개)."""
+    out, kw = [], {"Scope": "REGIONAL", "Limit": 100}
+    while True:
+        r = w.list_web_acls(**kw)
+        out += r.get("WebACLs", [])
+        if not r.get("NextMarker") or not r.get("WebACLs"):
+            return out
+        kw["NextMarker"] = r["NextMarker"]
+
+
+def _pages(ec2, op: str, key: str):
+    for page in ec2.get_paginator(op).paginate():
+        yield from page.get(key, [])
+
+
+def _network(ec2, env: dict) -> None:
+    """VPC·서브넷·네트워크 인터페이스(ENI). 서브넷과 VPC가 많은 계정에서 필요한 것:
+    - VPC 대역: 고객이 쓰는 사설·공인 대역을 '사내'로 판단(netaddr)
+    - 서브넷의 퍼블릭 여부: 라우팅 테이블에 인터넷 게이트웨이(igw-) 경로가 있으면 퍼블릭
+    - ENI: VPC Flow 로그의 interface-id로 대상 서버(EC2가 아닌 RDS·ALB·Lambda·NAT 포함)를 정확히 찾는다.
+      VPC마다 같은 사설 대역(10.0.0.0/16)을 쓰면 IP만으로는 서버를 구분할 수 없다."""
+    for v in _pages(ec2, "describe_vpcs", "Vpcs"):
+        cidrs = [a["CidrBlock"] for a in v.get("CidrBlockAssociationSet", [])
+                 if (a.get("CidrBlockState") or {}).get("State", "associated") == "associated"] or \
+            ([v["CidrBlock"]] if v.get("CidrBlock") else [])
+        cidrs += [a["Ipv6CidrBlock"] for a in v.get("Ipv6CidrBlockAssociationSet", []) if a.get("Ipv6CidrBlock")]
+        env["vpcs"].append({"vpc_id": v["VpcId"], "cidrs": cidrs, "is_default": bool(v.get("IsDefault"))})
+    # 라우팅 테이블: 명시적으로 연결된 서브넷, 그 밖의 서브넷은 VPC의 기본(main) 테이블을 쓴다
+    public_rt, by_subnet, main_rt = {}, {}, {}
+    for rt in _pages(ec2, "describe_route_tables", "RouteTables"):
+        rid = rt["RouteTableId"]
+        public_rt[rid] = any(str(r.get("GatewayId", "")).startswith("igw-") and r.get("State", "active") == "active"
+                             for r in rt.get("Routes", []))
+        for a in rt.get("Associations", []):
+            if a.get("SubnetId"):
+                by_subnet[a["SubnetId"]] = rid
+            if a.get("Main"):
+                main_rt[rt.get("VpcId")] = rid
+    for sn in _pages(ec2, "describe_subnets", "Subnets"):
+        rid = by_subnet.get(sn["SubnetId"]) or main_rt.get(sn.get("VpcId"))
+        env["subnets"].append({
+            "subnet_id": sn["SubnetId"], "vpc_id": sn.get("VpcId"), "cidr": sn.get("CidrBlock"),
+            "az": sn.get("AvailabilityZone"), "route_table": rid,
+            "public": bool(public_rt.get(rid)),  # 인터넷 게이트웨이로 나가는 경로가 있는가
+            "map_public_ip": bool(sn.get("MapPublicIpOnLaunch")),
+            "name": next((t["Value"] for t in sn.get("Tags", []) if t.get("Key") == "Name"), None)})
+    for n in _pages(ec2, "describe_network_interfaces", "NetworkInterfaces"):
+        att = n.get("Attachment") or {}
+        env["network_interfaces"].append({
+            "eni_id": n["NetworkInterfaceId"], "vpc_id": n.get("VpcId"), "subnet_id": n.get("SubnetId"),
+            "type": n.get("InterfaceType"), "description": (n.get("Description") or "")[:120],
+            "instance_id": att.get("InstanceId"), "requester": n.get("RequesterId"),
+            "private_ips": [p["PrivateIpAddress"] for p in n.get("PrivateIpAddresses", []) if p.get("PrivateIpAddress")]
+            or ([n["PrivateIpAddress"]] if n.get("PrivateIpAddress") else []),
+            "public_ip": (n.get("Association") or {}).get("PublicIp"),
+            "security_groups": [g["GroupId"] for g in n.get("Groups", [])]})
 
 
 def _docs(client, attached: list[dict], inline_names: list[str], get_inline) -> list[dict]:
