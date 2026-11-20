@@ -396,6 +396,10 @@ def describe_finding(f: dict, inc: dict) -> str:
         "WEBLOG_SQLI": f"{who}에서 보낸 웹 요청 {n}건에 SQL 인젝션 문자열이 있었습니다(정상 응답 {ok}건, 오류·거부 {bad}건)."
                        + _sqli_signal_sentence(f.get("detail", "")),
         "WEBLOG_IDOR_ENUM": f"{who}에서 번호만 바꿔 다른 사람의 데이터 {n}건을 열어 보려 했습니다(IDOR 탐색, 성공 {ok}건, 거부 {bad}건).",
+        "HOST_PRIV_ESC": f"서버에서 권한 상승이 있었습니다({f.get('detail', '')}). 웹셸 등으로 들어온 공격자가 root를 얻었을 수 있습니다.",
+        "HOST_PRIV_ESC_FAIL": f"서버에서 sudo·su 시도가 거부됐습니다({f.get('detail', '')}). 권한을 올리려는 시도일 수 있습니다.",
+        "HOST_ACCOUNT_CREATED": f"서버에 계정을 만들거나 관리자 권한을 줬습니다({f.get('detail', '')}). 다시 들어올 문을 만드는 단계일 수 있습니다.",
+        "CT_CONSOLE_BRUTE": f"{who}에서 AWS 콘솔 로그인을 {n}번 시도했습니다(실패 {bad}건, 성공 {ok}건). 비밀번호 대입 공격일 수 있습니다.",
         "GD_FINDING": f"GuardDuty 탐지: {f['title'].replace('GuardDuty: ', '')} ({f['detail']}).",
         # 웹 공격 규칙(웹서버 점검과 같은 규칙). 응답이 정상(2xx·3xx)이면 '성공', 4xx·5xx면 '거부'로 센다
         "WEBLOG_SCANNER": f"{who}에서 취약점 스캐너·자동 도구로 {n}건을 요청했습니다({_acts(evs, 2)} 등). "

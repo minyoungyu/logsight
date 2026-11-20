@@ -18,7 +18,7 @@ from datetime import timedelta
 from urllib.parse import parse_qsl, unquote_plus, urlparse
 
 from ..normalize import Event
-from ..detect import Finding, _bursts, _ok_fail, _route, sqli_success_signal
+from ..detect import Finding, _bursts, _ok_fail, _route, host_auth_findings, sqli_success_signal
 from .webprofile import SiteProfile
 
 # ------------------------------------------------------------------ 공격 패턴
@@ -49,6 +49,9 @@ def is_sqli(text: str) -> bool:
 
 TRAVERSAL = re.compile(
     r"(?i)(?:\.\./|\.\.%2f|%2e%2e/|\.\.\\|/etc/passwd|/proc/self/|c:\\windows|"
+    # ../ 없이 절대 경로로 바로 읽는 경우(file=/etc/shadow). 경로가 아니라 인자 값으로 들어온 것만 본다
+    r"[=:]\s*(?:file:/+)?/(?:etc/(?:shadow|gshadow|sudoers|group|hosts|crontab|ssh/)|root/\.|proc/\d+/|var/www/.*\.env\b)|"
+    r"/etc/shadow|win\.ini|"
     r"php://(?:filter|input)|data://|expect://|/\.ssh/|boot\.ini|"
     r"access\.log|error\.log|/var/log/)")
 # 헤더(User-Agent·Referer)에 실행 가능한 코드가 들어 있으면 로그 포이즈닝 준비일 가능성이 크다.
@@ -90,12 +93,27 @@ SHELL_WORDS = re.compile(
 BASE64_VALUE = re.compile(r"^[A-Za-z0-9+/_-]{12,}={0,2}$")
 
 
+# 필터를 피하려고 쓰는 변형 인코딩: UTF-8 과잉 길이(%c0%ae = "."), IIS 유니코드(%u002e), 전각 문자.
+# 표준 디코더는 이것을 깨진 글자(�)로 바꿔 ../ 를 놓치므로 먼저 원래 글자로 바꾼다
+_EVASION = [(re.compile(p, re.I), c) for p, c in (
+    (r"%c0%ae|%e0%80%ae|%f0%80%80%ae|%c0%2e|%u002e|%uff0e", "."),
+    (r"%c0%af|%e0%80%af|%f0%80%80%af|%c0%2f|%u2215|%u002f|%uff0f", "/"),
+    (r"%c1%9c|%u2216|%u005c|%uff3c", "\\"))]
+_FULLWIDTH = str.maketrans({"\uff0e": ".", "\uff0f": "/", "\uff3c": "\\"})
+
+
+def _undo_evasion(s: str) -> str:
+    for rx, ch in _EVASION:
+        s = rx.sub(lambda _m, c=ch: c, s)
+    return s.translate(_FULLWIDTH)
+
+
 def _dec(s: str | None) -> str:
     if not s:
         return ""
-    out = s
+    out = _undo_evasion(s)
     for _ in range(2):  # 이중 인코딩(%252e..)까지 한 번 더 푼다
-        new = unquote_plus(out)
+        new = _undo_evasion(unquote_plus(out))
         if new == out:
             break
         out = new
@@ -441,6 +459,10 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
                 if len(prior) >= 2:
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 SSH 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
+
+    # --- 서버 권한 상승·계정 생성(sudo·su·useradd): 웹셸에서 root로 올라갔는지 본다(사후 분석과 같은 코드)
+    if auth:
+        findings += host_auth_findings(auth)
 
     if skip or covered:
         covered = covered or {}

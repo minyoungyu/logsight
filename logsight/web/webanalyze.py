@@ -35,13 +35,14 @@ SUCCESS_SIGNAL = {
     "WEBLOG_AUTH_SUCCESS_AFTER_FAIL", "SSH_SUCCESS_AFTER_FAIL",
     "WEBLOG_EXPLOIT_5XX", "WEBLOG_LARGE_EXFIL", "WEBLOG_ADMIN_ACCESS", "WEBLOG_CODE_IN_HEADER",
     "WEBLOG_ADMIN_FORGED", "WEBLOG_IDOR_ENUM", "WEBLOG_BACKUP_LEAK", "WEBLOG_SSRF",
+    "HOST_PRIV_ESC", "HOST_ACCOUNT_CREATED",
 }
 WEAK_SUCCESS = {"WEBLOG_WEBSHELL_ACCESS", "WEBLOG_LARGE_EXFIL", "WEBLOG_ADMIN_ACCESS"}
 ATTEMPT_SIGNAL = {
     "WEBLOG_SQLI", "WEBLOG_TRAVERSAL", "WEBLOG_RFI", "WEBLOG_CMD_INJECTION",
     "WEBLOG_XSS", "WEBLOG_AUTH_BRUTE", "SSH_BRUTE_FORCE", "FILE_SUSPICIOUS",
     "WEBLOG_SENSITIVE_FILE", "WEBLOG_OPEN_REDIRECT", "WEBLOG_CSRF_SUSPECT",
-    "WEBLOG_EXPLOIT_PROBE", "WEBLOG_DIR_LISTING",
+    "WEBLOG_EXPLOIT_PROBE", "WEBLOG_DIR_LISTING", "HOST_PRIV_ESC_FAIL",
 }
 
 _STR = {"type": "string"}
@@ -277,6 +278,12 @@ def _remediation(findings: list[dict]) -> list[dict]:
         f = rules.get("WEBLOG_AUTH_SUCCESS_AFTER_FAIL") or rules["SSH_SUCCESS_AFTER_FAIL"]
         out.append({"id": "WEB_FIX_ACCOUNT", "action": "탈취 의심 계정 잠그고 비밀번호·키 교체", "target": "account", "priority": "now",
                     "detail": "해당 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다. 가능하면 다중 인증을 켠다.",
+                    "evidence": f["evidence"][:6]})
+    if rules.keys() & {"HOST_PRIV_ESC", "HOST_PRIV_ESC_FAIL", "HOST_ACCOUNT_CREATED"}:
+        f = next(rules[r] for r in ("HOST_PRIV_ESC", "HOST_ACCOUNT_CREATED", "HOST_PRIV_ESC_FAIL") if r in rules)
+        out.append({"id": "WEB_FIX_PRIVESC", "action": "서버 sudo 권한 정리와 새 계정 잠금", "target": "account", "priority": "now",
+                    "detail": "웹 서비스 계정(www-data 등)의 sudo 권한과 NOPASSWD 줄을 sudoers에서 지우고(visudo), "
+                              "모르는 계정은 잠근다(usermod -L). root를 얻었을 수 있으므로 서버를 깨끗한 이미지로 다시 만드는 것을 검토한다.",
                     "evidence": f["evidence"][:6]})
     if "WEBLOG_SQLI" in rules:
         out.append({"id": "WEB_FIX_SQLI", "action": "SQL 인젝션 취약 코드 수정", "target": "app", "priority": "soon",

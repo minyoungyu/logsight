@@ -119,6 +119,15 @@ SPEC: dict[str, dict] = {
         "fp": ["MFA 장치를 바꾸는 직원의 정상 작업(끄고 새로 등록)"],
         "first": "누가 바꿨는지 확인하고 MFA를 다시 켠다. 본인이 아니면 그 계정의 비밀번호와 키를 바꾼다.",
     },
+    "CT_CONSOLE_BRUTE": {
+        "logs": "CloudTrail(signin)",
+        "when": "같은 IP 또는 같은 사용자의 콘솔 로그인 실패(responseElements.ConsoleLogin=Failure) 10분 안에 5건 이상. "
+                "그 뒤 30분 안에 성공이 있으면 심각도 높음",
+        "blind": ["IP와 사용자를 모두 바꿔 가며 천천히 시도하는 분산 대입",
+                  "없는 사용자 이름의 실패는 AWS가 이름을 가려(HIDDEN_DUE_TO_SECURITY_REASONS) IP로만 묶임"],
+        "fp": ["비밀번호를 잊은 직원의 반복 실패"],
+        "first": "그 사용자에게 MFA를 켜고 비밀번호를 바꾼다. 성공한 로그인 뒤 무엇을 했는지 같은 사건에서 본다.",
+    },
     "CT_CONSOLE_NO_MFA": {
         "logs": "CloudTrail",
         "when": "ConsoleLogin 성공이고 MFAUsed가 No",
@@ -232,6 +241,34 @@ SPEC: dict[str, dict] = {
         "blind": ["다른 IP에서 실패하고 새 IP로 성공하면 보지 않음"],
         "fp": ["오타 두 번 뒤 정상 로그인"],
         "first": "그 계정으로 무엇을 했는지 셸 기록을 보고, 모르는 IP면 계정 비밀번호와 키를 바꾼다.",
+    },
+    # ------------------------------------------------------------------ 서버(auth.log) 권한 상승·계정
+    "HOST_PRIV_ESC": {
+        "logs": "서버 인증 로그(auth.log, secure)",
+        "when": "sudo·su 성공 1건 이상인데 (1) 실행한 계정이 웹 서비스 계정(www-data, apache, nginx, nobody 등)이거나 "
+                "(2) sudo 명령이 root 셸을 여는 모양(find -exec, python -c, tar --checkpoint-action, chmod +s, "
+                "/etc/shadow·sudoers 덮어쓰기 등). 계정별로 묶음",
+        "blind": ["웹셸이 sudo 없이 커널 취약점 등으로 권한을 올리면 auth.log에 남지 않음",
+                  "목록에 없는 이름으로 웹 서비스를 돌리는 서버(예: 직접 만든 app 계정)",
+                  "sudo vim 안에서 :!sh 처럼 실행 뒤에 셸로 빠지는 경우는 명령 줄만으로는 보이지 않음(서비스 계정이면 잡힘)"],
+        "fp": ["배포 스크립트가 웹 서비스 계정으로 sudo를 쓰도록 만든 서버. 그 계정을 우리 팀으로 확인하면 판정에서 빠짐",
+               "관리자가 일부러 find -exec를 sudo로 쓰는 정리 작업"],
+        "first": "그 계정의 sudo 권한(sudoers의 NOPASSWD 줄)을 바로 지우고, 같은 시각 웹 로그에서 웹셸 요청을 찾는다.",
+    },
+    "HOST_PRIV_ESC_FAIL": {
+        "logs": "서버 인증 로그(auth.log, secure)",
+        "when": "sudo 거부(NOT in sudoers, 비밀번호 틀림)·su 실패. 웹 서비스 계정은 1건부터, 다른 계정은 10분 안에 3건 이상",
+        "blind": ["권한이 없는 걸 미리 확인하고(sudo -l) 시도하지 않는 공격자"],
+        "fp": ["비밀번호를 세 번 틀린 관리자"],
+        "first": "그 계정이 왜 sudo를 시도했는지 본다. 웹 서비스 계정이면 웹셸이 이미 있다고 보고 웹 루트를 점검한다.",
+    },
+    "HOST_ACCOUNT_CREATED": {
+        "logs": "서버 인증 로그(auth.log, secure)",
+        "when": "useradd 기록 1건, 또는 sudo로 실행한 useradd·adduser·usermod -aG sudo|wheel·passwd root·sudoers 수정 1건",
+        "blind": ["/etc/passwd를 직접 고쳐 계정을 만드는 경우(파일 무결성 점검이 필요)",
+                  "SSH 키만 authorized_keys에 넣어 두는 지속성"],
+        "fp": ["새 직원 계정을 만드는 정상 작업. 우리 팀 확인이나 정상 작업 목록으로 내림"],
+        "first": "모르는 계정이면 잠그고(usermod -L), 그 계정의 authorized_keys와 sudo 권한을 확인한다.",
     },
     "GD_FINDING": {
         "logs": "GuardDuty 결과(콘솔 내보내기·EventBridge)",

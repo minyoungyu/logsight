@@ -115,6 +115,27 @@ INST_ENV = {"instances": [{"instance_id": "i-0abc", "public_ip": "203.0.113.10",
 TRUST_ENV = {"trusted_ips": ["192.0.2.0/24"]}
 
 
+def host(i, msg, proc="sudo"):
+    """auth.log의 sudo·su·useradd 줄(합성)."""
+    ts = (T0 + timedelta(seconds=i * 10)).strftime("%b %d %H:%M:%S")
+    return f"{ts} web {proc}[{300 + i}]: {msg}"
+
+
+def host_rules(lines):
+    return aws_rules(parse_sshauth("\n".join(lines), year=2026))
+
+
+def sudo(who, cmd, denied=False):
+    mid = "user NOT in sudoers ; " if denied else ""
+    return f"{who} : {mid}TTY=pts/0 ; PWD=/var/www ; USER=root ; COMMAND={cmd}"
+
+
+def console(i, ok, ip=ATK):
+    return ct(i, "ConsoleLogin", "signin", ip=ip, sec=30,
+              responseElements={"ConsoleLogin": "Success" if ok else "Failure"},
+              additionalEventData={"MFAUsed": "Yes"})
+
+
 def burst(name, n, src="iam", err=None, sec=60, **kw):
     return [ct(i, name if isinstance(name, str) else name[i % len(name)], src=src, err=err, sec=sec, **kw)
             for i in range(n)]
@@ -196,6 +217,14 @@ CASES = {
     "SSH_SUCCESS_AFTER_FAIL": (
         lambda: aws_rules(parse_sshauth("\n".join([ssh(0, "fail"), ssh(1, "fail"), ssh(2, "ok")]), year=2026)),
         lambda: aws_rules(parse_sshauth("\n".join([ssh(0, "fail"), ssh(2, "ok")]), year=2026))),
+    "HOST_PRIV_ESC": (lambda: host_rules([host(0, sudo("www-data", "/usr/bin/find . -exec /bin/sh -p ; -quit"))]),
+                      lambda: host_rules([host(0, sudo("ubuntu", "/usr/bin/systemctl restart nginx"))])),
+    "HOST_PRIV_ESC_FAIL": (lambda: host_rules([host(i, sudo("dev", "/bin/bash", denied=True)) for i in range(3)]),
+                           lambda: host_rules([host(i, sudo("dev", "/bin/bash", denied=True)) for i in range(2)])),
+    "HOST_ACCOUNT_CREATED": (lambda: host_rules([host(0, sudo("root", "/usr/sbin/useradd -m svc"))]),
+                             lambda: host_rules([host(0, sudo("root", "/usr/sbin/userdel old"))])),
+    "CT_CONSOLE_BRUTE": (lambda: aws_rules([console(i, False) for i in range(5)]),
+                         lambda: aws_rules([console(i, False) for i in range(4)] + [console(5, True)])),
     "GD_FINDING": (lambda: aws_rules(parse_guardduty(gd(5))),
                    lambda: aws_rules(parse_guardduty("{}"))),
     # --- 웹서버 로그

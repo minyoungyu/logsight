@@ -312,6 +312,16 @@ _SSH_RESULT = re.compile(
 # 키 인증만 허용한 서버는 "Failed password" 없이 이 줄만 남는다(없는 사용자 이름으로 접속 시도)
 _SSH_INVALID = re.compile(r"^Invalid user\s+(?P<user>\S*)\s+from\s+(?P<ip>[\d.a-fA-F:]+)(?:\s+port\s+(?P<port>\d+))?")
 _SUDO = re.compile(r"(?P<who>\S+)\s*:.*?COMMAND=(?P<cmd>.+)$")
+_SUDO_TARGET = re.compile(r"\bUSER=(?P<target>[^\s;]+)")
+# sudo가 거부한 줄: "www-data : user NOT in sudoers ; ... COMMAND=..." / "3 incorrect password attempts ; ..."
+_SUDO_DENIED = re.compile(r"(?i)NOT in sudoers|incorrect password attempt|command not allowed|a password is required")
+# su: "(to root) www-data on pts/0", "Successful su for root by www-data", "FAILED su for root by www-data",
+#     "pam_unix(su:session): session opened for user root(uid=0) by www-data(uid=33)"
+_SU_TO = re.compile(r"^\(to (?P<target>[^)]+)\)\s+(?P<who>\S+)\s+on\b")
+_SU_RESULT = re.compile(r"^(?P<result>Successful|FAILED) su for (?P<target>\S+) by (?P<who>\S+)")
+_SU_PAM_OPEN = re.compile(r"pam_unix\(su(?:-l)?:session\): session opened for user (?P<target>[^\s(]+)"
+                          r"(?:\(uid=\d+\))? by (?P<who>[^\s(]*)")
+_SU_PAM_FAIL = re.compile(r"pam_unix\(su(?:-l)?:auth\): authentication failure;.*?\bruser=(?P<who>\S*).*?\buser=(?P<target>\S+)")
 _USERADD = re.compile(r"new user: name=(?P<user>[^,]+)")
 _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
@@ -333,6 +343,7 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
     heads = [(i, line.strip(), _AUTH_HEAD.match(line.strip())) for i, line in enumerate(text.splitlines())]
     # 같은 접속(pid)의 "Failed password" 줄이 있으면 "Invalid user" 줄은 세지 않는다(한 시도를 두 번 셈)
     failed_pids = {m["pid"] for _, _, m in heads if m and m["pid"] and m["msg"].startswith("Failed ")}
+    su_seen: set[str] = set()
     for i, line, m in heads:
         if not m:
             continue
@@ -353,9 +364,25 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
         elif proc == "sudo":
             r = _SUDO.search(msg)
             if r:
-                ev = Event(ts=None, source="sshauth", actor=r["who"], action="sudo", outcome="success",
+                t = _SUDO_TARGET.search(msg)
+                ev = Event(ts=None, source="sshauth", actor=r["who"], action="sudo",
+                           outcome="failure" if _SUDO_DENIED.search(msg) else "success",
                            dst_ip=_host_ip(m["host"]), raw_ref=f"{name}:{i+1}",
-                           extra=base | {"command": r["cmd"][:200]})
+                           extra=base | {"command": r["cmd"][:200], "target_user": t["target"] if t else "root"})
+        elif proc in ("su", "su-l"):
+            # 한 번의 su가 여러 줄을 남기므로 pid마다 첫 결과 줄 하나만 쓴다
+            key = m["pid"] or f"line{i}"
+            if key in su_seen:
+                continue
+            r = _SU_TO.match(msg) or _SU_RESULT.match(msg) or _SU_PAM_OPEN.search(msg)
+            ok = bool(r) and not (r.groupdict().get("result") == "FAILED")
+            if not r:
+                r = _SU_PAM_FAIL.search(msg)
+            if r:
+                su_seen.add(key)
+                ev = Event(ts=None, source="sshauth", actor=(r["who"] or "?").strip(), action="su",
+                           outcome="success" if ok else "failure", dst_ip=_host_ip(m["host"]),
+                           raw_ref=f"{name}:{i+1}", extra=base | {"target_user": r["target"]})
         elif proc in ("useradd", "usermod"):
             r = _USERADD.search(msg)
             if r:
@@ -365,7 +392,23 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
             ev.ts = _line_ts(line, year)
             if ev.ts is not None:
                 events.append(ev)
+    _link_sessions(events)
     return events
+
+
+def _link_sessions(events: list[Event], window: timedelta = timedelta(hours=12)) -> None:
+    """sudo·su·useradd 줄에는 IP가 없다. 같은 서버에서 같은 사용자가 직전에 SSH로 로그인했으면 그 IP를 붙여
+    'SSH 대입 → 로그인 → 권한 상승·계정 생성'이 한 사건으로 묶이게 한다. 추정이므로 extra에 표시한다."""
+    last: dict[tuple[str, str], Event] = {}
+    for e in sorted(events, key=lambda x: x.ts):
+        k = (e.extra.get("host", ""), (e.actor or "").strip())
+        if e.action == "ssh_login" and e.outcome == "success":
+            last[k] = e
+        elif e.action in ("sudo", "su") and not e.src_ip:
+            s = last.get(k)
+            if s and timedelta(0) <= e.ts - s.ts <= window:
+                e.src_ip = s.src_ip
+                e.extra["src_ip_from"] = f"같은 사용자의 직전 SSH 로그인({s.raw_ref})"
 
 
 # ------------------------------------------------------------------ 서버 방화벽 로그(iptables/nftables/ufw)
@@ -716,6 +759,12 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     return flags
 
 
+def _console_failed(r: dict) -> bool:
+    """콘솔 로그인 실패는 errorCode 없이 responseElements.ConsoleLogin = "Failure"로만 남는다."""
+    re_ = r.get("responseElements")
+    return isinstance(re_, dict) and str(re_.get("ConsoleLogin", "")).lower() == "failure"
+
+
 def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
     try:
         ts = _iso(r["eventTime"])
@@ -756,7 +805,7 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
         instance_id=m.group(1) if m else None,
         access_key=sys.intern(key) if isinstance(key, str) else None,
         action=sys.intern(act),
-        outcome="failure" if r.get("errorCode") else "success",
+        outcome="failure" if r.get("errorCode") or _console_failed(r) else "success",
         raw_ref=ref,
         extra=extra,
     )

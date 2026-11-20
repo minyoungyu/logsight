@@ -44,6 +44,10 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WAF_BLOCKED":        ("T1190", "initial-access", "WAF가 공격 요청 차단", "low"),
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
+    "HOST_PRIV_ESC":      ("T1548.003", "privilege-escalation", "서버 권한 상승(웹 서비스 계정의 sudo·su, 셸 탈출 명령)", "high"),
+    "HOST_PRIV_ESC_FAIL": ("T1548.003", "privilege-escalation", "sudo·su 거부·연속 실패(권한 상승 시도)", "medium"),
+    "HOST_ACCOUNT_CREATED": ("T1136.001", "persistence", "서버에 새 계정 생성·관리자 그룹 추가", "medium"),
+    "CT_CONSOLE_BRUTE":   ("T1110", "credential-access", "AWS 콘솔 로그인 연속 실패(무차별 대입)", "medium"),
     "GD_FINDING":         ("GuardDuty", "other", "GuardDuty 탐지 결과", "medium"),
     # --- 웹서버 로그·파일 기반 규칙(logsight.web) ---
     "WEBLOG_SQLI":        ("T1190", "initial-access", "웹 요청에 SQL 인젝션 패턴", "high"),
@@ -313,6 +317,54 @@ def _web_rule_findings(events: list[Event], env: dict, prior: list[Finding]) -> 
                               covered=covered, include_auth=False)
 
 
+# 웹 서비스가 도는 계정. 이 계정이 sudo·su를 쓰는 일은 정상 운영에서 거의 없다(웹셸에서 권한을 올리는 모습)
+SERVICE_ACCOUNTS = frozenset({"www-data", "apache", "nginx", "httpd", "http", "wwwrun", "nobody", "daemon",
+                              "tomcat", "php-fpm", "lighttpd"})
+# sudo로 실행했을 때 root 셸을 여는 명령(GTFOBins에서 흔한 것). 관리자가 일상적으로 쓰는 모양과 겹치지 않는 것만
+SHELL_ESCAPE = re.compile(
+    r"(?i)(?:\bfind\b.*\s-exec\b|\b(?:python[\d.]*|perl|ruby|php|lua|node)\s+-[ecr]\b|"
+    r"\btar\b.*--checkpoint-action|\bzip\b.*\s-TT?\b|\bawk\b.*system\s*\(|\benv\s+/bin/(?:ba|da)?sh\b|"
+    r"\b(?:cp|tee|dd|mv)\b.*/etc/(?:passwd|shadow|sudoers)|\bchmod\b.*(?:u?\+s\b|\s[4-7][0-7]{3}\s)|"
+    r"\bnmap\b.*--(?:interactive|script)|/bin/(?:ba|da|z)?sh\s+-p\b)")
+# 새 계정 만들기·관리자 그룹에 넣기·root 비밀번호 바꾸기
+ACCOUNT_CMD = re.compile(r"(?i)(?:^|/|\s)(?:useradd|adduser|newusers)\b|\busermod\b.*-a?G\s*\S*\b(?:sudo|wheel|admin|root)\b"
+                         r"|(?:^|/)passwd\s+root\b|/etc/sudoers")
+
+
+def host_auth_findings(events: list[Event]) -> list[Finding]:
+    """서버 인증 로그(auth.log)의 sudo·su·계정 생성. 사후 분석과 웹서버 점검이 같이 쓴다."""
+    host = [e for e in events if e.source in ("sshauth", "auth") and e.action in ("sudo", "su", "useradd")]
+    findings: list[Finding] = []
+    esc: dict[str, list[Event]] = defaultdict(list)
+    fail: dict[str, list[Event]] = defaultdict(list)
+    acct: dict[str, list[Event]] = defaultdict(list)
+    for e in host:
+        who = (e.actor or "?").strip()
+        cmd = e.extra.get("command", "")
+        svc = who.lower() in SERVICE_ACCOUNTS
+        if e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
+            acct[who].append(e)
+        if e.action in ("sudo", "su") and e.outcome == "success" and (svc or SHELL_ESCAPE.search(cmd)):
+            esc[who].append(e)
+        elif e.action in ("sudo", "su") and e.outcome == "failure":
+            fail[who].append(e)
+    for who, evs in esc.items():
+        cmds = ", ".join(sorted({(e.extra.get("command") or f"su → {e.extra.get('target_user', 'root')}")[:60]
+                                 for e in evs})[:3])
+        why = "웹 서비스 계정" if who.lower() in SERVICE_ACCOUNTS else "셸 탈출 명령"
+        findings.append(Finding("HOST_PRIV_ESC", evs, f"{why} '{who}'의 권한 상승 {len(evs)}건: {cmds}", who))
+    for who, evs in fail.items():
+        evs.sort(key=lambda e: e.ts)
+        if who.lower() in SERVICE_ACCOUNTS:  # 서비스 계정은 한 번의 시도도 의미가 있다
+            findings.append(Finding("HOST_PRIV_ESC_FAIL", evs, f"웹 서비스 계정 '{who}'의 sudo·su 시도 {len(evs)}건 거부", who))
+            continue
+        for seg in _bursts(evs, timedelta(minutes=10), 3, key=lambda e: e.raw_ref):
+            findings.append(Finding("HOST_PRIV_ESC_FAIL", seg, f"10분 안에 '{who}'의 sudo·su 실패 {len(seg)}건", who))
+    for who, evs in acct.items():
+        findings.append(Finding("HOST_ACCOUNT_CREATED", evs, f"'{who}' 계정 생성·권한 부여 {len(evs)}건", who))
+    return findings
+
+
 def run_detections(events: list[Event], env: dict | None = None) -> list[Finding]:
     """모든 규칙을 돌려 Finding 목록을 만들고, 해당 이벤트에 규칙 ID를 붙인다."""
     env = env or {}
@@ -373,6 +425,35 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             singles[("CT_INSTANCE_CRED_OUTSIDE", e.instance_id)].append(e)
     for (rule, key), evs in singles.items():
         findings.append(Finding(rule, evs, _ok_fail(evs), key))
+
+    # --- CloudTrail: 콘솔 로그인 연속 실패(같은 IP 또는 같은 사용자). 실패 뒤 성공하면 높음으로 올린다
+    logins = sorted((e for e in ct if e.action == "signin:ConsoleLogin"), key=lambda e: e.ts)
+    for keyf in (lambda e: e.src_ip or "", lambda e: e.actor or ""):
+        groups: dict[str, list[Event]] = defaultdict(list)
+        for e in logins:
+            if keyf(e):
+                groups[keyf(e)].append(e)
+        for key, evs in groups.items():
+            fails = [e for e in evs if e.outcome == "failure"]
+            for seg in _bursts(fails, timedelta(minutes=10), 5, key=lambda e: e.raw_ref):
+                after = [e for e in evs if e.outcome == "success" and timedelta(0) < e.ts - seg[-1].ts <= timedelta(minutes=30)]
+                if after:
+                    findings.append(Finding("CT_CONSOLE_BRUTE", seg + after[:1],
+                                            f"10분 안에 실패 {len(seg)}건 뒤 로그인 성공", key,
+                                            override={"severity": "high", "title": "콘솔 로그인 연속 실패 뒤 성공(비밀번호 탈취 의심)"}))
+                else:
+                    findings.append(Finding("CT_CONSOLE_BRUTE", seg, f"10분 안에 실패 {len(seg)}건", key))
+    # 같은 실패 묶음이 IP와 사용자 양쪽에서 두 번 잡히면 하나만 남긴다
+    seen_cb: set[frozenset] = set()
+    dedup: list[Finding] = []
+    for f in findings:
+        if f.rule == "CT_CONSOLE_BRUTE":
+            k = frozenset(e.raw_ref for e in f.events)
+            if k in seen_cb:
+                continue
+            seen_cb.add(k)
+        dedup.append(f)
+    findings = dedup
 
     # --- CloudTrail: 같은 인스턴스 세션 자격증명이 서로 다른 공인 IP에서 사용
     by_inst: dict[str, list[Event]] = defaultdict(list)
@@ -485,6 +566,9 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                 if len(prior) >= 2:
                     findings.append(Finding("SSH_SUCCESS_AFTER_FAIL", prior + [e],
                                             f"직전 30분 실패 {len(prior)}건 뒤 '{e.actor}' 성공", ip))
+
+    # --- 서버 권한 상승·계정 생성(auth.log의 sudo·su·useradd)
+    findings += host_auth_findings(events)
 
     # --- 웹 공격 규칙(SQL 인젝션·스캐너·경로 조작·웹셸·IDOR 등): 웹서버 점검과 같은 코드(web/webdetect)로
     # nginx·ALB·WAF 로그를 본다. SSH는 위의 SSH 규칙이 본다.
