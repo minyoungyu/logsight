@@ -8,7 +8,7 @@ from pathlib import Path
 from .analyze import analyze, build_payload
 from .config_audit import audit
 from .correlate import build_incidents, group_repeats
-from .detect import run_detections
+from .detect import run_detections, shared_private_ips
 from .explain import mark_known, rule_triage
 from .normalize import Event, load_paths
 from .guard import hold
@@ -42,7 +42,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     n_known = mark_known(events, env)  # 설정의 정상 작업 목록과 맞는 이벤트 표시(지우지 않음)
     findings = run_detections(events, env)
     team_info = _team(events, env)
-    incidents = build_incidents(events, findings, window_min=window_min)
+    incidents = build_incidents(events, findings, window_min=window_min, env=env)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
     t_detect = time.time() - t0
     # 재검토: 공격으로 보이는 사건을 위로 올린다. 규칙 판정은 항상 만들고(키 없이도, 비교용),
@@ -103,7 +103,9 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "excluded_activity": excluded_summary(events),
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy")))
-        + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]],
+        + [f"설정 점검 중 오류가 나 그 사건의 수정안을 만들지 못했습니다: {m}" for m in audit_errors[:3]]
+        + [f"사내 IP {ip}는 여러 사용자가 함께 쓰는 주소로 보여 사건을 엮는 연결고리에서 뺐습니다({why})."
+           for ip, why in sorted(shared_private_ips(events, env).items())[:5]],
     }
 
 
@@ -159,6 +161,19 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
     if bad:
         out.append(f"형식을 알 수 없어 건너뛴 파일 {len(bad)}개: {', '.join(map(str, bad[:5]))}"
                    + (" 외" if len(bad) > 5 else "") + ". 파일 이름에 로그 종류(cloudtrail, vpcflow, nginx 등)를 넣으면 판별됩니다.")
+    for s in file_stats:
+        n = s.get("unparsed") or 0
+        if not n:
+            continue
+        total = n + (s.get("events") or 0)
+        why = ", ".join(f"{r} {c:,}줄" for r, c in sorted((s.get("unparsed_reasons") or {}).items(),
+                                                          key=lambda kv: -kv[1])[:3])
+        msg = (f"{Path(str(s['file'])).name}: {total:,}줄 중 {n:,}줄({n / total:.1%})을 읽지 못해 분석에서 빠졌습니다"
+               + (f"({why})" if why else "") + ".")
+        if s.get("kind") == "vpcflow":
+            msg += (" VPC Flow 사용자 지정 형식이면 파일 첫 줄에 필드 이름 머리줄(S3로 보내면 자동으로 붙음, "
+                    "예: version account-id interface-id srcaddr …)이 있어야 칸 순서를 알 수 있습니다.")
+        out.append(msg)
     if by_source.get("sshauth") or by_source.get("hostfw"):
         tz = SYSLOG["tz"].utcoffset(None)
         hours = tz.total_seconds() / 3600
@@ -174,8 +189,9 @@ def _assumptions(by_source: dict, env: dict, file_stats: list[dict] = (), proxie
     elif not env.get("trusted_ips"):
         out.append("관리자 IP(trusted_ips)가 비어 있어 수정안의 허용 IP가 자리표시로 나옵니다.")
     if proxied:
-        out.append(f"웹서버 로그 {proxied:,}줄은 ALB·프록시 내부 IP에서 왔고 실제 사용자 IP가 없어 내부 IP로 분석했습니다. "
-                   "nginx 로그 형식 끝에 \"$http_x_forwarded_for\"를 넣으면(nginx 기본 main 형식) 실제 IP로 분석합니다.")
+        out.append(f"웹서버 로그 {proxied:,}줄은 내부 IP(사내 사용자이거나 ALB·프록시)에서 왔고 X-Forwarded-For에 "
+                   "실제 사용자 IP가 없어 내부 IP로 분석했습니다. ALB·프록시 뒤라면 nginx 로그 형식 끝에 "
+                   "\"$http_x_forwarded_for\"를 넣으면(nginx 기본 main 형식) 실제 IP로 분석합니다.")
     return out
 
 
