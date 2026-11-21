@@ -1,0 +1,5 @@
+# cp terraform.tfvars.example terraform.tfvars 후 값을 채운다. terraform.tfvars는 저장소에 올리지 않는다.
+region         = "ap-southeast-2"
+team_count     = 10
+operator_cidrs = ["203.0.113.5/32"] # 운영진 공인 IP: curl -s https://checkip.amazonaws.com
+contest_open   = false              # 대회 10:00에 true로 apply, 19:00에 false로 apply
