@@ -57,7 +57,7 @@ class GuardDutyOnlyReport(unittest.TestCase):
         joined = " ".join(x["text"] + " " + x["target"] for x in first + rest)
         self.assertIn("i-0shop0web0001", joined)
         self.assertIn("shop-web-role", joined)
-        self.assertNotIn("ASIAZ3SAMPLEKEY00001", joined)  # 키는 가린 형식으로만(NFR-06)
+        self.assertNotIn("ASIAZ3EXAMPLEKEY0001", joined)  # 키는 가린 형식으로만(NFR-06)
 
     def test_detection_is_not_counted_as_failure(self):  # TC-GD-03
         r = gd_only()["results"][0]

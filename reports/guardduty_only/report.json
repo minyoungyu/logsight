@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-21T08:28:23Z",
+ "generated_at": "2026-11-21T08:33:43Z",
  "files": [
   {
    "file": "samples/guardduty_only/guardduty_findings.json",
@@ -345,7 +345,7 @@
        "GD_FINDING"
       ],
       "actor": "shop-web-role",
-      "access_key": "ASIAZ3SA********0001",
+      "access_key": "ASIAZ3EX********0001",
       "gd_type": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
       "gd_title": "(sample) UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
       "gd_severity": 8.0,
@@ -368,7 +368,7 @@
        "GD_FINDING"
       ],
       "actor": "shop-web-role",
-      "access_key": "ASIAZ3SA********0001",
+      "access_key": "ASIAZ3EX********0001",
       "gd_type": "Exfiltration:S3/AnomalousBehavior",
       "gd_title": "(sample) Exfiltration:S3/AnomalousBehavior",
       "gd_severity": 8.0,

@@ -75,7 +75,7 @@
    "Resource": {
     "ResourceType": "AccessKey",
     "AccessKeyDetails": {
-     "AccessKeyId": "ASIAZ3SAMPLEKEY00001",
+     "AccessKeyId": "ASIAZ3EXAMPLEKEY0001",
      "PrincipalId": "AROASAMPLE:i-0shop0web0001",
      "UserName": "shop-web-role",
      "UserType": "AssumedRole"
@@ -110,7 +110,7 @@
    "Resource": {
     "ResourceType": "S3Bucket",
     "AccessKeyDetails": {
-     "AccessKeyId": "ASIAZ3SAMPLEKEY00001",
+     "AccessKeyId": "ASIAZ3EXAMPLEKEY0001",
      "UserName": "shop-web-role"
     },
     "S3BucketDetails": [
