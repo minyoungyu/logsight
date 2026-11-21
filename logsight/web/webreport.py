@@ -152,6 +152,8 @@ def render(result: dict, title: str | None = None) -> str:
         h.append("</table></div></details></article>")
 
     h.append(_rest(result))
+    from ..report import quiet_admin_card
+    h.append(quiet_admin_card(result))
     h.append("<h2>탐지 규칙별 집계</h2><div class=tablewrap><table>"
              "<tr><th>규칙</th><th>설명</th><th>탐지</th><th>이벤트</th></tr>")
     for rid, c in result["rule_counts"].items():
