@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-20T17:40:09Z",
+ "generated_at": "2026-11-21T08:28:18Z",
  "files": [
   {
    "file": "samples/combined/alb.log",
@@ -217,7 +217,7 @@
     ],
     "verdict": "attack",
     "confidence": "high",
-    "reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건."
+    "reason": "GuardDuty: SSH 비밀번호 대입 공격, SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건."
    },
    {
     "id": "INC-002",
@@ -342,7 +342,7 @@
     ],
     "verdict": "attack",
     "confidence": "high",
-    "reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건."
+    "reason": "GuardDuty: SSH 비밀번호 대입 공격, SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건."
    },
    {
     "id": "INC-002",
@@ -501,7 +501,7 @@
       "rule": "GD_FINDING",
       "technique": "T1110",
       "stage": "credential-access",
-      "title": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입)",
+      "title": "GuardDuty: SSH 비밀번호 대입 공격",
       "severity": "medium",
       "detail": "UnauthorizedAccess:EC2/SSHBruteForce (심각도 5.0, 60회)",
       "key": "203.0.113.9",
@@ -625,7 +625,7 @@
       "rule": "GD_FINDING",
       "technique": "T1552.005",
       "stage": "credential-access",
-      "title": "GuardDuty: 인스턴스 역할 자격증명이 인스턴스 밖에서 사용",
+      "title": "GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임",
       "severity": "high",
       "detail": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 14회)",
       "key": "203.0.113.9",
@@ -693,7 +693,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 22,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eni-0abc"
      },
      {
       "ref": "alb.log:2",
@@ -994,14 +995,14 @@
         "Resource": "*",
         "Condition": {
          "DateLessThan": {
-          "aws:TokenIssueTime": "2026-11-20T17:40:09Z"
+          "aws:TokenIssueTime": "2026-11-21T08:28:18Z"
          }
         }
        }
       ]
      },
      "cli": [
-      "# 위 proposed를 policy.json으로 저장(aws:TokenIssueTime=2026-11-20T17:40:09Z=지금 UTC, 그 이전 발급 세션만 거부)",
+      "# 위 proposed를 policy.json으로 저장(aws:TokenIssueTime=2026-11-21T08:28:18Z=지금 UTC, 그 이전 발급 세션만 거부)",
       "aws iam put-role-policy --role-name ec2-app-role --policy-name AWSRevokeOlderSessions --policy-document file://policy.json",
       "# 같은 역할을 쓰는 정상 앱도 잠깐 끊긴다(인스턴스 프로필이 남아 있으면 재시작 때 새 자격증명을 받는다).",
       "# 다음 할 일(복구): 새 역할로 인스턴스 프로필을 교체(스왑)한 뒤, 확인되면 이 거부 정책을 뗀다."
@@ -1104,7 +1105,10 @@
       "cloudtrail.json:3"
      ],
      "current": {
-      "entries": 1
+      "entries": 1,
+      "subnets": [
+       "subnet-0a1"
+      ]
      },
      "proposed": {
       "deny": [
@@ -1114,7 +1118,7 @@
      "cli": [
       "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.9/32"
      ],
-     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해 첫 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
+     "caution": "NACL 규칙 수에는 한도(기본 20개)가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해, 계정에 하나뿐인 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
      "rollback": [
       "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
      ]
@@ -1137,17 +1141,17 @@
     }
    ],
    "report": {
-    "summary": "외부 공격으로 보입니다. 01-13 04:10~04:30 UTC(한국 13:10~13:30), 출발지 203.0.113.9: GuardDuty: SSH 비밀번호 연속 실패(무차별 대입) → SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW) → 취약점 스캐너·자동 도구 탐지 → 외부에서 관리 포트(22/3389) 접속 허용. 공격이 성공한 근거가 3건 있어 피해 범위를 확인해야 합니다(결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건). 먼저 할 일: 역할 ec2-app-role의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)(아래 수정안).",
+    "summary": "외부 공격으로 보입니다. 01-13 04:10~04:30 UTC(한국 13:10~13:30), 출발지 203.0.113.9: GuardDuty: SSH 비밀번호 대입 공격 → SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW) → 취약점 스캐너·자동 도구 탐지 → 외부에서 관리 포트(22/3389) 접속 허용. 공격이 성공한 근거가 3건 있어 피해 범위를 확인해야 합니다(결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건). 먼저 할 일: 역할 ec2-app-role의 탈취된 세션 무효화(이전에 발급된 임시 자격증명 차단)(아래 수정안).",
     "severity": "high",
     "confidence": "high",
     "verdict": "attack",
-    "verdict_reason": "GuardDuty: SSH 비밀번호 연속 실패(무차별 대입), SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건.",
+    "verdict_reason": "GuardDuty: SSH 비밀번호 대입 공격, SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW), 취약점 스캐너·자동 도구 탐지. 결과: 성공 3건, 통과 1건, 허용 1건, 실패·차단 4건.",
     "attack_flow": [
      {
       "stage": "credential-access",
       "technique": "T1110",
       "time": "2026-01-13T04:10:00+00:00",
-      "what": "GuardDuty 탐지: SSH 비밀번호 연속 실패(무차별 대입) (UnauthorizedAccess:EC2/SSHBruteForce (심각도 5.0, 60회)).",
+      "what": "GuardDuty 탐지: SSH 비밀번호 대입 공격 (UnauthorizedAccess:EC2/SSHBruteForce (심각도 5.0, 60회)). 누군가 서버의 SSH에 비밀번호를 계속 바꿔 넣고 있습니다. 결국 들어왔는지는 서버의 auth.log에만 남습니다.",
       "evidence": [
        "guardduty_findings.json:2"
       ]
@@ -1223,7 +1227,7 @@
       "stage": "credential-access",
       "technique": "T1552.005",
       "time": "2026-01-13T04:30:00+00:00",
-      "what": "GuardDuty 탐지: 인스턴스 역할 자격증명이 인스턴스 밖에서 사용 (UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 14회)).",
+      "what": "GuardDuty 탐지: 서버 역할 키가 AWS 밖에서 쓰임 (UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 14회)). 서버에만 있어야 할 임시 키가 인터넷의 다른 컴퓨터에서 쓰였습니다. 웹 취약점(SSRF 등)으로 키가 새었을 가능성이 큽니다.",
       "evidence": [
        "guardduty_findings.json:1"
       ]
@@ -1372,7 +1376,7 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 11825,
+    "payload_chars": 11836,
     "validation": {
      "evidence_total": 41,
      "evidence_invalid": 0,
@@ -1576,7 +1580,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 21,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:2",
@@ -1593,7 +1598,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 22,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:3",
@@ -1609,7 +1615,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 23,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:4",
@@ -1625,7 +1632,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 25,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:5",
@@ -1641,7 +1649,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 53,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:6",
@@ -1657,7 +1666,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 80,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:7",
@@ -1673,7 +1683,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 110,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:8",
@@ -1689,7 +1700,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 135,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:9",
@@ -1705,7 +1717,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 139,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:10",
@@ -1721,7 +1734,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 143,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:11",
@@ -1737,7 +1751,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 443,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:12",
@@ -1753,7 +1768,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 445,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:13",
@@ -1769,7 +1785,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 993,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:14",
@@ -1785,7 +1802,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 1433,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:15",
@@ -1801,7 +1819,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 3306,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:16",
@@ -1817,7 +1836,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 3389,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:17",
@@ -1833,7 +1853,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 5432,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:18",
@@ -1849,7 +1870,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 6379,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:19",
@@ -1865,7 +1887,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 8080,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "hostfw_kern.log:20",
@@ -1881,7 +1904,8 @@
       ],
       "dst_ip": "10.0.1.10",
       "dst_port": 9200,
-      "target_instance": "i-0abc123def456"
+      "target_instance": "i-0abc123def456",
+      "interface": "eth0"
      },
      {
       "ref": "nginx_access.log:1",
@@ -1896,7 +1920,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:2",
@@ -1912,7 +1938,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:3",
@@ -1927,7 +1955,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:4",
@@ -1942,7 +1972,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:5",
@@ -1957,7 +1989,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:6",
@@ -1973,7 +2007,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:7",
@@ -1989,7 +2025,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:8",
@@ -2004,7 +2042,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:9",
@@ -2019,7 +2059,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:10",
@@ -2034,7 +2076,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:11",
@@ -2049,7 +2093,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:12",
@@ -2064,7 +2110,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:13",
@@ -2079,7 +2127,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:14",
@@ -2094,7 +2144,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:15",
@@ -2109,7 +2161,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:16",
@@ -2124,7 +2178,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:17",
@@ -2139,7 +2195,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:18",
@@ -2154,7 +2212,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:19",
@@ -2169,7 +2229,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:20",
@@ -2184,7 +2246,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:21",
@@ -2199,7 +2263,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:22",
@@ -2214,7 +2280,9 @@
        "WEBLOG_ENUM_404"
       ],
       "ua": "Mozilla/5.0 (scanner)",
-      "http_status": 404
+      "http_status": 404,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:23",
@@ -2229,7 +2297,9 @@
        "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
-      "http_status": 200
+      "http_status": 200,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:24",
@@ -2246,7 +2316,9 @@
        "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
-      "http_status": 500
+      "http_status": 500,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:25",
@@ -2262,7 +2334,9 @@
        "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
-      "http_status": 200
+      "http_status": 200,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:26",
@@ -2278,7 +2352,9 @@
        "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
-      "http_status": 200
+      "http_status": 200,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      },
      {
       "ref": "nginx_access.log:27",
@@ -2294,7 +2370,9 @@
        "WEBLOG_SCANNER"
       ],
       "ua": "sqlmap/1.8",
-      "http_status": 200
+      "http_status": 200,
+      "target_instance": "i-0abc123def456",
+      "target_inferred": "같은 IP의 VPC Flow 기록"
      }
     ],
     "omitted_events": 0,
@@ -2375,7 +2453,10 @@
       "hostfw_kern.log:10"
      ],
      "current": {
-      "entries": 1
+      "entries": 1,
+      "subnets": [
+       "subnet-0a1"
+      ]
      },
      "proposed": {
       "deny": [
@@ -2385,7 +2466,7 @@
      "cli": [
       "aws ec2 create-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50 --protocol -1 --rule-action deny --cidr-block 203.0.113.50/32"
      ],
-     "caution": "NACL 규칙 수에는 한도가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해 첫 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
+     "caution": "NACL 규칙 수에는 한도(기본 20개)가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해, 계정에 하나뿐인 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
      "rollback": [
       "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
      ]
@@ -2570,7 +2651,7 @@
    "meta": {
     "mode": "rules",
     "model": null,
-    "payload_chars": 21194,
+    "payload_chars": 23747,
     "validation": {
      "evidence_total": 46,
      "evidence_invalid": 0,
@@ -2689,8 +2770,8 @@
   }
  ],
  "timing": {
-  "detect_correlate_s": 0.02,
-  "total_s": 0.02
+  "detect_correlate_s": 0.01,
+  "total_s": 0.01
  },
  "has_environment": true,
  "team": {
@@ -2700,6 +2781,6 @@
  },
  "excluded_activity": [],
  "assumptions": [
-  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 올해(미래면 작년)로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2026로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요."
  ]
 }

@@ -220,7 +220,8 @@ def rule_based(incident: dict, checks: list[dict], verdict: dict | None = None) 
     unknowns = []
     if v == "attack":
         unknowns.append("규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.")
-        if not any(e.get("status") == "success" for e in incident["events"]):
+        if not any(e.get("status") == "success" for e in incident["events"]) and \
+                any(e.get("status") == "failure" or e.get("disposition") == "blocked" for e in incident["events"]):
             unknowns.append("보이는 시도는 모두 실패·차단이지만, 로그가 없는 다른 경로로 성공했는지는 알 수 없습니다.")
     elif v == "unclear":
         unknowns.append(verdict["reason"])

@@ -1,0 +1,163 @@
+{
+ "Findings": [
+  {
+   "SchemaVersion": "2.0",
+   "AccountId": "123456789012",
+   "Region": "ap-northeast-2",
+   "Id": "gd-sample-01",
+   "Type": "Recon:EC2/PortProbeUnprotectedPort",
+   "Title": "(sample) Recon:EC2/PortProbeUnprotectedPort",
+   "Severity": 2.0,
+   "CreatedAt": "2026-11-18T02:07:00Z",
+   "UpdatedAt": "2026-11-18T02:07:00Z",
+   "Resource": {
+    "ResourceType": "Instance",
+    "InstanceDetails": {
+     "InstanceId": "i-0shop0web0001"
+    }
+   },
+   "Service": {
+    "ServiceName": "guardduty",
+    "Count": 3,
+    "EventFirstSeen": "2026-11-18T02:07:00Z",
+    "EventLastSeen": "2026-11-18T02:07:00Z",
+    "Action": {
+     "ActionType": "PORT_PROBE",
+     "PortProbeAction": {
+      "PortProbeDetails": [
+       {
+        "LocalPortDetails": {
+         "Port": 22
+        },
+        "RemoteIpDetails": {
+         "IpAddressV4": "198.51.100.23"
+        }
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "SchemaVersion": "2.0",
+   "AccountId": "123456789012",
+   "Region": "ap-northeast-2",
+   "Id": "gd-sample-02",
+   "Type": "UnauthorizedAccess:EC2/MetadataDNSRebind",
+   "Title": "(sample) UnauthorizedAccess:EC2/MetadataDNSRebind",
+   "Severity": 8.0,
+   "CreatedAt": "2026-11-18T02:14:00Z",
+   "UpdatedAt": "2026-11-18T02:14:00Z",
+   "Resource": {
+    "ResourceType": "Instance",
+    "InstanceDetails": {
+     "InstanceId": "i-0shop0web0001"
+    }
+   },
+   "Service": {
+    "ServiceName": "guardduty",
+    "Count": 3,
+    "EventFirstSeen": "2026-11-18T02:14:00Z",
+    "EventLastSeen": "2026-11-18T02:14:00Z",
+    "Action": {}
+   }
+  },
+  {
+   "SchemaVersion": "2.0",
+   "AccountId": "123456789012",
+   "Region": "ap-northeast-2",
+   "Id": "gd-sample-03",
+   "Type": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+   "Title": "(sample) UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+   "Severity": 8.0,
+   "CreatedAt": "2026-11-18T02:21:00Z",
+   "UpdatedAt": "2026-11-18T02:21:00Z",
+   "Resource": {
+    "ResourceType": "AccessKey",
+    "AccessKeyDetails": {
+     "AccessKeyId": "ASIAZ3EXAMPLEKEY0001",
+     "PrincipalId": "AROASAMPLE:i-0shop0web0001",
+     "UserName": "shop-web-role",
+     "UserType": "AssumedRole"
+    }
+   },
+   "Service": {
+    "ServiceName": "guardduty",
+    "Count": 3,
+    "EventFirstSeen": "2026-11-18T02:21:00Z",
+    "EventLastSeen": "2026-11-18T02:21:00Z",
+    "Action": {
+     "ActionType": "AWS_API_CALL",
+     "AwsApiCallAction": {
+      "Api": "ListBuckets",
+      "RemoteIpDetails": {
+       "IpAddressV4": "198.51.100.23"
+      }
+     }
+    }
+   }
+  },
+  {
+   "SchemaVersion": "2.0",
+   "AccountId": "123456789012",
+   "Region": "ap-northeast-2",
+   "Id": "gd-sample-04",
+   "Type": "Exfiltration:S3/AnomalousBehavior",
+   "Title": "(sample) Exfiltration:S3/AnomalousBehavior",
+   "Severity": 8.0,
+   "CreatedAt": "2026-11-18T02:28:00Z",
+   "UpdatedAt": "2026-11-18T02:28:00Z",
+   "Resource": {
+    "ResourceType": "S3Bucket",
+    "AccessKeyDetails": {
+     "AccessKeyId": "ASIAZ3EXAMPLEKEY0001",
+     "UserName": "shop-web-role"
+    },
+    "S3BucketDetails": [
+     {
+      "Name": "shop-customer-orders"
+     }
+    ]
+   },
+   "Service": {
+    "ServiceName": "guardduty",
+    "Count": 3,
+    "EventFirstSeen": "2026-11-18T02:28:00Z",
+    "EventLastSeen": "2026-11-18T02:28:00Z",
+    "Action": {
+     "ActionType": "AWS_API_CALL",
+     "AwsApiCallAction": {
+      "Api": "GetObject",
+      "RemoteIpDetails": {
+       "IpAddressV4": "198.51.100.23"
+      }
+     }
+    }
+   }
+  },
+  {
+   "SchemaVersion": "2.0",
+   "AccountId": "123456789012",
+   "Region": "ap-northeast-2",
+   "Id": "gd-sample-05",
+   "Type": "Execution:Runtime/ReverseShell",
+   "Title": "(sample) Execution:Runtime/ReverseShell",
+   "Severity": 8.0,
+   "CreatedAt": "2026-11-18T02:35:00Z",
+   "UpdatedAt": "2026-11-18T02:35:00Z",
+   "Resource": {
+    "ResourceType": "Instance",
+    "InstanceDetails": {
+     "InstanceId": "i-0shop0web0001"
+    }
+   },
+   "Service": {
+    "ServiceName": "guardduty",
+    "Count": 3,
+    "EventFirstSeen": "2026-11-18T02:35:00Z",
+    "EventLastSeen": "2026-11-18T02:35:00Z",
+    "Action": {}
+   }
+  }
+ ]
+}

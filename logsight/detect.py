@@ -674,10 +674,12 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         sev_n = e.extra.get("gd_severity", 0)
         sev = "high" if sev_n >= 7 else "medium" if sev_n >= 4 else "low"
         alias = [r for r in e.extra.get("gd_alias") or [] if r in RULES]
-        if alias:  # 같은 의미의 LogFinder 규칙이 있으면 그 단계·기법·한국어 이름을 쓴다
-            tech, stage, name, _ = RULES[alias[0]]
+        from .gd_types import describe  # 제목은 GuardDuty 유형을 풀어 쓴 한국어(규칙 이름의 '허용' 등과 섞이지 않게)
+        name = describe(typ)["title"]
+        if alias:  # 같은 의미의 LogFinder 규칙이 있으면 그 단계·기법을 쓴다
+            tech, stage, _, _ = RULES[alias[0]]
         else:
-            tech, stage, name = "", GD_STAGE.get(typ.split(":")[0], "other"), e.extra.get("gd_title") or typ
+            tech, stage = "", GD_STAGE.get(typ.split(":")[0], "other")
         findings.append(Finding("GD_FINDING", [e], f"{typ} (심각도 {sev_n}, {e.extra.get('gd_count') or 1}회)",
                                 e.src_ip or e.instance_id or e.actor or "",
                                 override={"stage": stage, "severity": sev, "technique": tech,

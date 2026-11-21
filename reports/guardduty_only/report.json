@@ -1,0 +1,505 @@
+{
+ "generated_at": "2026-11-21T08:33:43Z",
+ "files": [
+  {
+   "file": "samples/guardduty_only/guardduty_findings.json",
+   "kind": "guardduty",
+   "events": 5
+  }
+ ],
+ "n_events": 5,
+ "events_by_source": {
+  "guardduty": 5
+ },
+ "n_flagged": 5,
+ "n_findings": 5,
+ "rule_counts": {
+  "GD_FINDING": {
+   "findings": 5,
+   "events": 5
+  }
+ },
+ "n_incidents": 1,
+ "n_groups": 1,
+ "n_patterns": 1,
+ "severity_counts": {
+  "high": 1,
+  "medium": 0,
+  "low": 0
+ },
+ "incident_index": [
+  {
+   "id": "INC-001",
+   "start": "2026-11-18T02:07:00+00:00",
+   "end": "2026-11-18T02:35:00+00:00",
+   "severity": "high",
+   "score": 395,
+   "stages": [
+    "initial-access",
+    "credential-access",
+    "collection",
+    "impact"
+   ],
+   "src_ips": [
+    "198.51.100.23"
+   ],
+   "n_events": 5,
+   "repeats": 1,
+   "first_seen": "2026-11-18T02:07:00+00:00",
+   "last_seen": "2026-11-18T02:35:00+00:00",
+   "rules": [
+    "GD_FINDING"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  }
+ ],
+ "triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "guardduty_findings.json:1",
+     "guardduty_findings.json:2",
+     "guardduty_findings.json:3",
+     "guardduty_findings.json:4",
+     "guardduty_findings.json:5"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "GuardDuty: 열린 포트를 외부에서 두드림, GuardDuty: 서버 역할 키를 노린 요청, GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임. GuardDuty가 탐지한 일입니다. GuardDuty 결과에는 성공·실패가 적혀 있지 않아, 실제로 무엇을 했는지는 같은 시각의 CloudTrail·웹·서버 로그로 확인해야 합니다."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "CloudTrail 로그가 없어 AWS 계정에서 누가 어떤 API를 썼는지 알 수 없습니다.",
+   "VPC Flow 로그가 없어 어느 IP가 서버에 접속했고 데이터가 밖으로 나갔는지 알 수 없습니다.",
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지 알 수 없습니다.",
+   "ALB 로그가 없어 웹 요청이 어떤 응답을 받았는지 알 수 없습니다.",
+   "SSH 인증 로그가 없어 누가 서버에 로그인했는지 알 수 없습니다.",
+   "INC-001의 활동이 로그가 끝나는 무렵(11-18 02:35 UTC(한국 11:35))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "guardduty": {
+     "n_events": 5,
+     "first": "2026-11-18T02:07:00+00:00",
+     "last": "2026-11-18T02:35:00+00:00"
+    }
+   },
+   "missing_sources": [
+    "cloudtrail",
+    "vpcflow",
+    "waf",
+    "alb",
+    "sshauth"
+   ],
+   "cloudtrail_s3_object_calls": 0,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "rule_triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "guardduty_findings.json:1",
+     "guardduty_findings.json:2",
+     "guardduty_findings.json:3",
+     "guardduty_findings.json:4",
+     "guardduty_findings.json:5"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "GuardDuty: 열린 포트를 외부에서 두드림, GuardDuty: 서버 역할 키를 노린 요청, GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임. GuardDuty가 탐지한 일입니다. GuardDuty 결과에는 성공·실패가 적혀 있지 않아, 실제로 무엇을 했는지는 같은 시각의 CloudTrail·웹·서버 로그로 확인해야 합니다."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "CloudTrail 로그가 없어 AWS 계정에서 누가 어떤 API를 썼는지 알 수 없습니다.",
+   "VPC Flow 로그가 없어 어느 IP가 서버에 접속했고 데이터가 밖으로 나갔는지 알 수 없습니다.",
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지 알 수 없습니다.",
+   "ALB 로그가 없어 웹 요청이 어떤 응답을 받았는지 알 수 없습니다.",
+   "SSH 인증 로그가 없어 누가 서버에 로그인했는지 알 수 없습니다.",
+   "INC-001의 활동이 로그가 끝나는 무렵(11-18 02:35 UTC(한국 11:35))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "guardduty": {
+     "n_events": 5,
+     "first": "2026-11-18T02:07:00+00:00",
+     "last": "2026-11-18T02:35:00+00:00"
+    }
+   },
+   "missing_sources": [
+    "cloudtrail",
+    "vpcflow",
+    "waf",
+    "alb",
+    "sshauth"
+   ],
+   "cloudtrail_s3_object_calls": 0,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "n_known": 0,
+ "explain_mode": {
+  "report": "rules",
+  "models": [],
+  "triage": "rules",
+  "triage_model": null,
+  "ai_errors": []
+ },
+ "results": [
+  {
+   "incident": {
+    "start": "2026-11-18T02:07:00+00:00",
+    "end": "2026-11-18T02:35:00+00:00",
+    "severity": "high",
+    "score": 395,
+    "stages": [
+     "initial-access",
+     "credential-access",
+     "collection",
+     "impact"
+    ],
+    "src_ips": [
+     "198.51.100.23"
+    ],
+    "instances": [
+     "i-0shop0web0001"
+    ],
+    "actors": [
+     "shop-web-role"
+    ],
+    "sources": [
+     "guardduty"
+    ],
+    "n_events": 5,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "GD_FINDING",
+      "technique": "T1133",
+      "stage": "initial-access",
+      "title": "GuardDuty: 열린 포트를 외부에서 두드림",
+      "severity": "low",
+      "detail": "Recon:EC2/PortProbeUnprotectedPort (심각도 2.0, 3회)",
+      "key": "198.51.100.23",
+      "first": "2026-11-18T02:07:00+00:00",
+      "last": "2026-11-18T02:07:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:1"
+      ]
+     },
+     {
+      "rule": "GD_FINDING",
+      "technique": "GuardDuty",
+      "stage": "initial-access",
+      "title": "GuardDuty: 서버 역할 키를 노린 요청",
+      "severity": "high",
+      "detail": "UnauthorizedAccess:EC2/MetadataDNSRebind (심각도 8.0, 3회)",
+      "key": "i-0shop0web0001",
+      "first": "2026-11-18T02:14:00+00:00",
+      "last": "2026-11-18T02:14:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:2"
+      ]
+     },
+     {
+      "rule": "GD_FINDING",
+      "technique": "T1552.005",
+      "stage": "credential-access",
+      "title": "GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임",
+      "severity": "high",
+      "detail": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 3회)",
+      "key": "198.51.100.23",
+      "first": "2026-11-18T02:21:00+00:00",
+      "last": "2026-11-18T02:21:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:3"
+      ]
+     },
+     {
+      "rule": "GD_FINDING",
+      "technique": "T1530",
+      "stage": "collection",
+      "title": "GuardDuty: S3 데이터가 평소와 다르게 빠져나감",
+      "severity": "high",
+      "detail": "Exfiltration:S3/AnomalousBehavior (심각도 8.0, 3회)",
+      "key": "198.51.100.23",
+      "first": "2026-11-18T02:28:00+00:00",
+      "last": "2026-11-18T02:28:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:4"
+      ]
+     },
+     {
+      "rule": "GD_FINDING",
+      "technique": "GuardDuty",
+      "stage": "impact",
+      "title": "GuardDuty: 공격자에게 셸이 열림",
+      "severity": "high",
+      "detail": "Execution:Runtime/ReverseShell (심각도 8.0, 3회)",
+      "key": "i-0shop0web0001",
+      "first": "2026-11-18T02:35:00+00:00",
+      "last": "2026-11-18T02:35:00+00:00",
+      "n_events": 1,
+      "evidence": [
+       "guardduty_findings.json:5"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "guardduty_findings.json:1",
+      "ts": "2026-11-18T02:07:00+00:00",
+      "source": "guardduty",
+      "action": "Recon:EC2/PortProbeUnprotectedPort",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "GD_FINDING"
+      ],
+      "dst_port": 22,
+      "instance_id": "i-0shop0web0001",
+      "gd_type": "Recon:EC2/PortProbeUnprotectedPort",
+      "gd_title": "(sample) Recon:EC2/PortProbeUnprotectedPort",
+      "gd_severity": 2.0,
+      "gd_alias": [
+       "VPC_REMOTE_ADMIN_EXPOSED"
+      ],
+      "gd_count": 3,
+      "gd_last_seen": "2026-11-18T02:07:00Z"
+     },
+     {
+      "ref": "guardduty_findings.json:2",
+      "ts": "2026-11-18T02:14:00+00:00",
+      "source": "guardduty",
+      "action": "UnauthorizedAccess:EC2/MetadataDNSRebind",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": null,
+      "rules": [
+       "GD_FINDING"
+      ],
+      "instance_id": "i-0shop0web0001",
+      "gd_type": "UnauthorizedAccess:EC2/MetadataDNSRebind",
+      "gd_title": "(sample) UnauthorizedAccess:EC2/MetadataDNSRebind",
+      "gd_severity": 8.0,
+      "gd_count": 3,
+      "gd_last_seen": "2026-11-18T02:14:00Z"
+     },
+     {
+      "ref": "guardduty_findings.json:3",
+      "ts": "2026-11-18T02:21:00+00:00",
+      "source": "guardduty",
+      "action": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "GD_FINDING"
+      ],
+      "actor": "shop-web-role",
+      "access_key": "ASIAZ3EX********0001",
+      "gd_type": "UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+      "gd_title": "(sample) UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS",
+      "gd_severity": 8.0,
+      "gd_alias": [
+       "CT_INSTANCE_CRED_OUTSIDE"
+      ],
+      "gd_count": 3,
+      "gd_last_seen": "2026-11-18T02:21:00Z"
+     },
+     {
+      "ref": "guardduty_findings.json:4",
+      "ts": "2026-11-18T02:28:00+00:00",
+      "source": "guardduty",
+      "action": "Exfiltration:S3/AnomalousBehavior",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": "198.51.100.23",
+      "rules": [
+       "GD_FINDING"
+      ],
+      "actor": "shop-web-role",
+      "access_key": "ASIAZ3EX********0001",
+      "gd_type": "Exfiltration:S3/AnomalousBehavior",
+      "gd_title": "(sample) Exfiltration:S3/AnomalousBehavior",
+      "gd_severity": 8.0,
+      "gd_alias": [
+       "CT_S3_BULK_READ"
+      ],
+      "gd_target": "버킷 shop-customer-orders",
+      "gd_count": 3,
+      "gd_last_seen": "2026-11-18T02:28:00Z"
+     },
+     {
+      "ref": "guardduty_findings.json:5",
+      "ts": "2026-11-18T02:35:00+00:00",
+      "source": "guardduty",
+      "action": "Execution:Runtime/ReverseShell",
+      "outcome": "detected",
+      "status": "unknown",
+      "disposition": "detected",
+      "src_ip": null,
+      "rules": [
+       "GD_FINDING"
+      ],
+      "instance_id": "i-0shop0web0001",
+      "gd_type": "Execution:Runtime/ReverseShell",
+      "gd_title": "(sample) Execution:Runtime/ReverseShell",
+      "gd_severity": 8.0,
+      "gd_count": 3,
+      "gd_last_seen": "2026-11-18T02:35:00Z"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-001",
+    "repeats": 1,
+    "first_seen": "2026-11-18T02:07:00+00:00",
+    "last_seen": "2026-11-18T02:35:00+00:00",
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
+   },
+   "checks": [],
+   "report": {
+    "summary": "외부 공격 시도로 보입니다. 11-18 02:07~02:35 UTC(한국 11:07~11:35), 출발지 198.51.100.23: GuardDuty: 열린 포트를 외부에서 두드림 → GuardDuty: 서버 역할 키를 노린 요청 → GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임 → GuardDuty: S3 데이터가 평소와 다르게 빠져나감.",
+    "severity": "high",
+    "confidence": "medium",
+    "verdict": "attack",
+    "verdict_reason": "GuardDuty: 열린 포트를 외부에서 두드림, GuardDuty: 서버 역할 키를 노린 요청, GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임. GuardDuty가 탐지한 일입니다. GuardDuty 결과에는 성공·실패가 적혀 있지 않아, 실제로 무엇을 했는지는 같은 시각의 CloudTrail·웹·서버 로그로 확인해야 합니다.",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1133",
+      "time": "2026-11-18T02:07:00+00:00",
+      "what": "GuardDuty 탐지: 열린 포트를 외부에서 두드림 (Recon:EC2/PortProbeUnprotectedPort (심각도 2.0, 3회)). 인터넷에서 이 서버의 열린 포트에 접속을 시도하고 있습니다. 공격 전에 흔히 보이는 일입니다.",
+      "evidence": [
+       "guardduty_findings.json:1"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "GuardDuty",
+      "time": "2026-11-18T02:14:00+00:00",
+      "what": "GuardDuty 탐지: 서버 역할 키를 노린 요청 (UnauthorizedAccess:EC2/MetadataDNSRebind (심각도 8.0, 3회)). 서버의 메타데이터 주소(역할 키가 있는 곳)를 DNS로 우회해 부르려는 요청이 있었습니다. 웹 취약점으로 키를 빼내려는 시도입니다.",
+      "evidence": [
+       "guardduty_findings.json:2"
+      ]
+     },
+     {
+      "stage": "credential-access",
+      "technique": "T1552.005",
+      "time": "2026-11-18T02:21:00+00:00",
+      "what": "GuardDuty 탐지: 서버 역할 키가 AWS 밖에서 쓰임 (UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 3회)). 서버에만 있어야 할 임시 키가 인터넷의 다른 컴퓨터에서 쓰였습니다. 웹 취약점(SSRF 등)으로 키가 새었을 가능성이 큽니다.",
+      "evidence": [
+       "guardduty_findings.json:3"
+      ]
+     },
+     {
+      "stage": "collection",
+      "technique": "T1530",
+      "time": "2026-11-18T02:28:00+00:00",
+      "what": "GuardDuty 탐지: S3 데이터가 평소와 다르게 빠져나감 (Exfiltration:S3/AnomalousBehavior (심각도 8.0, 3회)). 평소와 다른 주체·위치에서 S3 객체를 많이 읽었습니다. 데이터 유출일 수 있습니다. 대상: 버킷 shop-customer-orders.",
+      "evidence": [
+       "guardduty_findings.json:4"
+      ]
+     },
+     {
+      "stage": "impact",
+      "technique": "GuardDuty",
+      "time": "2026-11-18T02:35:00+00:00",
+      "what": "GuardDuty 탐지: 공격자에게 셸이 열림 (Execution:Runtime/ReverseShell (심각도 8.0, 3회)). 서버의 프로그램이 공격자 쪽으로 명령 창(셸)을 열어 주었습니다. 공격자가 서버를 조작할 수 있는 상태입니다.",
+      "evidence": [
+       "guardduty_findings.json:5"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "firewall_changes": [],
+    "unknowns": [
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 5080,
+    "validation": {
+     "evidence_total": 5,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "ai_new_changes": [],
+     "passed": true
+    }
+   }
+  }
+ ],
+ "timing": {
+  "detect_correlate_s": 0.0,
+  "total_s": 0.0
+ },
+ "has_environment": false,
+ "team": {
+  "proposed": [],
+  "confirmed": [],
+  "excluded": []
+ },
+ "excluded_activity": [],
+ "assumptions": [
+  "설정 스냅샷(environment.json)이 없어 방화벽 수정안을 만들지 않았습니다. python -m logsight collect environment로 만들 수 있습니다."
+ ]
+}

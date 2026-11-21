@@ -5,6 +5,7 @@
 ## 미출시
 
 ### 추가
+- GuardDuty 결과 해석(사양서 FR-34, `docs/GuardDuty_해석.md`): 활성 유형 211종 모두 한국어 제목·한 줄 풀이·먼저 할 일(`logsight/gd_types.py`, 유형별 문장 72 + 낱말 조합 139). 설정 스냅샷 없이 GuardDuty 결과만 넣어도 키(가린 형식)·역할·서버·버킷 이름과 함께 먼저 할 일을 낸다. 같은 일을 하는 설정 수정안이 있으면 겹쳐 내지 않는다. `scripts/gd_coverage.py`로 유형 범위를 잰다(목록 `samples/guardduty/finding_types.tsv`). 예시 `samples/guardduty_only`(합성).
 - 서브넷·VPC가 많은 계정 대응(`docs/서브넷_많은_환경_점검.md`): 수집에 VPC 대역·서브넷(퍼블릭 여부)·네트워크 인터페이스(ENI)·인스턴스 VPC를 더하고 모두 페이지를 넘겨 읽는다. VPC Flow의 ENI로 대상·출발지 서버를 찾아 VPC끼리 같은 사설 대역을 써도 맞는 서버를 고른다.
 - 내부 확산 엮기: 우리 서버에서 다른 서버로 공격이 나가면 그 서버를 노린 직전 공격(6시간 안, 심각도 높음)과 한 사건으로 잇고, 그 서버 격리 수정안(`ISOLATE_COMPROMISED_SERVER`, 되돌리기 포함)을 낸다. 퍼블릭/프라이빗 서브넷을 설명에 적는다.
 - `logsight/netaddr.py`: 사내 IP 판단을 한 곳으로(RFC 1918·100.64/10·IPv6 ULA + 설정의 VPC 대역). `scripts/scale/`: 서브넷 수천 개 합성 측정.
@@ -38,6 +39,7 @@
 - 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
 
 ### 고침
+- GuardDuty 결과만 있는 사건을 '보이는 시도 0건은 모두 막히거나 실패, 급하지 않을 수 있습니다'로 적던 것: GuardDuty 결과에는 성공 여부가 없으므로 다른 로그로 확인하라고 적는다(심각도 7 이상이면 확신도 중간). 한 사건에 GuardDuty 결과가 여럿이면 단계마다 첫 결과의 풀이가 반복되던 것도 고침.
 - 정상 웹 요청 오탐 줄이기(사양서 S7): 백업 파일 노출은 내려받는 요청(GET·POST)만 보고 WebDAV PUT·PROPFIND·DELETE는 뺀다. 내부망 IP의 관리자 접근은 같은 IP의 다른 공격 신호 앞뒤 1시간 안의 것만 알린다(관리자 접근 요청 자체의 신호는 빼고 셈). AIT fox 0.136% → 0.029%, wheeler 0.065% → 0.021%, 재현율 그대로(둘 다 개발 점수, `docs/공개데이터셋_독립측정.md` 2-2).
 - 웹셸 접근(`WEBLOG_WEBSHELL_ACCESS`): 숫자만 있는 명령 인자 값(`c=0`, `run=1`)은 명령으로 보지 않는다. WordPress 관리 화면의 `load-scripts.php?c=0`·`load-styles.php?c=0`이 걸리던 오탐이다.
 - 원격 파일 포함(`WEBLOG_RFI`): 인자 값의 주소가 우리 사이트 이름(`own_hosts`)이면 뺀다. `/wp-login.php?redirect_to=https://우리사이트/wp-admin/` 같은 정상 이동이 걸리던 오탐이다. localhost·루프백·내부망 IP는 우리 것이어도 SSRF 표적이라 계속 잡는다.

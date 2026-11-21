@@ -1,0 +1,158 @@
+<!doctype html><html lang=ko><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>LogFinder 분석 보고서</title><style>:root{--paper:#fbfaf7;--desk:#e8e6e1;--card:#fbfaf7;--fg:#1a1a1a;--muted:#5a5852;--faint:#737067;
+--line:#d4d1c9;--rule:#1a1a1a;--soft:#f1efe9;--accent:#1f3a5f;--accent-soft:#e6ebf1;
+--high:#a4161a;--high-soft:#f6e6e4;--medium:#8a5a00;--medium-soft:#f5ecd9;--low:#2d5f3a;--low-soft:#e5eee6;
+--gray:#6b6860;--gray-soft:#ecebe6;--code:#f1efe9;--shadow:none;
+--serif:"Noto Serif KR","Nanum Myeongjo","AppleMyungjo","Batang","바탕",serif;
+--sans:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+--mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--desk);color:var(--fg);
+font:14.5px/1.75 var(--sans);-webkit-font-smoothing:antialiased}a{color:var(--accent)}
+.shell{max-width:1180px;margin:0 auto;padding:28px 16px 48px;display:grid;grid-template-columns:1fr;gap:28px}
+@media (min-width:1080px){.shell{grid-template-columns:200px minmax(0,1fr)}}
+.shell>main{min-width:0;background:var(--paper);border:1px solid #d2cfc7;padding:0 56px 40px;counter-reset:sec}
+@media (max-width:700px){.shell>main{padding:0 18px 32px}}
+header.top{padding:40px 0 0}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:var(--muted);
+border-top:3px solid var(--rule);border-bottom:1px solid var(--rule);padding:8px 0}
+.brand b{color:var(--fg)}.brand .cls{border:1.5px solid var(--high);color:var(--high);font-weight:700;padding:0 8px;letter-spacing:.12em;font-size:11px;white-space:nowrap}
+h1{font-family:var(--serif);font-weight:900;font-size:28px;line-height:1.35;margin:26px 0 4px;letter-spacing:-.02em}
+h2{font-family:var(--serif);font-weight:700;font-size:18.5px;margin:40px 0 14px;padding-bottom:6px;border-bottom:1px solid var(--rule);
+scroll-margin-top:16px;counter-increment:sec;display:flex;gap:14px;align-items:baseline}
+h2:before{content:counter(sec);font-family:var(--mono);font-size:13px;color:var(--high);font-weight:600}
+h3{font-size:14px;margin:24px 0 8px;font-weight:700}
+.muted{color:var(--muted)}.faint{color:var(--faint)}.small{font-size:12.5px}
+.card{background:transparent;border:0;border-top:1px solid var(--line);padding:12px 0;margin:10px 0}
+h2+.card:not(.modecard){border-top:0;padding-top:0}
+.pill{display:inline-block;border:1px solid currentColor;padding:0 7px;font-size:11.5px;font-weight:700;letter-spacing:.04em}
+.pill.rules{color:var(--accent)}.pill.ai{color:var(--medium)}
+.metaline{display:grid;grid-template-columns:110px 1fr;font-size:12.5px;margin:16px 0 8px;border-bottom:1px solid var(--line)}
+.metaline>span{border-top:1px solid var(--line);padding:5px 0}.metaline>span:nth-child(odd){color:var(--muted)}
+.metaline .pill{margin:3px 0}
+nav.toc{display:none}
+@media (min-width:1080px){nav.toc{display:block;position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);
+overflow:auto;padding-top:36px;font-size:13px;counter-reset:toc}}
+nav.toc .h{font-size:11.5px;font-weight:700;color:var(--muted);margin:16px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--rule)}
+nav.toc a{display:flex;gap:8px;align-items:baseline;padding:4px 0;color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line)}
+nav.toc a:hover{color:var(--high)}nav.toc .sub{color:var(--faint);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:170px}
+nav.toc b{font-family:var(--mono);font-weight:500;font-size:12px}
+.dot{flex:0 0 7px;width:7px;height:7px;background:var(--gray);display:inline-block}
+.dot.attack{background:var(--high)}.dot.risky_not_attack{background:var(--medium)}.dot.benign_activity{background:var(--low)}
+.card.modecard{display:block;border:1px solid var(--rule);padding:10px 14px;margin:6px 0 18px;font-size:13px}
+.modecard .ico{display:none}.modecard b{display:block;font-size:13px;margin-bottom:2px}
+.modecard.ai{border-color:var(--medium)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:14px 0 6px}
+.kpi{padding:10px 14px;border-left:1px solid var(--line)}.kpi:first-child{border-left:0;padding-left:0}
+.kpi span{font-size:12px;color:var(--muted);display:block}.kpi b{display:block;font-family:var(--serif);font-size:28px;font-weight:700;line-height:1.25;
+font-variant-numeric:tabular-nums}.kpi b.warn{color:var(--high)}
+.vbar{display:flex;height:8px;overflow:hidden;background:var(--soft);margin:10px 0 8px}
+.vbar i{display:block;height:100%}.vbar .attack{background:var(--high)}.vbar .risky_not_attack{background:var(--medium)}
+.vbar .unclear{background:var(--gray)}.vbar .benign_activity{background:var(--low)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}.legend span{display:inline-flex;gap:6px;align-items:center}
+.vd{display:inline-block;border:1.5px solid var(--gray);color:var(--gray);padding:0 7px;font-size:12px;font-weight:700;white-space:nowrap;letter-spacing:.03em}
+.vd.attack{border-color:var(--high);color:var(--high)}.vd.risky_not_attack{border-color:var(--medium);color:var(--medium)}
+.vd.benign_activity{border-color:var(--low);color:var(--low)}
+.sev{display:inline-block;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.sev.high{color:var(--high)}.sev.medium{color:var(--medium)}
+.chip{display:inline-block;border:1px solid var(--line);padding:0 7px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+ol.todo{list-style:none;margin:0;padding:0;counter-reset:t}
+ol.todo li{counter-increment:t;display:grid;grid-template-columns:28px 1fr;gap:4px 8px;padding:9px 0;border-bottom:1px solid var(--line)}
+ol.todo li:before{content:counter(t);font-family:var(--mono);font-size:12.5px;color:var(--muted);padding-top:1px}
+.pri{display:inline-block;font-size:12px;font-weight:700;margin-right:8px;color:var(--gray)}
+.pri.now{color:var(--high)}.pri.soon{color:var(--medium)}.pri:before{content:"["}.pri:after{content:"]"}
+.note{border:1px solid var(--line);border-left:3px solid var(--rule);padding:10px 14px}.note ul,.card ul{margin:6px 0 0;padding-left:20px}.card li{margin:3px 0}
+.gantt{display:grid;grid-template-columns:110px 1fr 64px;gap:6px 10px;align-items:center;font-size:12.5px;margin-top:6px}
+.gantt .track{position:relative;height:12px;background:var(--soft);border-bottom:1px solid var(--line)}
+.gantt .bar{position:absolute;top:2px;bottom:2px;background:var(--accent);min-width:3px}
+.gantt .bar.missing{display:none}.gantt .n{text-align:right;color:var(--muted);font-family:var(--mono);font-size:12px}
+.gantt .miss{color:var(--faint)}.gantt .mk{position:absolute;top:0;bottom:0;min-width:3px}
+.gantt .mk.attack{background:var(--high)}.gantt .mk.risky_not_attack{background:var(--medium)}
+.gantt .mk.unclear{background:var(--gray)}.gantt .mk.benign_activity{background:var(--low)}
+.axis{display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint);grid-column:2;font-family:var(--mono)}
+.cantell{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.gdnote{margin:0 0 12px;padding:8px 12px;border-left:3px solid var(--rule);background:var(--soft)}
+article.inc{margin:22px 0 36px;scroll-margin-top:16px}
+article.inc>.head{padding:10px 0 4px;border-top:3px solid var(--rule)}
+.head .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.head .id{font-family:var(--serif);font-size:20px;font-weight:900;margin-right:6px}
+.head .when{font-size:12.5px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.summary{font-family:var(--serif);font-size:16px;line-height:1.85;margin:12px 0 6px;padding-left:16px;border-left:3px solid var(--high)}
+article.inc:not(.attack) .summary{border-left-color:var(--rule)}
+.body{padding:2px 0 8px}
+.reason{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 0;font-size:13.5px;margin:10px 0}
+.reason b{font-size:12px;color:var(--muted);display:block}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;font-size:13px;margin:12px 0;border-top:1px solid var(--line)}
+.facts div{padding:6px 12px 6px 0;border-bottom:1px solid var(--line)}.facts div span{display:block;font-size:11.5px;color:var(--faint)}
+.stepper{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin:10px 0 2px;font-size:12.5px}
+.stepper span{font-weight:600}.stepper i{color:var(--faint);font-style:normal}
+.analysis{font-size:12px;color:var(--muted);margin-top:8px}.ok{color:var(--low)}.warn{color:var(--high)}
+ol.flow{list-style:none;padding:0;margin:4px 0 0;border-top:1px solid var(--rule);counter-reset:f}
+ol.flow li{display:grid;grid-template-columns:34px 1fr;padding:8px 0;border-bottom:1px solid var(--line);counter-increment:f}
+ol.flow li:before{content:counter(f, decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--faint);grid-row:span 3;padding-top:2px}
+.flowhead{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:12.5px}.flowhead b{font-size:13.5px}
+.flowhead .muted{font-family:var(--mono);font-size:11.5px}
+.tech{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.what{margin-top:1px}
+code,pre{font-family:var(--mono);font-size:12px}
+pre{background:var(--code);border-left:2px solid var(--rule);padding:8px 12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;margin:6px 0}
+a.ref{color:var(--high);text-decoration:none;font-family:var(--mono);font-size:11px;margin:0 8px 0 0;display:inline-block}
+a.ref:before{content:"↳ "}a.ref:hover{text-decoration:underline}
+.refs{margin-top:2px;line-height:1.7}.refs>.muted{font-size:11.5px;margin-right:6px}
+details.more{display:inline}details.more[open]{display:block}details.more summary{display:inline;color:var(--muted);font-size:12px;cursor:pointer}
+.fix{border-top:1px solid var(--line);padding:10px 0;margin:0}
+.fix .t{font-weight:700}.fix .res{font-size:12px;color:var(--muted);margin-top:1px;font-family:var(--mono);overflow-wrap:anywhere}
+.why{margin:6px 0 2px;font-size:13.5px}details summary{cursor:pointer;color:var(--accent);font-size:13px;margin-top:6px}
+details.evidence{margin:14px 0 0;border-top:1px solid var(--rule);padding-top:8px}
+details.evidence>summary{font-size:13.5px;color:var(--fg);font-weight:700}
+.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12.5px}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px 6px 0;text-align:left;vertical-align:top}
+th{font-size:11.5px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--rule)}tr:target{background:var(--high-soft)}
+table.ev{table-layout:fixed;min-width:760px}table.ev th:nth-child(1){width:14%}table.ev th:nth-child(2){width:17%}
+table.ev th:nth-child(3){width:10%}table.ev th:nth-child(4){width:21%}table.ev th:nth-child(5){width:8%}
+table.ev th:nth-child(6){width:16%}td.act,td code{word-break:break-all;overflow-wrap:anywhere}td.nw{white-space:nowrap;font-family:var(--mono);font-size:12px}
+.card,ol.flow li,.summary{overflow-wrap:anywhere}
+.sign{display:grid;grid-template-columns:repeat(3,1fr);margin-top:40px;border-top:1px solid var(--rule);font-size:12px;color:var(--muted)}
+.sign div{padding:6px 10px 34px;border-left:1px solid var(--line)}.sign div:first-child{border-left:0;padding-left:0}
+footer{color:var(--faint);font-size:11.5px;margin-top:18px;border-top:1px solid var(--line);padding-top:6px;display:flex;justify-content:space-between;gap:12px}
+@media print{body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}nav.toc{display:none}.shell{display:block;padding:0}.shell>main{border:0;padding:0;background:#fff}
+details{display:block}details>summary{display:none}article.inc+article.inc{break-before:page}h2,h3{break-after:avoid}.gantt,.kpis,.fix,ol.flow li{break-inside:avoid}}
+.flowgraph .node rect,.flowgraph rect.lab{rx:3px;ry:3px}
+.conclusion{border:2px solid var(--rule);background:var(--card);padding:12px 16px;margin:12px 0 10px}
+.conclusion.attack{border-color:var(--high);background:var(--high-soft)}.conclusion.medium{border-color:var(--medium)}
+.conclusion .lead{font-size:16px;font-weight:700;line-height:1.6}
+.conclusion .nowhead{font-size:12px;font-weight:700;color:var(--muted);margin-top:8px}
+.conclusion ol.now{margin:4px 0 6px;padding-left:22px}.conclusion ol.now li{margin:3px 0}
+.conclusion .pii{border-left:3px solid var(--high);padding-left:8px;margin-top:6px}
+.filenote{color:var(--muted);margin:0 0 6px}
+.ititle{font-weight:700;font-size:15px;margin-top:4px}
+.impact{border:1px solid var(--line);background:var(--soft);padding:8px 12px;margin:10px 0}.impact ul{margin:4px 0;padding-left:18px}
+.glossary dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0}.glossary dt{font-weight:700}.glossary dd{margin:0}
+details.expert{color:var(--muted);margin:6px 0}
+@media (max-width:700px){h1{font-size:19px;margin:10px 0 2px}.brand{font-size:11px;padding:4px 0}
+.conclusion{padding:10px 12px;margin:8px 0}.conclusion .lead{font-size:15px}}
+
+.flowgraph{display:block;max-width:100%;height:auto;font-family:inherit}
+.flowgraph .colh{font-size:12px;font-weight:700;fill:var(--faint);letter-spacing:.04em}
+.flowgraph .node rect{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+.flowgraph .node.src rect{stroke:var(--high);fill:var(--high-soft)}
+.flowgraph .node.entry rect{stroke:var(--accent)}.flowgraph .node.cred rect{stroke:var(--medium);fill:var(--medium-soft)}
+.flowgraph .node.svc rect{stroke:var(--gray)}
+.flowgraph .nt{font-size:14px;font-weight:700;fill:var(--fg)}.flowgraph .ns{font-size:12px;fill:var(--muted)}
+.flowgraph .nm{font-size:11.5px;font-weight:600;fill:var(--high)}
+.flowgraph .edge{fill:none;stroke-width:2}.flowgraph .edge.ok{stroke:var(--high)}.flowgraph .edge.no{stroke:var(--faint);stroke-dasharray:5 4}
+.flowgraph .ahp.ok{fill:var(--high)}.flowgraph .ahp.no{fill:var(--faint)}
+.flowgraph .badge circle{stroke-width:2;fill:var(--card)}.flowgraph .badge.ok circle{stroke:var(--high)}
+.flowgraph .badge.no circle{stroke:var(--faint)}.flowgraph .badge text{font-size:12px;font-weight:800;fill:var(--fg)}
+.graphwrap{overflow-x:auto}.graphwrap svg{min-width:640px}table.steps{min-width:680px}
+span.ref{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--soft);border-radius:5px;
+padding:0 6px;margin:0 4px 4px 0;display:inline-block}
+table.steps td{vertical-align:middle}table.steps .res.ok{color:var(--high);font-weight:600}table.steps .res.no{color:var(--muted)}
+.bn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px solid var(--faint);font-size:12px;font-weight:800}
+.bn.ok{border-color:var(--high)}.flowgraph .link{fill:none;stroke:var(--medium);stroke-width:1.5;stroke-dasharray:2 4}
+.flowgraph .linkt{font-size:11px;fill:var(--medium)}
+.flowgraph .lab{fill:var(--card);stroke-width:1.2}.flowgraph .lab.ok{stroke:var(--high)}.flowgraph .lab.no{stroke:var(--line)}
+.flowgraph .labt{font-size:12.5px;font-weight:600;fill:var(--fg)}.flowgraph .labs{font-size:11.5px;fill:var(--muted)}
+.flowgraph .labs.ok{fill:var(--high);font-weight:600}.flowgraph a{cursor:pointer}
+.graphnote{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.graphnote i{display:inline-block;width:22px;height:0;border-top:2px solid var(--high);vertical-align:middle;margin-right:5px}
+.graphnote i.no{border-top:2px dashed var(--faint)}.graphnote i.lk{border-top:2px dotted var(--medium)}
+</style><div class=shell><nav class=toc><div class=h>목차</div><a href='#conclusion'>결론과 먼저 할 일</a><a href='#summary'>요약</a><a href='#coverage'>로그 범위</a><div class=h>사건</div><a href='#INC-001'><span class='dot attack'></span><span><b>INC-001</b><div class=sub>GuardDuty: 공격자에게 셸이 열림 (i-0shop0web0001)</div></span></a></nav><main><header class=top><div class=brand><span><b>LogFinder</b> 침해사고 초동 분석 보고서 · 문서번호 <code>LS-20261121-0833</code></span><span class=cls>내부 검토용</span></div><h1>LogFinder 분석 보고서</h1><section id=conclusion class='conclusion attack'><div class=lead>공격이 있었습니다. 가장 심각한 일은 INC-001의 &#x27;GuardDuty: 공격자에게 셸이 열림 (i-0shop0web0001)&#x27;입니다. GuardDuty 결과에는 성공 여부가 없어, 실제 피해는 같은 시각의 CloudTrail·웹·서버 로그로 확인해야 합니다.</div><div class=nowhead>먼저 할 일 (순서대로)</div><ol class=now><li><b>이 서버 역할의 기존 세션을 무효화하고(이전에 발급된 키 거부) IMDSv2를 강제하세요</b><div class='small muted'>번지는 것 막기 · 대상: ASIAZ3EX********0001, shop-web-role (GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임) · <a href='#INC-001'>INC-001</a></div></li><li><b>버킷을 읽은 키를 비활성화하고, 어떤 객체를 읽었는지 S3 데이터 이벤트로 확인하세요</b><div class='small muted'>번지는 것 막기 · 대상: ASIAZ3EX********0001, shop-web-role, 버킷 shop-customer-orders (GuardDuty: S3 데이터가 평소와 다르게 빠져나감) · <a href='#INC-001'>INC-001</a></div></li><li><b>서버를 바로 격리하고 디스크 스냅샷으로 증거를 남기세요</b><div class='small muted'>번지는 것 막기 · 대상: i-0shop0web0001 (GuardDuty: 공격자에게 셸이 열림) · <a href='#INC-001'>INC-001</a></div></li></ol><details class=small><summary>그다음 할 일 2개</summary><ul><li>즉시 · IMDSv2를 강제하고 이 서버 역할 키가 밖에서 쓰였는지 CloudTrail로 확인하세요 <span class=muted>(i-0shop0web0001 (GuardDuty: 서버 역할 키를 노린 요청) · INC-001)</span></li><li>여유 있을 때 · 필요 없는 포트를 보안그룹에서 닫으세요 <span class=muted>(i-0shop0web0001 (GuardDuty: 열린 포트를 외부에서 두드림) · INC-001)</span></li></ul></details><div class='small faint'>수정안은 자동 적용되지 않습니다. 사건별 설명에서 적용·되돌리기 명령을 확인한 뒤 직접 적용하세요.</div></section><div class='filenote small'>이 파일에는 원본 로그 일부(IP·요청 경로·계정 이름)가 들어 있습니다. 비밀번호·토큰·키는 가렸습니다. 팀 밖으로 보낼 때는 받는 사람을 확인하세요.</div><div class=metaline><span>분석 방식</span><span><span class='pill rules'>AI 사용 안 함</span></span><span>분석 대상</span><span>원본 로그 1개 파일 · 이벤트 5건 (GuardDuty 5)</span><span>작성 일시</span><span><code>2026-11-21T08:33:43Z</code> · 처리 0.0초</span></div></header><section id=summary><h2>요약</h2><div class='card modecard'><div class=ico>규칙</div><div><b>설명 방식: 규칙 기반 · AI 사용 안 함</b><div class=small>사건 판정과 설명 문장을 프로그램 안의 규칙과 문장 틀로 만들었습니다. 로그는 이 컴퓨터 밖으로 나가지 않았고, 같은 로그를 넣으면 항상 같은 결과가 나옵니다. 규칙에 없는 상황은 설명하지 못하므로 '판단 불가' 사건은 사람이 확인하세요.</div></div></div><div class=kpis><div class=kpi><span>확인할 사건</span><b class='warn'>1건</b></div><div class=kpi><span>막힌 단발 시도</span><b class=''>0건</b></div><div class=kpi><span>심각도 높음</span><b class=''>1건</b></div><div class=kpi><span>읽은 이벤트</span><b class=''>5</b></div></div><div class=card><div class=small><b>사건 판정</b> <span class=muted>(규칙 판정, 공격 의심부터 보여 줍니다)</span></div><div class=vbar><i class='attack' style='width:100.00%'></i></div><div class=legend><span><i class='dot attack'></i>공격 의심 1</span></div></div><div class='small muted'>로그 종류별 GuardDuty 5. 이벤트 5건 중 5건이 규칙에 걸렸고, 탐지 5건을 사건 1건으로 엮었습니다.</div><details class='card small glossary'><summary><b>이 보고서의 낯선 말</b></summary><dl><dt>IMDS</dt><dd>서버 안에서 역할 키를 꺼내는 주소. v1은 토큰 없이 꺼낼 수 있어 웹 취약점으로 키가 새기 쉽다.</dd><dt>보안그룹</dt><dd>서버마다 붙는 방화벽. 허용 규칙만 있다.</dd><dt>역할</dt><dd>서버·서비스에 붙이는 IAM 권한 묶음. 서버가 이 권한으로 AWS를 호출한다.</dd><dt>확신도</dt><dd>판정이 맞을 가능성에 대한 프로그램의 판단. 근거 수와 성공 여부로 정한다.</dd><dt>심각도</dt><dd>이 사건의 행동이 얼마나 위험한가. 자원이 회사에 얼마나 중요한지는 반영하지 않는다.</dd><dt>허용</dt><dd>방화벽이 연결을 받아들였다는 뜻. 침투에 성공했다는 뜻은 아니다.</dd><dt>통과</dt><dd>WAF·웹서버가 요청을 막지 않았다는 뜻. 공격이 성공했다는 뜻은 아니다.</dd></dl></details></section><div class='card note small'><b>이렇게 해석했습니다</b><ul><li>설정 스냅샷(environment.json)이 없어 방화벽 수정안을 만들지 않았습니다. python -m logsight collect environment로 만들 수 있습니다.</li></ul></div><h2 id=coverage>로그로 볼 수 있는 범위</h2><div class=card><div class='small gdnote'>GuardDuty 결과만으로는 웹·서버 안쪽에서 일어난 일을 알 수 없습니다. WAF·ALB·웹서버·SSH 로그가 있으면 함께 넣어 주세요.</div><div class=gantt><div>GuardDuty</div><div class=track title='2026-11-18 02:07~02:35 UTC (한국 11-18 11:07~11:35)'><div class=bar style='left:0.00%;width:100.00%'></div></div><div class=n>5건</div><div><b>사건</b></div><div class=track><a href='#INC-001' class='mk attack' title='INC-001 공격 의심' style='left:0.00%;width:100.00%'></a></div><div class=n></div><div class=axis><span>11-18 02:07 UTC · 한국 11:07</span><span>11-18 02:35 UTC · 한국 11:35</span></div></div><div class='small' style='margin-top:10px'><span class=muted>없는 로그</span> <span class=chip>CloudTrail</span> <span class=chip>VPC Flow</span> <span class=chip>WAF</span> <span class=chip>ALB</span> <span class=chip>SSH 로그</span></div><div class=cantell><b>그래서 이 로그로는 알 수 없는 것</b><ul><li>CloudTrail 로그가 없어 AWS 계정에서 누가 어떤 API를 썼는지 알 수 없습니다.</li><li>VPC Flow 로그가 없어 어느 IP가 서버에 접속했고 데이터가 밖으로 나갔는지 알 수 없습니다.</li><li>WAF 로그가 없어 웹 공격 요청이 막혔는지 알 수 없습니다.</li><li>ALB 로그가 없어 웹 요청이 어떤 응답을 받았는지 알 수 없습니다.</li><li>SSH 인증 로그가 없어 누가 서버에 로그인했는지 알 수 없습니다.</li><li>INC-001의 활동이 로그가 끝나는 무렵(11-18 02:35 UTC(한국 11:35))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다.</li></ul></div><div class='small faint' style='margin-top:8px'>'기록이 없음'은 '일어나지 않음'이 아닙니다. 빠진 로그는 <code>python -m logsight check</code>로 켜는 방법과 비용을 볼 수 있습니다.</div></div><h2>사건 1건 자세히</h2><article class='inc attack' id='INC-001'><div class=head><div class=row><span class=id>INC-001</span><span class='vd attack'>공격 의심</span><span class=faint style='font-size:12px'>규칙 판정</span><span class="sev high">심각도 높음</span></div><div class=ititle>GuardDuty: 공격자에게 셸이 열림 (i-0shop0web0001)</div><div class=when>2026-11-18 02:07~02:35 UTC (한국 11-18 11:07~11:35)</div><p class=summary>외부 공격 시도로 보입니다. 11-18 02:07~02:35 UTC(한국 11:07~11:35), 출발지 198.51.100.23: GuardDuty: 열린 포트를 외부에서 두드림 → GuardDuty: 서버 역할 키를 노린 요청 → GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임 → GuardDuty: S3 데이터가 평소와 다르게 빠져나감.</p></div><div class=body><div class=reason><b>판정 이유</b>GuardDuty: 열린 포트를 외부에서 두드림, GuardDuty: 서버 역할 키를 노린 요청, GuardDuty: 서버 역할 키가 AWS 밖에서 쓰임. GuardDuty가 탐지한 일입니다. GuardDuty 결과에는 성공·실패가 적혀 있지 않아, 실제로 무엇을 했는지는 같은 시각의 CloudTrail·웹·서버 로그로 확인해야 합니다.</div><div class=stepper><span>초기 침투</span><i>→</i><span>자격증명 탈취</span><i>→</i><span>데이터 수집</span><i>→</i><span>피해</span></div><div class=facts><div><span>출발지</span>198.51.100.23</div><div><span>관련 서버</span>i-0shop0web0001</div><div><span>함께 본 로그</span>GuardDuty</div><div><span>이벤트</span>5건</div></div><div class='impact small'><b>성공한 일과 닿은 자원</b><div class=muted>공격이 성공한 근거가 로그에 없습니다(연결 허용·요청 통과는 성공이 아닙니다).</div></div><div class=analysis>설명: 규칙 기반(AI 사용 안 함) · 확신도 중간 · <span class=ok>근거 검증 통과</span></div><h3>단계별 설명</h3><ol class=flow><li><div class=flowhead><b>초기 침투</b><span class=muted>2026-11-18 02:07 UTC (한국 11-18 11:07)</span></div><div class=what>GuardDuty 탐지: 열린 포트를 외부에서 두드림 (Recon:EC2/PortProbeUnprotectedPort (심각도 2.0, 3회)). 인터넷에서 이 서버의 열린 포트에 접속을 시도하고 있습니다. 공격 전에 흔히 보이는 일입니다.</div><div class=refs><span class=muted>근거</span> <a class="ref" href="#INC-001-guardduty_findings.json:1">guardduty_findings.json:1</a></div></li><li><div class=flowhead><b>초기 침투</b><span class=muted>2026-11-18 02:14 UTC (한국 11-18 11:14)</span></div><div class=what>GuardDuty 탐지: 서버 역할 키를 노린 요청 (UnauthorizedAccess:EC2/MetadataDNSRebind (심각도 8.0, 3회)). 서버의 메타데이터 주소(역할 키가 있는 곳)를 DNS로 우회해 부르려는 요청이 있었습니다. 웹 취약점으로 키를 빼내려는 시도입니다.</div><div class=refs><span class=muted>근거</span> <a class="ref" href="#INC-001-guardduty_findings.json:2">guardduty_findings.json:2</a></div></li><li><div class=flowhead><b>자격증명 탈취</b><span class=muted>2026-11-18 02:21 UTC (한국 11-18 11:21)</span></div><div class=what>GuardDuty 탐지: 서버 역할 키가 AWS 밖에서 쓰임 (UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS (심각도 8.0, 3회)). 서버에만 있어야 할 임시 키가 인터넷의 다른 컴퓨터에서 쓰였습니다. 웹 취약점(SSRF 등)으로 키가 새었을 가능성이 큽니다.</div><div class=refs><span class=muted>근거</span> <a class="ref" href="#INC-001-guardduty_findings.json:3">guardduty_findings.json:3</a></div></li><li><div class=flowhead><b>데이터 수집</b><span class=muted>2026-11-18 02:28 UTC (한국 11-18 11:28)</span></div><div class=what>GuardDuty 탐지: S3 데이터가 평소와 다르게 빠져나감 (Exfiltration:S3/AnomalousBehavior (심각도 8.0, 3회)). 평소와 다른 주체·위치에서 S3 객체를 많이 읽었습니다. 데이터 유출일 수 있습니다. 대상: 버킷 shop-customer-orders.</div><div class=refs><span class=muted>근거</span> <a class="ref" href="#INC-001-guardduty_findings.json:4">guardduty_findings.json:4</a></div></li><li><div class=flowhead><b>피해</b><span class=muted>2026-11-18 02:35 UTC (한국 11-18 11:35)</span></div><div class=what>GuardDuty 탐지: 공격자에게 셸이 열림 (Execution:Runtime/ReverseShell (심각도 8.0, 3회)). 서버의 프로그램이 공격자 쪽으로 명령 창(셸)을 열어 주었습니다. 공격자가 서버를 조작할 수 있는 상태입니다.</div><div class=refs><span class=muted>근거</span> <a class="ref" href="#INC-001-guardduty_findings.json:5">guardduty_findings.json:5</a></div></li></ol><details class='expert small'><summary>전문가용: ATT&amp;CK 기법 번호</summary>초기 침투 T1133, 초기 침투 GuardDuty, 자격증명 탈취 T1552.005, 데이터 수집 T1530, 피해 GuardDuty</details><h3>로그만으로 확인할 수 없는 것</h3><ul class=small><li>규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.</li></ul><details class=evidence><summary>근거 이벤트 5건</summary><div class=tablewrap><table class=ev><tr><th>근거</th><th>시각(UTC)</th><th>로그</th><th>행위</th><th>결과</th><th>출발지 → 대상</th><th>탐지 규칙</th></tr><tr id='INC-001-guardduty_findings.json:1'><td><code>guardduty_findings.json:1</code></td><td class=nw>2026-11-18 02:07:00</td><td>GuardDuty</td><td class=act>Recon:EC2/PortProbeUnprotectedPort</td><td><span class=''>탐지</span></td><td class=act>198.51.100.23 → i-0shop0web0001:22</td><td><span title='GD_FINDING'>GuardDuty 탐지 결과</span></td></tr><tr id='INC-001-guardduty_findings.json:2'><td><code>guardduty_findings.json:2</code></td><td class=nw>2026-11-18 02:14:00</td><td>GuardDuty</td><td class=act>UnauthorizedAccess:EC2/MetadataDNSRebind</td><td><span class=''>탐지</span></td><td class=act> → i-0shop0web0001</td><td><span title='GD_FINDING'>GuardDuty 탐지 결과</span></td></tr><tr id='INC-001-guardduty_findings.json:3'><td><code>guardduty_findings.json:3</code></td><td class=nw>2026-11-18 02:21:00</td><td>GuardDuty</td><td class=act>UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS</td><td><span class=''>탐지</span></td><td class=act>198.51.100.23</td><td><span title='GD_FINDING'>GuardDuty 탐지 결과</span></td></tr><tr id='INC-001-guardduty_findings.json:4'><td><code>guardduty_findings.json:4</code></td><td class=nw>2026-11-18 02:28:00</td><td>GuardDuty</td><td class=act>Exfiltration:S3/AnomalousBehavior</td><td><span class=''>탐지</span></td><td class=act>198.51.100.23</td><td><span title='GD_FINDING'>GuardDuty 탐지 결과</span></td></tr><tr id='INC-001-guardduty_findings.json:5'><td><code>guardduty_findings.json:5</code></td><td class=nw>2026-11-18 02:35:00</td><td>GuardDuty</td><td class=act>Execution:Runtime/ReverseShell</td><td><span class=''>탐지</span></td><td class=act> → i-0shop0web0001</td><td><span title='GD_FINDING'>GuardDuty 탐지 결과</span></td></tr></table></div></details></div></article><div class=sign><div>분석 · LogFinder (자동 생성)</div><div>검토자</div><div>승인</div></div><footer><span>LogFinder · LS-20261121-0833</span><span>판단마다 근거 로그 위치(파일:줄)를 붙였습니다. 수정안은 자동 적용되지 않습니다.</span></footer></main></div></html>

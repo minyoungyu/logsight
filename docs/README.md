@@ -16,6 +16,7 @@
 | [웹서버_침해판단_설계](웹서버_침해판단_설계.md) | 웹서버 로그·파일만으로 "이미 뚫렸나"를 판단하는 기능의 설계와 검증 |
 | [비슷한_제품_비교](비슷한_제품_비교.md) | GuardDuty 조사 에이전트, Detective, Suzaku, AI SOC 등과 무엇이 다른가 |
 | [GuardDuty_비교](GuardDuty_비교.md), [GuardDuty가_못보는것](GuardDuty가_못보는것.md) | GuardDuty가 읽는 로그와 못 보는 탐지 유형 |
+| [GuardDuty_해석](GuardDuty_해석.md) | GuardDuty 결과 211종을 한국어 풀이·먼저 할 일로 바꾸기(FR-34)와 측정 |
 
 ## 측정 (처음 보는 데이터와 개발 데이터를 나눠 적음)
 
