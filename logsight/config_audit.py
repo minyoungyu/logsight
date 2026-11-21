@@ -525,8 +525,10 @@ def audit(incident: dict, env: dict) -> list[dict]:
             "caution": "조직(Organizations)을 쓰면 SCP로 중지를 막는다.",
         })
     out += web_fixes
+    from .impact_preview import preview
     for c in out:
         c["rollback"] = rollback(c["cli"])
+        c["impact"] = preview(c, incident, env)  # 적용하면 함께 바뀌는 것(FR-35). 셀 수 없으면 []
     sev = {"high": 0, "medium": 1, "low": 2}
     out.sort(key=lambda c: sev.get(c["severity"], 3))
     return out

@@ -479,6 +479,9 @@ def _incident(r: dict, verdicts: dict) -> str:
             h.append("<div class='muted small'>AI 제안 · 코드가 만든 적용 명령이 아님(직접 확인 후 적용)</div>")
         if rc:  # 원인 설명을 같은 카드에 붙여 '왜 → 무엇을 바꾸나'를 한곳에서 본다
             h.append(f"<div class=why>{escape(rc['why'])}</div>{_refs(rc.get('evidence', []), iid)}")
+        if c and c.get("impact"):  # 조치 전 영향 미리보기(FR-35): 명령을 펼치기 전에 보이게
+            h.append("<div class='impact small'><b>적용하면 함께 바뀌는 것</b><ul>"
+                     + "".join(f"<li>{escape(x)}</li>" for x in c["impact"]) + "</ul></div>")
         if c and not c.get("cli"):  # 코드·계정을 사람이 고치는 수정안(웹 애플리케이션): 명령 없음
             h.append(f"<div class='muted small'>주의: {escape(c['caution'])}</div>")
         elif c:
