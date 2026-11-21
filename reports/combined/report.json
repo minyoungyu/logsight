@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-21T08:28:18Z",
+ "generated_at": "2026-11-21T08:31:31Z",
  "files": [
   {
    "file": "samples/combined/alb.log",
@@ -911,6 +911,10 @@
      "rollback": [
       "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32",
       "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0"
+     ],
+     "impact": [
+      "이 보안그룹은 서버 1대(i-0abc123def456)에 붙어 있습니다.",
+      "적용 뒤에는 관리자 IP(192.0.2.10/32)에서만 이 포트에 들어올 수 있습니다. 그 밖에서 접속하던 사람·배포 도구는 끊깁니다."
      ]
     },
     {
@@ -943,7 +947,8 @@
      "caution": "정상 요청이 막히는지 먼저 COUNT 로그에서 오탐을 확인한다.",
      "rollback": [
       "# 변경 전에 저장한 acl.json의 Rules로 update-web-acl을 다시 실행(LockToken은 새로 받기)"
-     ]
+     ],
+     "impact": []
     },
     {
      "id": "IMDSV1_ENABLED",
@@ -970,6 +975,9 @@
      "caution": "오래된 SDK를 쓰는 앱은 IMDSv2를 지원하는지 먼저 확인한다.",
      "rollback": [
       "aws ec2 modify-instance-metadata-options --instance-id i-0abc123def456 --http-tokens optional --http-endpoint enabled"
+     ],
+     "impact": [
+      "i-0abc123def456에서 토큰 없이 메타데이터를 부르는 앱(오래된 SDK·직접 만든 스크립트)은 키를 받지 못합니다."
      ]
     },
     {
@@ -995,14 +1003,14 @@
         "Resource": "*",
         "Condition": {
          "DateLessThan": {
-          "aws:TokenIssueTime": "2026-11-21T08:28:18Z"
+          "aws:TokenIssueTime": "2026-11-21T08:31:31Z"
          }
         }
        }
       ]
      },
      "cli": [
-      "# 위 proposed를 policy.json으로 저장(aws:TokenIssueTime=2026-11-21T08:28:18Z=지금 UTC, 그 이전 발급 세션만 거부)",
+      "# 위 proposed를 policy.json으로 저장(aws:TokenIssueTime=2026-11-21T08:31:31Z=지금 UTC, 그 이전 발급 세션만 거부)",
       "aws iam put-role-policy --role-name ec2-app-role --policy-name AWSRevokeOlderSessions --policy-document file://policy.json",
       "# 같은 역할을 쓰는 정상 앱도 잠깐 끊긴다(인스턴스 프로필이 남아 있으면 재시작 때 새 자격증명을 받는다).",
       "# 다음 할 일(복구): 새 역할로 인스턴스 프로필을 교체(스왑)한 뒤, 확인되면 이 거부 정책을 뗀다."
@@ -1010,6 +1018,9 @@
      "caution": "같은 역할을 쓰는 운영 앱도 끊기므로 사람이 판단해 실행한다. 되돌리기는 거부 정책을 떼는 것이다.",
      "rollback": [
       "aws iam delete-role-policy --role-name ec2-app-role --policy-name AWSRevokeOlderSessions"
+     ],
+     "impact": [
+      "이 역할을 쓰는 서버 1대(i-0abc123def456)의 앱도 지금 가진 키가 거부됩니다. 새 키를 받을 때까지(보통 몇 분) AWS 호출이 실패할 수 있습니다."
      ]
     },
     {
@@ -1065,6 +1076,9 @@
      "caution": "실제로 쓰는 API는 IAM Access Analyzer의 '마지막 사용' 정보로 확인한다.",
      "rollback": [
       "aws iam delete-role-policy --role-name ec2-app-role --policy-name least-privilege"
+     ],
+     "impact": [
+      "이 역할을 쓰는 서버 1대(i-0abc123def456)에 함께 적용됩니다. 제안 권한에 없는 API를 쓰던 앱은 거부됩니다."
      ]
     },
     {
@@ -1083,7 +1097,8 @@
      "proposed": null,
      "cli": [],
      "rollback": [],
-     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다.",
+     "impact": []
     },
     {
      "id": "NACL_BLOCK_ATTACKER",
@@ -1121,6 +1136,9 @@
      "caution": "NACL 규칙 수에는 한도(기본 20개)가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해, 계정에 하나뿐인 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
      "rollback": [
       "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
+     ],
+     "impact": [
+      "이 NACL이 걸린 서브넷 1개(subnet-0a1) 안의 모든 자원이 이 IP와 주고받는 통신이 막힙니다(응답 포함). 설정 스냅샷에 서버의 서브넷 정보가 없어 서버 수는 세지 못했습니다."
      ]
     },
     {
@@ -1137,7 +1155,8 @@
      "proposed": null,
      "cli": [],
      "rollback": [],
-     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다.",
+     "impact": []
     }
    ],
    "report": {
@@ -2431,6 +2450,10 @@
      "rollback": [
       "aws ec2 revoke-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 192.0.2.10/32",
       "aws ec2 authorize-security-group-ingress --group-id sg-0web000000000001 --protocol tcp --port 22 --cidr 0.0.0.0/0"
+     ],
+     "impact": [
+      "이 보안그룹은 서버 1대(i-0abc123def456)에 붙어 있습니다.",
+      "적용 뒤에는 관리자 IP(192.0.2.10/32)에서만 이 포트에 들어올 수 있습니다. 그 밖에서 접속하던 사람·배포 도구는 끊깁니다."
      ]
     },
     {
@@ -2469,6 +2492,9 @@
      "caution": "NACL 규칙 수에는 한도(기본 20개)가 있고 공격 IP는 쉽게 바뀐다. 임시 조치로 쓰고 근본 원인(열린 포트, WAF 설정)을 함께 고친다. 번호가 50보다 작은 허용 규칙이 있으면 그 규칙이 먼저 적용되니 번호를 확인한다. 사건 서버의 서브넷을 설정에서 찾지 못해, 계정에 하나뿐인 NACL로 적었다. 서버가 있는 서브넷의 NACL인지 확인한다.",
      "rollback": [
       "aws ec2 delete-network-acl-entry --network-acl-id acl-0default00000001 --ingress --rule-number 50"
+     ],
+     "impact": [
+      "이 NACL이 걸린 서브넷 1개(subnet-0a1) 안의 모든 자원이 이 IP와 주고받는 통신이 막힙니다(응답 포함). 설정 스냅샷에 서버의 서브넷 정보가 없어 서버 수는 세지 못했습니다."
      ]
     },
     {
@@ -2488,7 +2514,8 @@
      "proposed": null,
      "cli": [],
      "rollback": [],
-     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다.",
+     "impact": []
     }
    ],
    "report": {
