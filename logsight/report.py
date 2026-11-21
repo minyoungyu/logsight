@@ -583,6 +583,22 @@ def _excluded_card(result: dict) -> str:
             "흐름 그림에는 그대로 들어가 있습니다. 모르는 이름이 있으면 목록에서 지우세요.</div></div>")
 
 
+def quiet_admin_card(result: dict) -> str:
+    """내부망 관리자 접근 중 공격 신호가 없어 알리지 않은 것(숨기지 않고 보인다). 웹서버 점검 보고서도 쓴다."""
+    qa = result.get("quiet_admin") or []
+    if not qa:
+        return ""
+    n = sum(x["n"] for x in qa)
+    rows = "".join(f"<li>{escape(x['ip'])}: {x['n']:,}건 · {escape(x['first'][:16].replace('T', ' '))} ~ "
+                   f"{escape(x['last'][:16].replace('T', ' '))} UTC · {escape(', '.join(x['paths']))}"
+                   + (f" · 계정 {escape(', '.join(x['users']))}" if x.get("users") else "") + "</li>" for x in qa)
+    return (f"<h2 id=quiet-admin>알리지 않은 관리자 접근 {n:,}건</h2><div class='card small'>"
+            "<div>사내망·VPN 주소에서 관리자 화면에 들어온 요청 중, 같은 주소에 공격 신호가 앞뒤 1시간 안에 없어 경보로 "
+            "올리지 않은 것입니다. 평소 관리 작업이면 괜찮지만, <b>퇴사자 계정이나 도난 계정이 사내망·VPN에서 들어오면 "
+            "이렇게 보입니다.</b> 우리 관리자인지 확인하세요. 관리자 IP를 <code>trusted_ips</code>에 적으면 나머지 주소의 "
+            f"관리자 접근은 모두 경보로 올라옵니다.</div><ul>{rows}</ul></div>")
+
+
 def _glossary_card(body: str) -> str:
     """본문에 나온 낯선 말 풀이(사양서 FR-28)."""
     import re
@@ -643,6 +659,8 @@ def render(result: dict, title: str | None = None) -> str:
         nav.insert(3, "<a href='#campaign'>같은 공격 묶음</a>")
     if result.get("excluded_activity"):
         nav.append("<a href='#excluded'>판정에서 뺀 활동</a>")
+    if result.get("quiet_admin"):
+        nav.append("<a href='#quiet-admin'>알리지 않은 관리자 접근</a>")
     nav.append("</nav>")
     h.append("<div class=shell>" + "".join(nav) + "<main>" + header)
 
@@ -704,6 +722,7 @@ def render(result: dict, title: str | None = None) -> str:
                      f"<td>{rep_txt}</td></tr>")
         h.append("</table></div>")
     h.append(_excluded_card(result))
+    h.append(quiet_admin_card(result))
     h.append(f"<div class=sign><div>분석 · {PRODUCT} (자동 생성)</div><div>검토자</div><div>승인</div></div>"
              f"<footer><span>{PRODUCT} · {doc_no}</span><span>판단마다 근거 로그 위치(파일:줄)를 붙였습니다. "
              "수정안은 자동 적용되지 않습니다.</span></footer></main></div></html>")

@@ -391,6 +391,20 @@ class AdminAndBackupFalsePositiveTests(unittest.TestCase):
         fs = self._findings([far.replace("10.0.0.7", "203.0.113.9")])
         self.assertIn("WEBLOG_ADMIN_ACCESS", {f.rule for f in fs})
 
+    def test_quiet_admin_access_is_listed_not_hidden(self):  # TC-SCAN-QA-01
+        from logsight.report import quiet_admin_card
+        evs = weblog.parse_access("\n".join([
+            self._line("10.0.0.8", "12/Oct/2026:09:00:00", "GET", "/wp-admin/users.php"),
+            self._line("10.0.0.8", "12/Oct/2026:09:05:00", "GET", "/wp-admin/options.php")]))
+        fs = webdetect.run_web_detections(evs, SiteProfile())
+        self.assertNotIn("WEBLOG_ADMIN_ACCESS", {f.rule for f in fs})  # 경보는 그대로 없음(오탐 기준 유지)
+        qa = webdetect.quiet_admin_summary(evs)
+        self.assertEqual((qa[0]["ip"], qa[0]["n"]), ("10.0.0.8", 2))
+        card = quiet_admin_card({"quiet_admin": qa})
+        self.assertIn("알리지 않은 관리자 접근 2건", card)
+        self.assertIn("퇴사자", card)
+        self.assertEqual(quiet_admin_card({"quiet_admin": []}), "")
+
 
 if __name__ == "__main__":
     unittest.main()

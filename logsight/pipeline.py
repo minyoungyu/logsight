@@ -104,6 +104,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "has_environment": bool(env) and not env.get("_error"),
         "team": team_info,
         "excluded_activity": excluded_summary(events),
+        "quiet_admin": quiet_admin_summary(events),
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy")))
         + _ambiguous_note(events)
@@ -119,6 +120,11 @@ def _ambiguous_note(events: list[Event]) -> list[str]:
         return []
     return [f"네트워크 기록 {n:,}건은 같은 IP를 쓰는 서버가 여러 VPC에 있어 대상 서버를 정하지 못했습니다. "
             "python -m logsight collect environment로 네트워크 인터페이스(ENI)까지 수집하면 정확히 찾습니다."]
+
+
+def quiet_admin_summary(events: list[Event]) -> list[dict]:
+    from .web.webdetect import quiet_admin_summary as q
+    return q(events)
 
 
 def excluded_summary(events: list[Event]) -> list[dict]:

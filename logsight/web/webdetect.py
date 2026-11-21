@@ -14,7 +14,7 @@ import binascii
 import ipaddress
 import re
 from bisect import bisect_left
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import timedelta
 from urllib.parse import parse_qsl, unquote_plus, urlparse
 
@@ -520,6 +520,11 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
 
     for rule, by_ip in (("WEBLOG_ADMIN_ACCESS", admin_access), ("WEBLOG_LARGE_EXFIL", admin_large)):
         keep = {ip: kept for ip, evs in by_ip.items() if (kept := _near_signal(ip, evs))}
+        for ip, evs in by_ip.items():  # 알리지 않은 것은 숨기지 않고 표시해 보고서에 따로 적는다(quiet_admin_summary)
+            kept_ids = {id(e) for e in keep.get(ip, [])}
+            for e in evs:
+                if id(e) not in kept_ids:
+                    e.extra["admin_quiet"] = rule
         for f in findings:  # 같은 IP의 대용량 응답 결과가 이미 있으면 그 결과에 합친다
             if f.rule == rule and f.key in keep:
                 f.events = sorted({id(e): e for e in f.events + keep.pop(f.key)}.values(), key=lambda e: e.ts)
@@ -535,3 +540,20 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             if f.rule not in e.findings:
                 e.findings.append(f.rule)
     return findings
+
+
+def quiet_admin_summary(events: list, max_ips: int = 10) -> list[dict]:
+    """내부망 IP의 관리자 접근 중 공격 신호가 없어 알리지 않은 것(IP별). 퇴사자·도난 계정의 사내망·VPN 접근이
+    이렇게 보이므로 경보 대신 보고서에 목록으로 남긴다."""
+    by_ip: dict[str, list] = defaultdict(list)
+    for e in events:
+        if e.extra.get("admin_quiet") and not e.extra.get("known"):
+            by_ip[e.src_ip or "?"].append(e)
+    out = []
+    for ip, evs in sorted(by_ip.items(), key=lambda x: -len(x[1]))[:max_ips]:
+        paths = Counter(str(e.extra.get("path") or e.action or "").split("?")[0] for e in evs)
+        out.append({"ip": ip, "n": len(evs), "first": min(e.ts for e in evs).isoformat(),
+                    "last": max(e.ts for e in evs).isoformat(),
+                    "paths": [p for p, _ in paths.most_common(3)],
+                    "users": sorted({str(e.actor) for e in evs if e.actor and e.actor != "-"})[:3]})
+    return out

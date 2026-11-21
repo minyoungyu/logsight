@@ -19,7 +19,7 @@ from ..correlate import build_incidents, group_repeats
 from ..explain import VERDICT_KO as ATTACK_KO, mark_known, rule_triage
 from ..detect import RULES
 from .weblog import parse_access, parse_weberror, parse_auth
-from .webdetect import run_web_detections
+from .webdetect import quiet_admin_summary, run_web_detections
 from .webscan import scan_webroot
 from .webanalyze import analyze_web, rule_verdict, VERDICT_KO, VERDICT_RANK
 from .webprofile import SiteProfile
@@ -128,6 +128,7 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         "n_incidents": len(incidents),
         "n_groups": len(groups),
         "n_known": n_known,
+        "quiet_admin": quiet_admin_summary(events),
         "incident_index": [{**{k: i[k] for k in ("id", "start", "end", "severity", "stages", "src_ips", "n_events")},
                             "repeats": i.get("repeats", 1),
                             "pii": bool(pii_risk([{"incident": i}])),
