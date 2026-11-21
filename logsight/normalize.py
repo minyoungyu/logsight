@@ -715,7 +715,25 @@ GD_ALIAS = [  # 탐지 유형(부분 문자열) → 같은 의미의 LogFinder �
     ("UnauthorizedAccess:IAMUser/MaliciousIPCaller", "CT_UNTRUSTED_IP"),
     ("UnauthorizedAccess:IAMUser/TorIPCaller", "CT_UNTRUSTED_IP"),
     ("Policy:S3/BucketBlockPublicAccessDisabled", "CT_LOGGING_TAMPER"),
+    ("PortProbeEMRUnprotectedPort", "VPC_REMOTE_ADMIN_EXPOSED"),
+    ("Stealth:IAMUser/PasswordPolicyChange", "CT_ACCOUNT_SECURITY"),
+    ("Policy:S3/BucketPublicAccessGranted", "CT_S3_PUBLIC"), ("Policy:S3/BucketAnonymousAccessGranted", "CT_S3_PUBLIC"),
+    ("CredentialAccess:IAMUser/CompromisedCredentials", "CT_UNTRUSTED_IP"),
 ]
+
+
+def _gd_target(res: dict) -> str | None:
+    """결과가 가리키는 자원 이름(버킷·DB·클러스터·함수). 서버·키는 instance_id·access_key로 따로 둔다."""
+    for b in res.get("S3BucketDetails") or []:
+        if b.get("Name"):
+            return f"버킷 {b['Name']}"
+    for k, label, name in (("RdsDbInstanceDetails", "DB", "DbInstanceIdentifier"),
+                           ("EksClusterDetails", "클러스터", "Name"), ("LambdaDetails", "함수", "FunctionName"),
+                           ("EcsClusterDetails", "ECS 클러스터", "Name")):
+        v = (res.get(k) or {}).get(name)
+        if v:
+            return f"{label} {v}"
+    return None
 
 
 def _gd_ip(action: dict) -> str | None:
@@ -795,7 +813,7 @@ def parse_guardduty(text: str, name: str = "guardduty") -> list[Event]:
             action=typ, outcome="detected", raw_ref=f"{name}:{i+1}",
             extra={"gd_id": f.get("Id"), "gd_type": typ, "gd_title": str(f.get("Title", ""))[:200],
                    "gd_severity": float(f.get("Severity") or 0), "gd_count": svc.get("Count"),
-                   "gd_api": api, "gd_resource": res.get("ResourceType"),
+                   "gd_api": api, "gd_resource": res.get("ResourceType"), "gd_target": _gd_target(res),
                    "gd_last_seen": svc.get("EventLastSeen") or f.get("UpdatedAt"),
                    "gd_alias": sorted({r for k, r in GD_ALIAS if k in typ})},
         ))

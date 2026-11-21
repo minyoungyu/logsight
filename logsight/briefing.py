@@ -198,6 +198,9 @@ def headline(result: dict) -> dict:
             s += " 무엇을 가져갔는지는 로그에 이름이 없어 확인이 필요합니다."
         elif imp["done"]:
             s += f" 피해 범위는 {top['incident']['id']}의 '성공한 일과 닿은 자원'을 확인하세요."
+        elif any(e.get("source") == "guardduty" for e in top["incident"]["events"]):
+            s += (" GuardDuty 결과에는 성공 여부가 없어, 실제 피해는 같은 시각의 CloudTrail·웹·서버 로그로 "
+                  "확인해야 합니다.")
         else:
             s += " 성공한 근거는 아직 보이지 않습니다."
         tone = "attack"
@@ -221,6 +224,42 @@ def headline(result: dict) -> dict:
 def _item(fix_id: str, text: str, target: str, iid: str, priority: str) -> dict:
     return {"id": fix_id, "text": text, "target": target, "incident": iid, "priority": priority,
             "phase": PHASE.get(fix_id, 2)}
+
+
+# GuardDuty 유형(부분 문자열) → 같은 일을 하는 설정 수정안. 그 수정안이 이미 있으면 GuardDuty 조치를 따로 넣지 않는다
+GD_COVERED = {
+    "CredentialExfiltration": {"IAM_ROLE_SESSION_REVOKE"}, "MetadataDNSRebind": {"IMDSV1_ENABLED"},
+    "SSHBruteForce": {"SG_ADMIN_PORT_OPEN"}, "RDPBruteForce": {"SG_ADMIN_PORT_OPEN"}, "PortProbe": {"SG_ADMIN_PORT_OPEN"},
+    "CompromisedCredentials": {"IAM_KEY_COMPROMISED"}, "PenTest:IAMUser": {"IAM_KEY_COMPROMISED"},
+    "CloudTrailLoggingDisabled": {"TRAIL_UNPROTECTED"},
+}
+
+
+def _gd_actions(inc: dict, iid: str, seen: set, fixes: set = frozenset()) -> list[dict]:
+    """GuardDuty 결과의 유형별 먼저 할 일(gd_types). 설정 스냅샷이 없어도 나온다.
+    대상은 결과가 가리키는 키·서버·버킷 등. 설정 수정안(명령)이 이미 같은 일을 하면 사건별 설명에서 본다."""
+    from .gd_types import describe
+    out = []
+    for e in inc["events"]:
+        if e.get("source") != "guardduty" or e.get("known"):
+            continue
+        typ = e.get("gd_type", "")
+        if any(k in typ and ids & fixes for k, ids in GD_COVERED.items()):
+            continue
+        d = describe(typ)
+        if not d["action"]:
+            continue
+        tgt = ", ".join(x for x in (e.get("access_key"), e.get("actor"), e.get("instance_id"), e.get("gd_target")) if x) \
+            or "로그에 이름 없음"
+        k = ("GD", d["action"], tgt)
+        if k in seen:
+            continue
+        seen.add(k)
+        sev = float(e.get("gd_severity") or 0)
+        pr = "now" if sev >= 7 or (d["phase"] == 0 and sev >= 4) else "soon" if sev >= 4 else "later"
+        out.append({"id": "GD_" + d["title"], "text": d["action"], "target": f"{tgt} (GuardDuty: {d['title']})",
+                    "incident": iid, "priority": pr, "phase": d["phase"]})
+    return out
 
 
 def actions(result: dict, limit: int = 3) -> tuple[list[dict], list[dict]]:
@@ -248,6 +287,8 @@ def actions(result: dict, limit: int = 3) -> tuple[list[dict], list[dict]]:
                 continue
             seen.add(k)
             items.append(_item(c["id"], c["action"], c.get("resource", ""), iid, c.get("priority", "soon")))
+        fixes = {fc["check_id"] for fc in r.get("report", {}).get("firewall_changes", [])}
+        items += _gd_actions(inc, iid, seen, fixes)
     pri = {"now": 0, "soon": 1, "later": 2}
     items.sort(key=lambda x: (x["phase"], pri.get(x["priority"], 3)))
     first = [x for x in items if x["priority"] == "now" or x["phase"] == 0][:limit]

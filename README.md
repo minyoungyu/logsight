@@ -22,6 +22,14 @@
 
 비슷한 도구(GuardDuty 조사 에이전트, Detective, Suzaku, AI SOC 등)와의 비교: [docs/비슷한_제품_비교.md](docs/비슷한_제품_비교.md)
 
+## GuardDuty 경보를 받았다면
+
+GuardDuty는 켜 두세요. 경보가 오면 결과 파일(또는 경보 자체)을 넣으면 무슨 뜻인지와 먼저 할 일이 한국어로 나옵니다.
+GuardDuty 활성 유형 211종 모두에 한국어 풀이와 먼저 할 일이 있습니다(유형별로 쓴 문장 72종, 낱말 조합 139종, [GuardDuty_해석](docs/GuardDuty_해석.md)).
+웹·서버 로그를 함께 넣으면 GuardDuty가 보지 못하는 "실제로 들어왔는지"까지 한 사건으로 봅니다.
+
+    python -m logsight analyze samples/guardduty_only --out reports/guardduty_only --no-ai
+
 ## 무엇을 주나
 
 로그 폴더를 넣거나 AWS 경보가 오면 사건 보고서 한 장(HTML)을 만든다.

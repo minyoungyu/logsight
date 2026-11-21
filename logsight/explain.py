@@ -282,6 +282,12 @@ def verdict_for(inc: dict) -> dict:
         c = counts(evs)
         tail = (f"결과: {phrase(c)}." + ("" if c["success"] else
                 " 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."))
+    elif not blocked and any(e.get("source") == "guardduty" for e in evs):
+        # GuardDuty 결과는 '탐지했다'는 기록이라 성공·실패가 없다. 실패로 세지 않는다
+        sev = max((float(e.get("gd_severity") or 0) for e in evs if e.get("source") == "guardduty"), default=0)
+        conf = "medium" if sev >= 7 else "low"
+        tail = ("GuardDuty가 탐지한 일입니다. GuardDuty 결과에는 성공·실패가 적혀 있지 않아, 실제로 무엇을 했는지는 "
+                "같은 시각의 CloudTrail·웹·서버 로그로 확인해야 합니다.")
     else:
         conf = "low"
         tail = f"보이는 시도 {blocked}건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
@@ -370,6 +376,18 @@ def _acts(evs: list[dict], k: int = 3) -> str:
     return ", ".join(f"{a} {n}건" if n > 1 else str(a) for a, n in c.most_common(k))
 
 
+def _gd_sentence(f: dict, evs: list[dict]) -> str:
+    """GuardDuty 결과 하나: 한국어 제목, 원래 유형 이름, 쉬운 풀이, 대상 자원."""
+    from .gd_types import describe
+    refs = set(f.get("evidence") or [])
+    evs = [e for e in evs if e.get("ref") in refs] or evs  # 이 탐지의 GuardDuty 결과만(한 사건에 여러 결과가 있을 수 있음)
+    typ = next((e.get("gd_type") for e in evs if e.get("gd_type")), "")
+    plain = describe(typ)["plain"] if typ else ""
+    target = next((e.get("gd_target") for e in evs if e.get("gd_target")), None)
+    return (f"GuardDuty 탐지: {f['title'].replace('GuardDuty: ', '')} ({f['detail']})."
+            + (f" {plain}" if plain else "") + (f" 대상: {target}." if target else ""))
+
+
 def describe_finding(f: dict, inc: dict) -> str:
     """탐지 하나를 쉬운 문장으로. 사건 안의 해당 이벤트에서 성공·실패를 센다.
     출발지는 'OOO에서' 꼴로만 써서 IP·영문 이름 뒤의 조사가 어색하지 않게 한다."""
@@ -419,7 +437,7 @@ def describe_finding(f: dict, inc: dict) -> str:
         "HOST_PRIV_ESC_FAIL": f"서버에서 sudo·su 시도가 거부됐습니다({f.get('detail', '')}). 권한을 올리려는 시도일 수 있습니다.",
         "HOST_ACCOUNT_CREATED": f"서버에 계정을 만들거나 관리자 권한을 줬습니다({f.get('detail', '')}). 다시 들어올 문을 만드는 단계일 수 있습니다.",
         "CT_CONSOLE_BRUTE": f"{who}에서 AWS 콘솔 로그인을 {n}번 시도했습니다(실패 {bad}건, 성공 {ok}건). 비밀번호 대입 공격일 수 있습니다.",
-        "GD_FINDING": f"GuardDuty 탐지: {f['title'].replace('GuardDuty: ', '')} ({f['detail']}).",
+        "GD_FINDING": _gd_sentence(f, evs),
         # 웹 공격 규칙(웹서버 점검과 같은 규칙). 응답이 정상(2xx·3xx)이면 '성공', 4xx·5xx면 '거부'로 센다
         "WEBLOG_SCANNER": f"{who}에서 취약점 스캐너·자동 도구로 {n}건을 요청했습니다({_acts(evs, 2)} 등). "
                           "공격 전 훑어보기입니다. 같은 IP의 다른 공격 요청이 성공했는지 보세요.",

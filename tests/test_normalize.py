@@ -126,7 +126,7 @@ class CombinedRun(SyslogYear):
         cred = [s for s in flows if "InstanceCredentialExfiltration" in s["what"]]
         self.assertTrue(cred)
         self.assertEqual(cred[0]["stage"], "credential-access")
-        self.assertIn("인스턴스 역할 자격증명", cred[0]["what"])
+        self.assertIn("서버 역할 키가 AWS 밖에서 쓰임", cred[0]["what"])  # GuardDuty 유형을 풀어 쓴 한국어 제목
 
     def test_waf_blocked_request_is_not_sqli_finding(self):
         for r in self.res["results"]:

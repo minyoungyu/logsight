@@ -273,7 +273,7 @@ def _compact(e: Event) -> dict:
     for k in ("errorCode", "params", "counted_rules", "labels", "ua", "userAgent", "awsRegion",
               "http_status", "http_host", "host", "proxy_ip", "target_instance",
               "src_instance", "target_ambiguous", "target_inferred", "interface",
-              "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_count", "gd_last_seen", "known"):
+              "gd_type", "gd_title", "gd_severity", "gd_alias", "gd_target", "gd_count", "gd_last_seen", "known"):
         v = e.extra.get(k)
         if v:
             d[k] = v
