@@ -1,0 +1,4 @@
+# 74298cc에 들어간 합성 GuardDuty 예시의 가짜 액세스 키(실제 키 아님). 다음 커밋 2691bb2에서 EXAMPLE 형식으로 바꿨다.
+74298cceac816bba63de1bd8bad28bb99c0012e3:tests/test_gd_types.py:aws-access-token:60
+74298cceac816bba63de1bd8bad28bb99c0012e3:samples/guardduty_only/guardduty_findings.json:aws-access-token:78
+74298cceac816bba63de1bd8bad28bb99c0012e3:samples/guardduty_only/guardduty_findings.json:aws-access-token:113
