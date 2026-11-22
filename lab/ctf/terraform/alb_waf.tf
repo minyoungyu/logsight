@@ -67,7 +67,7 @@ resource "aws_wafv2_regex_pattern_set" "scanners" {
 
 resource "aws_wafv2_ip_set" "shared_ip" {
   name               = "${var.name}-shared-venue-ip"
-  description        = "학교 공용 IP 등 여러 팀이 쓰는 IP: 전체 한도를 5분 500건으로 완화"
+  description        = "Shared IPs used by many teams, rate limit raised to 500 per 5 min"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = []
