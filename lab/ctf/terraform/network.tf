@@ -103,7 +103,7 @@ resource "aws_security_group" "alb" {
   description = "CTF ALB team ports"
   vpc_id      = aws_vpc.ctf.id
   ingress {
-    description = "team ports (contest_open=true -> everyone, else operators)"
+    description = "team ports: everyone when contest_open, else operators"
     from_port   = 8001
     to_port     = 8000 + var.team_count
     protocol    = "tcp"
