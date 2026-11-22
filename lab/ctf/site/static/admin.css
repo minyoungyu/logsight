@@ -1,0 +1,53 @@
+/* CTF 실습용 가상 관리자 화면 스타일 */
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.55 "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;color:#111827;background:#f3f4f6}
+a{color:inherit;text-decoration:none}
+.ctfbar{background:#fde68a;color:#78350f;text-align:center;font-size:13px;font-weight:700;padding:6px 12px}
+body.admin{display:grid;grid-template-columns:230px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+body.admin .ctfbar{grid-column:1/3}
+aside{background:#111827;color:#9ca3af;display:flex;flex-direction:column;padding:18px 12px}
+.alogo{display:flex;align-items:center;gap:8px;color:#fff;font-weight:800;font-size:16px;padding:6px 10px 18px}
+aside nav{display:flex;flex-direction:column;gap:2px;flex:1}
+aside nav a{padding:9px 12px;border-radius:8px}
+aside nav a:hover{background:#1f2937;color:#fff}
+aside nav a.on{background:#4338ca;color:#fff}
+aside nav a.dim{color:#4b5563;cursor:default}aside nav a.dim:hover{background:none;color:#4b5563}
+.sep{font-size:11px;text-transform:uppercase;color:#4b5563;padding:16px 12px 4px}
+.back{padding:9px 12px;font-size:13px}
+.amain{padding:24px 30px}
+.abar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.abar h1{margin:0;font-size:22px}.abar span{color:#6b7280;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpis div{background:#fff;border-radius:12px;padding:18px;border:1px solid #e5e7eb}
+.kpis span{display:block;color:#6b7280;font-size:13px}.kpis b{font-size:22px}.kpis .warn{color:#e11d48}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-bottom:16px}
+.panel h2{margin:0 0 10px;font-size:16px}
+.flagpanel{border-left:4px solid #4338ca}
+pre{background:#111827;color:#a5f3fc;padding:14px;border-radius:8px;overflow:auto}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;color:#6b7280;font-weight:600;font-size:12.5px;border-bottom:1px solid #e5e7eb;padding:8px}
+td{border-bottom:1px solid #f3f4f6;padding:9px 8px}
+.tag{background:#f3f4f6;border-radius:6px;padding:2px 8px;font-size:12px}.tag.admin{background:#eef2ff;color:#4338ca;font-weight:700}
+.abtn{display:inline-block;background:#4338ca;color:#fff;border:1px solid #4338ca;border-radius:8px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}
+.abtn.line{background:#fff;color:#4338ca}
+.ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-weight:600}
+.ok a{text-decoration:underline}
+.drop{border:2px dashed #c7d2fe;background:#f8faff;border-radius:12px;padding:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.drop div{flex:1;min-width:220px}.drop span{display:block;color:#6b7280;font-size:13px}
+.hint{color:#6b7280;font-size:13px}
+.urlrow{display:flex;gap:8px}.urlrow input{flex:1}
+input{font:inherit;border:1px solid #d1d5db;border-radius:8px;padding:9px 12px}
+.muted{color:#6b7280}
+code{background:#f3f4f6;padding:1px 6px;border-radius:4px}
+body.alogin{background:linear-gradient(160deg,#111827,#1e1b4b);min-height:100vh;margin:0}
+.alogin main{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 32px);gap:20px;padding:20px}
+.lbrand{display:flex;align-items:center;gap:10px;color:#fff}.lbrand b{display:block;font-size:20px}.lbrand span{color:#a5b4fc;font-size:13px}
+.lcard{background:#fff;border-radius:16px;padding:30px;width:100%;max-width:380px;display:grid;gap:12px}
+.lcard h1{margin:0;font-size:20px}.lcard p{margin:0;color:#6b7280}
+.lcard label{display:grid;gap:4px;font-size:13px;font-weight:600;color:#4b5563}
+.lcard button{background:#4338ca;color:#fff;border:0;border-radius:8px;padding:12px;font:inherit;font-weight:700;cursor:pointer}
+.lcard small{color:#9ca3af;text-align:center}
+.alert{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px 12px;border-radius:8px}
+.alogin footer{color:#6b7280;font-size:12px}
+@media (max-width:860px){body.admin{grid-template-columns:1fr}body.admin .ctfbar{grid-column:1}.kpis,.cols{grid-template-columns:1fr 1fr}}
