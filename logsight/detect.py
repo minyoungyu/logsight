@@ -319,6 +319,11 @@ def _web_rule_findings(events: list[Event], env: dict, prior: list[Finding]) -> 
 # 웹 서비스가 도는 계정. 이 계정이 sudo·su를 쓰는 일은 정상 운영에서 거의 없다(웹셸에서 권한을 올리는 모습)
 SERVICE_ACCOUNTS = frozenset({"www-data", "apache", "nginx", "httpd", "http", "wwwrun", "nobody", "daemon",
                               "tomcat", "php-fpm", "lighttpd"})
+# 클라우드 이미지가 부팅(cloud-init) 때 자동으로 만드는 계정. 공격이 아니라 provisioning 산물이라,
+# 이 이름이 '시스템 useradd'로 생성된 경우는 계정 생성 경보에서 뺀다. 공격자가 sudo 로 만드는
+# 계정이나, 이 목록에 없는 이름의 생성은 그대로 센다.
+BOOTSTRAP_ACCOUNTS = frozenset({"ec2-user", "ssm-user", "ec2-instance-connect", "ubuntu", "cloud-user",
+                                "centos", "fedora", "rocky", "almalinux", "debian", "rhel"})
 # sudo로 실행했을 때 root 셸을 여는 명령(GTFOBins에서 흔한 것). 관리자가 일상적으로 쓰는 모양과 겹치지 않는 것만
 SHELL_ESCAPE = re.compile(
     r"(?i)(?:\bfind\b.*\s-exec\b|\b(?:python[\d.]*|perl|ruby|php|lua|node)\s+-[ecr]\b|"
@@ -354,7 +359,14 @@ def host_auth_findings(events: list[Event]) -> list[Finding]:
         who = (e.actor or "?").strip()
         cmd = e.extra.get("command", "")
         svc = who.lower() in SERVICE_ACCOUNTS
-        if e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
+        if e.action == "useradd":
+            # 시스템 useradd(부팅·패키지 설치)는 클라우드 기본 계정(ec2-user 등)과 서비스 계정
+            # (nginx·apache 등)을 자동 생성한다 — 공격이 아니라 provisioning 산물이라 뺀다.
+            # 공격자가 같은 이름을 sudo 로 다시 만들거나, 목록에 없는 이름을 만들면 그대로 잡힌다.
+            tgt = _account_target(e).lower()
+            if tgt not in BOOTSTRAP_ACCOUNTS and tgt not in SERVICE_ACCOUNTS:
+                acct[_account_target(e)].append(e)
+        elif e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd):
             acct[_account_target(e)].append(e)
         if e.action in ("sudo", "su") and e.outcome == "success" and (svc or SHELL_ESCAPE.search(cmd)):
             esc[who].append(e)

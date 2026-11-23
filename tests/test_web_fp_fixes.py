@@ -96,5 +96,49 @@ class VerdictTests(unittest.TestCase):
         self.assertEqual(v[0], "likely_breached")
 
 
+class CategoryParamNotWebshellTests(unittest.TestCase):
+    """2026-11-23 CTF 리허설 회귀: 짧은 매개변수 c= 가 정상 앱 값(카테고리 등)일 때
+    웹셸로 오탐하면 안 된다. 실제 웹셸(c=/경로, c=명령)은 그대로 잡혀야 한다."""
+
+    def test_category_word_value_is_not_webshell(self):
+        for v in ("mouse", "laptop", "keyboard", "headset"):
+            self.assertNotIn("WEBLOG_WEBSHELL_ACCESS",
+                             rules([line(f"/category.php?c={v}")]), v)
+
+    def test_run_word_value_is_not_webshell(self):
+        self.assertNotIn("WEBLOG_WEBSHELL_ACCESS", rules([line("/report.php?run=weekly")]))
+
+    def test_real_webshell_command_value_still_detected(self):
+        # 업로드된 .phtml 에 명령형 값(경로·공백·명령어)을 준 진짜 웹셸은 유지
+        for q in ("c=/usr/local/bin/proof", "c=cat /etc/passwd", "cmd=id"):
+            self.assertIn("WEBLOG_WEBSHELL_ACCESS",
+                          rules([line(f"/uploads/x.phtml?{q}")]), q)
+
+
+class BootstrapAccountNotFlaggedTests(unittest.TestCase):
+    """2026-11-23 CTF 리허설 회귀: 부팅(cloud-init)·패키지 설치가 만드는 기본·서비스 계정
+    (ec2-user·nginx·apache)은 HOST_ACCOUNT_CREATED 로 잡으면 안 된다. 공격자가 sudo 로
+    만들거나 목록에 없는 이름을 만들면 그대로 잡혀야 한다."""
+
+    @staticmethod
+    def _findings(text):
+        from logsight.detect import host_auth_findings
+        from logsight.normalize import parse_sshauth
+        evs = parse_sshauth(text, "auth.log", year=2026)
+        return {f.rule for f in host_auth_findings(evs)}
+
+    def test_boot_and_service_accounts_not_flagged(self):
+        text = "\n".join([
+            "Nov 23 02:34:21 host useradd[1950]: new user: name=ec2-user, UID=1000, GID=1000, home=/home/ec2-user, shell=/bin/bash",
+            "Nov 23 02:34:50 host useradd[2010]: new user: name=nginx, UID=990, GID=990, home=/var/lib/nginx, shell=/sbin/nologin",
+            "Nov 23 02:34:51 host useradd[2011]: new user: name=apache, UID=48, GID=48, home=/usr/share/httpd, shell=/sbin/nologin",
+        ])
+        self.assertNotIn("HOST_ACCOUNT_CREATED", self._findings(text))
+
+    def test_attacker_created_account_still_flagged(self):
+        text = "Nov 23 03:10:00 host useradd[9100]: new user: name=backdoor, UID=1500, GID=1500, home=/home/backdoor, shell=/bin/bash"
+        self.assertIn("HOST_ACCOUNT_CREATED", self._findings(text))
+
+
 if __name__ == "__main__":
     unittest.main()

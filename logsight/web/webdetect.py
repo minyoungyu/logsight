@@ -84,7 +84,13 @@ SCANNER_UA = re.compile(
 WEBSHELL_NAME = re.compile(
     r"(?i)(?:^|/)(?:c99|r57|b374k|wso|webshell|backdoor|adminer|"
     r"alfa|indoxploit|p0wny|antichat|phpspy|tryag|0byt3m1n1)\.(?:php|phtml|jsp|asp|aspx)\b")
-SHELL_PARAM = re.compile(r"(?i)[?&](?:cmd|exec|command|c|run|shell|system|passthru)\s*=([^&]*)")
+SHELL_PARAM = re.compile(r"(?i)[?&](cmd|exec|command|c|run|shell|system|passthru)\s*=([^&]*)")
+# c·run 은 정상 앱에서도 흔한 짧은 매개변수(category=c=mouse, run=1 등)라 이름만으로는
+# 약하다. 값이 실제 명령처럼 보일 때만 센다. cmd·exec·shell 등 분명한 이름은 값만 있으면 센다.
+_AMBIGUOUS_SHELL_PARAM = frozenset({"c", "run"})
+_COMMAND_LIKE = re.compile(
+    r"[/\\;|&`$><]|\s|\.(?:sh|exe|bin|py|pl)\b"
+    r"|\b(?:cat|ls|id|whoami|wget|curl|nc|ncat|bash|sh|dash|zsh|python|perl|find|chmod|chown|sudo|uname|echo)\b")
 # 스크립트로 실행되는 파일 확장자(경로 끝). /remote.php/dav/a.jpg 처럼 스크립트 뒤에 경로가
 # 붙은 요청은 그 파일을 내려받는 것이라 실행으로 보지 않는다.
 SCRIPT_EXT = re.compile(r"(?i)\.(?:php\d?|phtml|phar|jsp|jspx|asp|aspx|cgi|pl)$")
@@ -155,14 +161,20 @@ def _is_admin_path(path: str, prefixes: tuple[str, ...]) -> bool:
 
 
 def _shell_param_hit(path: str, query: str) -> bool:
-    """명령 인자(cmd=, c= 등)로 스크립트를 부른 요청인가. 해시 같은 값은 뺀다."""
+    """명령 인자(cmd=, c= 등)로 스크립트를 부른 요청인가. 해시·일반 단어는 뺀다."""
     if not SCRIPT_EXT.search(path):
         return False
     for m in SHELL_PARAM.finditer("?" + query):
-        value = unquote_plus(m.group(1)).strip()
+        name = m.group(1).lower()
+        value = unquote_plus(m.group(2)).strip()
         # 숫자만 있는 값(c=0, run=1)은 켜고 끄는 옵션이지 명령이 아니다(WordPress load-scripts.php?c=0 등)
-        if value and not value.isdigit() and not HASH_LIKE.match(value):
-            return True
+        if not value or value.isdigit() or HASH_LIKE.match(value):
+            continue
+        # c·run 처럼 흔한 짧은 이름은 값이 명령처럼 보일 때만 센다. category.php?c=mouse 같은
+        # 평범한 단어(경로·공백·명령어 없음)는 카테고리·식별자이지 웹셸 명령이 아니다.
+        if name in _AMBIGUOUS_SHELL_PARAM and not _COMMAND_LIKE.search(value):
+            continue
+        return True
     return False
 
 
