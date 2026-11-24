@@ -1,0 +1,109 @@
+{
+ "note": "'모름' → 읽기 전용 확인 명령 제안(next_checks) 첫 실측. 버린 1개(EventName=PutBucketAcl)는 검사기의 잘못이라 이 측정 뒤 고쳤다.",
+ "runs": [
+  {
+   "run": "ai_v3_checks_1",
+   "cannot_tell": [
+    "web_admin 액세스 키(AKIAJOGC********XUPA)가 어떻게 외부로 유출됐는지는 이 로그로 알 수 없다.",
+    "35.153.154.221에서 온 CreateUser 시도가 공격자의 것인지 정상 사용자의 작업인지는 확실하지 않다.",
+    "coverage의 suspected_keys가 비어 있어 web_admin 키와 임시 키(ASIAZB6T********BJQA)의 전체 사용 내역을 볼 수 없다. 거부되지 않은 다른 호출이 있었는지, 키가 실제로 비활성화됐는지는 확인되지 않는다.",
+    "bstoll이 공개로 바꾼 S3 버킷이 어느 것인지 events에 없다. S3 객체 호출 로그(cloudtrail_s3_object_calls 0)도 없어 외부에서 데이터를 읽어 갔는지 알 수 없다.",
+    "bstoll 콘솔 로그인은 MFA 없이 두 IP(157.97.121.132, 107.77.212.175)에서 이뤄졌다. 정말 본인이었는지는 확실히 증명할 수 없다.",
+    "11211/udp를 전체에 연 보안그룹(sg-0849cdeb5ef571996)이 외부에서 악용됐는지는 이 사건 목록에 없다.",
+    "웹 명령 삽입 시도는 WAF 로그가 없고 호스트 내부 기록도 없다. 서버 안에서 실행되지 않았다고 완전히 확정할 수는 없다.",
+    "i-0cc93bade2b3cba63의 22번 포트 접속 뒤 로그인을 시도했는지, 성공했는지는 이 사건에 sshauth 기록이 없어 알 수 없다.",
+    "로그가 끝난 2018-08-20 15:26 이후의 일은 알 수 없다."
+   ],
+   "next_checks_kept": [
+    {
+     "about": "coverage의 suspected_keys가 비어 있어 web_admin 키와 임시 키(ASIAZB6T********BJQA)의 전체 사용 내역을 볼 수 없다. 거부되지 않은 다른 호출이 있었는지, 키가 실제로 비활성화됐는지는 확인되지 않는다.",
+     "command": "aws iam list-access-keys --user-name web_admin",
+     "purpose": "유출된 키의 Status가 Inactive이거나 목록에서 지워졌는지 본다."
+    },
+    {
+     "about": "coverage의 suspected_keys가 비어 있어 web_admin 키와 임시 키(ASIAZB6T********BJQA)의 전체 사용 내역을 볼 수 없다. 거부되지 않은 다른 호출이 있었는지, 키가 실제로 비활성화됐는지는 확인되지 않는다.",
+     "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=web_admin",
+     "purpose": "web_admin 이름으로 errorCode 없이 성공한 호출이 있는지 본다."
+    },
+    {
+     "about": "bstoll 콘솔 로그인은 MFA 없이 두 IP(157.97.121.132, 107.77.212.175)에서 이뤄졌다. 정말 본인이었는지는 확실히 증명할 수 없다.",
+     "command": "aws iam list-mfa-devices --user-name bstoll",
+     "purpose": "bstoll에 MFA 장치가 하나라도 등록돼 있는지 본다."
+    },
+    {
+     "about": "11211/udp를 전체에 연 보안그룹(sg-0849cdeb5ef571996)이 외부에서 악용됐는지는 이 사건 목록에 없다.",
+     "command": "aws ec2 describe-security-groups --group-ids sg-0849cdeb5ef571996 --region us-west-1",
+     "purpose": "11211/udp 규칙이 아직 0.0.0.0/0이나 ::/0에 열려 있는지 본다."
+    }
+   ],
+   "check_validation": {
+    "total": 5,
+    "kept": 4,
+    "dropped": [
+     {
+      "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=PutBucketAcl",
+      "reason": "사건 입력에 없는 자원(PutBucketAcl)"
+     }
+    ],
+    "over_limit": 0
+   },
+   "usage": {
+    "input_tokens": 26067,
+    "output_tokens": 9587,
+    "served_by": "claude-opus-5-5"
+   }
+  },
+  {
+   "run": "ai_v3_checks_2",
+   "cannot_tell": [
+    "web_admin의 장기 키(AKIAJOGC********XUPA)가 어떻게 유출됐는지는 이 로그로 알 수 없다.",
+    "139.198.18.205가 쓴 임시 키(ASIAZB6T********BJQA)가 web_admin 장기 키에서 발급된 것인지, 35.153.154.221과 같은 공격자인지는 사건 이벤트만으로 확정할 수 없다.",
+    "주변 동작에 RunInstances가 391건 있으나 거부 이벤트는 231건만 보여, 성공한 인스턴스 생성이 있었는지 알 수 없다.",
+    "대응 중 web_admin 키가 실제로 비활성화·삭제됐는지는 사건 이벤트에 없다.",
+    "S3 객체 단위 호출이 CloudTrail에 0건이라 기록되지 않은 것으로 보인다. 공개된 버킷에서 외부가 데이터를 읽어 갔는지(반출)는 보이지 않고, 어느 버킷이 공개됐는지도 사건 이벤트에 없다.",
+    "107.77.212.175의 bstoll 활동(버킷 공개, 11211/udp 개방)이 실제 bstoll 본인의 작업인지, MFA 없는 비밀번호가 도용된 것인지는 이 로그만으로 확정할 수 없다.",
+    "11211/udp를 연 보안그룹이 지금도 열려 있는지, 로그가 끝난 뒤 악용됐는지는 알 수 없다.",
+    "WAF 로그가 없고 웹 서버 내부 기록도 없어, 웹 명령 삽입이 다른 경로로 성공했는지는 알 수 없다.",
+    "SSH 포트 탐색 뒤 i-0cc93bade2b3cba63에 로그인이 있었는지는 이 인스턴스의 인증 로그가 사건에 없어 알 수 없다."
+   ],
+   "next_checks_kept": [
+    {
+     "about": "대응 중 web_admin 키가 실제로 비활성화·삭제됐는지는 사건 이벤트에 없다.",
+     "command": "aws iam list-access-keys --user-name web_admin",
+     "purpose": "XUPA로 끝나는 키가 남아 있는지, Status가 Inactive인지 본다."
+    },
+    {
+     "about": "주변 동작에 RunInstances가 391건 있으나 거부 이벤트는 231건만 보여, 성공한 인스턴스 생성이 있었는지 알 수 없다.",
+     "command": "aws ec2 describe-instances --region us-east-1 --filters Name=tag:my_i_key,Values=my_i_val",
+     "purpose": "공격자가 쓴 태그(my_i_key=my_i_val)를 가진 인스턴스가 있으면 생성에 성공한 것이다."
+    },
+    {
+     "about": "107.77.212.175의 bstoll 활동(버킷 공개, 11211/udp 개방)이 실제 bstoll 본인의 작업인지, MFA 없는 비밀번호가 도용된 것인지는 이 로그만으로 확정할 수 없다.",
+     "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=bstoll",
+     "purpose": "bstoll의 평소 접속 IP·브라우저와 107.77.212.175 활동을 비교하고, 본인에게 작업 여부를 확인한다."
+    },
+    {
+     "about": "11211/udp를 연 보안그룹이 지금도 열려 있는지, 로그가 끝난 뒤 악용됐는지는 알 수 없다.",
+     "command": "aws ec2 describe-security-groups --region us-west-1 --group-ids sg-0849cdeb5ef571996",
+     "purpose": "11211/udp에 0.0.0.0/0이나 ::/0 규칙이 남아 있는지 본다."
+    }
+   ],
+   "check_validation": {
+    "total": 5,
+    "kept": 4,
+    "dropped": [
+     {
+      "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=PutBucketAcl",
+      "reason": "사건 입력에 없는 자원(PutBucketAcl)"
+     }
+    ],
+    "over_limit": 0
+   },
+   "usage": {
+    "input_tokens": 26067,
+    "output_tokens": 10411,
+    "served_by": "claude-opus-5-5"
+   }
+  }
+ ]
+}

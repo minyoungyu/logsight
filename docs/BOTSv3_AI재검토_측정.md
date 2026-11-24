@@ -61,6 +61,15 @@
 - 근거 검증은 3회 모두 통과했다. 보내는 양이 줄어 입력 토큰이 약 40% 줄었다.
 - 직원 목록이 있는 규칙만(30/30)이 여전히 가장 좋다. 3절 4번 결론은 그대로다.
 
+### '모름'마다 확인 명령 제안 (AI 확대 1번, 2회)
+
+같은 조건으로 2회 더 돌려 AI가 '모름' 항목에 읽기 전용 AWS CLI 명령을 제안하게 했다(`next_checks`, 검사는 `logsight/checks.py`). 판정은 2회 모두 29/30, 근거 검증 통과. 결과 [`reports/public/botsv3_next_checks.json`](../reports/public/botsv3_next_checks.json).
+
+- 회마다 5개를 제안했고 4개가 검사를 통과했다. 쓰기·삭제 명령, 비밀값 조회, 셸 기호는 한 번도 나오지 않았다.
+- 통과한 예: `aws iam list-access-keys --user-name web_admin`(유출 키가 꺼졌나), `aws iam list-mfa-devices --user-name bstoll`(버킷을 공개한 직원 계정에 MFA가 있나), `aws ec2 describe-instances --filters Name=tag:my_i_key,Values=my_i_val`(공격자가 붙인 태그로 인스턴스 생성 성공 여부). 셋 다 로그로는 답할 수 없던 '모름' 항목과 짝이다.
+- 버린 1개(2회 모두 같음)는 `lookup-events`의 `AttributeKey=EventName,AttributeValue=PutBucketAcl`이다. 이벤트 이름을 자원 이름으로 잘못 보고 버렸다. **검사기의 잘못**이라 고쳤다(테스트 추가). 고친 뒤로는 통과한다.
+- 이 2회에서 검사기가 막아야 할 위험한 제안은 없었다. 그래서 이 측정은 "검사기가 위험한 명령을 막는다"의 증거가 아니다. 그것은 단위 테스트(쓰기·비밀값·셸 기호·지어낸 자원 15가지)가 보인다.
+
 ## 5. 한계
 
 - 하루치, 계정 하나. 사건 30개 중 21개가 같은 종류(열린 포트 접촉)라 합계 점수는 그 종류가 좌우한다. 종류별 줄을 보고 읽는다.

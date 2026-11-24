@@ -17,6 +17,8 @@ def test_read_only_command_with_known_resources_is_kept():
         "aws s3api get-bucket-policy --bucket frothlybucket",
         "aws ec2 describe-instances --instance-ids i-0a1b2c3d4e5f60718 --region us-west-2 --output json",
         "aws cloudtrail lookup-events --start-time 2018-08-20T09:00:00Z --max-results 50",
+        # 이벤트 이름은 자원이 아니다(BOTSv3 실측에서 잘못 버리던 것)
+        "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=PutBucketAcl",
     ]:
         kept, rep = run(cmd)
         assert len(kept) == 1, (cmd, rep)

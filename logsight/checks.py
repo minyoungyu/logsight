@@ -56,7 +56,7 @@ GENERIC = re.compile(
     r"^(?:\d+|json|text|table|yaml|true|false|"
     r"\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?Z?)?|"
     r"[a-z]{2}(?:-gov)?-[a-z]+-\d)$")
-LOOKUP_KEYS = {"AttributeKey", "AttributeValue", "Name", "Values"}
+NON_RESOURCE_KEYS = {"EventName", "EventSource", "ReadOnly", "ResourceType"}
 
 
 def _payload_text(payload: dict) -> str:
@@ -92,10 +92,14 @@ def _check_one(cmd: str, known: str) -> str | None:
         for p in ID_PATTERNS:
             values += p.findall(t)
         if prev == "--lookup-attributes" or prev == "--filters":
-            # AttributeKey=Username,AttributeValue=bob → bob만 자원으로 본다
-            for part in t.split(","):
-                k, _, v = part.partition("=")
-                if k in LOOKUP_KEYS and v and k in {"AttributeValue", "Values"} and not GENERIC.match(v):
+            # AttributeKey=Username,AttributeValue=bob → bob만 자원으로 본다.
+            # AttributeKey가 EventName·EventSource·ReadOnly·ResourceType이면 값은 API 이름 등이라 자원이 아니다.
+            parts = dict(p.partition("=")[::2] for p in t.split(","))
+            if parts.get("AttributeKey") in NON_RESOURCE_KEYS:
+                continue
+            for k in ("AttributeValue", "Values"):
+                v = parts.get(k)
+                if v and not GENERIC.match(v):
                     values.append(v)
     for v in values:
         v = v.strip("\"'")
