@@ -356,6 +356,13 @@ def _coverage_card(result: dict) -> str:
         if ai_notes:
             h.append("<b style='display:block;margin-top:10px'>Claude가 덧붙인 것</b><ul>" + "".join(
                 f"<li>{escape(n if isinstance(n, str) else n.get('what', str(n)))}</li>" for n in ai_notes) + "</ul>")
+        checks = tri.get("next_checks") if tri.get("mode") != "rules" else None
+        if checks:
+            h.append("<b style='display:block;margin-top:10px'>직접 확인해 볼 명령 (읽기 전용)</b>"
+                     "<div class='small muted'>Claude가 제안하고 코드가 검사했습니다: 조회 동작만, 셸 기호 없음, "
+                     "로그에 나온 자원 이름만. 계정에서 아무것도 바꾸지 않습니다.</div><ul>" + "".join(
+                         f"<li>{escape(c['about'])}<br><code>{escape(c['command'])}</code>"
+                         f"<div class='small muted'>{escape(c.get('purpose', ''))}</div></li>" for c in checks) + "</ul>")
         h.append("</div>")
     h.append("<div class='small faint' style='margin-top:8px'>'기록이 없음'은 '일어나지 않음'이 아닙니다. 빠진 로그는 "
              "<code>python -m logsight check</code>로 켜는 방법과 비용을 볼 수 있습니다.</div></div>")

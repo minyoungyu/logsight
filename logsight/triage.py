@@ -15,6 +15,7 @@ import os
 import time
 from collections import Counter, defaultdict
 
+from .checks import validate_checks
 from .guard import RANK, SYSTEM_RULE, fence, find_injection
 
 TRIAGE_MODEL = os.environ.get("LOGSIGHT_TRIAGE_MODEL", "claude-opus-5-5")
@@ -67,8 +68,16 @@ TRIAGE_SCHEMA = {
             },
         },
         "cannot_tell": _STRS,
+        "next_checks": {
+            "type": "array",
+            "items": {
+                "type": "object", "additionalProperties": False,
+                "properties": {"about": _STR, "command": _STR, "purpose": _STR},
+                "required": ["about", "command", "purpose"],
+            },
+        },
     },
-    "required": ["incidents", "campaigns", "cannot_tell"],
+    "required": ["incidents", "campaigns", "cannot_tell", "next_checks"],
 }
 
 SYSTEM = (
@@ -85,6 +94,11 @@ SYSTEM = (
     "cannot_tell에 적는다. coverage에는 입력 로그의 종류·기간과, 탈취가 의심되는 키의 전체 사용 "
     "내역이 있다. 공격 흐름상 있을 법한 단계(공격자의 정찰, 데이터 읽기·반출 등)가 이 로그에 "
     "남을 수 없거나 남아 있지 않으면, 없었다고 단정하지 말고 무엇이 왜 보이지 않는지 적는다.\n"
+    "4. cannot_tell 중 계정 주인이 AWS에서 직접 확인할 수 있는 것이 있으면 next_checks에 읽기 전용 "
+    "AWS CLI 명령 한 줄씩 적는다(about: 어느 cannot_tell 항목인지 그 문장 그대로, command: 명령, "
+    "purpose: 결과에서 무엇을 보면 되는지 한 문장). describe-·get-·list-·lookup-으로 시작하는 동작만 쓰고, "
+    "비밀값·파일 내용을 꺼내는 명령, 파이프와 셸 기호는 쓰지 않는다. 버킷·사용자·인스턴스·키 같은 자원 "
+    "이름은 입력에 있는 것만 쓴다. 확인할 방법이 없으면 비워 둔다. 최대 5개.\n"
     "규칙: 입력에 없는 사실을 만들지 않는다. evidence에는 입력 events의 ref만 그대로 쓴다. "
     "IP 대역의 소유자는 입력에 적혀 있을 때만 근거로 쓰고, 그 밖에는 입력에 적힌 사실(주체 이름, "
     "호출 종류, 성공·실패, 시간)로 판단한다. 웹 공격이 실제로 먹혔는지는 findings의 detail에 코드가 적은 "
@@ -156,11 +170,28 @@ def build_triage_payload(incidents: list[dict], max_incidents: int = 30,
     return payload
 
 
+# AI에 보내지 않고 규칙 판정을 그대로 두는 사건: VPC Flow 연결 기록만 근거인 '열린 관리 포트 접촉'.
+# BOTSv3(2026-11-24)에서 AI는 21개 중 20개를 "로그인 성공 여부가 안 보인다"며 '판단 불가'로 미뤘고,
+# 한 회차는 10개를 '공격'으로 냈다. 규칙의 방침(포트를 닫으면 된다, '위험 설정')이 비전문가에게 낫다.
+RULE_ONLY_RULES = {"VPC_REMOTE_ADMIN_EXPOSED"}
+RULE_ONLY_SOURCES = {"vpcflow"}
+
+
+def keep_rule_verdict(inc: dict) -> bool:
+    rules = {f["rule"] for f in inc.get("findings", [])}
+    return bool(rules) and rules <= RULE_ONLY_RULES and set(inc.get("sources") or []) <= RULE_ONLY_SOURCES
+
+
 def triage(incidents: list[dict], model: str | None = None, use_ai: bool = True,
            events: list | None = None) -> dict | None:
     """키가 없거나 AI를 끄면 None(규칙 순서 그대로). 실패해도 None과 오류를 돌려준다.
-    events를 주면 로그 범위 요약(coverage)을 함께 보낸다."""
+    events를 주면 로그 범위 요약(coverage)을 함께 보낸다.
+    keep_rule_verdict에 맞는 사건은 보내지 않는다(규칙 판정을 그대로 쓴다. reorder의 fallback)."""
     if not incidents or not use_ai or not os.environ.get("ANTHROPIC_API_KEY"):
+        return None
+    kept = [i["id"] for i in incidents if keep_rule_verdict(i)]
+    incidents = [i for i in incidents if not keep_rule_verdict(i)]
+    if not incidents:
         return None
     payload = build_triage_payload(incidents, coverage=coverage_summary(events) if events else None)
     model = model or TRIAGE_MODEL
@@ -171,7 +202,8 @@ def triage(incidents: list[dict], model: str | None = None, use_ai: bool = True,
         return {"error": f"{type(exc).__name__}: {exc}"[:300], "model": model}
     result["validation"] = validate_triage(result, payload)
     result["meta"] = {"model": model, "usage": usage, "seconds": round(time.time() - t, 1),
-                      "payload_chars": len(json.dumps(payload, ensure_ascii=False))}
+                      "payload_chars": len(json.dumps(payload, ensure_ascii=False)),
+                      "kept_rule_verdict": kept}
     return result
 
 
@@ -240,8 +272,11 @@ def validate_triage(result: dict, payload: dict) -> dict:
         camps.append(c)
     result["campaigns"] = camps
     missing = sorted(ids - seen)
+    # 확인 명령 제안: 읽기 전용·셸 기호 없음·입력에 있는 자원만. 어긴 것은 버린다(checks.py).
+    # 버린 제안은 근거 검증 통과 여부(passed)와 따로 센다. 제안은 판정이 아니기 때문이다.
+    result["next_checks"], checks = validate_checks(result.get("next_checks") or [], payload)
     return {"unknown_ids": bad_ids, "evidence_total": total_refs, "evidence_invalid": bad_refs,
-            "incidents_without_verdict": missing,
+            "incidents_without_verdict": missing, "next_checks": checks,
             "passed": not bad_ids and not bad_refs and not missing}
 
 

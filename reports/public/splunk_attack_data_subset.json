@@ -1,0 +1,125 @@
+{
+ "criteria": {
+  "excluded_services": {
+   "bedrock": "생성형 AI 서비스. 대상 고객이 가드레일·지식 기반을 운영한다고 보기 어렵다",
+   "ecr": "컨테이너 이미지 저장소와 이미지 취약점 검사",
+   "saml": "회사 SSO(SAML 자격 공급자) 연동"
+  },
+  "needs_existing": {
+   "DeleteGuardrail": "bedrock",
+   "DeleteKnowledgeBase": "bedrock",
+   "DeleteModelInvocationLoggingConfiguration": "bedrock",
+   "DescribeImageScanFindings": "ecr",
+   "PutImage": "ecr",
+   "UpdateSAMLProvider": "saml"
+  }
+ },
+ "all": {
+  "맞게 탐지": 16,
+  "놓침": 28,
+  "다른 이유로만 걸림": 8
+ },
+ "subset": {
+  "맞게 탐지": 16,
+  "놓침": 19,
+  "다른 이유로만 걸림": 8
+ },
+ "dropped": [
+  {
+   "detection": "AWS Bedrock Delete GuardRails",
+   "judgement": "놓침",
+   "services": [
+    "bedrock"
+   ]
+  },
+  {
+   "detection": "AWS Bedrock Delete Knowledge Base",
+   "judgement": "놓침",
+   "services": [
+    "bedrock"
+   ]
+  },
+  {
+   "detection": "AWS Bedrock Delete Model Invocation Logging Configuration",
+   "judgement": "놓침",
+   "services": [
+    "bedrock"
+   ]
+  },
+  {
+   "detection": "AWS ECR Container Scanning Findings High",
+   "judgement": "놓침",
+   "services": [
+    "ecr"
+   ]
+  },
+  {
+   "detection": "AWS ECR Container Scanning Findings Low Informational Unknown",
+   "judgement": "놓침",
+   "services": [
+    "ecr"
+   ]
+  },
+  {
+   "detection": "AWS ECR Container Scanning Findings Medium",
+   "judgement": "놓침",
+   "services": [
+    "ecr"
+   ]
+  },
+  {
+   "detection": "AWS ECR Container Upload Outside Business Hours",
+   "judgement": "놓침",
+   "services": [
+    "ecr"
+   ]
+  },
+  {
+   "detection": "AWS ECR Container Upload Unknown User",
+   "judgement": "놓침",
+   "services": [
+    "ecr"
+   ]
+  },
+  {
+   "detection": "AWS SAML Update identity provider",
+   "judgement": "놓침",
+   "services": [
+    "saml"
+   ]
+  }
+ ],
+ "subset_missed": [
+  "AWS Bedrock Invoke Model Access Denied",
+  "AWS Concurrent Sessions From Different Ips",
+  "AWS Console Login Failed During MFA Challenge",
+  "AWS Defense Evasion PutBucketLifecycle",
+  "AWS Detect Users creating keys with encrypt policy without MFA",
+  "AWS Detect Users with KMS keys performing encryption S3",
+  "AWS Disable Bucket Versioning",
+  "AWS EC2 Multiple SSH Public Keys Uploaded by a Single Identity",
+  "AWS EC2 Startup Script Modified on Stopped Instance",
+  "AWS Exfiltration via Batch Service",
+  "AWS Exfiltration via Bucket Replication",
+  "AWS Exfiltration via DataSync Task",
+  "AWS High Number Of Failed Authentications For User",
+  "AWS IAM Assume Role Policy Brute Force",
+  "AWS IAM Delete Policy",
+  "AWS IAM Failure Group Deletion",
+  "AWS IAM Successful Group Deletion",
+  "AWS Lambda UpdateFunctionCode",
+  "AWS Multi-Factor Authentication Disabled",
+  "AWS Multiple Failed MFA Requests For User",
+  "AWS Network Access Control List Created with All Open Ports",
+  "AWS Network Access Control List Deleted",
+  "AWS New MFA Method Registered For User",
+  "AWS Password Policy Changes",
+  "AWS Repeated CloudWatch Logs Read Operations",
+  "AWS SetDefaultPolicyVersion",
+  "AWS Successful Console Authentication From Multiple IPs"
+ ],
+ "summary": {
+  "all": "16/52",
+  "subset": "16/43"
+ }
+}
