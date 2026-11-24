@@ -23,6 +23,7 @@ dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "httpx",
 
 [project.scripts]
 logsight = "logsight.__main__:main"
+logfinder = "logsight.__main__:main"  # 제품 이름(LogFinder). 패키지·저장소 이름은 logsight 그대로
 
 [project.urls]
 Source = "https://github.com/minyoungyu/logsight"

@@ -55,7 +55,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     tri = ai_tri if ai_tri and "incidents" in ai_tri else rule_tri
     if tri is ai_tri:
         tri["guard"] = hold(groups, tri, rule_tri)  # AI가 규칙의 공격 판정을 낮춘 것을 표시·되돌림
-    groups = reorder(groups, tri)
+    groups = reorder(groups, tri, fallback=rule_tri)  # AI에 안 보낸 사건은 규칙 판정 그대로
     rule_v = {x["id"]: x for x in rule_tri["incidents"]}
     results, audit_errors = [], []
     for inc in groups[:top]:

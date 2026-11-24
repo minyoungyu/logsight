@@ -5,6 +5,14 @@
 ## 미출시
 
 ### 추가
+- 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
+- BOTSv3 AI 재검토 측정(`docs/BOTSv3_AI재검토_측정.md`, `reports/public/botsv3_ai_triage.json`): 정답을 실행 전에 고정하고 4조건 × 3회.
+- AI가 '모름'마다 읽기 전용 확인 명령을 제안(`next_checks`, `logsight/checks.py`): 코드가 조회 동작(describe·get·list·lookup)만, 셸 기호 없음, 비밀값·파일을 꺼내는 동작 아님, 명령의 자원 이름이 AI에 보낸 입력에 있음을 검사하고 어긴 제안은 버린다. 보고서 '알 수 없는 것' 칸에 "직접 확인해 볼 명령"으로 나온다. 확인 명령은 서비스별로 이름을 적은 조회 동작만 받는다(describe·get·list로 시작해도 eks get-token, ssm get-parameter-history처럼 비밀값을 내는 것이 있어서). 재검토에서 `--endpoint-url`(로그의 공격자 IP로 서명된 요청을 보내게 하는 길), `--cli-input-json`·`file://`, `--debug`, 가린 키 값, 환경 변수를 보여 주는 동작(Lambda 설정·ECS 작업 정의)도 막았다. 같은 '모름' 항목의 명령은 한 묶음으로 보이고 CloudShell에서 실행한다는 안내가 붙는다.
+- VPC Flow만 근거인 '열린 관리 포트 접촉' 사건은 AI에 보내지 않고 규칙 판정을 쓴다(`triage.keep_rule_verdict`). BOTSv3 개발 점수 9/30 → 29/30, 입력 토큰 약 40% 감소. 늘어난 20개는 규칙 판정이고, AI가 직접 판정한 사건의 정답(10개 중 9개)은 그대로다.
+- `logfinder` 명령(기존 `logsight`와 같음). 대상 고객 기준 부분 점수(`scripts/public/subset_splunk_attack_data.py`): 처음 본 데이터 16/43(37%).
+- 비전문가 3명 30분 파일럿(`docs/사용자평가/파일럿_3명.md`, 기준을 미리 고정), AWS 계정이 필요한 남은 확인(`docs/AWS_계정이_필요한_확인.md`).
+- 핵심 차별점 정리(`docs/핵심_차별점.md`), CTF 관찰 전용 운용(`docs/CTF_사례/관찰전용_운용.md`)과 3자 비교 평가 설계(`docs/CTF_사례/3자_비교평가.md`).
+- 주입 문장 패턴: AI에게 말을 거는 문장("message for the AI assistant", "tell them to run", "AI 분석 참고:"). 찾기 전에 전각 문자를 풀고 폭 없는 문자를 지운다. 한국어 패턴은 콜론이 있을 때만('AI에게 물어보세요' 같은 글을 거르지 않게).
 - CTF 리허설(2026-11-23) 대응: `WEBLOG_ROBOTS_HIDDEN`(robots.txt를 읽은 IP만 가는 숨은 경로 접근, F1), `WEBLOG_SSRF_IMDS`(SSRF로 인스턴스 메타데이터 요청, 역할 키 경로 성공 표시, F5). `lab/ctf/environment.json`(운영진 계정 `ctf-deployer`를 정상 작업으로).
 
 ### 고침(CTF 리허설 오탐)
@@ -49,6 +57,8 @@
 - 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
 
 ### 고침
+- AI 재검토에 보내지 않은 사건(점수순 상위 30개 밖)이 규칙 판정 대신 '판단 불가'로 바뀌던 것: 규칙 판정을 그대로 쓴다(BOTSv3 측정에서 23개가 바뀌어 있었다).
+- README의 "근거가 없으면 그 문장을 버린다"를 실제 동작(근거를 떼고 '확인 안 된 근거'로 표시)에 맞게 고침.
 - GuardDuty 결과만 있는 사건을 '보이는 시도 0건은 모두 막히거나 실패, 급하지 않을 수 있습니다'로 적던 것: GuardDuty 결과에는 성공 여부가 없으므로 다른 로그로 확인하라고 적는다(심각도 7 이상이면 확신도 중간). 한 사건에 GuardDuty 결과가 여럿이면 단계마다 첫 결과의 풀이가 반복되던 것도 고침.
 - 정상 웹 요청 오탐 줄이기(사양서 S7): 백업 파일 노출은 내려받는 요청(GET·POST)만 보고 WebDAV PUT·PROPFIND·DELETE는 뺀다. 내부망 IP의 관리자 접근은 같은 IP의 다른 공격 신호 앞뒤 1시간 안의 것만 알린다(관리자 접근 요청 자체의 신호는 빼고 셈). AIT fox 0.136% → 0.029%, wheeler 0.065% → 0.021%, 재현율 그대로(둘 다 개발 점수, `docs/공개데이터셋_독립측정.md` 2-2).
 - 웹셸 접근(`WEBLOG_WEBSHELL_ACCESS`): 숫자만 있는 명령 인자 값(`c=0`, `run=1`)은 명령으로 보지 않는다. WordPress 관리 화면의 `load-scripts.php?c=0`·`load-styles.php?c=0`이 걸리던 오탐이다.
