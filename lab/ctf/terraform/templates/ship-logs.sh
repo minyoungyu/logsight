@@ -32,3 +32,5 @@ ship auth         /var/log/auth.log
 ship secure       /var/log/secure
 ship messages     /var/log/messages
 ship php-fpm      /var/log/php-fpm/error.log
+ship nginx-body   /var/log/nginx/body.log
+ship audit        /var/log/audit/audit.log

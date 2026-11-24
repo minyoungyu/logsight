@@ -41,6 +41,8 @@ HOST_LOGS = {
     "secure": ("analyze", "secure.log"),               # sshauth (RHEL 계열 기본 경로)
     "messages": ("extra", "messages.log"),
     "php-fpm": ("extra", "php-fpm.log"),
+    "nginx-body": ("extra", "nginx-body.log"),   # 관리자 로그인·fetch POST 본문(사람이 F2·F5 근거로 볼 때)
+    "audit": ("extra", "audit.log"),             # 웹 계정의 명령 실행(auditd, key=ctf_webexec)
 }
 _PIECE = re.compile(r"^(?P<epoch>\d+)-(?P<off>\d+)\.log$")
 
