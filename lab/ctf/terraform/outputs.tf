@@ -48,3 +48,9 @@ output "flags" {
 output "region" {
   value = var.region
 }
+
+output "f4_sudo_rule" {
+  description = "F4 권한 상승용 sudo 규칙. user-data가 아니라 부팅 후 SSM 주입(inject_flags.sh)이 /etc/sudoers.d/90-ctf 에 쓴다."
+  value       = var.f4_sudo_rule
+  sensitive   = true
+}

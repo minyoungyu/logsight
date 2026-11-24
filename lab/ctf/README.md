@@ -45,11 +45,16 @@ terraform plan -out ctf.plan                   # 자원 수와 비용 확인 후
 terraform apply ctf.plan                       # 운영진 승인 후에만
 bash ../inject_flags.sh                        # 서버가 SSM Online이 되면 F1~F4 주입
 terraform output -json flags > ~/ctf-flags.json   # CTFd 등록용, 저장소 밖에 보관
+terraform output -json basic_auth                 # 팀별 기본 인증 비밀번호(팀에게 자기 것만 배부)
+# CTFd 첫 접속 화면에서 관리자 계정을 만들고, 팀 이름을 t01, t02 … 로 만든 뒤 Settings → Access Tokens 에서 토큰 발급
+python ../ctfd/ctfd_setup.py setup --url http://<CTFd IP> --token <토큰> --flags ~/ctf-flags.json   # 문제·플래그·힌트 등록
 
 # 대회 10:00
 terraform apply -var contest_open=true
 # 대회 19:00
 terraform apply -var contest_open=false
+# 대회 뒤: 다른 팀 플래그 제출 점검
+python ../ctfd/ctfd_setup.py check-sharing --url http://<CTFd IP> --token <토큰> --flags ~/ctf-flags.json
 # 수집 후 정리(로그 버킷은 force_destroy=false라 남는다)
 terraform destroy
 ```
@@ -78,3 +83,28 @@ terraform destroy
 
 성공 지표는 등수가 아니라 **단계별 로그 커버리지**다: F5·F6에 도달한 팀 수와, 8종 로그가 모두
 채워졌는지를 본다.
+
+## 힌트와 점수(CTFd)
+
+`ctfd/challenges.json`에 문제별 점수와 힌트 2단계가 있다. 힌트를 열면 그 비용만큼 팀 점수가 깎이고(CTFd 기본 동작),
+2단계는 1단계를 연 팀만 열 수 있다. 힌트는 방향만 주고 공격 문자열은 적지 않는다.
+
+| 문제 | 점수 | 힌트 1 | 힌트 2 |
+|---|---|---|---|
+| F1 숨겨진 길 | 100 | -10 | -30 |
+| F2 관리자의 문 | 200 | -20 | -60 |
+| F3 이미지가 아닌 이미지 | 300 | -30 | -90 |
+| F4 더 높은 곳 | 300 | -30 | -90 |
+| F5 서버의 신분증 | 300 | -30 | -90 |
+| F6 클라우드 금고 | 400 | -40 | -120 |
+
+플래그는 팀마다 다르지만 CTFd 문제 하나에 모든 팀 플래그를 넣으므로, 남의 팀 플래그도 정답으로 받는다.
+대회 뒤 `check-sharing`으로 제출 팀과 플래그 주인을 대조한다.
+
+## 추가 로그(2026-11-24)
+
+- `/var/log/nginx/body.log`: `POST /admin/login.php`·`/admin/fetch.php` 두 곳만 본문을 남긴다(F2 SQL 인젝션 문자열, F5 SSRF 대상).
+  참가자가 로그인 칸에 넣은 값이 그대로 남으므로 대회 뒤 외부에 공유하지 않는다.
+- `/var/log/audit/audit.log`: nginx 계정의 프로그램 실행(key `ctf_webexec`, F3 웹셸 명령·F4). AL2023 기본 규칙의
+  `-a task,never`를 꺼야 기록된다(user-data가 처리).
+- 두 로그 모두 1분마다 S3 `hosts/<팀>/nginx-body/`, `hosts/<팀>/audit/`로 가고, `collect_logs.py`가 `extra/hosts/`에 모은다.

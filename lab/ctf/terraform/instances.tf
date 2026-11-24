@@ -29,15 +29,13 @@ resource "aws_instance" "team" {
     delete_on_termination = true
   }
 
-  # 플래그는 여기 넣지 않는다(메타데이터로 보인다). 팀 번호·버킷 이름·기본 인증 비밀번호만 있다.
+  # 플래그·비밀번호·F4 sudo 규칙·플래그 버킷 이름은 여기 넣지 않는다(IMDS user-data로 노출됨).
+  # 팀 번호와 공개 버킷 이름(ops·logs)만 둔다. 민감값은 부팅 후 SSM 주입(inject_flags.sh)이 채운다.
   user_data = templatefile("${path.module}/templates/team_user_data.sh.tftpl", {
     team        = each.key
     region      = var.region
     ops_bucket  = aws_s3_bucket.b["ops"].id
     logs_bucket = aws_s3_bucket.b["logs"].id
-    flag_bucket = aws_s3_bucket.b["flags"].id
-    basic_pass  = random_password.basic[each.key].result
-    sudo_rule   = var.f4_sudo_rule
   })
   user_data_replace_on_change = true
 
