@@ -105,5 +105,40 @@ class RdsMasterPassword(unittest.TestCase):
         self.assertNotIn("CT_IAM_PERSISTENCE", rules_of(run_detections([e], {})))
 
 
+
+class TrailBucketLifecycle(unittest.TestCase):
+    """Invictus aws_dataset(Stratus cloudtrail-lifecycle-rule): 이름에 trail·log가 없는 CloudTrail 버킷에 1일 만료 규칙."""
+
+    @staticmethod
+    def _rec(i, source, name, params):
+        return {"eventTime": f"2026-10-11T05:00:{i:02d}Z", "eventSource": source, "eventName": name,
+                "awsRegion": "us-east-1", "sourceIPAddress": "198.51.100.7", "recipientAccountId": "111122223333",
+                "userIdentity": {"type": "IAMUser", "userName": "u", "arn": "arn:aws:iam::111122223333:user/u",
+                                 "accountId": "111122223333"}, "requestParameters": params}
+
+    def _rules(self, recs):
+        evs = [cloudtrail_record_to_event(r, f"t:{i}") for i, r in enumerate(recs)]
+        return {f.rule for f in run_detections(evs, {}) if any(e.action.startswith("s3:PutBucketLifecycle")
+                                                                for e in f.events)}
+
+    LC = {"bucketName": "acme-ctlr-bucket", "LifecycleConfiguration": {"Rule": {"Status": "Enabled",
+                                                                                   "Expiration": {"Days": 1}}}}
+
+    def test_expiry_on_trail_bucket(self):
+        trail = self._rec(0, "cloudtrail.amazonaws.com", "CreateTrail", {"name": "t", "s3BucketName": "acme-ctlr-bucket"})
+        lc = self._rec(1, "s3.amazonaws.com", "PutBucketLifecycle", self.LC)
+        self.assertIn("CT_LOGGING_TAMPER", self._rules([trail, lc]))
+
+    def test_expiry_on_bucket_with_cloudtrail_policy(self):
+        pol = self._rec(0, "s3.amazonaws.com", "PutBucketPolicy", {"bucketName": "acme-ctlr-bucket", "bucketPolicy": {
+            "Statement": [{"Principal": {"Service": "cloudtrail.amazonaws.com"}, "Action": "s3:PutObject"}]}})
+        lc = self._rec(1, "s3.amazonaws.com", "PutBucketLifecycle", self.LC)
+        self.assertIn("CT_LOGGING_TAMPER", self._rules([pol, lc]))
+
+    def test_expiry_on_ordinary_bucket_is_quiet(self):
+        lc = self._rec(1, "s3.amazonaws.com", "PutBucketLifecycle", self.LC)
+        self.assertNotIn("CT_LOGGING_TAMPER", self._rules([lc]))
+
+
 if __name__ == "__main__":
     unittest.main()

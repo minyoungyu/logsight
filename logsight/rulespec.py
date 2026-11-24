@@ -19,8 +19,11 @@ SPEC: dict[str, dict] = {
         "when": "StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors, DeleteFlowLogs, GuardDuty DeleteDetector·"
                 "UpdateDetector, WAF DeleteLoggingConfiguration, Config 기록 중지·삭제, CloudWatch DeleteLogGroup, "
                 "Route 53 Resolver 질의 로그 삭제·해제, Security Hub 끄기, Access Analyzer 삭제, Bedrock 호출 로그 끄기, "
-                "LeaveOrganization(조직 통제 벗어나기) 호출 1건. 이름에 trail·log·audit가 든 버킷의 수명 주기 설정(로그 자동 삭제)도 포함",
-        "blind": ["로그 버킷 이름에 trail·log·audit가 없으면 수명 주기로 로그 지우기를 놓침",
+                "LeaveOrganization(조직 통제 벗어나기) 호출 1건. 이름에 trail·log·audit가 든 버킷의 수명 주기 설정(로그 자동 삭제)과, "
+                "같은 기록 안에서 CloudTrail 저장 버킷으로 확인된 버킷(CreateTrail·UpdateTrail의 s3BucketName, "
+                "cloudtrail.amazonaws.com을 허용한 버킷 정책)에 만료 규칙을 거는 것도 포함",
+        "blind": ["로그 버킷 이름에 trail·log·audit가 없고, 그 버킷이 CloudTrail 저장 버킷이라는 기록(추적 생성·버킷 정책)도 "
+                  "같은 분석 범위에 없으면 수명 주기로 로그 지우기를 놓침",
                   "로그를 끄면 그 뒤 기록이 없으므로, 끄기 전 기록이 있어야 걸림"],
         "fp": ["운영자가 추적(trail) 설정을 바꾸는 정상 작업. 정상 작업 목록에 넣어도 '위험 설정'으로 남음"],
         "first": "누가 껐는지 확인하고 바로 다시 켠다. 끈 계정의 키를 의심한다.",

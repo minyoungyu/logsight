@@ -1,0 +1,1049 @@
+{
+ "runs": [
+  {
+   "run": "99607e74",
+   "attack_calls": [
+    [
+     "cloudtrail:DeleteTrail",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "1d949e3e",
+   "attack_calls": [
+    [
+     "cloudtrail:PutEventSelectors",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "c00af10e",
+   "attack_calls": [
+    [
+     "cloudtrail:PutEventSelectors",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "bc09c9aa",
+   "attack_calls": [
+    [
+     "cloudtrail:StartLogging",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "cf435b7d",
+   "attack_calls": [
+    [
+     "cloudtrail:StartLogging",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "018e6dc0",
+   "attack_calls": [
+    [
+     "cloudtrail:StartLogging",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "1e5be608",
+   "attack_calls": [
+    [
+     "cloudtrail:StopLogging",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "717d4d39",
+   "attack_calls": [
+    [
+     "cloudtrail:StopLogging",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "e27c7b82",
+   "attack_calls": [
+    [
+     "cloudtrail:StopLogging",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "2142a106",
+   "attack_calls": [
+    [
+     "ec2:AuthorizeSecurityGroupIngress",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SG_OPENED"
+   ]
+  },
+  {
+   "run": "20f9795b",
+   "attack_calls": [
+    [
+     "ec2:DeleteFlowLogs",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "ad7e993a",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "1862a3bd",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "b8310f6a",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "631bdcf7",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "8f842891",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "06e68e16",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "d40831dd",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "b19c2145",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "cdeeefe3",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "80c784c4",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "b32ebbff",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "318c3ae8",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "ca8a2f6a",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "149b293e",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "3251404f",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "e2f5a03c",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "789357cd",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "c3be9ac6",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "a18b5c62",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "47254459",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "1cb95553",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "21636747",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "23dfedb2",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "bde1e36c",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "cfec8195",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "50336c67",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "07a91076",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "6bc0e5a4",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "14df3804",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "0ea6efcb",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "a6499bca",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "02aeb845",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "70df2217",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "4c0f68d8",
+   "attack_calls": [
+    [
+     "ec2:DescribeAccountAttributes",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "9cbca289",
+   "attack_calls": [
+    [
+     "ec2:DescribeInstanceAttribute",
+     15
+    ],
+    [
+     "sts:AssumeRole",
+     5
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST"
+   ]
+  },
+  {
+   "run": "39f95f43",
+   "attack_calls": [
+    [
+     "ec2:GetPasswordData",
+     29
+    ],
+    [
+     "sts:AssumeRole",
+     5
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_SECRET_ACCESS"
+   ]
+  },
+  {
+   "run": "b47d6b97",
+   "attack_calls": [
+    [
+     "ec2:ModifyImageAttribute",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ]
+  },
+  {
+   "run": "9e44f427",
+   "attack_calls": [
+    [
+     "ec2:ModifyImageAttribute",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ]
+  },
+  {
+   "run": "36659dd6",
+   "attack_calls": [
+    [
+     "ec2:ModifySnapshotAttribute",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ]
+  },
+  {
+   "run": "8bec4cee",
+   "attack_calls": [
+    [
+     "ec2:ModifySnapshotAttribute",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ]
+  },
+  {
+   "run": "4277e8d8",
+   "attack_calls": [
+    [
+     "ec2:RevokeSecurityGroupIngress",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "bc31c885",
+   "attack_calls": [
+    [
+     "ec2:RunInstances",
+     1
+    ],
+    [
+     "sts:AssumeRole",
+     4
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST"
+   ]
+  },
+  {
+   "run": "d0fe321d",
+   "attack_calls": [
+    [
+     "ec2:RunInstances",
+     1
+    ],
+    [
+     "sts:AssumeRole",
+     4
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST"
+   ]
+  },
+  {
+   "run": "e1bd4d05",
+   "attack_calls": [
+    [
+     "iam:AttachUserPolicy",
+     1
+    ],
+    [
+     "iam:CreateAccessKey",
+     1
+    ],
+    [
+     "iam:CreateUser",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "run": "61e3765a",
+   "attack_calls": [
+    [
+     "iam:CreateAccessKey",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "run": "9f92f988",
+   "attack_calls": [
+    [
+     "iam:CreateLoginProfile",
+     1
+    ],
+    [
+     "sts:GetCallerIdentity",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_DISCOVERY_BURST",
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "run": "21b27090",
+   "attack_calls": [
+    [
+     "iam:DeleteAccessKey",
+     1
+    ],
+    [
+     "iam:DeleteUser",
+     1
+    ],
+    [
+     "iam:DetachUserPolicy",
+     1
+    ],
+    [
+     "iam:ListAccessKeys",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_DISCOVERY_BURST"
+   ]
+  },
+  {
+   "run": "2a9377af",
+   "attack_calls": [
+    [
+     "iam:DeleteAccessKey",
+     1
+    ],
+    [
+     "iam:ListAccessKeys",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_DISCOVERY_BURST"
+   ]
+  },
+  {
+   "run": "0dca585f",
+   "attack_calls": [
+    [
+     "iam:DeleteLoginProfile",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "8f96a106",
+   "attack_calls": [
+    [
+     "iam:UpdateAssumeRolePolicy",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "run": "ab44e842",
+   "attack_calls": [
+    [
+     "iam:UpdateAssumeRolePolicy",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "run": "1222242e",
+   "attack_calls": [
+    [
+     "lambda:AddPermission",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SERVERLESS_CHANGE"
+   ]
+  },
+  {
+   "run": "a2b12a28",
+   "attack_calls": [
+    [
+     "lambda:RemovePermission",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "7e61c71f",
+   "attack_calls": [
+    [
+     "lambda:UpdateFunctionCode",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SERVERLESS_CHANGE"
+   ]
+  },
+  {
+   "run": "f771f4ac",
+   "attack_calls": [
+    [
+     "lambda:UpdateFunctionCode",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SERVERLESS_CHANGE"
+   ]
+  },
+  {
+   "run": "7d2a6913",
+   "attack_calls": [
+    [
+     "organizations:LeaveOrganization",
+     1
+    ],
+    [
+     "sts:AssumeRole",
+     5
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "run": "06a62bf9",
+   "attack_calls": [
+    [
+     "rds:ModifyDBSnapshotAttribute",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ]
+  },
+  {
+   "run": "dfe006ac",
+   "attack_calls": [
+    [
+     "rds:ModifyDBSnapshotAttribute",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_SNAPSHOT_SHARE"
+   ]
+  },
+  {
+   "run": "d42001c7",
+   "attack_calls": [
+    [
+     "rolesanywhere:CreateProfile",
+     1
+    ],
+    [
+     "rolesanywhere:CreateTrustAnchor",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "run": "22fd7cec",
+   "attack_calls": [
+    [
+     "rolesanywhere:DeleteProfile",
+     1
+    ],
+    [
+     "rolesanywhere:DeleteTrustAnchor",
+     1
+    ],
+    [
+     "rolesanywhere:ListProfiles",
+     1
+    ],
+    [
+     "rolesanywhere:ListTrustAnchors",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "1807d824",
+   "attack_calls": [
+    [
+     "s3:DeleteBucketLifecycle",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "b1d7e3ac",
+   "attack_calls": [
+    [
+     "s3:DeleteBucketPolicy",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "4990da05",
+   "attack_calls": [
+    [
+     "s3:PutBucketLifecycle",
+     1
+    ]
+   ],
+   "detected": false,
+   "rules": []
+  },
+  {
+   "run": "0362e208",
+   "attack_calls": [
+    [
+     "s3:PutBucketPolicy",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_S3_PUBLIC"
+   ]
+  },
+  {
+   "run": "561fe49b",
+   "attack_calls": [
+    [
+     "secretsmanager:GetSecretValue",
+     20
+    ],
+    [
+     "secretsmanager:ListSecrets",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_DISCOVERY_BURST",
+    "CT_SECRET_ACCESS"
+   ]
+  },
+  {
+   "run": "01190e38",
+   "attack_calls": [
+    [
+     "signin:ConsoleLogin",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_CONSOLE_NO_MFA"
+   ]
+  },
+  {
+   "run": "6a7ec681",
+   "attack_calls": [
+    [
+     "ssm:DescribeInstanceInformation",
+     27
+    ],
+    [
+     "ssm:GetCommandInvocation",
+     2
+    ],
+    [
+     "ssm:SendCommand",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_EXEC"
+   ]
+  },
+  {
+   "run": "11a6ef34",
+   "attack_calls": [
+    [
+     "ssm:DescribeParameters",
+     5
+    ],
+    [
+     "ssm:GetParameters",
+     5
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_DISCOVERY_BURST",
+    "CT_SECRET_ACCESS"
+   ]
+  },
+  {
+   "run": "3a63b39c",
+   "attack_calls": [
+    [
+     "ssm:SendCommand",
+     1
+    ]
+   ],
+   "detected": true,
+   "rules": [
+    "CT_INSTANCE_EXEC"
+   ]
+  }
+ ],
+ "unlabeled": 1754,
+ "unlabeled_flagged": 352,
+ "unlabeled_rules": {
+  "CT_DISCOVERY_BURST": 286,
+  "CT_SECRET_ACCESS": 62,
+  "CT_LOGGING_TAMPER": 3,
+  "CT_DATA_DESTRUCTION": 1
+ }
+}

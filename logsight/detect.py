@@ -526,12 +526,16 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             by_actor[e.actor].append(e)
 
     # --- CloudTrail: 단건 규칙
+    # 같은 기록 안에서 CloudTrail 로그 저장 버킷으로 확인된 버킷(이름에 trail·log가 없어도)
+    trail_buckets = {fl.split(":", 1)[1] for e in ct for fl in (e.extra.get("flags") or ())
+                     if fl.startswith("trail_bucket:")}
     singles: dict[tuple[str, str], list[Event]] = defaultdict(list)
     for e in ct:
         a = e.action or ""
         params = e.extra.get("params") or {}
         flags = e.extra.get("flags") or ()
-        if a in LOGGING_TAMPER or "log_bucket_expire" in flags:
+        if a in LOGGING_TAMPER or "log_bucket_expire" in flags or any(
+                fl.startswith("expire_bucket:") and fl.split(":", 1)[1] in trail_buckets for fl in flags):
             singles[("CT_LOGGING_TAMPER", e.src_ip or "")].append(e)
         if a in ACCOUNT_SECURITY:
             singles[("CT_ACCOUNT_SECURITY", e.actor or "")].append(e)

