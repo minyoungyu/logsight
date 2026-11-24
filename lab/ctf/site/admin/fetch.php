@@ -1,7 +1,9 @@
 <?php
 // 외부 이미지 가져오기 — F5 경로(관리자 전용). 설계한 취약점: 내부 주소를 막지 않는다(SSRF).
 // http/https 만 허용(file://·gopher:// 등은 거부, 3-3). 내부망·메타데이터(169.254.169.254)는 막지 않는다.
-// SSRF 로 메타데이터의 인스턴스 역할 이름(F5)을 읽는다.
+// SSRF 로 메타데이터의 인스턴스 역할 이름(F5)·임시 자격 증명(F6)을 읽는다.
+// 단, 메타데이터 IP(169.254.169.254)에서는 /latest/meta-data/ 만 허용한다.
+// user-data(부팅 스크립트: 비밀번호·sudo 규칙·버킷명)와 dynamic/(계정 ID·리전) 은 거부한다.
 require __DIR__ . '/../_init.php';
 require_admin();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['url'])) {
@@ -10,6 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['url'])) {
     if (!in_array($scheme, ['http', 'https'], true)) {
         http_response_code(400); header('Content-Type: text/plain; charset=utf-8');
         echo 'http/https 주소만 가져올 수 있습니다.'; exit;
+    }
+    // 민감 메타데이터 경로는 거부한다(F5·F6 의 /latest/meta-data/iam/ 은 허용).
+    // user-data(부팅 스크립트: 비번·sudo 규칙·버킷) 와 dynamic/(계정 ID·리전) 은 막는다.
+    // 경로로 판정하므로 호스트 표기(끝점·10진수 IP 등)로 우회할 수 없다.
+    $path = (string)parse_url($url, PHP_URL_PATH);
+    if (preg_match('#^/+latest/(user-data|dynamic(/|$))#i', $path)) {
+        http_response_code(403); header('Content-Type: text/plain; charset=utf-8');
+        echo '이 메타데이터 경로는 열람할 수 없습니다.'; exit;
     }
     $ctx = stream_context_create(['http' => ['timeout' => 5, 'follow_location' => 0]]);
     $body = @file_get_contents($url, false, $ctx);
