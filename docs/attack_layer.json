@@ -1,0 +1,270 @@
+{
+ "name": "LogFinder 0.4.2 규칙 범위",
+ "versions": {
+  "attack": "15",
+  "navigator": "4.9.1",
+  "layer": "4.5"
+ },
+ "domain": "enterprise-attack",
+ "description": "LogFinder(logsight) 규칙이 표시하는 ATT&CK 기법. 탐지 범위이지 탐지 정확도가 아니다.",
+ "techniques": [
+  {
+   "techniqueID": "T1030",
+   "tactic": "exfiltration",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_LARGE_EXFIL",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1046",
+   "tactic": "discovery",
+   "score": 1,
+   "color": "",
+   "comment": "VPC_PORT_SCAN",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1059.007",
+   "tactic": "execution",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_XSS",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1078",
+   "tactic": "initial-access",
+   "score": 4,
+   "color": "",
+   "comment": "SSH_SUCCESS_AFTER_FAIL, WEBLOG_ADMIN_ACCESS, WEBLOG_ADMIN_FORGED, WEBLOG_AUTH_SUCCESS_AFTER_FAIL",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1078.004",
+   "tactic": "initial-access",
+   "score": 3,
+   "color": "",
+   "comment": "CT_CONSOLE_NO_MFA, CT_ROOT_USAGE, CT_UNTRUSTED_IP",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1083",
+   "tactic": "discovery",
+   "score": 2,
+   "color": "",
+   "comment": "WEBLOG_DIR_LISTING, WEBLOG_SENSITIVE_FILE",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1098",
+   "tactic": "persistence",
+   "score": 1,
+   "color": "",
+   "comment": "CT_IAM_PERSISTENCE",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1105",
+   "tactic": "command-and-control",
+   "score": 1,
+   "color": "",
+   "comment": "FILE_SUSPICIOUS",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1110",
+   "tactic": "credential-access",
+   "score": 3,
+   "color": "",
+   "comment": "CT_CONSOLE_BRUTE, SSH_BRUTE_FORCE, WEBLOG_AUTH_BRUTE",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1133",
+   "tactic": "initial-access",
+   "score": 1,
+   "color": "",
+   "comment": "VPC_REMOTE_ADMIN_EXPOSED",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1136.001",
+   "tactic": "persistence",
+   "score": 1,
+   "color": "",
+   "comment": "HOST_ACCOUNT_CREATED",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1190",
+   "tactic": "initial-access",
+   "score": 10,
+   "color": "",
+   "comment": "WAF_BLOCKED, WAF_SQLI_NOT_BLOCKED, WEBLOG_CMD_INJECTION, WEBLOG_CSRF_SUSPECT, WEBLOG_EXPLOIT_5XX, WEBLOG_EXPLOIT_PROBE, WEBLOG_RFI, WEBLOG_SQLI, WEBLOG_SSRF, WEBLOG_TRAVERSAL",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1213",
+   "tactic": "collection",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_BACKUP_LEAK",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1485",
+   "tactic": "impact",
+   "score": 1,
+   "color": "",
+   "comment": "CT_DATA_DESTRUCTION",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1496",
+   "tactic": "impact",
+   "score": 1,
+   "color": "",
+   "comment": "CT_RUN_INSTANCES_BURST",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1505.003",
+   "tactic": "persistence",
+   "score": 4,
+   "color": "",
+   "comment": "FILE_WEBSHELL, WEBLOG_CODE_IN_HEADER, WEBLOG_UPLOAD_EXEC, WEBLOG_WEBSHELL_ACCESS",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1525",
+   "tactic": "persistence",
+   "score": 1,
+   "color": "",
+   "comment": "CT_SERVERLESS_CHANGE",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1530",
+   "tactic": "collection",
+   "score": 2,
+   "color": "",
+   "comment": "CT_S3_BULK_READ, WEBLOG_IDOR_ENUM",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1537",
+   "tactic": "exfiltration",
+   "score": 2,
+   "color": "",
+   "comment": "CT_S3_PUBLIC, CT_SNAPSHOT_SHARE",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1548.003",
+   "tactic": "privilege-escalation",
+   "score": 2,
+   "color": "",
+   "comment": "HOST_PRIV_ESC, HOST_PRIV_ESC_FAIL",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1552.005",
+   "tactic": "credential-access",
+   "score": 3,
+   "color": "",
+   "comment": "CT_INSTANCE_CRED_MULTI_IP, CT_INSTANCE_CRED_OUTSIDE, WEBLOG_SSRF_IMDS",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1555.006",
+   "tactic": "credential-access",
+   "score": 1,
+   "color": "",
+   "comment": "CT_SECRET_ACCESS",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1556.006",
+   "tactic": "defense-evasion",
+   "score": 1,
+   "color": "",
+   "comment": "CT_ACCOUNT_SECURITY",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1562.007",
+   "tactic": "defense-evasion",
+   "score": 1,
+   "color": "",
+   "comment": "CT_SG_OPENED",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1562.008",
+   "tactic": "defense-evasion",
+   "score": 1,
+   "color": "",
+   "comment": "CT_LOGGING_TAMPER",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1566",
+   "tactic": "initial-access",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_OPEN_REDIRECT",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1580",
+   "tactic": "discovery",
+   "score": 2,
+   "color": "",
+   "comment": "CT_ACCESS_DENIED_BURST, CT_DISCOVERY_BURST",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1594",
+   "tactic": "reconnaissance",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_ROBOTS_HIDDEN",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1595.002",
+   "tactic": "reconnaissance",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_SCANNER",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1595.003",
+   "tactic": "reconnaissance",
+   "score": 1,
+   "color": "",
+   "comment": "WEBLOG_ENUM_404",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1651",
+   "tactic": "execution",
+   "score": 1,
+   "color": "",
+   "comment": "CT_INSTANCE_EXEC",
+   "enabled": true
+  }
+ ],
+ "gradient": {
+  "colors": [
+   "#e7f1fb",
+   "#3b7dd8"
+  ],
+  "minValue": 0,
+  "maxValue": 4
+ },
+ "legendItems": [],
+ "showTacticRowBackground": false
+}

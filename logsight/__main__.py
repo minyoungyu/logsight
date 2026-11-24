@@ -249,6 +249,9 @@ def main(argv: list[str] | None = None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "report.json").write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "report.html").write_text(render(result), encoding="utf-8")
+    from .ocsf import to_ocsf  # 다른 보안 제품이 읽는 공용 형식(OCSF 1.3.0 Detection Finding)
+    (out / "findings.ocsf.json").write_text(json.dumps(to_ocsf(result), ensure_ascii=False, indent=1),
+                                            encoding="utf-8")
     from .selflog import record, summary_of
     record(out, "analyze", files=[f["file"] for f in result.get("files", [])], result=summary_of(result))
     if args.dry_run:

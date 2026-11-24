@@ -55,6 +55,7 @@ Python 3.10 이상. AWS 계정이나 API 키 없이 저장소 샘플로 바로 �
     pip install -r requirements.txt          # 또는 pip install .  (logfinder·logsight 명령이 생긴다)
     python -m logsight analyze samples/combined --out reports/combined --no-ai
     # reports/combined/report.html 을 브라우저로 연다
+    # reports/combined/findings.ocsf.json: 다른 보안 제품용 OCSF 1.3.0 형식
 
 웹 화면: `uvicorn app:app` → http://127.0.0.1:8000 · 모든 명령과 설정: [docs/사용법.md](docs/사용법.md)
 
