@@ -39,8 +39,9 @@ echo ok > "$WEBROOT/health.txt"
 # F6 단서: 셸(F3 이후)에서 보이는 앱 설정. 버킷 이름과 리전(시드니)을 적어 둔다.
 cat > /etc/ctf/app.ini <<INI
 [storage]
-; 상품 이미지 백업 위치 (팀 전용 폴더)
-bucket = ${flag_bucket}
+; 상품 이미지 백업 위치 (팀 전용 폴더). 버킷 이름은 user-data에 두지 않는다(IMDS user-data로 노출됨).
+; 실제 버킷은 부팅 후 운영진 SSM 주입(inject_flags.sh)이 채운다.
+bucket =
 prefix = ${team}/
 region = ${region}
 INI
@@ -69,7 +70,9 @@ systemctl daemon-reload
 systemctl enable --now php-fpm
 
 # 5) nginx: 팀 포트 기본 인증, 접속 로그에 X-Forwarded-For, 민감 파일 차단(3-3)
-printf '%s:%s\n' "$TEAM" "$(openssl passwd -apr1 '${basic_pass}')" > /etc/nginx/ctf.htpasswd
+# 팀 비밀번호는 user-data에 두지 않는다(IMDS user-data로 노출됨). 부팅 시엔 무작위 값으로 잠가 두고,
+# 실제 팀 비밀번호는 부팅 후 운영진 SSM 주입(inject_flags.sh)이 설정한다(그 전까지 아무도 못 들어옴).
+printf '%s:%s\n' "$TEAM" "$(openssl passwd -apr1 "$(head -c 18 /dev/urandom | base64)")" > /etc/nginx/ctf.htpasswd
 chown root:nginx /etc/nginx/ctf.htpasswd && chmod 0640 /etc/nginx/ctf.htpasswd
 cat > /etc/nginx/nginx.conf <<'NGINX'
 user nginx;
@@ -133,10 +136,8 @@ augenrules --load || service auditd reload || true
 # task,never가 걸려 있을 때 뜬 프로세스는 계속 빠지므로 웹 서비스를 다시 띄운다(아래 nginx는 이후에 처음 켜짐)
 systemctl restart php-fpm || true
 
-# 6) F4: sudo 규칙 1개 (설계한 권한 상승 경로 하나만)
-echo '${sudo_rule}' > /etc/sudoers.d/90-ctf
-chmod 0440 /etc/sudoers.d/90-ctf
-visudo -cf /etc/sudoers.d/90-ctf
+# 6) F4: sudo 규칙은 user-data에 두지 않는다(IMDS user-data로 보이면 F4 정답이 그대로 노출됨).
+#    /etc/sudoers.d/90-ctf 는 부팅 후 운영진 SSM 주입(inject_flags.sh)이 만든다.
 
 # 7) 로그 전송: 1분마다 새로 쌓인 부분만 logs 버킷 hosts/<팀>/ 으로 (versioning으로 원본 보존)
 aws s3 cp "s3://${ops_bucket}/site/ship-logs.sh" /usr/local/sbin/ctf-ship-logs --region "$REGION"
