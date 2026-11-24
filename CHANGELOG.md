@@ -7,7 +7,7 @@
 ### 추가
 - 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
 - BOTSv3 AI 재검토 측정(`docs/BOTSv3_AI재검토_측정.md`, `reports/public/botsv3_ai_triage.json`): 정답을 실행 전에 고정하고 4조건 × 3회.
-- AI가 '모름'마다 읽기 전용 확인 명령을 제안(`next_checks`, `logsight/checks.py`): 코드가 조회 동작(describe·get·list·lookup)만, 셸 기호 없음, 비밀값·파일을 꺼내는 동작 아님, 명령의 자원 이름이 AI에 보낸 입력에 있음을 검사하고 어긴 제안은 버린다. 보고서 '알 수 없는 것' 칸에 "직접 확인해 볼 명령"으로 나온다.
+- AI가 '모름'마다 읽기 전용 확인 명령을 제안(`next_checks`, `logsight/checks.py`): 코드가 조회 동작(describe·get·list·lookup)만, 셸 기호 없음, 비밀값·파일을 꺼내는 동작 아님, 명령의 자원 이름이 AI에 보낸 입력에 있음을 검사하고 어긴 제안은 버린다. 보고서 '알 수 없는 것' 칸에 "직접 확인해 볼 명령"으로 나온다. 재검토에서 `--endpoint-url`(로그의 공격자 IP로 서명된 요청을 보내게 하는 길), `--cli-input-json`·`file://`, `--debug`, 가린 키 값, 환경 변수를 보여 주는 동작(Lambda 설정·ECS 작업 정의)도 막았다. 같은 '모름' 항목의 명령은 한 묶음으로 보이고 CloudShell에서 실행한다는 안내가 붙는다.
 - VPC Flow만 근거인 '열린 관리 포트 접촉' 사건은 AI에 보내지 않고 규칙 판정을 쓴다(`triage.keep_rule_verdict`). BOTSv3 개발 점수 9/30 → 29/30, 입력 토큰 약 40% 감소.
 - `logfinder` 명령(기존 `logsight`와 같음). 대상 고객 기준 부분 점수(`scripts/public/subset_splunk_attack_data.py`): 처음 본 데이터 16/43(37%).
 - 비전문가 3명 30분 파일럿(`docs/사용자평가/파일럿_3명.md`, 기준을 미리 고정), AWS 계정이 필요한 남은 확인(`docs/AWS_계정이_필요한_확인.md`).

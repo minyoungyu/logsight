@@ -31,7 +31,8 @@ DENY_OPS = {
     "get-secret-value", "batch-get-secret-value", "get-password-data", "get-object",
     "get-object-torrent", "get-parameter", "get-parameters", "get-parameters-by-path",
     "get-login-password", "get-session-token", "get-federation-token", "get-authorization-token",
-    "get-function", "get-console-screenshot", "get-launch-template-data",
+    "get-function", "get-function-configuration", "get-console-output", "get-console-screenshot",
+    "get-launch-template-data", "describe-task-definition",  # 환경 변수에 비밀값이 들어 있을 수 있음
 }
 SHELL_META = re.compile(r"[;|&`$<>\n\\]")
 
@@ -57,6 +58,11 @@ GENERIC = re.compile(
     r"\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?Z?)?|"
     r"[a-z]{2}(?:-gov)?-[a-z]+-\d)$")
 NON_RESOURCE_KEYS = {"EventName", "EventSource", "ReadOnly", "ResourceType"}
+# 요청을 다른 곳으로 보내거나, 로컬 파일을 읽거나, 서명·응답을 화면에 쏟는 전역 옵션.
+# 로그에 공격자 IP가 있으므로 --endpoint-url http://<그 IP>는 "입력에 있는 자원" 검사를 통과해 버린다.
+DENY_OPTS = {"--endpoint-url", "--cli-input-json", "--cli-input-yaml", "--debug", "--no-verify-ssl",
+             "--ca-bundle", "--no-sign-request", "--cli-connect-timeout", "--cli-read-timeout"}
+URL_VALUE = re.compile(r"(?i)^[a-z][a-z0-9+.-]*://")
 
 
 def _payload_text(payload: dict) -> str:
@@ -82,6 +88,12 @@ def _check_one(cmd: str, known: str) -> str | None:
         return f"비밀값·데이터를 꺼내는 동작({op})"
     if not (op.startswith(READ_PREFIXES) or op in READ_EXTRA):
         return f"읽기 전용이 아닌 동작({op})"
+    for t in toks[3:]:
+        name = t.split("=", 1)[0]
+        if name in DENY_OPTS:
+            return f"허용하지 않는 옵션({name})"
+        if URL_VALUE.match(t.split("=", 1)[-1] if t.startswith("--") else t):
+            return "주소·파일 값(file://, http:// 등)"
     values: list[str] = []
     for i, t in enumerate(toks[3:], start=3):
         prev = toks[i - 1]
@@ -103,6 +115,8 @@ def _check_one(cmd: str, known: str) -> str | None:
                     values.append(v)
     for v in values:
         v = v.strip("\"'")
+        if "*" in v:
+            return f"가린 값이라 그대로 실행할 수 없음({v[:60]})"
         if v and not GENERIC.match(v) and v not in known:
             return f"사건 입력에 없는 자원({v[:60]})"
     return None
