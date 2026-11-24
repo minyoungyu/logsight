@@ -245,22 +245,29 @@ def validate_triage(result: dict, payload: dict) -> dict:
             "passed": not bad_ids and not bad_refs and not missing}
 
 
-def reorder(incidents: list[dict], result: dict | None) -> list[dict]:
+def reorder(incidents: list[dict], result: dict | None, fallback: dict | None = None) -> list[dict]:
     """공격 → 위험 설정 → 판단 불가 → 정상 활동 순으로 정렬. 같은 판정 안에서는 규칙 순서를
     지킨다. 판정이 없는 사건은 '판단 불가'로 둔다. 사건 자체는 지우지 않는다.
     판정은 inc["verdict"]와 inc["verdict_by"]("claude" 또는 "rules")에 적는다.
     Claude 판정이면 inc["ai_verdict"]에도 같은 값을 적는다(이전 형식 호환).
     규칙이 공격으로 본 것을 AI가 낮춘 사건(guard.hold의 contested)은 '판단 불가'보다 아래로 가지 않는다.
-    로그에 AI를 속이려는 문장이 있으면 inc["injection"]에 적는다(규칙 판정일 때도)."""
+    로그에 AI를 속이려는 문장이 있으면 inc["injection"]에 적는다(규칙 판정일 때도).
+    fallback(규칙 판정)을 주면, AI에 보내지 않은 사건(점수순 상위 30개 밖)은 '판단 불가'가 아니라
+    규칙 판정을 그대로 쓰고 verdict_by를 "rules"로 둔다."""
     if not result or "incidents" not in result:
         return incidents
     by = "rules" if result.get("mode") == "rules" else "claude"
     rows = {x["id"]: x for x in result["incidents"]}
+    fb = {x["id"]: x for x in (fallback or {}).get("incidents", [])} if by == "claude" else {}
     for inc in incidents:
-        row = rows.get(inc["id"], {})
+        row = rows.get(inc["id"])
+        row_by = by
+        if row is None and inc["id"] in fb:
+            row, row_by = fb[inc["id"]], "rules"
+        row = row or {}
         inc["verdict"] = row.get("verdict", "unclear")
-        inc["verdict_by"] = by
-        if by == "claude":
+        inc["verdict_by"] = row_by
+        if row_by == "claude":
             inc["ai_verdict"] = inc["verdict"]
         else:
             inc.pop("ai_verdict", None)

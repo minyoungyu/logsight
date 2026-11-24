@@ -127,3 +127,16 @@ def test_coverage_summary_lists_suspected_key_calls():
     k = c["suspected_keys"][0]
     assert k["n_calls"] == 3 and k["src_ips"] == ["198.18.0.1", "198.18.7.1"]  # 사건 밖 호출까지 센다
     assert T.build_triage_payload([_inc("INC-001", ["ct:1"])], coverage=c)["coverage"] is c
+
+
+def test_reorder_uses_rule_verdict_for_incidents_not_sent_to_ai():
+    # BOTSv3(2026-11-24): 사건 53개 중 AI에는 상위 30개만 보낸다. 나머지 23개가 '판단 불가'로 바뀌던 것
+    incs = [_inc(f"INC-00{i}", [f"r{i}"]) for i in range(1, 4)]
+    ai = {"incidents": [{"id": "INC-001", "verdict": "attack"}], "meta": {"model": "m"}}
+    rules = {"mode": "rules", "incidents": [{"id": "INC-001", "verdict": "unclear"},
+                                            {"id": "INC-002", "verdict": "risky_not_attack"},
+                                            {"id": "INC-003", "verdict": "attack"}]}
+    out = {i["id"]: i for i in T.reorder(incs, ai, fallback=rules)}
+    assert out["INC-001"]["verdict"] == "attack" and out["INC-001"]["verdict_by"] == "claude"
+    assert out["INC-002"]["verdict"] == "risky_not_attack" and out["INC-002"]["verdict_by"] == "rules"
+    assert out["INC-003"]["verdict"] == "attack" and "ai_verdict" not in out["INC-003"]

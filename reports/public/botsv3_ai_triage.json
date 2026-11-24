@@ -1,0 +1,3811 @@
+{
+ "measured_at": "2026-11-24",
+ "data": "Splunk BOTSv3 (CC0), scripts/public/botsv3_extract.py 출력",
+ "model": "claude-opus-5-5 (logsight.triage 기본, effort high)",
+ "labels_sha256": "c9618793abbf6fc6a22b0ff638500ea8b63a1c3ad29d91fe7a4e9dc484cea834",
+ "labels": {
+  "note": "AI 실행 전에 고정한 정답(허용 판정 목록). 기준: 외부인의 악의적 행동=attack, 직원의 위험 설정·인터넷 스캐너의 열린 포트 접촉=risky_not_attack, 직원·연동 계정·부팅 시 일상 작업=benign_activity. 직원: bstoll, btun, splunk_access(공개 풀이). B1=INC-003, B2=INC-001.",
+  "labels": {
+   "INC-001": [
+    "risky_not_attack"
+   ],
+   "INC-002": [
+    "risky_not_attack"
+   ],
+   "INC-003": [
+    "attack"
+   ],
+   "INC-004": [
+    "attack"
+   ],
+   "INC-005": [
+    "attack"
+   ],
+   "INC-006": [
+    "attack"
+   ],
+   "INC-007": [
+    "attack"
+   ],
+   "INC-008": [
+    "benign_activity",
+    "unclear"
+   ],
+   "INC-015": [
+    "benign_activity",
+    "unclear"
+   ],
+   "INC-068": [
+    "benign_activity"
+   ],
+   "INC-069": [
+    "attack"
+   ],
+   "INC-070": [
+    "attack",
+    "risky_not_attack"
+   ],
+   "INC-009": [
+    "risky_not_attack"
+   ],
+   "INC-012": [
+    "risky_not_attack"
+   ],
+   "INC-016": [
+    "risky_not_attack"
+   ],
+   "INC-017": [
+    "risky_not_attack"
+   ],
+   "INC-019": [
+    "risky_not_attack"
+   ],
+   "INC-018": [
+    "risky_not_attack"
+   ],
+   "INC-020": [
+    "risky_not_attack"
+   ],
+   "INC-022": [
+    "risky_not_attack"
+   ],
+   "INC-023": [
+    "risky_not_attack"
+   ],
+   "INC-025": [
+    "risky_not_attack"
+   ],
+   "INC-026": [
+    "risky_not_attack"
+   ],
+   "INC-021": [
+    "risky_not_attack"
+   ],
+   "INC-024": [
+    "risky_not_attack"
+   ],
+   "INC-027": [
+    "risky_not_attack"
+   ],
+   "INC-028": [
+    "risky_not_attack"
+   ],
+   "INC-030": [
+    "risky_not_attack"
+   ],
+   "INC-031": [
+    "risky_not_attack"
+   ],
+   "INC-033": [
+    "risky_not_attack"
+   ],
+   "INC-034": [
+    "risky_not_attack"
+   ],
+   "INC-035": [
+    "risky_not_attack"
+   ],
+   "INC-038": [
+    "risky_not_attack"
+   ],
+   "INC-040": [
+    "risky_not_attack"
+   ],
+   "INC-043": [
+    "risky_not_attack"
+   ],
+   "INC-045": [
+    "risky_not_attack"
+   ],
+   "INC-046": [
+    "risky_not_attack"
+   ],
+   "INC-048": [
+    "risky_not_attack"
+   ],
+   "INC-049": [
+    "risky_not_attack"
+   ],
+   "INC-050": [
+    "risky_not_attack"
+   ],
+   "INC-052": [
+    "risky_not_attack"
+   ],
+   "INC-053": [
+    "risky_not_attack"
+   ],
+   "INC-054": [
+    "risky_not_attack"
+   ],
+   "INC-057": [
+    "risky_not_attack"
+   ],
+   "INC-059": [
+    "risky_not_attack"
+   ],
+   "INC-060": [
+    "risky_not_attack"
+   ],
+   "INC-061": [
+    "risky_not_attack"
+   ],
+   "INC-029": [
+    "risky_not_attack"
+   ],
+   "INC-047": [
+    "risky_not_attack"
+   ],
+   "INC-051": [
+    "risky_not_attack"
+   ]
+  }
+ },
+ "scores": [
+  {
+   "run": "rules",
+   "reviewed": 53,
+   "model": "rules",
+   "usage": {},
+   "validation": true,
+   "guard": null,
+   "rules": {
+    "correct": "48/53",
+    "attack_recall": "6/6",
+    "false_attack": 5,
+    "wrong": [
+     "INC-001:attack",
+     "INC-002:attack",
+     "INC-008:attack",
+     "INC-015:attack",
+     "INC-068:attack"
+    ]
+   },
+   "final": {
+    "correct": "48/53",
+    "attack_recall": "6/6",
+    "false_attack": 5,
+    "wrong": [
+     "INC-001:attack",
+     "INC-002:attack",
+     "INC-008:attack",
+     "INC-015:attack",
+     "INC-068:attack"
+    ]
+   }
+  },
+  {
+   "run": "rules_known",
+   "reviewed": 53,
+   "model": "rules",
+   "usage": {},
+   "validation": true,
+   "guard": null,
+   "rules": {
+    "correct": "52/53",
+    "attack_recall": "6/6",
+    "false_attack": 1,
+    "wrong": [
+     "INC-068:attack"
+    ]
+   },
+   "final": {
+    "correct": "52/53",
+    "attack_recall": "6/6",
+    "false_attack": 1,
+    "wrong": [
+     "INC-068:attack"
+    ]
+   }
+  },
+  {
+   "run": "ai_1",
+   "reviewed": 30,
+   "model": "claude-opus-5-5",
+   "usage": {
+    "input_tokens": 42353,
+    "output_tokens": 9860,
+    "served_by": "claude-opus-5-5"
+   },
+   "validation": true,
+   "guard": {
+    "restored": [],
+    "contested": [
+     "INC-001",
+     "INC-002",
+     "INC-008",
+     "INC-015"
+    ],
+    "injection": []
+   },
+   "rules": {
+    "correct": "26/30",
+    "attack_recall": "5/5",
+    "false_attack": 4,
+    "wrong": [
+     "INC-001:attack",
+     "INC-002:attack",
+     "INC-008:attack",
+     "INC-015:attack"
+    ]
+   },
+   "final": {
+    "correct": "9/30",
+    "attack_recall": "5/5",
+    "false_attack": 1,
+    "wrong": [
+     "INC-009:attack",
+     "INC-012:unclear",
+     "INC-016:unclear",
+     "INC-017:unclear",
+     "INC-019:unclear",
+     "INC-018:unclear",
+     "INC-020:unclear",
+     "INC-022:unclear",
+     "INC-023:unclear",
+     "INC-025:unclear",
+     "INC-026:unclear",
+     "INC-021:unclear",
+     "INC-024:unclear",
+     "INC-027:unclear",
+     "INC-028:unclear",
+     "INC-030:unclear",
+     "INC-031:unclear",
+     "INC-033:unclear",
+     "INC-034:unclear",
+     "INC-035:unclear",
+     "INC-038:unclear"
+    ]
+   }
+  },
+  {
+   "run": "ai_2",
+   "reviewed": 30,
+   "model": "claude-opus-5-5",
+   "usage": {
+    "input_tokens": 42353,
+    "output_tokens": 11970,
+    "served_by": "claude-opus-5-5"
+   },
+   "validation": true,
+   "guard": {
+    "restored": [],
+    "contested": [
+     "INC-008",
+     "INC-001",
+     "INC-002",
+     "INC-015"
+    ],
+    "injection": []
+   },
+   "rules": {
+    "correct": "26/30",
+    "attack_recall": "5/5",
+    "false_attack": 4,
+    "wrong": [
+     "INC-008:attack",
+     "INC-001:attack",
+     "INC-002:attack",
+     "INC-015:attack"
+    ]
+   },
+   "final": {
+    "correct": "9/30",
+    "attack_recall": "5/5",
+    "false_attack": 1,
+    "wrong": [
+     "INC-009:attack",
+     "INC-012:unclear",
+     "INC-016:unclear",
+     "INC-017:unclear",
+     "INC-019:unclear",
+     "INC-018:unclear",
+     "INC-020:unclear",
+     "INC-022:unclear",
+     "INC-023:unclear",
+     "INC-025:unclear",
+     "INC-026:unclear",
+     "INC-021:unclear",
+     "INC-024:unclear",
+     "INC-027:unclear",
+     "INC-028:unclear",
+     "INC-030:unclear",
+     "INC-031:unclear",
+     "INC-033:unclear",
+     "INC-034:unclear",
+     "INC-035:unclear",
+     "INC-038:unclear"
+    ]
+   }
+  },
+  {
+   "run": "ai_3",
+   "reviewed": 30,
+   "model": "claude-opus-5-5",
+   "usage": {
+    "input_tokens": 42353,
+    "output_tokens": 9870,
+    "served_by": "claude-opus-5-5"
+   },
+   "validation": true,
+   "guard": {
+    "restored": [],
+    "contested": [
+     "INC-008",
+     "INC-001",
+     "INC-002",
+     "INC-015"
+    ],
+    "injection": []
+   },
+   "rules": {
+    "correct": "26/30",
+    "attack_recall": "5/5",
+    "false_attack": 4,
+    "wrong": [
+     "INC-008:attack",
+     "INC-001:attack",
+     "INC-002:attack",
+     "INC-015:attack"
+    ]
+   },
+   "final": {
+    "correct": "9/30",
+    "attack_recall": "5/5",
+    "false_attack": 1,
+    "wrong": [
+     "INC-009:attack",
+     "INC-012:unclear",
+     "INC-016:unclear",
+     "INC-017:unclear",
+     "INC-019:unclear",
+     "INC-018:unclear",
+     "INC-020:unclear",
+     "INC-022:unclear",
+     "INC-023:unclear",
+     "INC-025:unclear",
+     "INC-026:unclear",
+     "INC-021:unclear",
+     "INC-024:unclear",
+     "INC-027:unclear",
+     "INC-028:unclear",
+     "INC-030:unclear",
+     "INC-031:unclear",
+     "INC-033:unclear",
+     "INC-034:unclear",
+     "INC-035:unclear",
+     "INC-038:unclear"
+    ]
+   }
+  },
+  {
+   "run": "ai_known_1",
+   "reviewed": 30,
+   "model": "claude-opus-5-5",
+   "usage": {
+    "input_tokens": 42852,
+    "output_tokens": 11539,
+    "served_by": "claude-opus-5-5"
+   },
+   "validation": true,
+   "guard": {
+    "restored": [],
+    "contested": [],
+    "injection": []
+   },
+   "rules": {
+    "correct": "30/30",
+    "attack_recall": "5/5",
+    "false_attack": 0,
+    "wrong": []
+   },
+   "final": {
+    "correct": "9/30",
+    "attack_recall": "5/5",
+    "false_attack": 10,
+    "wrong": [
+     "INC-009:attack",
+     "INC-018:attack",
+     "INC-022:attack",
+     "INC-034:attack",
+     "INC-012:attack",
+     "INC-023:attack",
+     "INC-038:attack",
+     "INC-019:attack",
+     "INC-021:attack",
+     "INC-026:attack",
+     "INC-016:unclear",
+     "INC-017:unclear",
+     "INC-020:unclear",
+     "INC-025:unclear",
+     "INC-024:unclear",
+     "INC-027:unclear",
+     "INC-028:unclear",
+     "INC-030:unclear",
+     "INC-031:unclear",
+     "INC-033:unclear",
+     "INC-035:unclear"
+    ]
+   }
+  },
+  {
+   "run": "ai_known_2",
+   "reviewed": 30,
+   "model": "claude-opus-5-5",
+   "usage": {
+    "input_tokens": 42852,
+    "output_tokens": 9163,
+    "served_by": "claude-opus-5-5"
+   },
+   "validation": true,
+   "guard": {
+    "restored": [],
+    "contested": [],
+    "injection": []
+   },
+   "rules": {
+    "correct": "30/30",
+    "attack_recall": "5/5",
+    "false_attack": 0,
+    "wrong": []
+   },
+   "final": {
+    "correct": "9/30",
+    "attack_recall": "5/5",
+    "false_attack": 1,
+    "wrong": [
+     "INC-009:attack",
+     "INC-012:unclear",
+     "INC-016:unclear",
+     "INC-017:unclear",
+     "INC-019:unclear",
+     "INC-018:unclear",
+     "INC-020:unclear",
+     "INC-022:unclear",
+     "INC-023:unclear",
+     "INC-025:unclear",
+     "INC-026:unclear",
+     "INC-021:unclear",
+     "INC-024:unclear",
+     "INC-027:unclear",
+     "INC-028:unclear",
+     "INC-030:unclear",
+     "INC-031:unclear",
+     "INC-033:unclear",
+     "INC-034:unclear",
+     "INC-035:unclear",
+     "INC-038:unclear"
+    ]
+   }
+  },
+  {
+   "run": "ai_known_3",
+   "reviewed": 30,
+   "model": "claude-opus-5-5",
+   "usage": {
+    "input_tokens": 42852,
+    "output_tokens": 9348,
+    "served_by": "claude-opus-5-5"
+   },
+   "validation": true,
+   "guard": {
+    "restored": [],
+    "contested": [],
+    "injection": []
+   },
+   "rules": {
+    "correct": "30/30",
+    "attack_recall": "5/5",
+    "false_attack": 0,
+    "wrong": []
+   },
+   "final": {
+    "correct": "9/30",
+    "attack_recall": "5/5",
+    "false_attack": 1,
+    "wrong": [
+     "INC-009:attack",
+     "INC-012:unclear",
+     "INC-016:unclear",
+     "INC-017:unclear",
+     "INC-019:unclear",
+     "INC-018:unclear",
+     "INC-020:unclear",
+     "INC-022:unclear",
+     "INC-023:unclear",
+     "INC-025:unclear",
+     "INC-026:unclear",
+     "INC-021:unclear",
+     "INC-024:unclear",
+     "INC-027:unclear",
+     "INC-028:unclear",
+     "INC-030:unclear",
+     "INC-031:unclear",
+     "INC-033:unclear",
+     "INC-034:unclear",
+     "INC-035:unclear",
+     "INC-038:unclear"
+    ]
+   }
+  }
+ ],
+ "runs": {
+  "ai_1": {
+   "incidents": [
+    {
+     "id": "INC-001",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "bstoll이 107.77.212.175에서 MFA 없이 콘솔로 로그인했다. 이후 같은 IP의 콘솔 세션(userAgent signin.amazonaws.com)으로 EC2·S3 목록을 조회했다. 콘솔 화면을 쓰는 사람의 조회 패턴이고, 외부 공격자라고 볼 근거는 입력에 없다. 다만 MFA 없는 로그인과 S3 버킷 공개(CT_S3_PUBLIC 1건 성공)는 위험해서 고쳐야 한다. 공개 이벤트 자체는 events에 없어서 어떤 버킷인지는 확인하지 못했다. 규칙이 붙인 'exfiltration' 단계도 S3 객체 호출 기록이 0건이라 확인할 수 없다.",
+     "evidence": [
+      "cloudtrail.json:4856",
+      "cloudtrail.json:3662",
+      "cloudtrail.json:3665",
+      "cloudtrail.json:3667",
+      "cloudtrail.json:4293",
+      "cloudtrail.json:5485",
+      "cloudtrail.json:5539"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "risky_not_attack"
+     }
+    },
+    {
+     "id": "INC-002",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "INC-001과 같은 bstoll이 같은 IP(107.77.212.175)에서 MFA 없이 콘솔로 로그인했다. 이 세션에서 보안그룹 sg-0849cdeb5ef571996의 UDP 11211(memcached)을 0.0.0.0/0과 ::/0에 열었다. INC-001에서 쓰인 세션 키(…EHNR)와 같은 키다. 계정 주인의 작업으로 보이지만, memcached를 인터넷 전체에 여는 것은 매우 위험한 설정이다.",
+     "evidence": [
+      "cloudtrail.json:6401",
+      "cloudtrail.json:6455"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "risky_not_attack"
+     }
+    },
+    {
+     "id": "INC-003",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "web_admin 이름으로 139.198.18.205에서 Boto3로 10분 안에 231건이 거부됐다. 시도한 작업은 여러 리전(sa-east-1, us-east-1, eu-central-1)에서 c4.8xlarge·r3.8xlarge 같은 대형 인스턴스를 최대 10대씩 만드는 RunInstances, 키페어 조회, 기본 VPC 생성이다. 비슷한 시각에 같은 사용자의 장기 키(AKIAJOGC…)로 35.153.154.221에서 iam:CreateUser도 시도했다가 거부됐다. 탈취된 키로 자원을 만들고 지속성을 확보하려 한 행위로 보인다. 입력에 보인 시도는 모두 실패했다.",
+     "evidence": [
+      "cloudtrail.json:345",
+      "cloudtrail.json:353",
+      "cloudtrail.json:356",
+      "cloudtrail.json:359",
+      "cloudtrail.json:388",
+      "cloudtrail.json:396",
+      "cloudtrail.json:1091",
+      "cloudtrail.json:1111",
+      "cloudtrail.json:1119",
+      "cloudtrail.json:1123",
+      "cloudtrail.json:1129",
+      "cloudtrail.json:1132"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-004",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "Hakai/2.0 도구로 /login.cgi에 명령 삽입을 시도했다. 외부 주소에서 파일을 받아 실행하는 wget·sh 명령이 들어 있다. 응답은 400이고, 코드 판단은 '성공 신호 없음'이다. 자동화된 외부 공격 시도이며 성공 근거는 없다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-005",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "Gemini/2.0 도구로 /shell 경로에 wget으로 파일을 받아 실행하는 명령을 넣었다. 응답은 400이고, 코드 판단은 성공 0건·실패 1건이다. 외부 공격 시도이며 성공 근거는 없다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "INC-005와 같은 UA(Gemini/2.0)와 같은 페이로드(199.195.254.118/jaws)를 다른 IP에서 보냈다. 응답은 400이고, 코드 판단은 성공 0건이다. 외부 공격 시도이며 성공 근거는 없다.",
+     "evidence": [
+      "alb.log:8"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "라우터 진단 페이지(luci nslookup)를 노린 명령 삽입 시도다. 파일을 받아 chmod 777로 권한을 주고 실행하는 명령이 들어 있다. 응답은 404이고, 코드 판단은 성공 0건이다. 외부 공격 시도이며 성공 근거는 없다.",
+     "evidence": [
+      "access.log:858"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-008",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "web_admin 공격 시도(INC-003) 직후 bstoll이 콘솔로 로그인했다. 그리고 web_admin 사용자 정보, 붙은 정책, 접근 키 목록을 확인했다. 주변 작업에 iam:UpdateAccessKey가 있어, 키를 끄는 등 대응 작업으로 보인다. 다만 MFA 없는 콘솔 로그인이라 위험 요소는 남아 있다. 또 다른 bstoll 세션(107.77.212.175)과 IP가 다르다.",
+     "evidence": [
+      "cloudtrail.json:1181",
+      "cloudtrail.json:1186",
+      "cloudtrail.json:1188",
+      "cloudtrail.json:1191",
+      "cloudtrail.json:1192",
+      "cloudtrail.json:1201"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "benign_activity"
+     }
+    },
+    {
+     "id": "INC-009",
+     "verdict": "attack",
+     "confidence": "medium",
+     "reason": "GuardDuty가 외부 IP 122.112.243.11이 인스턴스 i-0cc93bade2b3cba63의 22번 포트를 두드린다고 탐지했다(Recon, 심각도 2.0). 흐름 로그에는 TCP 연결 허용만 있고, 로그인이 성공했는지는 보이지 않는다. 외부의 정찰 행위다.",
+     "evidence": [
+      "guardduty_findings.jsonl:1",
+      "vpcflow.log:59569",
+      "vpcflow.log:157004"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-012",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 22번 포트에 접속했고 허용됐다. 흐름 로그로는 TCP 연결만 보이고, 누가 무엇을 했는지와 로그인 성공 여부는 알 수 없다. SSH를 인터넷에 연 설정 자체는 위험하다.",
+     "evidence": [
+      "vpcflow.log:27077",
+      "vpcflow.log:124512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-015",
+     "verdict": "benign_activity",
+     "confidence": "high",
+     "reason": "splunk_access 키로 config·inspector·EC2·RDS·S3 설정을 주기적으로 조회했다. 자기 자신의 키 목록 조회와 GetCallerIdentity 반복도 있다. 수집 도구(Boto)의 정상 수집 패턴으로 보이며, 실패나 변경 작업은 없다.",
+     "evidence": [
+      "cloudtrail.json:6037",
+      "cloudtrail.json:6096",
+      "cloudtrail.json:6124",
+      "cloudtrail.json:6211",
+      "cloudtrail.json:6361"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "benign_activity"
+     }
+    },
+    {
+     "id": "INC-016",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 약 20분 동안 172.16.0.178의 SSH에 여러 번 접속했고 허용됐다. 연결 허용만 보이고 인증 결과는 없다.",
+     "evidence": [
+      "vpcflow.log:26567",
+      "vpcflow.log:28616",
+      "vpcflow.log:30205",
+      "vpcflow.log:30395"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-017",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149의 SSH에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:17818",
+      "vpcflow.log:115253"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-019",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 외부 IP가 2분 안에 내부 호스트 세 곳(172.16.0.149, 172.16.1.196, 172.16.1.210)의 SSH에 차례로 접속했다. 훑어보기(스캔) 형태와 비슷하지만, 연결 허용만 보이고 인증 결과는 없다.",
+     "evidence": [
+      "vpcflow.log:36272",
+      "vpcflow.log:41833",
+      "vpcflow.log:42262"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-018",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 반복해서 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26693",
+      "vpcflow.log:28113",
+      "vpcflow.log:30135"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-020",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 접속했고 허용됐다. 근처에 ssh_login 기록 3건이 있지만, 이 IP의 것인지와 성공했는지는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:83625",
+      "vpcflow.log:83739"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-022",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27619",
+      "vpcflow.log:30039"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-023",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27960",
+      "vpcflow.log:29491"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-025",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 접속했고 허용됐다. 근처에 ssh_login 1건이 있지만, 연결 관계와 성공 여부는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:66078",
+      "vpcflow.log:163513"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-026",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178과 172.16.1.239의 SSH에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:84059",
+      "vpcflow.log:84646"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-021",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 1분 안에 172.16.0.178과 172.16.0.149의 SSH에 접속했다. 연결 허용만 보인다.",
+     "evidence": [
+      "vpcflow.log:25202",
+      "vpcflow.log:25101"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-024",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 SSH에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:30696",
+      "vpcflow.log:128131"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-027",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.181의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:5280",
+      "vpcflow.log:102715"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-028",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.181의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:9297",
+      "vpcflow.log:106732"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-030",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:21069",
+      "vpcflow.log:118504"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-031",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:23098",
+      "vpcflow.log:120533"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-033",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:25144",
+      "vpcflow.log:122579"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-034",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27230",
+      "vpcflow.log:124665"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-035",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26966",
+      "vpcflow.log:124401"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-038",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 SSH에 한 번 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:30066",
+      "vpcflow.log:127501"
+     ],
+     "contested": null
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-003"
+     ],
+     "summary": "web_admin 키를 손에 넣은 공격자가 여러 리전에서 대형 EC2 인스턴스를 대량으로 만들려 했고, IAM 사용자 생성도 시도했다. 모두 권한 부족으로 거부됐다.",
+     "link_reason": "같은 주체(web_admin), 같은 세션 키(ASIAZB6T…BJQA), 같은 IP(139.198.18.205), 같은 태그(my_i_key/my_i_val)를 단 반복 요청이다. 35.153.154.221의 CreateUser는 같은 사용자와 같은 시간대라는 점으로만 묶었다.",
+     "steps": [
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:12+00:00",
+       "what": "web_admin 장기 키로 IAM 사용자 생성 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:345"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:17+00:00",
+       "what": "키페어 조회, 기본 VPC 생성, 인스턴스 조회 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:353",
+        "cloudtrail.json:356",
+        "cloudtrail.json:359"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:45+00:00",
+       "what": "us-east-1에서 대형 인스턴스 최대 10대 생성 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:388",
+        "cloudtrail.json:396"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:28:07+00:00",
+       "what": "eu-central-1에서 여러 인스턴스 유형으로 생성 반복 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:1091",
+        "cloudtrail.json:1111",
+        "cloudtrail.json:1132"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-005",
+      "INC-006"
+     ],
+     "summary": "웹 로드밸런서의 /shell 경로에 악성 파일을 받아 실행하려는 명령 삽입을 보냈다. 둘 다 400 응답이고 성공 근거는 없다.",
+     "link_reason": "같은 UA(Gemini/2.0)와 똑같은 요청 문자열(199.195.254.118/jaws 다운로드)을 7분 간격으로 보냈다. IP만 다르다.",
+     "steps": [
+      {
+       "incident_id": "INC-005",
+       "time": "2018-08-20T09:46:51+00:00",
+       "what": "197.41.194.233에서 명령 삽입 요청(400)",
+       "evidence": [
+        "alb.log:6"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2018-08-20T09:53:00+00:00",
+       "what": "156.202.167.187에서 같은 요청(400)",
+       "evidence": [
+        "alb.log:8"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-004"
+     ],
+     "summary": "Hakai/2.0 도구의 /login.cgi 명령 삽입·SQL 인젝션 시도. 400 응답이고 성공 신호는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-004",
+       "time": "2018-08-20T13:31:22+00:00",
+       "what": "wget으로 /tmp/hk를 받아 실행하려는 요청",
+       "evidence": [
+        "access.log:2512"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-007"
+     ],
+     "summary": "라우터 진단 페이지를 노린 명령 삽입 시도. 404 응답이고 성공 근거는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-007",
+       "time": "2018-08-20T11:13:54+00:00",
+       "what": "nslookup 파라미터에 다운로드·실행 명령을 삽입",
+       "evidence": [
+        "access.log:858"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-009"
+     ],
+     "summary": "외부 IP가 인스턴스 i-0cc93bade2b3cba63의 SSH 포트를 정찰했다.",
+     "link_reason": "단일 사건이다. GuardDuty 탐지와 흐름 로그가 같은 IP와 같은 시각(13:50~13:51)으로 이어진다.",
+     "steps": [
+      {
+       "incident_id": "INC-009",
+       "time": "2018-08-20T13:50:05+00:00",
+       "what": "GuardDuty가 22번 포트 탐침을 탐지했고, 흐름 로그에 TCP 연결 허용이 남았다",
+       "evidence": [
+        "guardduty_findings.jsonl:1",
+        "vpcflow.log:59569"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "web_admin 키가 어떻게 유출됐는지는 이 로그로 알 수 없다. 또 coverage의 suspected_keys가 비어 있어, 그 키의 전체 사용 내역도 입력에 없다.",
+    "35.153.154.221(장기 키 AKIAJOGC…)과 139.198.18.205(세션 키)가 같은 공격자인지, 세션 키가 어떻게 발급됐는지 알 수 없다. 주변에 sts:GetSessionToken이 있지만 해당 이벤트는 입력에 없다.",
+    "INC-003 주변의 iam:DeleteAccessKey, iam:ListAccessKeys를 누가 했는지 events에 없어서 알 수 없다.",
+    "RunInstances의 userData는 '<sensitiveDataRemoved>'로 지워져 있어, 무엇을 실행하려 했는지(예: 채굴) 확인할 수 없다.",
+    "INC-001에서 공개된 S3 버킷이 어느 것인지, 공개 이벤트 원문이 없어 알 수 없다.",
+    "cloudtrail_s3_object_calls가 0이다. S3 객체 읽기·다운로드(데이터 반출)는 이 로그에 남지 않으므로, 공개 버킷에서 누가 무엇을 가져갔는지 판단할 수 없다.",
+    "memcached(UDP 11211) 개방 뒤 실제로 외부 악용이 있었는지는 입력 사건에 없다.",
+    "SSH 허용 흐름 로그(INC-012~038 등)는 TCP 연결만 보여준다. sshauth 로그(65건)가 있지만 사건과 연결되어 있지 않아 로그인 성공 여부를 알 수 없다.",
+    "122.226.181.x, 221.194.44.x 같은 비슷한 대역이 11:32~11:51에 같은 호스트 172.16.0.178을 두드렸다. 같은 주체인지는 이 입력만으로 단정할 수 없다.",
+    "웹 명령 삽입이 서버에서 실행됐는지는 알 수 없다. 호스트 로그가 없고, WAF 로그도 missing_sources에 들어 있다.",
+    "CloudTrail은 15:15:20, 흐름 로그는 15:26:46에 끝난다. 그 이후의 활동은 알 수 없다.",
+    "전체 사건 53건 가운데 일부만 입력에 있어, 나머지 사건과의 연결은 판단하지 못했다."
+   ],
+   "validation": {
+    "unknown_ids": [],
+    "evidence_total": 98,
+    "evidence_invalid": 0,
+    "incidents_without_verdict": [],
+    "passed": true
+   },
+   "meta": {
+    "model": "claude-opus-5-5",
+    "usage": {
+     "input_tokens": 42353,
+     "output_tokens": 9860,
+     "served_by": "claude-opus-5-5"
+    },
+    "seconds": 87.6,
+    "payload_chars": 73887
+   },
+   "guard": {
+    "restored": [],
+    "contested": [
+     "INC-001",
+     "INC-002",
+     "INC-008",
+     "INC-015"
+    ],
+    "injection": []
+   }
+  },
+  "ai_2": {
+   "incidents": [
+    {
+     "id": "INC-003",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "web_admin 키로 외부에서 권한 밖 작업을 시도했다. 139.198.18.205에서 임시키(ASIA…BJQA)로 10분 안에 거부 231건이 났다. 여러 리전(us-east-1, sa-east-1, eu-central-1)에서 c4.8xlarge·r3.8xlarge 같은 큰 인스턴스를 최대 10대씩, 종료 방지(disableApiTermination)를 켜고 띄우려 했다. 채굴용 자원 탈취 시도의 전형이다. 같은 시각 35.153.154.221에서는 장기키(AKIA…XUPA)로 CreateUser를 시도했다. 모든 시도는 거부되어 성공한 생성은 없다.",
+     "evidence": [
+      "cloudtrail.json:345",
+      "cloudtrail.json:353",
+      "cloudtrail.json:356",
+      "cloudtrail.json:359",
+      "cloudtrail.json:388",
+      "cloudtrail.json:396",
+      "cloudtrail.json:1091",
+      "cloudtrail.json:1111",
+      "cloudtrail.json:1119",
+      "cloudtrail.json:1123",
+      "cloudtrail.json:1129",
+      "cloudtrail.json:1132"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-008",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "bstoll이 콘솔로 로그인해 web_admin의 정책·사용자 정보·접근키를 조회했다. INC-003 공격 직후(약 7분 뒤)에 공격받은 사용자만 살핀 것이라 대응 작업으로 보인다. 근처에 iam:UpdateAccessKey도 있어 키 비활성화로 보이지만, 그 이벤트는 events에 없다. 다만 MFA 없이 콘솔에 로그인한 점은 고쳐야 한다.",
+     "evidence": [
+      "cloudtrail.json:1181",
+      "cloudtrail.json:1186",
+      "cloudtrail.json:1191",
+      "cloudtrail.json:1192",
+      "cloudtrail.json:1201"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "benign_activity"
+     }
+    },
+    {
+     "id": "INC-001",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "bstoll이 MFA 없이 콘솔에 로그인해 S3 정책·ACL과 EC2·보안그룹·스냅샷을 조회했다. 모두 콘솔(signin.amazonaws.com)에서 나온 호출이고 실패가 없다. 오전에 대응 작업을 한 같은 사용자라 일반 콘솔 작업으로 보인다. 그러나 S3 버킷을 공개한 성공 1건은 위험한 설정이다. 그 이벤트 자체는 events에 없어 어느 버킷인지는 모른다. 'exfiltration' 단계는 공개 설정 규칙 때문에 붙은 것일 뿐, 데이터 반출 증거는 없다. 계정 탈취 정황(실패 로그인, 이상한 도구)도 입력에 없다.",
+     "evidence": [
+      "cloudtrail.json:3662",
+      "cloudtrail.json:3665",
+      "cloudtrail.json:3667",
+      "cloudtrail.json:4293",
+      "cloudtrail.json:4856",
+      "cloudtrail.json:5467",
+      "cloudtrail.json:5539"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "risky_not_attack"
+     }
+    },
+    {
+     "id": "INC-002",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "같은 IP 107.77.212.175에서 bstoll이 MFA 없이 다시 로그인했다. 이어 보안그룹 sg-0849cdeb5ef571996에 UDP 11211(memcached)을 0.0.0.0/0과 ::/0으로 열었다. INC-001과 같은 콘솔 세션키(EHNR)를 썼고 콘솔 작업 흐름이 이어진다. memcached UDP를 인터넷에 여는 것은 반사 DDoS에 악용될 수 있는 위험한 설정이므로 바로 닫아야 한다. 공격자 행위라는 근거는 없다.",
+     "evidence": [
+      "cloudtrail.json:6401",
+      "cloudtrail.json:6455"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "risky_not_attack"
+     }
+    },
+    {
+     "id": "INC-015",
+     "verdict": "benign_activity",
+     "confidence": "high",
+     "reason": "splunk_access 사용자가 Boto 도구로 조회만 반복했다. 약 5분마다 GetCallerIdentity를 부르고 Config·Inspector·EC2·RDS를 조회했다. 로그 수집기의 정기 폴링 형태다. 변경 호출이나 실패는 없다.",
+     "evidence": [
+      "cloudtrail.json:6037",
+      "cloudtrail.json:6090",
+      "cloudtrail.json:6096",
+      "cloudtrail.json:6124",
+      "cloudtrail.json:6211",
+      "cloudtrail.json:6312",
+      "cloudtrail.json:6361"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "benign_activity"
+     }
+    },
+    {
+     "id": "INC-004",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "외부 IP가 /login.cgi에 wget으로 악성 스크립트를 받아 실행하는 명령 삽입을 시도했다. UA는 Hakai/2.0이다. 응답은 400이었고 findings도 '성공 신호 없음'이다. 시도는 공격이지만 성공 근거는 없다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-005",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "ALB의 /shell 경로에 wget으로 'jaws'를 받아 실행하는 명령 삽입을 시도했다. UA는 Gemini/2.0이다. 응답은 400이고 실패 1건으로 기록돼 성공 근거가 없다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "INC-005와 요청 문자열·UA·다운로드 주소가 똑같은 명령 삽입 시도다. 응답은 400이고 실패로 기록돼 성공 근거가 없다.",
+     "evidence": [
+      "alb.log:8"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "라우터 진단 페이지(/cgi-bin/luci nslookup)를 노려 wget으로 스크립트를 받아 실행하려는 명령 삽입 시도다. 응답은 404이고 실패로 기록돼 성공 근거가 없다.",
+     "evidence": [
+      "access.log:858"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-009",
+     "verdict": "attack",
+     "confidence": "medium",
+     "reason": "GuardDuty가 인스턴스 i-0cc93bade2b3cba63의 22번 포트를 외부에서 두드리는 정찰(PortProbeUnprotectedPort, 심각도 2.0)로 판정했다. 흐름 로그에는 TCP 22 연결 허용만 있다. 로그인 시도나 성공 여부는 이 입력으로 알 수 없다. 22번 포트가 인터넷에 열려 있는 점도 고쳐야 한다.",
+     "evidence": [
+      "guardduty_findings.jsonl:1",
+      "vpcflow.log:59569",
+      "vpcflow.log:157004"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-012",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 22번 포트로 연결한 흐름 ACCEPT만 있다. 흐름 허용은 로그인 성공이 아니고, 스캔인지 관리자 접속인지 구분할 정보가 없다. 22번 포트의 인터넷 노출은 위험하다.",
+     "evidence": [
+      "vpcflow.log:27077",
+      "vpcflow.log:124512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-016",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름만 20분 동안 여러 번 있다. 로그인 결과를 보여주는 sshauth 이벤트가 연결돼 있지 않아 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:26567",
+      "vpcflow.log:30395"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-017",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149의 22번 포트로 연결한 흐름 ACCEPT만 있다. 로그인 여부는 모른다.",
+     "evidence": [
+      "vpcflow.log:17818",
+      "vpcflow.log:117383"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-019",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "같은 외부 IP가 2분 안에 서로 다른 내부 호스트 3대의 22번 포트에 연결했다. 스캔 형태지만 흐름 허용만 있고 로그인 시도나 결과는 보이지 않는다.",
+     "evidence": [
+      "vpcflow.log:36272",
+      "vpcflow.log:41833",
+      "vpcflow.log:42262"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-018",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름만 있다. 122.226.181.166·.167(INC-034, INC-022)과 같은 대역이고 같은 대상·시간대라 같은 스캐너로 보이지만, 로그인 결과는 모른다.",
+     "evidence": [
+      "vpcflow.log:26693",
+      "vpcflow.log:30135"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-020",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름이 있고, 근처에 ssh_login 3건이 있다. 그 결과(성공·실패)와 사용자명은 입력에 없어 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:83625",
+      "vpcflow.log:83739"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-022",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 연결 허용 흐름만 있다. 같은 대역의 INC-018·INC-034와 대상·시간이 겹친다. 로그인 결과는 모른다.",
+     "evidence": [
+      "vpcflow.log:27619",
+      "vpcflow.log:30039"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-023",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 연결 허용 흐름만 있다. 221.194.44.232(INC-012)와 비슷한 대역·시간대이지만 로그인 결과는 모른다.",
+     "evidence": [
+      "vpcflow.log:27960",
+      "vpcflow.log:29491"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-025",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 연결 허용 흐름과 근처의 ssh_login 1건이 있다. 그 결과는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:66078",
+      "vpcflow.log:163513"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-026",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "같은 외부 IP가 내부 호스트 2대의 22번 포트에 연결한 흐름만 있다. 로그인 결과는 모른다.",
+     "evidence": [
+      "vpcflow.log:84059",
+      "vpcflow.log:84646"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-021",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "같은 외부 IP가 1분 사이 내부 호스트 2대의 22번 포트에 연결한 흐름만 있다. 로그인 결과는 모른다.",
+     "evidence": [
+      "vpcflow.log:25202",
+      "vpcflow.log:25101"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-024",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름만 있다.",
+     "evidence": [
+      "vpcflow.log:30696",
+      "vpcflow.log:128131"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-027",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름 1쌍만 있다.",
+     "evidence": [
+      "vpcflow.log:5280",
+      "vpcflow.log:102715"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-028",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름 1쌍만 있다.",
+     "evidence": [
+      "vpcflow.log:9297",
+      "vpcflow.log:106732"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-030",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름 1쌍만 있다.",
+     "evidence": [
+      "vpcflow.log:21069",
+      "vpcflow.log:118504"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-031",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름 1쌍만 있다.",
+     "evidence": [
+      "vpcflow.log:23098",
+      "vpcflow.log:120533"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-033",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름 1쌍만 있다.",
+     "evidence": [
+      "vpcflow.log:25144",
+      "vpcflow.log:122579"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-034",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 연결 허용 흐름 1쌍만 있다. INC-018·INC-022와 같은 대역이다.",
+     "evidence": [
+      "vpcflow.log:27230",
+      "vpcflow.log:124665"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-035",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP의 22번 연결 허용 흐름 1쌍만 있다.",
+     "evidence": [
+      "vpcflow.log:26966",
+      "vpcflow.log:124401"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-038",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 연결 허용 흐름 1쌍만 있다. 221.194 대역의 다른 사건과 시간대가 겹친다.",
+     "evidence": [
+      "vpcflow.log:30066",
+      "vpcflow.log:127501"
+     ],
+     "contested": null
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-003"
+     ],
+     "summary": "유출된 것으로 보이는 web_admin 키로 IAM 사용자 생성과 여러 리전의 대형 인스턴스 생성(채굴 의심)을 시도했다. 모두 거부되었다.",
+     "link_reason": "같은 사용자 web_admin이다. 장기키 AKIA…XUPA(35.153.154.221)의 CreateUser와 임시키 ASIA…BJQA(139.198.18.205)의 연속 시도가 5초 간격으로 이어진다. 근처에 sts:GetSessionToken이 있어 장기키에서 임시키를 만든 것으로 보이지만, 그 이벤트는 events에 없다.",
+     "steps": [
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:12+00:00",
+       "what": "web_admin 장기키로 IAM CreateUser 시도, 거부",
+       "evidence": [
+        "cloudtrail.json:345"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:17+00:00",
+       "what": "139.198.18.205에서 임시키로 키페어·VPC·인스턴스 조회와 생성 시도, 권한 없음",
+       "evidence": [
+        "cloudtrail.json:353",
+        "cloudtrail.json:356",
+        "cloudtrail.json:359"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:45+00:00",
+       "what": "us-east-1에서 c4.8xlarge·r3.8xlarge 최대 10대 생성 시도(종료 방지 설정), 거부",
+       "evidence": [
+        "cloudtrail.json:388",
+        "cloudtrail.json:396"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:28:07+00:00",
+       "what": "eu-central-1로 옮겨 여러 인스턴스 유형으로 계속 생성 시도, 모두 거부",
+       "evidence": [
+        "cloudtrail.json:1091",
+        "cloudtrail.json:1111",
+        "cloudtrail.json:1132"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-005",
+      "INC-006"
+     ],
+     "summary": "ALB /shell 경로에 'jaws' 악성 스크립트를 내려받아 실행하려는 자동화된 명령 삽입 시도. 둘 다 400으로 실패했다.",
+     "link_reason": "요청 문자열, UA(Gemini/2.0), 다운로드 주소(199.195.254.118)가 완전히 같다. 6분 간격이며, 출발 IP만 다르다(봇넷 의심).",
+     "steps": [
+      {
+       "incident_id": "INC-005",
+       "time": "2018-08-20T09:46:51+00:00",
+       "what": "197.41.194.233에서 /shell 명령 삽입 시도, 400",
+       "evidence": [
+        "alb.log:6"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2018-08-20T09:53:00+00:00",
+       "what": "156.202.167.187에서 같은 요청 반복, 400",
+       "evidence": [
+        "alb.log:8"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-004"
+     ],
+     "summary": "Hakai 도구로 /login.cgi에 명령·SQL 삽입을 시도했다. 400으로 실패했고 성공 근거는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-004",
+       "time": "2018-08-20T13:31:22+00:00",
+       "what": "wget으로 /tmp/hk를 받아 실행하는 페이로드 전송, 400",
+       "evidence": [
+        "access.log:2512"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-007"
+     ],
+     "summary": "luci 라우터 진단 페이지를 노린 명령 삽입 시도. 404로 실패했다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-007",
+       "time": "2018-08-20T11:13:54+00:00",
+       "what": "nslookup 파라미터에 wget·chmod·sh 명령 삽입, 404",
+       "evidence": [
+        "access.log:858"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-009"
+     ],
+     "summary": "외부 IP가 i-0cc93bade2b3cba63의 열린 22번 포트를 두드린 정찰이다.",
+     "link_reason": "단일 사건이다. GuardDuty 탐지와 같은 시각·같은 IP의 흐름 기록이 있다.",
+     "steps": [
+      {
+       "incident_id": "INC-009",
+       "time": "2018-08-20T13:50:05+00:00",
+       "what": "GuardDuty가 22번 포트 탐색을 탐지했고, 흐름 로그에 TCP 22 허용이 남았다",
+       "evidence": [
+        "guardduty_findings.jsonl:1",
+        "vpcflow.log:59569"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "web_admin 키(AKIA…XUPA)가 어떻게 유출됐는지는 이 로그로 알 수 없다.",
+    "35.153.154.221이 공격자인지, 원래 키를 쓰던 정상 호스트인지 판단할 수 없다. 장기키에서 임시키 ASIA…BJQA를 만든 GetSessionToken 이벤트도 events에 없다. coverage의 suspected_keys가 비어 있어 이 키의 전체 사용 내역을 확인할 수 없다.",
+    "INC-003 근처의 iam:ListAccessKeys·iam:DeleteAccessKey를 누가 했는지(공격자인지 대응팀인지)는 events에 없어 모른다.",
+    "cloudtrail_s3_object_calls가 0이다. S3 객체 읽기·쓰기(데이터 이벤트)가 기록되지 않아, 공격자의 데이터 열람이나 공개된 버킷에 대한 외부 접근·반출이 있었는지 알 수 없다. 없었다고 단정할 수 없다.",
+    "INC-001의 S3 공개 설정 이벤트는 events에 없어 어떤 버킷을 어떤 범위로 공개했는지 확인할 수 없다.",
+    "bstoll의 콘솔 로그인은 MFA가 없었다. 157.97.121.132와 107.77.212.175 접속이 모두 본인인지는 로그만으로 확정할 수 없다.",
+    "UDP 11211을 연 뒤 외부에서 memcached로 악용됐는지는 이 입력에 흐름 증거가 없다. 흐름 로그는 15:26에 끝나 그 뒤 일은 모른다.",
+    "SSH 사건들은 흐름 ACCEPT만 있다. sshauth 로그(65건)가 있지만 사건과 연결된 성공·실패 결과가 없어, 로그인 성공 여부나 무차별 대입 여부를 알 수 없다. 122.226.181.x와 221.194.x 대역은 같은 대상에 같은 시간대로 몰려 같은 스캐너로 보이지만 확정할 수 없다.",
+    "웹 명령 삽입이 서버에서 실행됐는지는 호스트 로그가 없어 직접 확인할 수 없다. WAF 로그도 빠져 있다. 응답 코드와 findings 기준으로는 성공 근거가 없다.",
+    "전체 53건 중 이 입력에 포함된 사건만 검토했다. 나머지 사건과의 연결은 알 수 없다.",
+    "CloudTrail은 15:15, 다른 로그도 15:26 전후로 끝나 그 뒤 공격자의 후속 행동은 보이지 않는다."
+   ],
+   "validation": {
+    "unknown_ids": [],
+    "evidence_total": 96,
+    "evidence_invalid": 0,
+    "incidents_without_verdict": [],
+    "passed": true
+   },
+   "meta": {
+    "model": "claude-opus-5-5",
+    "usage": {
+     "input_tokens": 42353,
+     "output_tokens": 11970,
+     "served_by": "claude-opus-5-5"
+    },
+    "seconds": 111.8,
+    "payload_chars": 73887
+   },
+   "guard": {
+    "restored": [],
+    "contested": [
+     "INC-008",
+     "INC-001",
+     "INC-002",
+     "INC-015"
+    ],
+    "injection": []
+   }
+  },
+  "ai_3": {
+   "incidents": [
+    {
+     "id": "INC-003",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "web_admin 자격증명이 외부에서 악용됐다. 09:16:12에 장기 키(AKIA…XUPA)로 iam:CreateUser를 시도했으나 거부됐다. 5초 뒤부터는 139.198.18.205에서 임시 키(ASIA…BJQA)로 여러 리전(sa-east-1, us-east-1, eu-central-1)에 걸쳐 c4.8xlarge, r3.8xlarge 같은 큰 인스턴스를 최대 10대씩 띄우려 했다. 이 시도는 모두 UnauthorizedOperation으로 실패했다. 태그(my_i_key)가 자동화 도구 흔적과 같고, 대형 인스턴스를 여러 리전에서 반복 시도한 점은 자원 도용(채굴 등) 시도로 보인다. 입력에 보인 시도는 모두 실패였다.",
+     "evidence": [
+      "cloudtrail.json:345",
+      "cloudtrail.json:353",
+      "cloudtrail.json:356",
+      "cloudtrail.json:359",
+      "cloudtrail.json:388",
+      "cloudtrail.json:396",
+      "cloudtrail.json:1091",
+      "cloudtrail.json:1111",
+      "cloudtrail.json:1119",
+      "cloudtrail.json:1123",
+      "cloudtrail.json:1129",
+      "cloudtrail.json:1132"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-008",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "bstoll이 콘솔로 로그인한 직후, INC-003 공격이 끝나고 약 7분 뒤에 web_admin 사용자와 그 접근 키만 집중해서 조회했다. 주변에 iam:UpdateAccessKey도 있어 탈취된 키를 확인하고 비활성화하는 대응 작업으로 보인다. 다만 MFA 없이 콘솔에 로그인한 점은 고쳐야 한다.",
+     "evidence": [
+      "cloudtrail.json:1181",
+      "cloudtrail.json:1186",
+      "cloudtrail.json:1191",
+      "cloudtrail.json:1192",
+      "cloudtrail.json:1201"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "benign_activity"
+     }
+    },
+    {
+     "id": "INC-001",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "bstoll이 콘솔(UA signin.amazonaws.com)로 S3 버킷 설정과 EC2·보안그룹·스냅샷을 둘러본 기록이다. 콘솔 탐색 형태라 공격 정찰로 볼 근거는 없다. 그러나 같은 세션에서 S3 버킷 1개가 인터넷 전체나 다른 계정에 공개됐고(CT_S3_PUBLIC 성공 1건), MFA 없이 로그인했다. 그 공개 이벤트는 events 목록에 없어서 어느 버킷인지 확인할 수 없다. INC-008과 출발 IP와 브라우저가 다르지만, 이것만으로 계정 탈취라고 볼 수는 없다.",
+     "evidence": [
+      "cloudtrail.json:3662",
+      "cloudtrail.json:3665",
+      "cloudtrail.json:3667",
+      "cloudtrail.json:4856",
+      "cloudtrail.json:5467",
+      "cloudtrail.json:5539"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "risky_not_attack"
+     }
+    },
+    {
+     "id": "INC-002",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "bstoll이 콘솔 로그인 3분 뒤 보안그룹 sg-0849cdeb5ef571996에 UDP 11211(memcached)을 0.0.0.0/0과 ::/0으로 열었다. INC-001과 같은 IP, 같은 콘솔 세션 흐름이라 운영자 작업으로 보인다. 하지만 memcached를 인터넷에 여는 것은 증폭 공격에 악용될 수 있어 위험하다. MFA도 쓰지 않았다.",
+     "evidence": [
+      "cloudtrail.json:6401",
+      "cloudtrail.json:6455"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "risky_not_attack"
+     }
+    },
+    {
+     "id": "INC-015",
+     "verdict": "benign_activity",
+     "confidence": "high",
+     "reason": "splunk_access 키로 Boto 스크립트가 config·inspector·ec2·rds 목록을 주기적으로 읽은 기록이다. sts:GetCallerIdentity가 약 5분 간격으로 반복된다. 로그 수집 도구(Splunk 연동)의 정상 동작으로 보인다.",
+     "evidence": [
+      "cloudtrail.json:6037",
+      "cloudtrail.json:6090",
+      "cloudtrail.json:6096",
+      "cloudtrail.json:6211",
+      "cloudtrail.json:6361"
+     ],
+     "contested": {
+      "rules": "attack",
+      "ai": "benign_activity"
+     }
+    },
+    {
+     "id": "INC-004",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "login.cgi에 명령 삽입(wget으로 185.172.164.41/e를 받아 실행)을 시도했다. UA는 Hakai/2.0이다. 응답은 400이고, findings 판단은 '성공 신호 없음'이다. 공격 시도는 맞지만 성공 근거는 없다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-005",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "ALB의 /shell에 명령 삽입(199.195.254.118/jaws를 받아 실행)을 시도했다. 응답은 400이고 findings는 실패 1건으로 집계했다. 성공 근거는 없다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "INC-005와 같은 페이로드, 같은 UA(Gemini/2.0), 같은 다운로드 주소로 /shell에 명령 삽입을 시도했다. 응답은 400이고 성공 근거는 없다.",
+     "evidence": [
+      "alb.log:8"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "라우터 진단 페이지(luci nslookup)를 노리고 명령 삽입(178.128.11.199/rvs를 받아 실행)을 시도했다. 응답은 404이고 성공 근거는 없다.",
+     "evidence": [
+      "access.log:858"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-009",
+     "verdict": "attack",
+     "confidence": "medium",
+     "reason": "GuardDuty가 인스턴스 i-0cc93bade2b3cba63의 열린 22번 포트를 외부(122.112.243.11)에서 탐색했다고 보고했다(심각도 2.0). VPC 흐름에도 22번 접속 허용이 남아 있다. 정찰 단계이며, 로그인 성공 여부는 이 입력으로 알 수 없다.",
+     "evidence": [
+      "guardduty_findings.jsonl:1",
+      "vpcflow.log:59569",
+      "vpcflow.log:157004"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-012",
+     "verdict": "unclear",
+     "confidence": "medium",
+     "reason": "외부 IP에서 172.16.0.178의 22번으로 같은 시각에 10건 접속이 허용됐다. 스캔이나 대입 시도처럼 보이지만, VPC 흐름은 연결 허용만 보여 주고 로그인 시도나 성공은 알 수 없다. SSH를 인터넷 전체에 연 설정 자체는 위험하다.",
+     "evidence": [
+      "vpcflow.log:27077",
+      "vpcflow.log:124512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-016",
+     "verdict": "unclear",
+     "confidence": "medium",
+     "reason": "119.249.54.217이 20분 동안 172.16.0.178의 22번에 반복 접속했다. 비슷한 시간대에 다른 외부 IP들도 같은 호스트에 접속해 대입 공격 정황이 있지만, 흐름 로그만으로는 로그인 여부를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26567",
+      "vpcflow.log:30395"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-017",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "185.143.223.202가 172.16.0.149의 22번에 6건 접속했다. 흐름 로그만으로는 성격과 결과를 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:17818",
+      "vpcflow.log:115253"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-019",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "118.212.143.46이 2분 안에 내부 호스트 3대(172.16.0.149, 172.16.1.196, 172.16.1.210)의 22번에 차례로 접속했다. 스캔 형태이지만 로그인 여부는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:36272",
+      "vpcflow.log:41833",
+      "vpcflow.log:42262"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-018",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "122.226.181.164가 172.16.0.178의 22번에 반복 접속했다. 같은 시간대에 122.226.181.166과 122.226.181.167도 같은 호스트에 접속했다. 흐름 로그만으로는 결과를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26693",
+      "vpcflow.log:30135"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-020",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "5.101.40.81이 172.16.0.178의 22번에 접속했고, 주변에 ssh_login 기록 3건이 있다. 그러나 그 로그인이 성공인지, 누구인지는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:83625",
+      "vpcflow.log:83739"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-022",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "122.226.181.167이 172.16.0.178의 22번에 접속했다. INC-018과 같은 대역, 같은 시간대다. 흐름 로그만으로는 결과를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27619",
+      "vpcflow.log:30039"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-023",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "221.194.44.211이 172.16.0.178의 22번에 접속했다. INC-012와 같은 대역이다. 흐름 로그만으로는 결과를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27960",
+      "vpcflow.log:29491"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-025",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "113.162.80.84가 172.16.0.178의 22번에 접속했고 주변에 ssh_login 1건이 있다. 성공 여부는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:66078",
+      "vpcflow.log:163513"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-026",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "217.61.6.175가 내부 호스트 2대의 22번에 접속했다. 흐름 로그만으로는 결과를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:84059",
+      "vpcflow.log:84646"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-021",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "178.128.150.169가 1분 사이에 호스트 2대의 22번에 접속했다. 스캔 형태이지만 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:25202",
+      "vpcflow.log:25101"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-024",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "80.211.17.200이 172.16.1.239의 22번에 접속했다. 흐름 로그만으로는 결과를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:30696",
+      "vpcflow.log:128131"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-027",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "217.61.105.67이 172.16.1.181의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:5280"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-028",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "180.250.182.26이 172.16.1.181의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:9297"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-030",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "5.228.65.234가 172.16.1.239의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:21069"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-031",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "213.74.138.66이 172.16.1.239의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:23098"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-033",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "95.84.246.183이 172.16.0.149의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:25144"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-034",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "122.226.181.166이 172.16.0.178의 22번에 접속했다. INC-018, INC-022와 같은 대역, 같은 시간대다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27230"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-035",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "106.43.254.90이 172.16.1.239의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:26966"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-038",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "221.194.47.236이 172.16.0.178의 22번에 1회 접속했다. 판단 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:30066"
+     ],
+     "contested": null
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-003"
+     ],
+     "summary": "web_admin 자격증명을 탈취해 IAM 사용자를 만들고 여러 리전에 대형 EC2를 띄우려 한 시도다. 입력에 보인 시도는 모두 권한 부족으로 실패했다.",
+     "link_reason": "같은 주체(web_admin)이고 5초 간격으로 이어졌다. 139.198.18.205는 하나의 임시 키(ASIA…BJQA)로 같은 RunInstances 패턴(같은 태그, maxCount 10)을 반복했다.",
+     "steps": [
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:12+00:00",
+       "what": "장기 키 AKIA…XUPA로 35.153.154.221에서 iam:CreateUser를 시도했으나 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:345"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:17+00:00",
+       "what": "139.198.18.205에서 임시 키로 키페어 조회, 기본 VPC 생성, 인스턴스 조회를 시도했으나 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:353",
+        "cloudtrail.json:356",
+        "cloudtrail.json:359"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:45+00:00",
+       "what": "us-east-1에서 c4.8xlarge, r3.8xlarge 인스턴스 실행을 시도했으나 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:388",
+        "cloudtrail.json:396"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:28:32+00:00",
+       "what": "eu-central-1에서 여러 대형 인스턴스 유형으로 실행을 반복 시도했으나 모두 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:1111",
+        "cloudtrail.json:1119",
+        "cloudtrail.json:1123",
+        "cloudtrail.json:1129",
+        "cloudtrail.json:1132"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-005",
+      "INC-006"
+     ],
+     "summary": "/shell 경로에 같은 명령 삽입 페이로드를 보낸 자동화 봇 공격이다. 두 번 모두 400으로 끝났고 성공 근거는 없다.",
+     "link_reason": "같은 UA(Gemini/2.0), 같은 요청 문자열, 같은 다운로드 주소(199.195.254.118/jaws)를 썼고, 약 6분 간격이다. 출발 IP는 서로 다르다.",
+     "steps": [
+      {
+       "incident_id": "INC-005",
+       "time": "2018-08-20T09:46:51+00:00",
+       "what": "197.41.194.233에서 /shell 명령 삽입을 시도했고 400 응답을 받았다.",
+       "evidence": [
+        "alb.log:6"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2018-08-20T09:53:00+00:00",
+       "what": "156.202.167.187에서 같은 페이로드를 보냈고 400 응답을 받았다.",
+       "evidence": [
+        "alb.log:8"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-004"
+     ],
+     "summary": "login.cgi에 Hakai 봇이 명령 삽입과 SQL 인젝션을 시도했다. 성공 신호는 없다.",
+     "link_reason": "단일 사건이다. INC-006과 156.202 대역이 같지만 UA와 페이로드가 달라서 묶지 않았다.",
+     "steps": [
+      {
+       "incident_id": "INC-004",
+       "time": "2018-08-20T13:31:22+00:00",
+       "what": "wget으로 악성 스크립트를 받아 실행하려 했고 400 응답을 받았다.",
+       "evidence": [
+        "access.log:2512"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-007"
+     ],
+     "summary": "라우터 진단 페이지를 노린 명령 삽입 봇이다. 404 응답이고 성공 근거는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-007",
+       "time": "2018-08-20T11:13:54+00:00",
+       "what": "luci nslookup 경로로 명령 삽입을 시도했다.",
+       "evidence": [
+        "access.log:858"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-009"
+     ],
+     "summary": "GuardDuty가 탐지한 22번 포트 외부 탐색(정찰)이다.",
+     "link_reason": "단일 사건이다. 같은 IP와 같은 인스턴스(i-0cc93bade2b3cba63)의 탐지와 흐름 기록을 묶었다.",
+     "steps": [
+      {
+       "incident_id": "INC-009",
+       "time": "2018-08-20T13:50:05+00:00",
+       "what": "122.112.243.11이 i-0cc93bade2b3cba63의 22번 포트를 탐색했고, 흐름 로그에 접속 허용이 남았다.",
+       "evidence": [
+        "guardduty_findings.jsonl:1",
+        "vpcflow.log:59569"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "web_admin 키(AKIA…XUPA)가 어떻게 유출됐는지는 로그에 없다.",
+    "coverage의 suspected_keys가 비어 있어, 탈취 의심 키(AKIA…XUPA, ASIA…BJQA)의 전체 사용 내역이 입력에 없다. 공격자가 조회 등 다른 API를 성공시켰는지 확인할 수 없다.",
+    "139.198.18.205가 쓴 임시 키(ASIA…BJQA)가 언제 발급됐는지(주변의 sts:GetSessionToken)는 사건 events에 없어 확인할 수 없다.",
+    "RunInstances는 주변에 391건이 있지만 입력에는 일부만 있다. 전부 실패했는지, 다른 리전에서 성공한 것이 있는지 확인이 필요하다. userData가 지워져 있어 무엇을 실행하려 했는지도 알 수 없다.",
+    "35.153.154.221(CreateUser 시도)이 공격자인지, 키를 정상적으로 쓰던 시스템인지는 입력만으로 단정할 수 없다.",
+    "주변의 iam:DeleteAccessKey와 iam:UpdateAccessKey를 누가 했는지는 events에 없다. 대응팀 작업으로 추정할 뿐이다.",
+    "S3 데이터 이벤트(cloudtrail_s3_object_calls=0)가 기록되지 않았다. 공개된 버킷에서 객체를 누가 읽거나 가져갔는지는 볼 수 없다. 공개된 버킷 이름도 사건 events에 없다.",
+    "bstoll의 출발 IP(157.97.121.132와 107.77.212.175)와 브라우저가 다르다. 둘 다 본인인지는 입력만으로 확정할 수 없다. IP 소유자 정보도 입력에 없다.",
+    "VPC 흐름은 연결 허용만 보여 준다. SSH 로그인 성공 여부와 계정은 sshauth 로그(65건)를 직접 봐야 한다. 이 사건 목록에는 그 내용이 없다.",
+    "웹 공격의 다운로드 주소(185.172.164.41, 199.195.254.118, 178.128.11.199)로 실제 바깥 연결이 있었는지는 이 입력에 없다.",
+    "WAF 로그가 없어 웹 요청이 차단됐는지 따로 확인할 수 없다.",
+    "전체 사건 53건 중 일부만 입력돼 나머지 사건은 검토하지 못했다."
+   ],
+   "validation": {
+    "unknown_ids": [],
+    "evidence_total": 87,
+    "evidence_invalid": 0,
+    "incidents_without_verdict": [],
+    "passed": true
+   },
+   "meta": {
+    "model": "claude-opus-5-5",
+    "usage": {
+     "input_tokens": 42353,
+     "output_tokens": 9870,
+     "served_by": "claude-opus-5-5"
+    },
+    "seconds": 89.0,
+    "payload_chars": 73887
+   },
+   "guard": {
+    "restored": [],
+    "contested": [
+     "INC-008",
+     "INC-001",
+     "INC-002",
+     "INC-015"
+    ],
+    "injection": []
+   }
+  },
+  "ai_known_1": {
+   "incidents": [
+    {
+     "id": "INC-003",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "web_admin 자격 증명이 139.198.18.205에서 Boto3로 쓰였다. 10분 안에 거부 231건이 나왔고, 여러 리전(sa-east-1, us-east-1, eu-central-1)에서 c4.8xlarge·r3.8xlarge 같은 큰 인스턴스를 최대 10대씩 띄우려 했다. disableApiTermination도 켜져 있었다. 자원을 몰래 쓰려는 공격 패턴이다. 09:16에는 35.153.154.221에서 같은 사용자의 장기 키로 iam:CreateUser도 시도했다. 호출은 모두 AccessDenied 또는 UnauthorizedOperation으로 실패했다.",
+     "evidence": [
+      "cloudtrail.json:345",
+      "cloudtrail.json:353",
+      "cloudtrail.json:356",
+      "cloudtrail.json:359",
+      "cloudtrail.json:388",
+      "cloudtrail.json:396",
+      "cloudtrail.json:1091",
+      "cloudtrail.json:1111",
+      "cloudtrail.json:1119",
+      "cloudtrail.json:1123",
+      "cloudtrail.json:1129",
+      "cloudtrail.json:1132"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-008",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "직원 bstoll이 INC-003 직후(09:35)에 콘솔로 로그인했다. web_admin의 정보, 붙은 정책, 접근 키를 집중해서 조회했다. 근처 호출에 iam:UpdateAccessKey가 있어 키를 끄는 대응 작업으로 보인다. 다만 MFA 없이 로그인한 것은 고쳐야 할 위험이다.",
+     "evidence": [
+      "cloudtrail.json:1181",
+      "cloudtrail.json:1186",
+      "cloudtrail.json:1188",
+      "cloudtrail.json:1191",
+      "cloudtrail.json:1192",
+      "cloudtrail.json:1201"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-001",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "직원 bstoll이 107.77.212.175에서 콘솔(signin.amazonaws.com)로 S3·EC2 정보를 둘러본 것으로, 흔한 콘솔 사용 형태다. 다만 MFA 없는 로그인이 있었다. findings에는 S3 버킷을 공개한 변경이 1건 성공으로 나온다(해당 이벤트는 events에 없음). 탈취 정황(실패한 로그인 등)은 입력에 없지만, 공개 설정은 바로 고쳐야 한다.",
+     "evidence": [
+      "cloudtrail.json:4856",
+      "cloudtrail.json:3662",
+      "cloudtrail.json:3665",
+      "cloudtrail.json:3667",
+      "cloudtrail.json:4293",
+      "cloudtrail.json:5539"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-002",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "INC-001과 같은 IP에서 bstoll이 MFA 없이 콘솔에 로그인했다. 3분 뒤 보안그룹 sg-0849cdeb5ef571996에 UDP 11211(memcached)을 0.0.0.0/0과 ::/0으로 열었다. 공격자 행위라는 근거는 없지만, 증폭 공격에 악용될 수 있는 위험한 설정이다.",
+     "evidence": [
+      "cloudtrail.json:6401",
+      "cloudtrail.json:6455"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-015",
+     "verdict": "benign_activity",
+     "confidence": "high",
+     "reason": "splunk_access 사용자가 장기 키 하나로 Boto 조회 API(config, inspector, ec2, rds, s3 메타데이터)를 주기적으로 호출했다. 로그 수집 도구가 정상적으로 동작한 모습이다. 변경 호출은 없다.",
+     "evidence": [
+      "cloudtrail.json:6037",
+      "cloudtrail.json:6096",
+      "cloudtrail.json:6124",
+      "cloudtrail.json:6211",
+      "cloudtrail.json:6361"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-004",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "외부 IP가 login.cgi에 명령 삽입을 시도했다(wget으로 파일을 받아 sh로 실행하는 내용, UA Hakai/2.0). 응답은 400이다. 코드 판단은 '성공 신호 없음'이므로 실패한 시도로 본다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-005",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "ALB의 /shell 경로로 명령 삽입을 시도했다(jaws 파일을 받아 실행하려 함). 응답은 400, 성공 0건으로 성공 근거가 없다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "INC-005와 같은 페이로드, 같은 UA(Gemini/2.0)로 명령 삽입을 시도했다. 응답은 400, 성공 0건으로 성공 근거가 없다.",
+     "evidence": [
+      "alb.log:8"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "공유기 진단 페이지(luci nslookup)를 노린 명령 삽입 시도다(wget 후 실행). 응답은 404, 성공 0건으로 성공 근거가 없다.",
+     "evidence": [
+      "access.log:858"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-009",
+     "verdict": "attack",
+     "confidence": "medium",
+     "reason": "GuardDuty가 인스턴스 i-0cc93bade2b3cba63의 열린 22번 포트를 외부에서 두드린 것을 탐지했다(심각도 2.0). 흐름 로그에 TCP 22 연결 허용이 있다. 정찰 단계이며, 로그인 성공 여부는 알 수 없다.",
+     "evidence": [
+      "guardduty_findings.jsonl:1",
+      "vpcflow.log:59569",
+      "vpcflow.log:157004"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-018",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "122.226.181.x 대역의 IP 3개(INC-018/022/034)가 11:32~11:50 사이에 같은 호스트 172.16.0.178의 22번 포트에 반복해서 접속했다. SSH 무차별 대입이나 스캔으로 보인다. 흐름 로그만으로는 로그인 결과를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26693",
+      "vpcflow.log:28113",
+      "vpcflow.log:30135"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-022",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "INC-018과 같은 대역, 같은 대상 호스트, 같은 시간대에 SSH 접속을 반복했다.",
+     "evidence": [
+      "vpcflow.log:27619",
+      "vpcflow.log:30039"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-034",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "INC-018과 같은 대역에서 같은 호스트에 SSH로 접속했다.",
+     "evidence": [
+      "vpcflow.log:27230",
+      "vpcflow.log:124665"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-012",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "221.194.x 대역의 IP 3개(INC-012/023/038)가 11:33~11:49 사이에 172.16.0.178의 22번 포트에 접속했다. INC-012는 같은 초에 10건이다. 스캔이나 무차별 대입으로 보이며, 로그인 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27077",
+      "vpcflow.log:27089",
+      "vpcflow.log:124512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-023",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "INC-012와 같은 대역, 같은 대상, 같은 시간대에 SSH 접속을 반복했다.",
+     "evidence": [
+      "vpcflow.log:27960",
+      "vpcflow.log:29491"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-038",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "INC-012와 같은 221.194 대역에서 같은 호스트에 SSH로 접속했다.",
+     "evidence": [
+      "vpcflow.log:30066",
+      "vpcflow.log:127501"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-019",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "한 외부 IP가 2분 안에 내부 호스트 3대(172.16.0.149, 172.16.1.196, 172.16.1.210)의 22번 포트를 차례로 두드렸다. 스캔 형태다.",
+     "evidence": [
+      "vpcflow.log:36272",
+      "vpcflow.log:41833",
+      "vpcflow.log:42262"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-021",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "한 외부 IP가 1분 안에 호스트 2대의 22번 포트에 접속했다. 스캔 형태다.",
+     "evidence": [
+      "vpcflow.log:25202",
+      "vpcflow.log:25101"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-026",
+     "verdict": "attack",
+     "confidence": "low",
+     "reason": "한 외부 IP가 호스트 2대(172.16.0.178, 172.16.1.239)의 22번 포트에 접속했다. 스캔 형태다.",
+     "evidence": [
+      "vpcflow.log:84059",
+      "vpcflow.log:84646"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-016",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 20분 동안 한 호스트의 22번 포트에 여러 번 연결이 허용됐다. 무차별 대입일 수도 있지만, 흐름 로그만으로는 정상 관리자 접속과 구분할 수 없다. SSH를 인터넷에 연 것 자체는 위험하다.",
+     "evidence": [
+      "vpcflow.log:26567",
+      "vpcflow.log:28616",
+      "vpcflow.log:30395"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-017",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 한 호스트의 22번 포트에 한 번에 연결한 기록만 있다. 목적은 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:17818",
+      "vpcflow.log:115253"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-020",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 포트 연결이 허용됐고 근처에 ssh_login 기록 3건이 있다. 하지만 로그인 성공 여부와 주체가 입력에 없어 관리자인지 공격자인지 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:83625",
+      "vpcflow.log:83739"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-025",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "22번 포트 연결이 허용됐고 근처에 ssh_login 1건이 있다. 결과와 주체는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:66078",
+      "vpcflow.log:163513"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-024",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다. 판단할 근거가 부족하다.",
+     "evidence": [
+      "vpcflow.log:30696"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-027",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다.",
+     "evidence": [
+      "vpcflow.log:5280"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-028",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다.",
+     "evidence": [
+      "vpcflow.log:9297"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-030",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다.",
+     "evidence": [
+      "vpcflow.log:21069"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-031",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다.",
+     "evidence": [
+      "vpcflow.log:23098"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-033",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다.",
+     "evidence": [
+      "vpcflow.log:25144"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-035",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 번의 22번 포트 연결만 있다.",
+     "evidence": [
+      "vpcflow.log:26966"
+     ],
+     "contested": null
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-003"
+     ],
+     "summary": "유출된 web_admin 자격 증명으로 IAM 사용자 생성과 여러 리전에 큰 인스턴스 대량 생성을 시도했다. 모두 권한 부족으로 실패했다.",
+     "link_reason": "같은 주체(web_admin), 같은 세션 키(ASIAZB6T...BJQA), 같은 IP(139.198.18.205), 연속된 시간. 35.153.154.221의 CreateUser는 같은 사용자의 장기 키로 5초 전에 일어나 함께 묶었다.",
+     "steps": [
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:12+00:00",
+       "what": "35.153.154.221에서 web_admin 장기 키로 iam:CreateUser를 시도했다(거부).",
+       "evidence": [
+        "cloudtrail.json:345"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:17+00:00",
+       "what": "139.198.18.205에서 세션 키로 키페어·VPC·인스턴스 조회와 생성을 시도했다(거부).",
+       "evidence": [
+        "cloudtrail.json:353",
+        "cloudtrail.json:356",
+        "cloudtrail.json:359"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:45+00:00",
+       "what": "us-east-1, eu-central-1 등에서 큰 인스턴스를 최대 10대씩 띄우려고 RunInstances를 반복했다(모두 거부).",
+       "evidence": [
+        "cloudtrail.json:388",
+        "cloudtrail.json:396",
+        "cloudtrail.json:1111",
+        "cloudtrail.json:1132"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-005",
+      "INC-006"
+     ],
+     "summary": "ALB /shell 경로에 jaws 악성 파일을 받아 실행하려는 명령 삽입 시도. 성공 근거는 없다.",
+     "link_reason": "같은 요청 문자열, 같은 다운로드 주소(199.195.254.118/jaws), 같은 UA(Gemini/2.0), 6분 간격. 출발 IP는 다르다.",
+     "steps": [
+      {
+       "incident_id": "INC-005",
+       "time": "2018-08-20T09:46:51+00:00",
+       "what": "197.41.194.233에서 명령 삽입을 시도했다(400).",
+       "evidence": [
+        "alb.log:6"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2018-08-20T09:53:00+00:00",
+       "what": "156.202.167.187에서 같은 요청을 보냈다(400).",
+       "evidence": [
+        "alb.log:8"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-004"
+     ],
+     "summary": "Hakai UA를 쓴 login.cgi 명령 삽입·SQL 인젝션 시도. 성공 신호는 없다.",
+     "link_reason": "단일 사건.",
+     "steps": [
+      {
+       "incident_id": "INC-004",
+       "time": "2018-08-20T13:31:22+00:00",
+       "what": "156.202.170.156에서 wget·sh 명령을 삽입하려 했다(400).",
+       "evidence": [
+        "access.log:2512"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-007"
+     ],
+     "summary": "luci nslookup 페이지를 노린 명령 삽입 시도. 성공 근거는 없다.",
+     "link_reason": "단일 사건.",
+     "steps": [
+      {
+       "incident_id": "INC-007",
+       "time": "2018-08-20T11:13:54+00:00",
+       "what": "153.197.134.1에서 명령 삽입을 시도했다(404).",
+       "evidence": [
+        "access.log:858"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-009"
+     ],
+     "summary": "i-0cc93bade2b3cba63의 22번 포트를 외부에서 정찰했다.",
+     "link_reason": "단일 사건(GuardDuty와 흐름 로그의 IP·포트가 같음).",
+     "steps": [
+      {
+       "incident_id": "INC-009",
+       "time": "2018-08-20T13:50:05+00:00",
+       "what": "122.112.243.11이 22번 포트를 두드렸고 연결이 허용됐다.",
+       "evidence": [
+        "guardduty_findings.jsonl:1",
+        "vpcflow.log:59569"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-018",
+      "INC-034",
+      "INC-022"
+     ],
+     "summary": "122.226.181.x 대역에서 172.16.0.178로 SSH 접속을 반복했다.",
+     "link_reason": "같은 /24 대역, 같은 대상 호스트, 11:32~11:50의 연속된 시간.",
+     "steps": [
+      {
+       "incident_id": "INC-018",
+       "time": "2018-08-20T11:32:21+00:00",
+       "what": ".164에서 SSH 연결을 시작해 11:50까지 반복했다.",
+       "evidence": [
+        "vpcflow.log:26693",
+        "vpcflow.log:30135"
+       ]
+      },
+      {
+       "incident_id": "INC-034",
+       "time": "2018-08-20T11:34:21+00:00",
+       "what": ".166에서 같은 호스트에 연결했다.",
+       "evidence": [
+        "vpcflow.log:27230"
+       ]
+      },
+      {
+       "incident_id": "INC-022",
+       "time": "2018-08-20T11:36:21+00:00",
+       "what": ".167에서 같은 호스트에 연결했다(11:49까지).",
+       "evidence": [
+        "vpcflow.log:27619",
+        "vpcflow.log:30039"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-012",
+      "INC-023",
+      "INC-038"
+     ],
+     "summary": "221.194.x 대역에서 172.16.0.178로 SSH 접속을 반복했다.",
+     "link_reason": "같은 221.194 대역, 같은 대상 호스트, 11:33~11:49의 연속된 시간.",
+     "steps": [
+      {
+       "incident_id": "INC-012",
+       "time": "2018-08-20T11:33:21+00:00",
+       "what": "221.194.44.232에서 같은 초에 10건 연결했다.",
+       "evidence": [
+        "vpcflow.log:27077",
+        "vpcflow.log:124512"
+       ]
+      },
+      {
+       "incident_id": "INC-023",
+       "time": "2018-08-20T11:38:21+00:00",
+       "what": "221.194.44.211에서 연결했다(11:46 반복).",
+       "evidence": [
+        "vpcflow.log:27960",
+        "vpcflow.log:29491"
+       ]
+      },
+      {
+       "incident_id": "INC-038",
+       "time": "2018-08-20T11:49:21+00:00",
+       "what": "221.194.47.236에서 연결했다.",
+       "evidence": [
+        "vpcflow.log:30066"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-019"
+     ],
+     "summary": "118.212.143.46이 내부 호스트 3대의 SSH를 스캔했다.",
+     "link_reason": "단일 사건.",
+     "steps": [
+      {
+       "incident_id": "INC-019",
+       "time": "2018-08-20T13:15:32+00:00",
+       "what": "2분 안에 호스트 3대의 22번 포트에 연결했다.",
+       "evidence": [
+        "vpcflow.log:36272",
+        "vpcflow.log:41833",
+        "vpcflow.log:42262"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-021"
+     ],
+     "summary": "178.128.150.169가 호스트 2대의 SSH를 스캔했다.",
+     "link_reason": "단일 사건.",
+     "steps": [
+      {
+       "incident_id": "INC-021",
+       "time": "2018-08-20T11:23:21+00:00",
+       "what": "1분 안에 호스트 2대의 22번 포트에 연결했다.",
+       "evidence": [
+        "vpcflow.log:25202",
+        "vpcflow.log:25101"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-026"
+     ],
+     "summary": "217.61.6.175가 호스트 2대의 SSH를 스캔했다.",
+     "link_reason": "단일 사건.",
+     "steps": [
+      {
+       "incident_id": "INC-026",
+       "time": "2018-08-20T15:09:25+00:00",
+       "what": "8분 간격으로 호스트 2대의 22번 포트에 연결했다.",
+       "evidence": [
+        "vpcflow.log:84059",
+        "vpcflow.log:84646"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "web_admin 키가 어떻게 유출됐는지는 이 로그로 알 수 없다.",
+    "coverage의 suspected_keys가 비어 있어 web_admin 키의 전체 사용 내역(09:00 이전 사용, 다른 IP 사용)은 확인할 수 없다.",
+    "139.198.18.205가 쓴 세션 키(ASIA...BJQA)를 누가 언제 sts:GetSessionToken으로 발급했는지는 이벤트가 입력에 없어 알 수 없다. 35.153.154.221과의 관계도 추정일 뿐이다.",
+    "RunInstances의 userData는 '<sensitiveDataRemoved>'로 가려져 있어, 띄우려던 인스턴스의 목적(채굴 등)은 확인할 수 없다.",
+    "INC-008 근처의 iam:UpdateAccessKey는 대상과 결과가 입력에 없다. web_admin 키가 실제로 꺼졌는지 단정할 수 없다.",
+    "INC-001의 S3 공개 변경 이벤트는 events에 없어, 어느 버킷이 어떤 범위로 공개됐는지 알 수 없다.",
+    "cloudtrail_s3_object_calls가 0이라 S3 객체 읽기·다운로드가 기록되지 않는다. 공개 버킷에서 데이터가 빠져나갔는지 이 로그로는 보이지 않는다.",
+    "bstoll의 107.77.212.175 세션이 본인 작업인지는 IP 소유자 정보가 없어 확인할 수 없다. 탈취를 뒷받침하는 사실도 입력에 없다.",
+    "INC-002에서 연 memcached 포트(UDP 11211)가 실제로 악용됐는지는 이 사건 목록에 나타나지 않는다.",
+    "VPC 흐름 로그는 TCP 연결 허용만 보여준다. SSH 로그인 성공 여부는 sshauth 로그(65건)를 따로 봐야 하는데 이 사건들에는 내용이 없다.",
+    "웹 명령 삽입 대상 서버가 다운로드 주소(185.172.164.41, 199.195.254.118, 178.128.11.199)로 나가는 연결을 했는지는 입력에 없다. WAF 로그도 없다.",
+    "전체 사건은 53건인데 33건만 입력됐다. 나머지는 검토하지 못했다.",
+    "로그는 15:26 무렵에 끝나므로 그 뒤의 일은 알 수 없다."
+   ],
+   "validation": {
+    "unknown_ids": [],
+    "evidence_total": 106,
+    "evidence_invalid": 0,
+    "incidents_without_verdict": [],
+    "passed": true
+   },
+   "meta": {
+    "model": "claude-opus-5-5",
+    "usage": {
+     "input_tokens": 42852,
+     "output_tokens": 11539,
+     "served_by": "claude-opus-5-5"
+    },
+    "seconds": 103.2,
+    "payload_chars": 74651
+   },
+   "guard": {
+    "restored": [],
+    "contested": [],
+    "injection": []
+   }
+  },
+  "ai_known_2": {
+   "incidents": [
+    {
+     "id": "INC-003",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "web_admin 키가 외부 IP 139.198.18.205에서 Boto3로 여러 리전(sa-east-1, us-east-1, eu-central-1)에 c4.8xlarge·r3.8xlarge 같은 큰 인스턴스를 최대 10대씩, 종료 방지 옵션을 켜고 띄우려 했다. 모두 권한 부족으로 거부됐다. 같은 시각 다른 IP 35.153.154.221에서 같은 사용자의 다른 키로 iam:CreateUser도 시도했으나 거부됐다. 자원 남용(채굴 등)과 지속성 확보 시도로 보인다. 실제로 만들어진 자원은 없다.",
+     "evidence": [
+      "cloudtrail.json:345",
+      "cloudtrail.json:353",
+      "cloudtrail.json:356",
+      "cloudtrail.json:359",
+      "cloudtrail.json:388",
+      "cloudtrail.json:396",
+      "cloudtrail.json:1091",
+      "cloudtrail.json:1111",
+      "cloudtrail.json:1119",
+      "cloudtrail.json:1123",
+      "cloudtrail.json:1129",
+      "cloudtrail.json:1132"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-008",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "직원 bstoll이 INC-003 직후(09:35) 콘솔로 로그인했다. 그 뒤 web_admin의 정책과 액세스 키를 조회했다. 주변에 iam:UpdateAccessKey가 있어 키를 비활성화한 대응 작업으로 보인다. 다만 MFA 없이 로그인했으므로 고쳐야 한다. IP가 다른 bstoll 세션(107.77.212.175)과 달라 계정 주인 본인인지는 입력만으로 확인할 수 없다.",
+     "evidence": [
+      "cloudtrail.json:1181",
+      "cloudtrail.json:1186",
+      "cloudtrail.json:1188",
+      "cloudtrail.json:1191",
+      "cloudtrail.json:1192",
+      "cloudtrail.json:1201"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-001",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "직원 bstoll이 107.77.212.175에서 콘솔로 S3·EC2 자원을 조회한 것으로, 일상 관리 작업 형태다. 그러나 MFA 없는 콘솔 로그인이 있다. S3 버킷을 인터넷 또는 다른 계정에 공개한 변경도 1건 성공했다. 이 공개 변경 이벤트는 목록에 없어 어떤 버킷인지는 보이지 않는다. 공격 흔적은 없지만 위험한 설정이다.",
+     "evidence": [
+      "cloudtrail.json:3662",
+      "cloudtrail.json:3665",
+      "cloudtrail.json:3667",
+      "cloudtrail.json:4293",
+      "cloudtrail.json:4856",
+      "cloudtrail.json:5467",
+      "cloudtrail.json:5539"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-002",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "같은 bstoll이 같은 IP 107.77.212.175에서 MFA 없이 콘솔로 로그인했다. 이어서 보안그룹 sg-0849cdeb5ef571996에 UDP 11211(memcached)을 0.0.0.0/0과 ::/0에 열었다. 직원의 콘솔 작업으로 보이지만, 전체 인터넷에 memcached 포트를 연 매우 위험한 설정이므로 바로 되돌려야 한다.",
+     "evidence": [
+      "cloudtrail.json:6401",
+      "cloudtrail.json:6455"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-015",
+     "verdict": "benign_activity",
+     "confidence": "high",
+     "reason": "splunk_access 키가 한 IP에서 Boto로 GetCallerIdentity, config, inspector, EC2·RDS 조회를 주기적으로 실행했다. 로그·설정을 수집하는 Splunk 연동의 정상 조회로 보인다. 변경 호출은 없다.",
+     "evidence": [
+      "cloudtrail.json:6037",
+      "cloudtrail.json:6090",
+      "cloudtrail.json:6096",
+      "cloudtrail.json:6124",
+      "cloudtrail.json:6211",
+      "cloudtrail.json:6361"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-004",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "외부 IP가 Hakai/2.0 UA로 /login.cgi에 wget으로 악성 스크립트를 받아 실행하는 명령 삽입을 시도했다. 응답은 400이고 코드 판단은 '성공 신호 없음'이다. 자동화된 봇 공격 시도다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-005",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "ALB로 /shell 경로에 wget 다운로드·실행 명령 삽입을 시도했다(UA Gemini/2.0). 응답은 400이고 성공 근거는 없다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "INC-005와 같은 요청(같은 다운로드 주소, 같은 UA)을 다른 IP에서 6분 뒤 보냈다. 응답은 400이고 성공 근거는 없다.",
+     "evidence": [
+      "alb.log:8"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "라우터 진단 페이지(/cgi-bin/luci)의 ping_ip 값에 wget·chmod·sh 명령을 넣는 공격 시도다. 응답은 404이고 성공 근거는 없다.",
+     "evidence": [
+      "access.log:858"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-009",
+     "verdict": "attack",
+     "confidence": "medium",
+     "reason": "GuardDuty가 인스턴스 i-0cc93bade2b3cba63의 열린 22번 포트를 외부에서 두드리는 정찰을 탐지했다(심각도 2.0). VPC 흐름에서도 같은 IP의 22번 접속이 허용됐다. 로그인 성공 여부는 알 수 없다.",
+     "evidence": [
+      "guardduty_findings.jsonl:1",
+      "vpcflow.log:59569",
+      "vpcflow.log:157004"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-012",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP에서 172.16.0.178의 22번 포트 접속이 허용됐다. 흐름 로그만으로는 로그인 시도인지, 성공했는지, 누구인지 알 수 없다. 22번이 인터넷에 열려 있는 것 자체는 위험하다. 비슷한 시간대에 221.194.44.x·47.x 대역에서도 같은 대상으로 접속이 있었다.",
+     "evidence": [
+      "vpcflow.log:27077",
+      "vpcflow.log:124512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-016",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 20분간 172.16.0.178의 22번 포트에 여러 번 접속했고 허용됐다. 인증 결과는 이 사건에 없다.",
+     "evidence": [
+      "vpcflow.log:26567",
+      "vpcflow.log:28616",
+      "vpcflow.log:30205",
+      "vpcflow.log:30395"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-017",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149의 22번 포트에 접속했고 허용됐다. 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:17818",
+      "vpcflow.log:115253"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-019",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "한 외부 IP가 2분 안에 내부 호스트 3대(172.16.0.149, 172.16.1.196, 172.16.1.210)의 22번 포트에 차례로 접속했다. 스캔 형태지만 흐름 로그만으로는 의도와 결과를 확정할 수 없다.",
+     "evidence": [
+      "vpcflow.log:36272",
+      "vpcflow.log:41833",
+      "vpcflow.log:42262"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-018",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "122.226.181.x 대역 IP가 172.16.0.178의 22번 포트에 반복 접속했다(INC-022, INC-034와 같은 대역, 같은 대상, 같은 시간대). 인증 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26693",
+      "vpcflow.log:28113",
+      "vpcflow.log:30135"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-020",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 22번 포트에 접속했다. 주변에 ssh_login 기록 3건이 있지만 그 결과(성공·실패)는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:83625",
+      "vpcflow.log:83739"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-022",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "122.226.181.167이 172.16.0.178의 22번 포트에 접속했다. INC-018과 같은 대역이다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27619",
+      "vpcflow.log:30039"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-023",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "221.194.44.211이 172.16.0.178의 22번 포트에 접속했다. INC-012와 같은 대역이다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27960",
+      "vpcflow.log:29491"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-025",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 22번 포트에 접속했다. 주변에 ssh_login 1건이 있으나 결과는 입력에 없다.",
+     "evidence": [
+      "vpcflow.log:66078",
+      "vpcflow.log:163513"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-026",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 두 호스트(172.16.0.178, 172.16.1.239)의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:84059",
+      "vpcflow.log:84646"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-021",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 1분 사이에 두 호스트의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:25202",
+      "vpcflow.log:25101"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-024",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:30696",
+      "vpcflow.log:128131"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-027",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.181의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:5280",
+      "vpcflow.log:102715"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-028",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.181의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:9297",
+      "vpcflow.log:106732"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-030",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:21069",
+      "vpcflow.log:118504"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-031",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:23098",
+      "vpcflow.log:120533"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-033",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:25144",
+      "vpcflow.log:122579"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-034",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "122.226.181.166이 172.16.0.178의 22번 포트에 접속했다. INC-018·022와 같은 대역이다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:27230",
+      "vpcflow.log:124665"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-035",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26966",
+      "vpcflow.log:124401"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-038",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "221.194.47.236이 172.16.0.178의 22번 포트에 접속했다. 결과는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:30066",
+      "vpcflow.log:127501"
+     ],
+     "contested": null
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-003"
+     ],
+     "summary": "web_admin 키를 손에 넣은 외부 공격자가 여러 리전에 고사양 인스턴스를 대량으로 띄우려 했고 IAM 사용자 생성도 시도했다. 모두 권한 부족으로 실패했다.",
+     "link_reason": "같은 주체 web_admin, 같은 임시 키(ASIAZB6T...BJQA), 같은 IP 139.198.18.205, 같은 UA, 같은 태그(my_i_key)를 쓴 RunInstances가 이어진다. CreateUser는 같은 주체가 같은 시각에 호출했지만 IP와 키가 달라 연결은 추정이다.",
+     "steps": [
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:12+00:00",
+       "what": "35.153.154.221에서 web_admin 장기 키로 iam:CreateUser를 시도했으나 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:345"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:17+00:00",
+       "what": "139.198.18.205에서 키페어·VPC·인스턴스를 조회하거나 만들려다 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:353",
+        "cloudtrail.json:356",
+        "cloudtrail.json:359"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:45+00:00",
+       "what": "us-east-1에 c4.8xlarge·r3.8xlarge 최대 10대 생성을 시도했으나 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:388",
+        "cloudtrail.json:396"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:28:07+00:00",
+       "what": "eu-central-1에서 여러 인스턴스 유형으로 생성을 반복 시도했으나 모두 거부됐다.",
+       "evidence": [
+        "cloudtrail.json:1091",
+        "cloudtrail.json:1111",
+        "cloudtrail.json:1129",
+        "cloudtrail.json:1132"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-005",
+      "INC-006"
+     ],
+     "summary": "ALB의 /shell 경로에 같은 다운로드·실행 명령을 넣은 봇 공격 시도다. 둘 다 400 응답이고 성공 근거는 없다.",
+     "link_reason": "요청 내용(199.195.254.118/jaws 다운로드), UA(Gemini/2.0), 대상 호스트가 같고 6분 간격으로 이어진다. IP는 서로 다르다.",
+     "steps": [
+      {
+       "incident_id": "INC-005",
+       "time": "2018-08-20T09:46:51+00:00",
+       "what": "197.41.194.233에서 명령 삽입 요청을 보냈고 400 응답을 받았다.",
+       "evidence": [
+        "alb.log:6"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2018-08-20T09:53:00+00:00",
+       "what": "156.202.167.187에서 같은 요청을 보냈고 400 응답을 받았다.",
+       "evidence": [
+        "alb.log:8"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-004"
+     ],
+     "summary": "Hakai 봇이 /login.cgi에 명령 삽입과 SQL 인젝션을 시도했다. 400 응답이며 성공 신호는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-004",
+       "time": "2018-08-20T13:31:22+00:00",
+       "what": "156.202.170.156에서 wget 다운로드·실행 명령 삽입을 시도했다.",
+       "evidence": [
+        "access.log:2512"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-007"
+     ],
+     "summary": "라우터 취약점(luci nslookup)을 노린 명령 삽입 시도다. 404 응답이며 성공 근거는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-007",
+       "time": "2018-08-20T11:13:54+00:00",
+       "what": "153.197.134.1에서 ping_ip 값에 wget·sh 명령을 넣어 요청했다.",
+       "evidence": [
+        "access.log:858"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-009"
+     ],
+     "summary": "외부 IP가 인스턴스 i-0cc93bade2b3cba63의 열린 SSH 포트를 정찰했다.",
+     "link_reason": "단일 사건이다. GuardDuty 탐지와 VPC 흐름의 IP·포트·시각이 일치한다.",
+     "steps": [
+      {
+       "incident_id": "INC-009",
+       "time": "2018-08-20T13:50:05+00:00",
+       "what": "GuardDuty가 22번 포트 탐침을 탐지했고, 흐름 로그에 같은 IP의 22번 접속 허용이 남았다.",
+       "evidence": [
+        "guardduty_findings.jsonl:1",
+        "vpcflow.log:59569"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "web_admin 키가 어떻게 유출됐는지 이 로그로는 알 수 없다. 의심 키의 전체 사용 내역(suspected_keys)이 비어 있어, 키의 다른 사용이나 GetSessionToken으로 임시 키 BJQA를 만든 경위도 확인할 수 없다.",
+    "35.153.154.221의 CreateUser 시도가 139.198.18.205 공격자와 같은 사람인지 확정할 수 없다.",
+    "RunInstances의 userData가 제거돼 있어, 실행하려던 코드(채굴 등)가 무엇인지 알 수 없다.",
+    "CloudTrail에 S3 객체 수준 호출이 0건이라, 공개된 버킷이나 다른 버킷의 데이터가 읽히거나 반출됐는지는 보이지 않는다. 어떤 버킷이 공개됐는지도 사건 events에 없다.",
+    "bstoll의 S3 공개 설정과 memcached 포트 개방이 승인된 작업인지, 157.97.121.132와 107.77.212.175 세션이 모두 본인인지는 입력만으로 확인할 수 없다.",
+    "SSH 접속(VPC 흐름 ACCEPT)은 연결 허용만 보여준다. 로그인 성공 여부는 sshauth 로그(65건)와 연결된 내용이 이 사건들에 없어 알 수 없다.",
+    "웹 공격이 서버에서 실제로 실행됐는지는 호스트 로그가 없어 확인할 수 없다. WAF 로그도 빠져 있다.",
+    "CloudTrail은 15:15:20, VPC 흐름은 15:26:46 이후 기록이 없어 그 뒤의 일은 알 수 없다.",
+    "전체 53건 중 일부 사건만 입력돼 나머지 사건과의 연관은 판단하지 못했다."
+   ],
+   "validation": {
+    "unknown_ids": [],
+    "evidence_total": 100,
+    "evidence_invalid": 0,
+    "incidents_without_verdict": [],
+    "passed": true
+   },
+   "meta": {
+    "model": "claude-opus-5-5",
+    "usage": {
+     "input_tokens": 42852,
+     "output_tokens": 9163,
+     "served_by": "claude-opus-5-5"
+    },
+    "seconds": 79.4,
+    "payload_chars": 74651
+   },
+   "guard": {
+    "restored": [],
+    "contested": [],
+    "injection": []
+   }
+  },
+  "ai_known_3": {
+   "incidents": [
+    {
+     "id": "INC-003",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "web_admin 키로 sa-east-1·us-east-1·eu-central-1 등 여러 리전에서 큰 인스턴스(c4.8xlarge, r3.8xlarge 등)를 최대 10대씩 띄우려 했고, 모두 권한 거부됐다. 10분 안에 거부 231건이 나왔다. 같은 시각 다른 IP(35.153.154.221)에서 같은 사용자로 CreateUser도 시도했다가 거부됐다. 정상 운영 패턴이 아니다. 기록에 보이는 시도는 모두 실패다.",
+     "evidence": [
+      "cloudtrail.json:345",
+      "cloudtrail.json:353",
+      "cloudtrail.json:356",
+      "cloudtrail.json:359",
+      "cloudtrail.json:388",
+      "cloudtrail.json:396",
+      "cloudtrail.json:1091",
+      "cloudtrail.json:1111",
+      "cloudtrail.json:1119",
+      "cloudtrail.json:1123",
+      "cloudtrail.json:1129",
+      "cloudtrail.json:1132"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-008",
+     "verdict": "benign_activity",
+     "confidence": "medium",
+     "reason": "INC-003 직후(09:35) 직원 bstoll이 콘솔로 로그인해 web_admin 사용자와 그 액세스 키를 조회했다. 주변 호출에 iam:UpdateAccessKey가 있어 대응 작업(키 확인·비활성화)으로 보인다. 다만 MFA 없이 로그인했으므로 MFA 적용은 필요하다.",
+     "evidence": [
+      "cloudtrail.json:1181",
+      "cloudtrail.json:1188",
+      "cloudtrail.json:1191",
+      "cloudtrail.json:1192",
+      "cloudtrail.json:1201"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-001",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "직원 bstoll이 107.77.212.175에서 MFA 없이 콘솔로 로그인했다. 이후 콘솔(signin.amazonaws.com)로 EC2·S3를 조회했는데, 사람이 콘솔을 둘러본 형태다. 같은 사용자가 S3 버킷 하나를 공개로 바꾼 성공 기록(CT_S3_PUBLIC)이 있어 위험한 설정 변경이다. 외부 공격자라는 근거는 입력에 없다.",
+     "evidence": [
+      "cloudtrail.json:4856",
+      "cloudtrail.json:3662",
+      "cloudtrail.json:3665",
+      "cloudtrail.json:3667",
+      "cloudtrail.json:4293",
+      "cloudtrail.json:5467",
+      "cloudtrail.json:5539"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-002",
+     "verdict": "risky_not_attack",
+     "confidence": "medium",
+     "reason": "bstoll이 같은 IP(107.77.212.175)에서 MFA 없이 콘솔로 로그인했다. 3분 뒤 보안그룹 sg-0849cdeb5ef571996에 UDP 11211(memcached)을 0.0.0.0/0과 ::/0에 열었다. 직원의 콘솔 작업으로 보이지만 인터넷 전체에 포트를 연 위험한 설정이다.",
+     "evidence": [
+      "cloudtrail.json:6401",
+      "cloudtrail.json:6455"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-015",
+     "verdict": "benign_activity",
+     "confidence": "high",
+     "reason": "splunk_access 사용자가 고정 IP에서 Boto로 config, inspector, EC2, RDS, S3 설정을 주기적으로 조회했다. 로그·설정을 수집하는 연동 도구의 정상 동작 형태이고, 변경 호출은 없다.",
+     "evidence": [
+      "cloudtrail.json:6037",
+      "cloudtrail.json:6096",
+      "cloudtrail.json:6124",
+      "cloudtrail.json:6211",
+      "cloudtrail.json:6361"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-004",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "/login.cgi에 wget으로 외부 파일(185.172.164.41)을 받아 실행하려는 명령 삽입 요청이 들어왔다. UA는 Hakai/2.0이다. 응답은 400이고, findings에는 '성공 신호 없음'으로 적혀 있다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-005",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "ALB에 /shell 경로로 wget 다운로드·실행 명령(199.195.254.118/jaws)을 넣은 요청이 들어왔다. 응답은 400이고, findings 기준 성공 0건이다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-006",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "INC-005와 같은 요청(같은 다운로드 주소, 같은 UA Gemini/2.0)이 다른 IP에서 들어왔다. 응답은 400이고, findings 기준 성공 0건이다.",
+     "evidence": [
+      "alb.log:8"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-007",
+     "verdict": "attack",
+     "confidence": "high",
+     "reason": "라우터 진단 페이지(luci nslookup)를 노린 명령 삽입 요청이다. 178.128.11.199에서 파일을 받아 실행하려 했다. 응답은 404이고, findings 기준 성공 0건이다.",
+     "evidence": [
+      "access.log:858"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-009",
+     "verdict": "attack",
+     "confidence": "medium",
+     "reason": "GuardDuty가 i-0cc93bade2b3cba63의 22번 포트를 외부에서 두드린 정찰(PortProbeUnprotectedPort)로 탐지했다. 흐름 기록상 연결은 허용됐지만, 로그인 성공 여부는 이 입력에 없다.",
+     "evidence": [
+      "guardduty_findings.jsonl:1",
+      "vpcflow.log:59569",
+      "vpcflow.log:157004"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-012",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178의 22번 포트에 접속했고 네트워크에서 허용됐다. 흐름 기록만으로는 로그인 시도인지, 성공했는지, 누구인지 알 수 없다. 22번이 인터넷에 열려 있는 것 자체는 위험하다.",
+     "evidence": [
+      "vpcflow.log:27077",
+      "vpcflow.log:124611"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-016",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 20분 동안 여러 번 172.16.0.178:22에 접속했다(허용). 흐름 기록만으로는 로그인 성공 여부를 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26567",
+      "vpcflow.log:30395"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-017",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149:22에 접속했다(허용). 흐름 기록만으로는 성격을 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:17818",
+      "vpcflow.log:117383"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-019",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP 하나가 2분 안에 내부 호스트 3대(172.16.0.149, 172.16.1.196, 172.16.1.210)의 22번에 차례로 접속했다. 훑어보기(스캔)와 비슷하지만 흐름 기록만으로는 확정할 수 없다.",
+     "evidence": [
+      "vpcflow.log:36272",
+      "vpcflow.log:41833",
+      "vpcflow.log:42262"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-018",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 여러 번 접속했다(허용). INC-022·INC-034와 앞 세 자리가 같은 주소이고 시간대도 겹친다. 하지만 로그인 성공 여부는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:26693",
+      "vpcflow.log:30135"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-020",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 접속했다(허용). 주변에 ssh_login 기록이 있지만 사건 events에 없어서 성공 여부와 계정을 확인할 수 없다.",
+     "evidence": [
+      "vpcflow.log:83625",
+      "vpcflow.log:83739"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-022",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:27619",
+      "vpcflow.log:30039"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-023",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:27960",
+      "vpcflow.log:29491"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-025",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 접속했다(허용). 주변에 ssh_login 1건이 있지만 내용이 입력에 없어 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:66078",
+      "vpcflow.log:163572"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-026",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 두 호스트(172.16.0.178, 172.16.1.239)의 22번에 접속했다(허용). 성공 여부는 알 수 없다.",
+     "evidence": [
+      "vpcflow.log:84059",
+      "vpcflow.log:84646"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-021",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 1분 사이 두 호스트의 22번에 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:25202",
+      "vpcflow.log:25101"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-024",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239:22에 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:30696",
+      "vpcflow.log:128175"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-027",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.181:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:5280",
+      "vpcflow.log:102715"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-028",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.181:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:9297",
+      "vpcflow.log:106732"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-030",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:21069",
+      "vpcflow.log:118504"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-031",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:23098",
+      "vpcflow.log:120533"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-033",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.149:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:25144",
+      "vpcflow.log:122579"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-034",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 한 번 접속했다(허용). INC-018·INC-022와 비슷한 주소이지만 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:27230",
+      "vpcflow.log:124665"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-035",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.1.239:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:26966",
+      "vpcflow.log:124401"
+     ],
+     "contested": null
+    },
+    {
+     "id": "INC-038",
+     "verdict": "unclear",
+     "confidence": "low",
+     "reason": "외부 IP가 172.16.0.178:22에 한 번 접속했다(허용). 흐름 기록만으로는 판단할 수 없다.",
+     "evidence": [
+      "vpcflow.log:30066",
+      "vpcflow.log:127501"
+     ],
+     "contested": null
+    }
+   ],
+   "campaigns": [
+    {
+     "incident_ids": [
+      "INC-003"
+     ],
+     "summary": "web_admin 자격증명으로 계정 안에 IAM 사용자를 만들고, 여러 리전에 고사양 인스턴스를 대량으로 띄우려 했다. 기록상 모두 권한 거부됐다.",
+     "link_reason": "같은 주체(web_admin)이고 13분 안에 연속으로 일어났다. 대량 RunInstances는 139.198.18.205에서 같은 임시 키(ASIAZB6T...BJQA)로 실행됐다. 35.153.154.221의 CreateUser는 다른 키(AKIAJOGC...XUPA)를 썼고 같은 주체·시각이라는 점으로만 이어진다.",
+     "steps": [
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:12+00:00",
+       "what": "35.153.154.221에서 web_admin 키로 IAM 사용자 생성 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:345"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:17+00:00",
+       "what": "139.198.18.205에서 키페어·VPC·인스턴스 조회와 생성 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:353",
+        "cloudtrail.json:356",
+        "cloudtrail.json:359"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:16:45+00:00",
+       "what": "us-east-1에서 c4.8xlarge·r3.8xlarge를 최대 10대씩 실행 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:388",
+        "cloudtrail.json:396"
+       ]
+      },
+      {
+       "incident_id": "INC-003",
+       "time": "2018-08-20T09:28:07+00:00",
+       "what": "eu-central-1로 옮겨 여러 인스턴스 유형으로 반복 실행 시도(거부)",
+       "evidence": [
+        "cloudtrail.json:1091",
+        "cloudtrail.json:1111",
+        "cloudtrail.json:1132"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-005",
+      "INC-006"
+     ],
+     "summary": "ALB의 /shell 경로에 악성 파일을 받아 실행하는 명령 삽입을 시도했다. 둘 다 400 응답이고 성공 근거는 없다.",
+     "link_reason": "요청 문자열, 다운로드 주소(199.195.254.118/jaws), UA(Gemini/2.0)가 같고 6분 간격으로 들어왔다.",
+     "steps": [
+      {
+       "incident_id": "INC-005",
+       "time": "2018-08-20T09:46:51+00:00",
+       "what": "197.41.194.233에서 /shell 명령 삽입 시도(400)",
+       "evidence": [
+        "alb.log:6"
+       ]
+      },
+      {
+       "incident_id": "INC-006",
+       "time": "2018-08-20T09:53:00+00:00",
+       "what": "156.202.167.187에서 같은 요청 반복(400)",
+       "evidence": [
+        "alb.log:8"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-004"
+     ],
+     "summary": "Hakai UA로 /login.cgi에 명령 삽입·SQL 인젝션을 시도했다. 400 응답이고 성공 신호는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-004",
+       "time": "2018-08-20T13:31:22+00:00",
+       "what": "185.172.164.41에서 파일을 받아 실행하는 명령 삽입 시도",
+       "evidence": [
+        "access.log:2512"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-007"
+     ],
+     "summary": "라우터 진단 페이지를 노린 명령 삽입 시도다. 404 응답이고 성공 근거는 없다.",
+     "link_reason": "단일 사건이다.",
+     "steps": [
+      {
+       "incident_id": "INC-007",
+       "time": "2018-08-20T11:13:54+00:00",
+       "what": "luci nslookup 파라미터로 178.128.11.199에서 파일을 받아 실행하려 시도",
+       "evidence": [
+        "access.log:858"
+       ]
+      }
+     ]
+    },
+    {
+     "incident_ids": [
+      "INC-009"
+     ],
+     "summary": "GuardDuty가 탐지한 EC2 22번 포트 외부 정찰이다.",
+     "link_reason": "단일 사건이다. GuardDuty 탐지와 흐름 기록이 같은 IP·포트·시각을 가리킨다.",
+     "steps": [
+      {
+       "incident_id": "INC-009",
+       "time": "2018-08-20T13:50:05+00:00",
+       "what": "i-0cc93bade2b3cba63의 22번 포트를 탐색, 연결 허용",
+       "evidence": [
+        "guardduty_findings.jsonl:1",
+        "vpcflow.log:59569"
+       ]
+      }
+     ]
+    }
+   ],
+   "cannot_tell": [
+    "web_admin 자격증명이 어떻게 유출됐는지는 이 로그로 알 수 없다. coverage의 suspected_keys가 비어 있어 이 키의 전체 사용 내역도 확인할 수 없다.",
+    "INC-003의 대량 RunInstances가 하나라도 성공했는지 알 수 없다. 주변 호출 수는 391건인데, 입력 events에는 거부된 기록만 있다. userData는 마스킹되어 무엇을 실행하려 했는지도 알 수 없다.",
+    "35.153.154.221(CreateUser 시도)과 139.198.18.205가 같은 공격자인지 확정할 수 없다. 사용한 키가 서로 다르다.",
+    "sts:GetSessionToken·iam:DeleteAccessKey·iam:UpdateAccessKey가 주변 호출에 있지만 사건 events에 없다. 누가 임시 키를 발급했고 누가 키를 비활성화·삭제했는지 확인할 수 없다.",
+    "INC-001에서 공개로 바뀐 버킷 이름과 변경 내용은 events에 없다. CloudTrail S3 객체 수준 호출이 0건이라, 그 버킷의 데이터를 누가 읽거나 올렸는지 이 로그로는 보이지 않는다.",
+    "bstoll이 쓴 두 IP(157.97.121.132, 107.77.212.175)가 모두 본인인지 확인할 수 없다. 외부 공격자라는 근거도 입력에 없다.",
+    "SSH 22번 허용 흐름은 TCP 연결만 보여준다. 로그인 성공 여부와 사용 계정은 sshauth 기록이 사건에 연결되지 않아 알 수 없다.",
+    "웹 명령 삽입이 서버에서 실행됐는지, 다운로드 서버로 나가는 연결이 있었는지는 입력에 없다. WAF 로그도 없다.",
+    "CloudTrail은 09:00~15:15 구간만 있다. 그 이전과 이후의 키 사용, 그리고 공격자의 사전 정찰은 보이지 않는다."
+   ],
+   "validation": {
+    "unknown_ids": [],
+    "evidence_total": 94,
+    "evidence_invalid": 0,
+    "incidents_without_verdict": [],
+    "passed": true
+   },
+   "meta": {
+    "model": "claude-opus-5-5",
+    "usage": {
+     "input_tokens": 42852,
+     "output_tokens": 9348,
+     "served_by": "claude-opus-5-5"
+    },
+    "seconds": 82.0,
+    "payload_chars": 74651
+   },
+   "guard": {
+    "restored": [],
+    "contested": [],
+    "injection": []
+   }
+  }
+ }
+}

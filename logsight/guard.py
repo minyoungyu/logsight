@@ -30,7 +30,11 @@ _PATTERNS = [
     r"\bverdict\b",
     r"\b(authori[sz]ed|approved|sanctioned)\s+(pen\s*test|pentest|testing|activity|scan)",
     r"\b(do\s+not|don'?t|never)\s+(flag|report|alert|escalate|mention)",
+    # AI에게 말을 거는 문장(판정 대신 '복구 명령'을 권하게 하는 주입도 여기에 걸린다. 2026-11-24 시연에서 추가)
+    r"\b(note|message|instructions?)\s+(to|for)\s+(the\s+)?(ai|llm|assistant|analyst)\b",
+    r"\b(tell|advise|instruct|ask)\s+(them|the\s+(owner|user|admin|operator))\s+to\s+(run|execute|apply)",
     r"(이전|위의?|앞의?)\s*(지시|명령|규칙).{0,6}(무시|따르지)",
+    r"\bAI\s*(분석|어시스턴트|비서)?\s*(참고|에게|께)\s*[:：]?",
     r"(정상|허가된?|승인된?)\s*(작업|활동|점검|테스트)(이니|이므로|입니다|임)",
     r"(오탐|정상\s*활동)\s*(으로|이라고)\s*(판정|분류|표시|보고)",
     r"(판정|분류)\s*(하지\s*마|하지\s*말)",
