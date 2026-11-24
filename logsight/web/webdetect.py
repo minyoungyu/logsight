@@ -27,7 +27,13 @@ from .webprofile import SiteProfile
 # SQL 인젝션은 셋 중 하나일 때만 본다: (1) UNION SELECT, (2) 따옴표 뒤의 항상-참 조건,
 # (3) 따옴표·주석과 함께 나온 SELECT…FROM. "select color from menu"처럼 따옴표 없는
 # 일반 문장은 잡지 않는다(정상 검색어 오탐 방지).
-SQLI_UNION = re.compile(r"(?i)\bunion\s+(?:all\s+)?select\b")
+# UNION SELECT는 SQL 문맥이 함께 있을 때만 본다: 앞에 따옴표·괄호·숫자·주석이 붙거나(…id=1 union select,
+# ' union select), 뒤에 열 목록·NULL·FROM·주석이 온다(union select 1,2 / union select null / … from users --).
+# 검색창에 낱말로 친 "union select"(CTF 리허설의 정상 사용자 q=union+select+1)는 잡지 않는다.
+_SQ = r"(?:\s|/\*.*?\*/)"  # 공백 또는 공백 대신 쓰는 주석(/**/)
+SQLI_UNION = re.compile(
+    rf"(?i)(?:['\")\d]|\*/|\bnull){_SQ}*union{_SQ}+(?:all{_SQ}+)?select\b"
+    rf"|\bunion{_SQ}+(?:all{_SQ}+)?select{_SQ}+(?:null\b|[\w'\"@().]+\s*,|.*\bfrom\b|.*(?:--|#|/\*))")
 SQLI_TAUTOLOGY = re.compile(r"(?i)'\s*(?:or|and)\s+['\d(]|\b(?:or|and)\s+\d+\s*=\s*\d+\b")
 SQLI_TAIL = re.compile(r"(?i)'|--|/\*")
 SQLI_MISC = re.compile(
@@ -63,6 +69,19 @@ EXPLOIT_PROBE = re.compile(r"(?i)\$\{jndi:|\$\{(?:lower|upper|env|sys):|\(\)\s*\
 SSRF_TARGET = re.compile(
     r"(?i)[?&](?:url|src|dest|uri|callback|file|path)=https?://(?:127\.|localhost|0\.0\.0\.0|"
     r"169\.254\.169\.254|10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)")
+# 그중 클라우드 인스턴스 메타데이터 서비스(IMDS) 주소: AWS·Azure·GCP 169.254.169.254, AWS IPv6, GCP 이름,
+# 알리바바 100.100.100.200. 여기서 서버 역할의 임시 키를 꺼낼 수 있어 일반 SSRF보다 한 단계 더 나간 것이다
+IMDS_TARGET = re.compile(
+    r"(?i)[?&=](?:https?://)?(?:169\.254\.169\.254|\[?fd00:ec2::254\]?|metadata\.google\.internal|"
+    r"100\.100\.100\.200)(?:[:/?#&]|$)")
+# IMDS 안에서 역할 키·사용자 데이터를 꺼내는 경로
+IMDS_SECRET = re.compile(r"(?i)/(?:iam/security-credentials|identity-credentials|user-data|"
+                         r"computeMetadata/v1/instance/service-accounts)")
+# 검색엔진 봇(robots.txt를 읽고 페이지를 돌아다니는 것이 정상인 것)
+CRAWLER_UA = re.compile(r"(?i)googlebot|bingbot|yeti|daum|duckduckbot|baiduspider|yandex|applebot|slurp")
+# robots.txt를 읽은 뒤 숨은 경로를 열어 본 것으로 볼 시간 폭
+ROBOTS_FOLLOW_SPAN = timedelta(minutes=30)
+_STATIC_EXT = re.compile(r"(?i)\.(?:css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|map|webp)$")
 # 외부 사이트로 보내는 리다이렉트 인자(열린 리다이렉트)
 REDIRECT_TARGET = re.compile(r"(?i)[?&](?:next|return|redirect|continue|to)=https?://")
 # 웹 요청 중 응답 본문으로 파일을 내려받는 방식(백업 파일 유출 판단에 쓴다)
@@ -84,7 +103,15 @@ SCANNER_UA = re.compile(
 WEBSHELL_NAME = re.compile(
     r"(?i)(?:^|/)(?:c99|r57|b374k|wso|webshell|backdoor|adminer|"
     r"alfa|indoxploit|p0wny|antichat|phpspy|tryag|0byt3m1n1)\.(?:php|phtml|jsp|asp|aspx)\b")
-SHELL_PARAM = re.compile(r"(?i)[?&](?:cmd|exec|command|c|run|shell|system|passthru)\s*=([^&]*)")
+SHELL_PARAM = re.compile(r"(?i)[?&](cmd|exec|command|c|run|shell|system|passthru)\s*=([^&]*)")
+# 짧고 흔한 인자 이름(c=, run=)은 정상 페이지에서도 쓴다(category.php?c=mouse, report.php?run=weekly).
+# 이 이름은 값이 명령처럼 생겼을 때만 웹셸 접근으로 본다. CTF 리허설에서 상품 분류 c=mouse를 본
+# 정상 사용자 7명이 '웹셸 접근 높음'으로 잡혔다.
+WEAK_SHELL_PARAMS = frozenset({"c", "run"})
+# 값이 명령으로 보이는 모양: 셸 연결 기호, 시스템 경로로 시작, 공백이 든 명령어, 단독으로 쓰는 정찰 명령
+_CMD_META = re.compile(r"[;|`]|\$\(|&&|>\s*/")
+_CMD_ABS = re.compile(r"^/(?:usr|bin|sbin|etc|tmp|var|opt|home|root|dev|proc|sys)/")
+_CMD_SOLO = frozenset({"id", "whoami", "uname", "ls", "pwd", "ps", "ifconfig", "netstat", "hostname", "env"})
 # 스크립트로 실행되는 파일 확장자(경로 끝). /remote.php/dav/a.jpg 처럼 스크립트 뒤에 경로가
 # 붙은 요청은 그 파일을 내려받는 것이라 실행으로 보지 않는다.
 SCRIPT_EXT = re.compile(r"(?i)\.(?:php\d?|phtml|phar|jsp|jspx|asp|aspx|cgi|pl)$")
@@ -159,11 +186,24 @@ def _shell_param_hit(path: str, query: str) -> bool:
     if not SCRIPT_EXT.search(path):
         return False
     for m in SHELL_PARAM.finditer("?" + query):
-        value = unquote_plus(m.group(1)).strip()
+        value = unquote_plus(m.group(2)).strip()
         # 숫자만 있는 값(c=0, run=1)은 켜고 끄는 옵션이지 명령이 아니다(WordPress load-scripts.php?c=0 등)
-        if value and not value.isdigit() and not HASH_LIKE.match(value):
-            return True
+        if not value or value.isdigit() or HASH_LIKE.match(value):
+            continue
+        if m.group(1).lower() in WEAK_SHELL_PARAMS and not looks_like_command(value):
+            continue
+        return True
     return False
+
+
+def looks_like_command(value: str) -> bool:
+    """인자 값이 운영체제 명령처럼 생겼는가(c=mouse 같은 낱말 값과 c=/usr/bin/id, c=cat /etc/passwd 구별)."""
+    v = value.strip()
+    if _CMD_META.search(v) or _CMD_ABS.match(v):
+        return True
+    if v.lower() in _CMD_SOLO:
+        return True
+    return " " in v and bool(SHELL_WORDS.search(v))
 
 
 def _decoded_command(query: str) -> str | None:
@@ -334,6 +374,8 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             buckets["WEBLOG_SENSITIVE_FILE"][ip].append(e)
         if SSRF_TARGET.search(target):
             buckets["WEBLOG_SSRF"][ip].append(e); matched = True
+        if IMDS_TARGET.search(target) and _oc(e) != "client-error":
+            buckets["WEBLOG_SSRF_IMDS"][ip].append(e); matched = True
         if REDIRECT_TARGET.search(target):
             buckets["WEBLOG_OPEN_REDIRECT"][ip].append(e)
         if EXPLOIT_PROBE.search(ua) or EXPLOIT_PROBE.search(e.extra.get("referer", "")):
@@ -380,6 +422,8 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
     for rule, by_ip in buckets.items():
         if rule == "WEBLOG_SQLI":  # 응답 크기로 본 성공 신호(코드 판단)를 함께 적는다
             findings += _mk(rule, by_ip, lambda evs: f"{_ok_fail(evs)} · {sqli_success_signal(evs, access)}")
+        elif rule == "WEBLOG_SSRF_IMDS":
+            findings += _mk(rule, by_ip, _imds_detail)
         else:
             findings += _mk(rule, by_ip, lambda evs: _ok_fail(evs))
 
@@ -412,6 +456,9 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
                                     f"10분 안에 {r} 객체 {len({(e.action or '').split('?', 1)[0] for e in seg})}개에 "
                                     f"403/404 {len(seg)}건", ip,
                                     override={"severity": "medium", "title": "남의 객체 번호를 바꿔 가며 접근 시도(IDOR 탐색)"}))
+
+    # --- robots.txt를 읽고 거기 적힌(남들은 아무도 안 가는) 숨은 경로를 바로 열어 봄: 정찰 후 숨은 자원 접근
+    findings += _robots_hidden(access, trusted)
 
     # --- 로그인 기록 없이 관리자 페이지에 바로 들어감: 쿠키 위조 의심
     login_ips = {e.src_ip for e in access if e.extra.get("method") == "POST"
@@ -540,6 +587,68 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
             if f.rule not in e.findings:
                 e.findings.append(f.rule)
     return findings
+
+
+def _imds_detail(evs: list[Event]) -> str:
+    ok = [e for e in evs if _oc(e) == "success"]
+    secret = [e for e in ok if IMDS_SECRET.search(_dec(e.extra.get("query", "")))]
+    tail = (f" · 역할 키 경로(iam/security-credentials 등) 응답 성공 {len(secret)}건: 서버 역할 키가 나갔을 수 있음"
+            if secret else "")
+    return _ok_fail(evs) + tail
+
+
+def _first_seg(path: str) -> str:
+    """경로의 첫 마디(/9cf787dfb273/flag → /9cf787dfb273). 숨은 경로는 보통 첫 마디가 이름이다."""
+    p = (path or "/").split("?", 1)[0]
+    seg = p.strip("/").split("/", 1)[0]
+    return "/" + seg if seg else "/"
+
+
+def _robots_hidden(access: list[Event], trusted: list[str]) -> list[Finding]:
+    """robots.txt를 읽은 IP가 ROBOTS_FOLLOW_SPAN 안에, robots.txt를 먼저 읽지 않은 다른 사용자는 아무도 가지 않은
+    경로(첫 마디 기준)를 열어 2xx를 받으면 잡는다. robots.txt 본문은 로그에 없으므로 '그 경로를 robots.txt
+    읽은 사람만 안다'는 것으로 대신 판단한다(CTF F1: Disallow로 흘린 무작위 토큰 경로).
+    정상 사용자가 여럿(3 IP 이상) 보일 때만 본다. 사용자가 한둘이면 '아무도 안 가는 경로'를 가릴 수 없다."""
+    reads: dict[str, list] = defaultdict(list)
+    for e in access:
+        if e.extra.get("path", "").lower() == "/robots.txt" and _oc(e) == "success":
+            reads[e.src_ip or "?"].append(e.ts)
+    if not reads:
+        return []
+    ips = {e.src_ip for e in access if e.src_ip}
+    if len(ips - set(reads)) < 3:
+        return []
+    # 첫 마디별로 robots.txt를 읽지 않은 사용자(또는 읽기 전의 요청)가 간 적 있는지
+    public: set[str] = set()
+    for e in access:
+        seg = _first_seg(e.extra.get("path", ""))
+        rt = reads.get(e.src_ip or "?")
+        if not rt or e.ts < min(rt):
+            public.add(seg)
+    by_ip: dict[str, list[Event]] = defaultdict(list)
+    for e in access:
+        if (e.src_ip or "?") in reads:
+            by_ip[e.src_ip or "?"].append(e)
+    out: list[Finding] = []
+    for ip, rts in reads.items():
+        if _trusted(ip, trusted):
+            continue
+        hits = []
+        for e in by_ip[ip]:
+            if _oc(e) != "success" or CRAWLER_UA.search(e.extra.get("ua", "")):
+                continue
+            path = e.extra.get("path", "")
+            seg = _first_seg(path)
+            if seg in public or seg in ("/", "/robots.txt") or _STATIC_EXT.search(path):
+                continue
+            if any(timedelta(0) <= e.ts - t <= ROBOTS_FOLLOW_SPAN for t in rts):
+                hits.append(e)
+        if hits:
+            segs = sorted({_first_seg(e.extra.get("path", "")) for e in hits})
+            out.append(Finding("WEBLOG_ROBOTS_HIDDEN", sorted(hits, key=lambda e: e.ts),
+                               f"robots.txt를 읽은 뒤 다른 사용자는 아무도 가지 않은 경로 {', '.join(segs[:3])}"
+                               f"{' 외' if len(segs) > 3 else ''}에 {len(hits)}건 접근(성공)", ip))
+    return out
 
 
 def quiet_admin_summary(events: list, max_ips: int = 10) -> list[dict]:

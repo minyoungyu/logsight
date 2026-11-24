@@ -296,7 +296,7 @@ def verdict_for(inc: dict) -> dict:
 
 def _campaigns(incs: list[dict], verdicts: dict[str, str]) -> list[dict]:
     """공격 판정 사건 중 같은 IP·액세스 키로 이어지는 것을 묶는다.
-    같은 /24 대역에서 2시간 안에 일어난 것은 '추정'으로 묶는다."""
+    같은 /24 대역에서 2시간 안에 같은 규칙(수법)이 걸린 것은 '추정'으로 묶는다."""
     att = [i for i in incs if verdicts.get(i["id"]) == "attack"]
     parent = {i["id"]: i["id"] for i in att}
     why: dict[frozenset, str] = {}
@@ -325,8 +325,11 @@ def _campaigns(incs: list[dict], verdicts: dict[str, str]) -> list[dict]:
                 na = {".".join(ip.split(".")[:3]) for ip in a["src_ips"] if _public(ip) and "." in ip}
                 nb = {".".join(ip.split(".")[:3]) for ip in b["src_ips"] if _public(ip) and "." in ip}
                 ta, tb = datetime.fromisoformat(a["start"]), datetime.fromisoformat(b["start"])
-                if na & nb and abs(ta - tb) <= timedelta(hours=2):
-                    reason = "같은 /24 대역, 2시간 안(추정)"
+                # 대역만 같으면 잇지 않는다: 같은 규칙(같은 공격 수법)이 양쪽에 있을 때만. 대회장·사무실 NAT처럼
+                # 한 대역을 여럿이 쓰면 깨끗한 사용자의 사건이 공격자 묶음에 끌려 들어간다(CTF 리허설 198.51.100.30~32)
+                same_rule = _inc_rules(a) & _inc_rules(b)
+                if na & nb and same_rule and abs(ta - tb) <= timedelta(hours=2):
+                    reason = "같은 /24 대역·같은 수법, 2시간 안(추정)"
             if reason:
                 why[frozenset((a["id"], b["id"]))] = reason
                 parent[find(a["id"])] = find(b["id"])
@@ -450,6 +453,10 @@ def describe_finding(f: dict, inc: dict) -> str:
                                 "성공했다면 서버에서 명령이 실행됐을 수 있습니다.",
         "WEBLOG_XSS": f"{who}에서 페이지에 스크립트를 심으려 한 요청이 {n}건 있었습니다(XSS, {res}).",
         "WEBLOG_SSRF": f"{who}에서 서버가 내부 주소(메타데이터 등)를 대신 요청하게 하려 했습니다({n}건, {res}).",
+        "WEBLOG_SSRF_IMDS": f"{who}에서 서버가 클라우드 메타데이터 주소(169.254.169.254)를 대신 요청하게 했습니다({n}건, {res}). "
+                            "성공했다면 서버 역할의 임시 키가 나갔을 수 있으니 CloudTrail에서 그 역할이 바깥에서 쓰였는지 보세요.",
+        "WEBLOG_ROBOTS_HIDDEN": f"{who}에서 robots.txt를 읽은 뒤, 다른 사용자는 아무도 가지 않은 숨은 경로를 열었습니다"
+                                f"({n}건, {_acts(evs, 2)}). robots.txt로 숨긴 경로는 누구나 볼 수 있습니다.",
         "WEBLOG_WEBSHELL_ACCESS": f"{who}에서 웹셸로 보이는 경로에 {n}번 접근했습니다({res}). "
                                   "응답이 정상이면 서버에 웹셸이 이미 올라가 있을 수 있습니다.",
         "WEBLOG_UPLOAD_EXEC": f"{who}에서 업로드 폴더 안의 스크립트를 {n}번 실행했습니다({res}). 올린 파일을 실행하는 단계입니다.",

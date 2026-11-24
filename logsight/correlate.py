@@ -39,6 +39,12 @@ def _key_policy(events: list[Event], findings: list[Finding], env: dict | None):
 
     def keys(e: Event):
         ip = e.src_ip
+        # 정상 작업 목록(운영자·배포 계정)과 맞는 이벤트는 IP로 남의 활동과 잇지 않는다. 운영자가 공격 재현과
+        # 같은 PC·NAT에서 일하면(CTF 리허설) 배포 계정의 SSM·조회가 공격 사건에 섞여 '공격'으로 보였다.
+        # 같은 계정·키·서버끼리는 그대로 묶여 한 '정상 작업' 사건이 된다.
+        if e.extra.get("known"):
+            yield from _other_keys(e)
+            return
         if ip and _is_ip(ip):
             if not _is_private(ip):
                 yield ("ip", ip)

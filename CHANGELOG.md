@@ -5,6 +5,14 @@
 ## 미출시
 
 ### 추가
+- CTF 리허설(2026-11-23) 대응: `WEBLOG_ROBOTS_HIDDEN`(robots.txt를 읽은 IP만 가는 숨은 경로 접근, F1), `WEBLOG_SSRF_IMDS`(SSRF로 인스턴스 메타데이터 요청, 역할 키 경로 성공 표시, F5). `lab/ctf/environment.json`(운영진 계정 `ctf-deployer`를 정상 작업으로).
+
+### 고침(CTF 리허설 오탐)
+- `WEBLOG_WEBSHELL_ACCESS`: c=·run= 인자는 값이 명령처럼 생겼을 때만 센다. 상품 분류 `category.php?c=mouse`를 본 정상 사용자 7 IP가 '웹셸 접근 높음'으로 잡혔다(11건 → 3건, 실제 공격자 3 IP만 남음).
+- `WEBLOG_SQLI`: UNION SELECT는 SQL 문맥(따옴표·숫자·괄호·주석, 열 목록·NULL·FROM)이 있을 때만. 검색어 `q=union+select+1` 오탐 제거.
+- `HOST_ACCOUNT_CREATED`: 부팅·패키지 설치 계정(UID 1000의 ec2-user 등 cloud-init 기본 계정, 시스템 UID·nologin의 nginx·apache)을 뺌. `bash -c '… useradd hacker 2>/dev/null'`에서 계정 이름을 `2>/dev/null'`로 읽던 것 고침.
+- 사건 묶기: 정상 작업 목록과 맞는 이벤트는 IP로 남의 활동과 잇지 않는다(운영자 SSM·조회가 같은 IP의 공격 재현 사건에 섞이던 것). 공격 묶음의 '같은 /24 대역' 추정 연결은 같은 규칙(수법)이 양쪽에 있을 때만.
+- `lab/ctf/collect_logs.py`: auth.log와 내용이 같은 secure는 분석에서 빼 중복 집계를 막는다.
 - 조치 전 영향 미리보기(사양서 FR-35, `logsight/impact_preview.py`): 보안그룹·NACL·역할 세션 무효화·IMDSv2·키 비활성화·서버 격리 수정안에 "이 보안그룹은 서버 3대(web-1…)에 붙어 있음", "이 역할을 쓰는 서버 2대의 앱도 키가 거부됨", "막을 IP가 관리자 IP 대역 안" 같은 문장을 설정 스냅샷과 사건 로그로 세어 붙인다. 셀 수 없으면 적지 않는다. 보고서에서 명령보다 먼저 보인다.
 - 알리지 않은 관리자 접근을 보고서에 남김(사양서 6절 위험, FR-09): 내부망 IP의 관리자 화면 접근 중 공격 신호가 앞뒤 1시간 안에 없어 경보로 올리지 않은 것을 IP·건수·기간·경로·계정으로 보고서 끝에 적고, 퇴사자·도난 계정이 이렇게 보인다고 안내한다. 경보 조건(오탐 기준)은 바꾸지 않았다.
 - GuardDuty 결과 해석(사양서 FR-34, `docs/GuardDuty_해석.md`): 활성 유형 211종 모두 한국어 제목·한 줄 풀이·먼저 할 일(`logsight/gd_types.py`, 유형별 문장 72 + 낱말 조합 139). 설정 스냅샷 없이 GuardDuty 결과만 넣어도 키(가린 형식)·역할·서버·버킷 이름과 함께 먼저 할 일을 낸다. 같은 일을 하는 설정 수정안이 있으면 겹쳐 내지 않는다. `scripts/gd_coverage.py`로 유형 범위를 잰다(목록 `samples/guardduty/finding_types.tsv`). 예시 `samples/guardduty_only`(합성).

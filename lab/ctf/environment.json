@@ -1,0 +1,6 @@
+{
+  "_comment": "CTF 대회 분석용 설정(python -m logsight analyze <폴더> --env lab/ctf/environment.json). 운영진의 배포·플래그 주입(SSM)·점검 조회를 정상 작업으로 표시한다. 운영자 PC와 공격 재현이 같은 IP일 수 있어 IP는 넣지 않고 계정 이름만 적는다.",
+  "known_activity": [
+    {"label": "CTF 운영진(배포·플래그 주입 SSM·점검 조회)", "actors": ["ctf-deployer"]}
+  ]
+}

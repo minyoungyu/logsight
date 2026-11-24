@@ -18,7 +18,9 @@
   extra/               LogFinder가 읽지 않는 호스트 로그(messages, php-fpm). 사람이 볼 때만
   pieces.json          이어 붙인 조각 목록과 끊김(중간에 처음부터 다시 보낸 곳)
 
-분석:  python -m logsight analyze data/ctf-2026-11/analyze --no-ai --out data/ctf-2026-11/report_rules
+분석:  python -m logsight analyze data/ctf-2026-11/analyze --no-ai --env lab/ctf/environment.json \
+           --out data/ctf-2026-11/report_rules
+       (environment.json: 운영진 계정 ctf-deployer의 배포·SSM·점검 조회를 정상 작업으로 표시)
 """
 from __future__ import annotations
 
@@ -77,7 +79,25 @@ def assemble_hosts(hosts_dir: Path, out: Path) -> dict:
                     expected = off + len(data)
             report[f"{team}/{name}"] = {"file": str(dest.relative_to(out)), "pieces": len(pieces),
                                         "bytes": dest.stat().st_size, "restarts": restarts}
+    _dedupe_secure(out, report)
     return report
+
+
+def _dedupe_secure(out: Path, report: dict) -> None:
+    """Amazon Linux 2023은 같은 줄을 auth.log와 secure에 똑같이 남긴다. 둘 다 분석에 넣으면 sudo·계정 생성이
+    두 번씩 세진다(리허설: ec2-user 계정 생성 2대 → 4건). 내용이 같으면 secure를 extra/로 옮긴다."""
+    for key in [k for k in report if k.endswith("/secure")]:
+        team = key.split("/", 1)[0]
+        auth = report.get(f"{team}/auth")
+        if not auth:
+            continue
+        sec_p, auth_p = out / report[key]["file"], out / auth["file"]
+        if "analyze" in sec_p.relative_to(out).parts and sec_p.read_bytes() == auth_p.read_bytes():
+            moved = out / "extra" / "hosts" / sec_p.name
+            moved.parent.mkdir(parents=True, exist_ok=True)
+            sec_p.replace(moved)
+            report[key]["file"] = str(moved.relative_to(out))
+            report[key]["note"] = "auth.log와 내용이 같아 분석에서 뺌(중복 집계 방지)"
 
 
 def _sync(src: str, dest: Path, region: str) -> None:
