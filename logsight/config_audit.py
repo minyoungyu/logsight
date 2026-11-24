@@ -151,7 +151,7 @@ def _attacker_ips(inc: dict) -> list[str]:
 
 # 애플리케이션까지 들어온 웹 공격 요청(WAF가 막을 수 있는 종류). WEB_NO_WAF·NACL 차단의 근거가 된다
 WEB_ATTACK_RULES = ("WAF_SQLI_NOT_BLOCKED", "WEBLOG_SQLI", "WEBLOG_TRAVERSAL", "WEBLOG_RFI",
-                    "WEBLOG_CMD_INJECTION", "WEBLOG_XSS", "WEBLOG_SSRF", "WEBLOG_EXPLOIT_PROBE",
+                    "WEBLOG_CMD_INJECTION", "WEBLOG_XSS", "WEBLOG_SSRF", "WEBLOG_SSRF_IMDS", "WEBLOG_EXPLOIT_PROBE",
                     "WEBLOG_CODE_IN_HEADER", "WEBLOG_SENSITIVE_FILE")
 # 출발지 IP를 막을 근거가 되는 규칙(위의 웹 공격 + 스캐너·무차별 대입·웹셸 접근)
 BLOCK_IP_RULES = frozenset({"VPC_PORT_SCAN", "SSH_BRUTE_FORCE", "SSH_SUCCESS_AFTER_FAIL", "VPC_REMOTE_ADMIN_EXPOSED",
@@ -160,7 +160,7 @@ BLOCK_IP_RULES = frozenset({"VPC_PORT_SCAN", "SSH_BRUTE_FORCE", "SSH_SUCCESS_AFT
                             *WEB_ATTACK_RULES})
 _WEB_KO = {"WAF_SQLI_NOT_BLOCKED": "SQL 인젝션", "WEBLOG_SQLI": "SQL 인젝션",
            "WEBLOG_TRAVERSAL": "경로 조작", "WEBLOG_RFI": "원격 파일 포함", "WEBLOG_CMD_INJECTION": "명령 삽입",
-           "WEBLOG_XSS": "XSS", "WEBLOG_SSRF": "SSRF", "WEBLOG_EXPLOIT_PROBE": "알려진 취약점 공격 문자열",
+           "WEBLOG_XSS": "XSS", "WEBLOG_SSRF": "SSRF", "WEBLOG_SSRF_IMDS": "메타데이터 SSRF", "WEBLOG_EXPLOIT_PROBE": "알려진 취약점 공격 문자열",
            "WEBLOG_CODE_IN_HEADER": "헤더 코드 삽입", "WEBLOG_SENSITIVE_FILE": "설정 파일 열람"}
 
 

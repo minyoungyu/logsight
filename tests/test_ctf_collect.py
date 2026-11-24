@@ -57,6 +57,20 @@ class CollectTest(unittest.TestCase):
             self.assertEqual(len(rep["t02/auth"]["restarts"]), 1)
             self.assertEqual((out / "analyze" / "hosts" / "t02-auth.log").read_bytes(), SUDO + SUDO)
 
+    def test_identical_secure_moved_out_of_analysis(self):
+        # Amazon Linux 2023은 auth.log와 secure에 같은 줄을 남긴다: 둘 다 분석하면 sudo·계정 생성이 두 번 세진다
+        with tempfile.TemporaryDirectory() as t:
+            raw, out = Path(t) / "raw", Path(t) / "out"
+            self._piece(raw, "t01", "auth", 1795000000, 0, SUDO)
+            self._piece(raw, "t01", "secure", 1795000000, 0, SUDO)
+            self._piece(raw, "t02", "auth", 1795000000, 0, SUDO)
+            self._piece(raw, "t02", "secure", 1795000000, 0, SUDO + SUDO)  # 다르면 그대로 둔다
+            rep = collect.assemble_hosts(raw / "hosts", out)
+            self.assertFalse((out / "analyze" / "hosts" / "t01-secure.log").exists())
+            self.assertTrue((out / "extra" / "hosts" / "t01-secure.log").exists())
+            self.assertIn("note", rep["t01/secure"])
+            self.assertTrue((out / "analyze" / "hosts" / "t02-secure.log").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

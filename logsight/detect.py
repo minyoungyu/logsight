@@ -66,6 +66,8 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WEBLOG_CODE_IN_HEADER": ("T1505.003", "persistence", "요청 헤더(User-Agent 등)에 실행 코드 삽입(로그 포이즈닝 준비)", "high"),
     "WEBLOG_ADMIN_ACCESS": ("T1078", "initial-access", "관리자 영역 접근 성공(기본 계정 로그인 의심)", "high"),
     "WEBLOG_SSRF":        ("T1190", "initial-access", "서버를 이용해 내부 주소를 요청(SSRF)", "high"),
+    "WEBLOG_SSRF_IMDS":   ("T1552.005", "credential-access", "SSRF로 인스턴스 메타데이터(IMDS) 요청 — 서버 역할 키 탈취 시도", "high"),
+    "WEBLOG_ROBOTS_HIDDEN": ("T1594", "discovery", "robots.txt를 읽고 숨은 경로에 접근", "medium"),
     "WEBLOG_OPEN_REDIRECT": ("T1566", "initial-access", "열린 리다이렉트(외부 사이트로 보내기) 시도", "low"),
     "WEBLOG_IDOR_ENUM":   ("T1530", "collection", "다른 사람의 주문 번호를 차례로 열람(IDOR)", "high"),
     "WEBLOG_ADMIN_FORGED": ("T1078", "initial-access", "로그인 없이 관리자 영역 접근(쿠키 위조 의심)", "high"),
@@ -330,16 +332,55 @@ ACCOUNT_CMD = re.compile(r"(?i)(?:^|/|\s)(?:useradd|adduser|newusers)\b|\busermo
                          r"|(?:^|/)passwd\s+root\b|/etc/sudoers")
 
 
+# 서버가 처음 켜질 때 cloud-init이 만드는 기본 로그인 계정(이미지마다 하나). 첫 일반 계정(UID 1000)으로 생긴다
+CLOUD_DEFAULT_USERS = frozenset({"ec2-user", "ubuntu", "admin", "centos", "cloud-user", "fedora", "debian",
+                                 "rocky", "almalinux", "azureuser", "opc", "bitnami", "core", "alpine", "arch"})
+_NOLOGIN = re.compile(r"(?:^|/)(?:nologin|false)$")
+# 명령 줄에서 계정 이름이 아닌 조각: 리다이렉트(2>/dev/null), 셸 연결 기호
+_NOT_NAME = re.compile(r"[<>|;&]")
+
+
+def _setup_account(e: Event) -> str | None:
+    """설치·부팅 과정에서 생기는 계정이면 그 이유. sudo로 만든 계정은 여기서 빼지 않는다(sudo 줄이 따로 잡힌다).
+    - 패키지가 만드는 서비스 계정: 시스템 UID(1000 미만)이고 로그인 셸이 없음(nginx, apache …)
+    - cloud-init 기본 계정: ec2-user·ubuntu 등이 첫 일반 계정(UID 1000)으로 생김
+    CTF 리허설에서 두 서버의 부팅 기록(ec2-user, nginx, apache)이 '새 계정 생성(지속성)'으로 잡혔다."""
+    if e.action != "useradd":
+        return None
+    uid, shell = e.extra.get("uid"), e.extra.get("shell") or ""
+    name = (e.actor or "").strip().lower()
+    if isinstance(uid, int) and uid < 1000 and _NOLOGIN.search(shell):
+        return "시스템 서비스 계정(패키지 설치)"
+    if uid == 1000 and name in CLOUD_DEFAULT_USERS:
+        return "클라우드 이미지 기본 계정(부팅)"
+    return None
+
+
 def _account_target(e: Event) -> str:
-    """만들어지거나 권한을 받은 계정 이름. useradd 줄은 그 사용자, sudo 명령은 명령의 마지막 인자(옵션 제외)."""
+    """만들어지거나 권한을 받은 계정 이름. useradd 줄은 그 사용자, sudo 명령은 명령의 마지막 인자(옵션 제외).
+    bash -c 'sudo useradd hacker 2>/dev/null'처럼 감싼 명령은 따옴표·리다이렉트를 걷고 useradd 뒤를 본다."""
     if e.action == "useradd":
         return (e.actor or "?").strip()
     cmd = e.extra.get("command", "")
     if "/etc/sudoers" in cmd:
         return "sudoers"
-    args = [a for a in cmd.split()[1:] if not a.startswith("-")]
-    if re.search(r"(?:^|/)usermod\b", cmd) and args:  # usermod -aG sudo bob → bob
-        return args[-1]
+    m = re.search(r"(?:^|/|\s)(?:useradd|adduser|newusers|usermod)\b(.*)", cmd)
+    tail = m.group(1) if m else " ".join(cmd.split()[1:])
+    toks = [t.strip("'\"") for t in tail.split()]
+    args = []
+    skip_next = False
+    for t in toks:
+        if _NOT_NAME.search(t) or not t:
+            break  # 리다이렉트·다음 명령부터는 계정 이름이 아니다
+        if skip_next:
+            skip_next = False
+            continue
+        if t.startswith("-"):
+            # 값을 받는 옵션(-s /bin/bash, -G wheel, -d /home/x 등)은 다음 조각을 건너뛴다
+            skip_next = len(t) == 2 and t[1] in "sGgdcekpuK" or t in ("--shell", "--groups", "--gid", "--home-dir",
+                                                                    "--comment", "--uid", "--password")
+            continue
+        args.append(t)
     return args[-1] if args else "?"
 
 
@@ -354,7 +395,9 @@ def host_auth_findings(events: list[Event]) -> list[Finding]:
         who = (e.actor or "?").strip()
         cmd = e.extra.get("command", "")
         svc = who.lower() in SERVICE_ACCOUNTS
-        if e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
+        if e.action == "useradd" and _setup_account(e):
+            e.extra["setup_account"] = _setup_account(e)  # 지우지 않고 표시만(보고서 근거 확인용)
+        elif e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
             acct[_account_target(e)].append(e)
         if e.action in ("sudo", "su") and e.outcome == "success" and (svc or SHELL_ESCAPE.search(cmd)):
             esc[who].append(e)

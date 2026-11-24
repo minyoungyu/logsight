@@ -409,7 +409,7 @@ _SU_RESULT = re.compile(r"^(?P<result>Successful|FAILED) su for (?P<target>\S+) 
 _SU_PAM_OPEN = re.compile(r"pam_unix\(su(?:-l)?:session\): session opened for user (?P<target>[^\s(]+)"
                           r"(?:\(uid=\d+\))? by (?P<who>[^\s(]*)")
 _SU_PAM_FAIL = re.compile(r"pam_unix\(su(?:-l)?:auth\): authentication failure;.*?\bruser=(?P<who>\S*).*?\buser=(?P<target>\S+)")
-_USERADD = re.compile(r"new user: name=(?P<user>[^,]+)")
+_USERADD = re.compile(r"new user: name=(?P<user>[^,]+)(?:.*?\bUID=(?P<uid>\d+))?(?:.*?\bshell=(?P<shell>[^,\s]+))?")
 _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
@@ -473,8 +473,10 @@ def parse_sshauth(text: str, name: str = "sshauth", year: int | None = None) -> 
         elif proc in ("useradd", "usermod"):
             r = _USERADD.search(msg)
             if r:
+                info = {k: v for k, v in (("uid", int(r["uid"]) if r["uid"] else None),
+                                           ("shell", r["shell"])) if v is not None}
                 ev = Event(ts=None, source="sshauth", actor=r["user"], action="useradd", outcome="success",
-                           dst_ip=_host_ip(m["host"]), raw_ref=f"{name}:{i+1}", extra=base)
+                           dst_ip=_host_ip(m["host"]), raw_ref=f"{name}:{i+1}", extra=base | info)
         if ev is not None:
             ev.ts = _line_ts(line, year)
             if ev.ts is not None:

@@ -102,6 +102,16 @@ def web_rules(lines, profile=None):
     return {f.rule for f in webdetect.run_web_detections(evs, profile or SiteProfile())}
 
 
+def _robots_traffic(hidden_after_robots: bool):
+    """정상 사용자 3명이 공개 페이지를 보고, 공격자가 robots.txt를 읽은 뒤 숨은 경로를 연다(음성: 숨은 경로를
+    robots.txt보다 먼저 연 사용자가 있어 '남들도 가는 경로'가 된다)."""
+    lines = [acc(i, p, ip=f"192.0.2.{10 + i}") for i in range(3) for p in ("/", "/product.php?id=1")]
+    if not hidden_after_robots:
+        lines.append(acc(0, "/9cf787dfb273/", ip="192.0.2.10"))
+    lines += [acc(5, "/robots.txt"), acc(6, "/9cf787dfb273/")]
+    return lines
+
+
 def file_rules(content, rel="shell.php"):
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / rel
@@ -259,6 +269,12 @@ CASES = {
                             lambda: web_rules([acc(0, "/admin/users")], SiteProfile(trusted_ips=[ATK + "/32"]))),
     "WEBLOG_SSRF": (lambda: web_rules([acc(0, "/fetch.php?url=http://169.254.169.254/latest/meta-data/")]),
                     lambda: web_rules([acc(0, "/fetch.php?url=https://www.example.com/")])),
+    "WEBLOG_SSRF_IMDS": (
+        lambda: web_rules([acc(0, "/fetch.php?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/")]),
+        lambda: web_rules([acc(0, "/fetch.php?url=http://127.0.0.1/internal/stats.php")])),
+    "WEBLOG_ROBOTS_HIDDEN": (
+        lambda: web_rules(_robots_traffic(hidden_after_robots=True)),
+        lambda: web_rules(_robots_traffic(hidden_after_robots=False))),
     "WEBLOG_OPEN_REDIRECT": (lambda: web_rules([acc(0, "/go?next=https://evil.example/")]),
                              lambda: web_rules([acc(0, "/go?next=/home")])),
     "WEBLOG_IDOR_ENUM": (lambda: web_rules([acc(i, f"/order.php?id={i}") for i in range(10)], PRIVATE),
