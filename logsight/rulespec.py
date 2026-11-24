@@ -37,7 +37,8 @@ SPEC: dict[str, dict] = {
         "logs": "CloudTrail",
         "when": "CreateUser, CreateAccessKey, Create/UpdateLoginProfile, Attach/Put(User|Role)Policy, AddUserToGroup, "
                 "CreateRole, UpdateAssumeRolePolicy, Create·SetDefaultPolicyVersion, 임시 연합 토큰(GetFederationToken), "
-                "IAM Roles Anywhere 신뢰 앵커·프로필 생성, EC2 키 페어 생성·가져오기 호출 1건(성공·실패 모두)",
+                "IAM Roles Anywhere 신뢰 앵커·프로필 생성, EC2 키 페어 생성·가져오기, "
+                "RDS DB 관리자 비밀번호 재설정(ModifyDBInstance·ModifyDBCluster에 masterUserPassword) 호출 1건(성공·실패 모두)",
         "blind": ["정책·그룹 삭제, SAML 공급자 변경은 보지 않음",
                   "역할을 '외부 계정이 맡을 수 있게' 만든 것과 내부용 역할을 구별하지 않음"],
         "fp": ["배포 도구(Terraform·CloudFormation)의 정상 IAM 변경. 배포 역할을 정상 작업 목록에 넣는다"],
@@ -249,7 +250,8 @@ SPEC: dict[str, dict] = {
         "logs": "서버 인증 로그(auth.log, secure)",
         "when": "sudo·su 성공 1건 이상인데 (1) 실행한 계정이 웹 서비스 계정(www-data, apache, nginx, nobody 등)이거나 "
                 "(2) sudo 명령이 root 셸을 여는 모양(find -exec, python -c, tar --checkpoint-action, chmod +s, "
-                "/etc/shadow·sudoers 덮어쓰기 등). 계정별로 묶음",
+                "/etc/shadow·sudoers 덮어쓰기 등)이거나 (3) sudo로 /etc/shadow·/root/.ssh/를 읽거나 "
+                "(4) 웹 서비스 계정이 su로 넘어간 계정의 sudo. 계정별로 묶음",
         "blind": ["웹셸이 sudo 없이 커널 취약점 등으로 권한을 올리면 auth.log에 남지 않음",
                   "목록에 없는 이름으로 웹 서비스를 돌리는 서버(예: 직접 만든 app 계정)",
                   "sudo vim 안에서 :!sh 처럼 실행 뒤에 셸로 빠지는 경우는 명령 줄만으로는 보이지 않음(서비스 계정이면 잡힘)"],
@@ -453,8 +455,9 @@ SPEC: dict[str, dict] = {
     "WEBLOG_BACKUP_LEAK": {
         "logs": "웹서버 접근 로그",
         "when": "backup·dump·.sql·.bak·.zip·.tar.gz·/.git/ 경로를 내려받는 요청(GET·POST)이 200으로 응답. "
-                "WebDAV로 올리기·살피기·지우기(PUT·PROPFIND·DELETE)는 빼고 본다",
-        "blind": ["다른 이름의 백업 파일", "WebDAV COPY·MOVE로 공개 경로에 옮긴 뒤 내려받으면 내려받는 요청만 잡힌다"],
+                "WebDAV로 올리기·살피기·지우기(PUT·PROPFIND·DELETE)와 파일 공유 앱(Nextcloud·ownCloud의 "
+                "/remote.php/dav·webdav, /apps/files, 공유 링크 내려받기)에서 받는 것은 빼고 본다",
+        "blind": ["다른 이름의 백업 파일", "훔친 계정으로 파일 공유 앱에서 내려받는 것(로그인한 사용자의 정상 내려받기와 구별하지 않음)", "WebDAV COPY·MOVE로 공개 경로에 옮긴 뒤 내려받으면 내려받는 요청만 잡힌다"],
         "fp": ["일부러 내려받게 한 압축 파일"],
         "first": "그 파일을 웹 루트에서 치우고, 안에 든 비밀번호·키를 모두 바꾼다.",
     },

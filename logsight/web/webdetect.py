@@ -89,6 +89,9 @@ _READ_METHODS = frozenset({"GET", "POST", "-", ""})
 # 내부망 IP의 관리자 접근을 같은 IP의 다른 공격 신호와 묶어 볼 시간 폭
 ADMIN_SIGNAL_SPAN = timedelta(hours=1)
 # 백업·덤프 파일 이름
+# 로그인한 사용자가 자기 파일을 내려받는 파일 공유 앱 경로(Nextcloud·ownCloud WebDAV, 파일 앱 API, 공유 링크).
+# 여기서 받는 .zip은 웹 루트에 노출된 백업이 아니다(AIT-LDS wardbeck·wilson의 사용자 Documents/*.zip 내려받기).
+FILE_APP_PATH = re.compile(r"(?i)^/(?:remote\.php/(?:web)?dav/|(?:index\.php/)?apps/files(?:_sharing)?/|(?:index\.php/)?s/[A-Za-z0-9]+/download)")
 BACKUP_NAME = re.compile(r"(?i)(?:backup|dump|\.sql|\.bak|\.old|\.zip|\.tar\.gz|/\.git/)")
 RFI = re.compile(r"(?i)=\s*(?:https?|ftp)://([^/?#&\s:]*)")
 CMDI = re.compile(
@@ -383,7 +386,7 @@ def run_web_detections(events: list[Event], profile: SiteProfile | None = None, 
         # 내려받기(GET·POST)만 유출로 본다. WebDAV로 자기 파일을 올리고(PUT) 살피고(PROPFIND) 지우는(DELETE)
         # 것은 백업 파일 노출이 아니다(Nextcloud 사용자의 unit.zip 업로드가 걸린 것을 AIT fox에서 확인).
         if _oc(e) == "success" and method in _READ_METHODS and BACKUP_NAME.search(path) \
-                and not path.endswith("/"):
+                and not path.endswith("/") and not FILE_APP_PATH.search(path):
             buckets["WEBLOG_BACKUP_LEAK"][ip].append(e); matched = True
         if method == "GET" and _oc(e) == "success" and path.endswith("/") \
                 and path.lower().startswith(upload_dirs):

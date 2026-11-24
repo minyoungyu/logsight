@@ -10,6 +10,7 @@
 - 외부 표준 형식 내보내기: `analyze`가 `report.json`·`report.html` 옆에 `findings.ocsf.json`([OCSF](https://schema.ocsf.io) 1.3.0 Detection Finding, class_uid 2004)을 쓴다. Security Lake·Security Hub·SIEM이 읽는 형식이다. LogFinder만의 값(판정, 판정 주체, 성공·실패 건수)은 `unmapped.logfinder`에 둔다(`logsight/ocsf.py`).
 - 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
 - 탐지 문제점 재점검(`docs/탐지_문제점_재점검.md`).
+- 처음 보는 공개 데이터를 개발용·보류용으로 나눠 고치기 전·뒤에 한 번씩 잰 결과(`docs/공개데이터_개발보류_측정.md`). 보류용(AIT harrison·shaw) 공격 단계 9/13 → 11/13, 오탐 줄 121 → 115.
 - 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
 - BOTSv3 AI 재검토 측정(`docs/BOTSv3_AI재검토_측정.md`, `reports/public/botsv3_ai_triage.json`): 정답을 실행 전에 고정하고 4조건 × 3회.
 - AI가 '모름'마다 읽기 전용 확인 명령을 제안(`next_checks`, `logsight/checks.py`): 코드가 조회 동작(describe·get·list·lookup)만, 셸 기호 없음, 비밀값·파일을 꺼내는 동작 아님, 명령의 자원 이름이 AI에 보낸 입력에 있음을 검사하고 어긴 제안은 버린다. 보고서 '알 수 없는 것' 칸에 "직접 확인해 볼 명령"으로 나온다. 확인 명령은 서비스별로 이름을 적은 조회 동작만 받는다(describe·get·list로 시작해도 eks get-token, ssm get-parameter-history처럼 비밀값을 내는 것이 있어서). 재검토에서 `--endpoint-url`(로그의 공격자 IP로 서명된 요청을 보내게 하는 길), `--cli-input-json`·`file://`, `--debug`, 가린 키 값, 환경 변수를 보여 주는 동작(Lambda 설정·ECS 작업 정의)도 막았다. 같은 '모름' 항목의 명령은 한 묶음으로 보이고 CloudShell에서 실행한다는 안내가 붙는다.
@@ -48,6 +49,11 @@
 - 사양서 v2.2: 위 요구사항을 ✅로, 근거 파일이 없던 "CSIC 0.017%"를 지우고 AIT는 처음 본 데이터(fox 0.18%)로, 제품 평가용 점검(11절) 추가.
 
 ### Fixed
+
+- 서버 권한 상승: 웹 서비스 계정이 su로 넘어간 계정의 sudo, sudo로 `/etc/shadow`·`/root/.ssh/` 읽기를 `HOST_PRIV_ESC`로 잡는다(AIT-LDS에서 놓친 것).
+- 파일 공유 앱(Nextcloud·ownCloud WebDAV, 파일 앱, 공유 링크)에서 사용자가 .zip을 내려받은 것을 `WEBLOG_BACKUP_LEAK`로 잡던 오탐.
+- RDS DB 관리자 비밀번호 재설정(`ModifyDBInstance`·`ModifyDBCluster`의 `masterUserPassword`)을 `CT_IAM_PERSISTENCE`로 잡는다.
+- 측정 도구: Splunk 규칙 파일에 `source:` 줄이 있으면 시험 데이터를 건너뛰던 오류(11/3 측정에서 10개가 빠졌음).
 
 - ATT&CK 전술이 틀린 규칙 5개(WEBLOG_SCANNER·WEBLOG_ENUM_404·WEBLOG_ROBOTS_HIDDEN은 reconnaissance, WEBLOG_XSS는 execution, FILE_SUSPICIOUS는 command-and-control). 외부 내보내기는 ATT&CK 전술을 쓰고, 보고서 화면의 단계 이름은 대회 뒤에 고친다.
 

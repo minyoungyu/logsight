@@ -1,0 +1,1085 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "shaw",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS shaw/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/shaw/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "error.log.6",
+     "intranet.thomasmurray.shaw.info",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.1",
+      "kind": "access",
+      "events": 1792
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+      "kind": "access",
+      "events": 6626
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.3",
+      "kind": "access",
+      "events": 1073
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.4",
+      "kind": "access",
+      "events": 1374
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.5",
+      "kind": "access",
+      "events": 1511
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.6",
+      "kind": "access",
+      "events": 3370
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/error.log.6",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log.2",
+      "kind": "weberror",
+      "events": 33
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log.4",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 5
+     }
+    ],
+    "lines": 20565,
+    "parsed_lines": 15806,
+    "attack_lines": 5271,
+    "tp": 5217,
+    "fn": 54,
+    "fp": 1,
+    "tn": 15293,
+    "recall": 0.9897552646556631,
+    "precision": 0.9998083556918359,
+    "false_positive_rate": 6.53851183470642e-05,
+    "f1": 0.9947564114786919,
+    "steps": {
+     "dirb": {
+      "lines": 4485,
+      "flagged": 4455,
+      "line_recall": 0.9933110367892977,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ADMIN_FORGED",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 4485
+     },
+     "wpscan": {
+      "lines": 760,
+      "flagged": 750,
+      "line_recall": 0.9868421052631579,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 760
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 11,
+      "flagged": 11,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 11
+     },
+     "attacker_change_user": {
+      "lines": 5,
+      "flagged": 1,
+      "line_recall": 0.2,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 1
+     },
+     "escalated_command": {
+      "lines": 8,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_UPLOAD_EXEC": 1,
+     "WEBLOG_CMD_INJECTION": 1,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "172.24.249.224": 1
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 5181,
+     "WEBLOG_SCANNER": 750,
+     "WEBLOG_IDOR_ENUM": 240,
+     "WEBLOG_SENSITIVE_FILE": 102,
+     "WEBLOG_UPLOAD_EXEC": 11,
+     "WEBLOG_LARGE_EXFIL": 11,
+     "WEBLOG_CMD_INJECTION": 9,
+     "WEBLOG_ADMIN_FORGED": 1,
+     "WEBLOG_ADMIN_ACCESS": 1,
+     "HOST_PRIV_ESC": 1
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:6005",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log.1:697",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log.1:698",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:699",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:700",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:701",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:702",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log.1:703",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:704",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:705",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalate",
+       "escalated_sudo_session"
+      ]
+     },
+     {
+      "ref": "auth.log.1:706",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log.1:707",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:3440",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:3560",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:3694",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:4665",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:5821",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:5827",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:5891",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:5937",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "webshell_upload"
+      ]
+     },
+     {
+      "ref": "intranet.thomasmurray.shaw.info-access.log.2:5938",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "webshell_upload"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 7,
+     "truth_attack_ips": 1,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 1
+    },
+    "recall": 1.0,
+    "precision": 1.0,
+    "false_positive_rate": 0.0,
+    "f1": 1.0,
+    "missed": [],
+    "false_positives": [],
+    "unknown_flagged": [
+     "www-data"
+    ],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.24.249.224",
+      "malicious": true
+     },
+     {
+      "ip": "192.168.188.162",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.169",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.179",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.32",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.49",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.66",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS shaw/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/shaw/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/shaw/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/shaw/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.thomasmurray.shaw.info",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "error.log.6",
+     "mail.thomasmurray.shaw.info",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-access.log.1",
+      "kind": "access",
+      "events": 12003
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-access.log.2",
+      "kind": "access",
+      "events": 11324
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-access.log.3",
+      "kind": "access",
+      "events": 10172
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-access.log.4",
+      "kind": "access",
+      "events": 9421
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-access.log.5",
+      "kind": "access",
+      "events": 9218
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-access.log.6",
+      "kind": "access",
+      "events": 9231
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-access.log.1",
+      "kind": "access",
+      "events": 13291
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-access.log.2",
+      "kind": "access",
+      "events": 14720
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-access.log.3",
+      "kind": "access",
+      "events": 12341
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-access.log.4",
+      "kind": "access",
+      "events": 12406
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-access.log.5",
+      "kind": "access",
+      "events": 11602
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-access.log.6",
+      "kind": "access",
+      "events": 14011
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 1108
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 1241
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 951
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 988
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-access.log.5",
+      "kind": "access",
+      "events": 945
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-access.log.6",
+      "kind": "access",
+      "events": 1153
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/cloud.thomasmurray.shaw.info-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/error.log.6",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/mail.thomasmurray.shaw.info-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/apache2/proxy-error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 147042,
+    "parsed_lines": 146147,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 3,
+    "tn": 147039,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 2.040233402701269e-05,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_BACKUP_LEAK": 3,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "172.24.249.224": 3
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "cloud.thomasmurray.shaw.info-access.log.1:6390",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.thomasmurray.shaw.info-access.log.1:6392",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "cloud.thomasmurray.shaw.info-access.log.2:10881",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 8,
+     "truth_attack_ips": 0,
+     "flagged_ips": 1,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.125,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "172.24.249.224"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.70.33.29",
+      "malicious": false
+     },
+     {
+      "ip": "172.24.249.224",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.162",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.169",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.32",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.49",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.188.66",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS shaw/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/shaw/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "error.log.6",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4",
+     "other_vhosts_access.log.5",
+     "other_vhosts_access.log.6"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 12144
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 11453
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 10255
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 9521
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/other_vhosts_access.log.5",
+      "kind": "access",
+      "events": 9310
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/other_vhosts_access.log.6",
+      "kind": "access",
+      "events": 9296
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/apache2/error.log.6",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/shaw/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 72976,
+    "parsed_lines": 61994,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 3,
+    "tn": 72973,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 4.110940583205437e-05,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_BACKUP_LEAK": 3,
+     "WEBLOG_LARGE_EXFIL": 1
+    },
+    "fp_by_ip": {
+     "172.24.251.86": 3
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "other_vhosts_access.log.1:6485",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.1:6487",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:11009",
+      "rules": [
+       "WEBLOG_BACKUP_LEAK",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 2,
+     "truth_attack_ips": 0,
+     "flagged_ips": 1,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.5,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "172.24.251.86"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "172.24.251.86",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "likely_breached"
+   }
+  }
+ }
+}

@@ -878,6 +878,8 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     if action in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") \
             and re.search(r'"skipFinalSnapshot"\s*:\s*true', txt):
         flags.append("no_final_snapshot")  # 마지막 스냅샷 없이 지움: 되살릴 수 없다
+    if action in ("rds:ModifyDBInstance", "rds:ModifyDBCluster") and '"masterUserPassword"' in txt:
+        flags.append("db_master_password")  # DB 관리자 비밀번호를 새로 정함: 탈취한 키로 DB를 여는 수법
     if action in ("ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath") \
             and re.search(r'"withDecryption"\s*:\s*true', txt):
         flags.append("decrypt")

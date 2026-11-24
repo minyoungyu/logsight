@@ -12,7 +12,7 @@ from collections import Counter, defaultdict
 import re
 from dataclasses import dataclass
 from functools import lru_cache
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import unquote_plus, urlsplit
 
 from .netaddr import is_internal
@@ -22,7 +22,7 @@ from .normalize import Event, S3_PUBLIC_CALLS
 RULES: dict[str, tuple[str, str, str, str]] = {
     "CT_LOGGING_TAMPER":  ("T1562.008", "defense-evasion", "감사 로그·보안 서비스 중지·삭제", "high"),
     "CT_ROOT_USAGE":      ("T1078.004", "initial-access", "루트 계정 사용", "high"),
-    "CT_IAM_PERSISTENCE": ("T1098", "persistence", "IAM 사용자·키·권한 생성/변경", "high"),
+    "CT_IAM_PERSISTENCE": ("T1098", "persistence", "IAM 사용자·키·권한·DB 관리자 비밀번호 생성/변경", "high"),
     "CT_SG_OPENED":       ("T1562.007", "defense-evasion", "보안그룹·네트워크 ACL을 0.0.0.0/0에 개방", "high"),
     "CT_S3_PUBLIC":       ("T1537", "exfiltration", "S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책)", "high"),
     "CT_SNAPSHOT_SHARE":  ("T1537", "exfiltration", "스냅샷·AMI(EC2·RDS)를 외부 계정과 공유", "high"),
@@ -45,7 +45,7 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "WAF_BLOCKED":        ("T1190", "initial-access", "WAF가 공격 요청 차단", "low"),
     "SSH_BRUTE_FORCE":    ("T1110", "credential-access", "SSH 비밀번호 연속 실패(무차별 대입)", "medium"),
     "SSH_SUCCESS_AFTER_FAIL": ("T1078", "initial-access", "연속 실패 뒤 SSH 로그인 성공", "high"),
-    "HOST_PRIV_ESC":      ("T1548.003", "privilege-escalation", "서버 권한 상승(웹 서비스 계정의 sudo·su, 셸 탈출 명령)", "high"),
+    "HOST_PRIV_ESC":      ("T1548.003", "privilege-escalation", "서버 권한 상승(웹 서비스 계정의 sudo·su, 셸 탈출·비밀번호 해시 읽기)", "high"),
     "HOST_PRIV_ESC_FAIL": ("T1548.003", "privilege-escalation", "sudo·su 거부·연속 실패(권한 상승 시도)", "medium"),
     "HOST_ACCOUNT_CREATED": ("T1136.001", "persistence", "서버에 새 계정 생성·관리자 그룹 추가", "medium"),
     "CT_CONSOLE_BRUTE":   ("T1110", "credential-access", "AWS 콘솔 로그인 연속 실패(무차별 대입)", "medium"),
@@ -327,6 +327,8 @@ SHELL_ESCAPE = re.compile(
     r"\btar\b.*--checkpoint-action|\bzip\b.*\s-TT?\b|\bawk\b.*system\s*\(|\benv\s+/bin/(?:ba|da)?sh\b|"
     r"\b(?:cp|tee|dd|mv)\b.*/etc/(?:passwd|shadow|sudoers)|\bchmod\b.*(?:u?\+s\b|\s[4-7][0-7]{3}\s)|"
     r"\bnmap\b.*--(?:interactive|script)|/bin/(?:ba|da|z)?sh\s+-p\b)")
+# sudo로 계정 비밀번호 해시·root의 SSH 키를 읽는 명령(자격증명 수집, ATT&CK T1003.008·T1552.004)
+CRED_READ = re.compile(r"(?i)/etc/g?shadow\b|/root/\.ssh/")
 # 새 계정 만들기·관리자 그룹에 넣기·root 비밀번호 바꾸기
 ACCOUNT_CMD = re.compile(r"(?i)(?:^|/|\s)(?:useradd|adduser|newusers)\b|\busermod\b.*-a?G\s*\S*\b(?:sudo|wheel|admin|root)\b"
                          r"|(?:^|/)passwd\s+root\b|/etc/sudoers")
@@ -391,22 +393,30 @@ def host_auth_findings(events: list[Event]) -> list[Finding]:
     esc: dict[str, list[Event]] = defaultdict(list)
     fail: dict[str, list[Event]] = defaultdict(list)
     acct: dict[str, list[Event]] = defaultdict(list)
-    for e in host:
+    # 웹 서비스 계정이 su로 넘어간 계정. 그 뒤 이 계정의 sudo는 웹셸에서 이어진 권한 상승으로 본다
+    # (AIT-LDS: www-data → su blord → sudo cat /etc/shadow 가 놓쳤던 것)
+    via_service: set[str] = set()
+    for e in sorted(host, key=lambda e: e.ts or datetime.min.replace(tzinfo=timezone.utc)):
         who = (e.actor or "?").strip()
         cmd = e.extra.get("command", "")
-        svc = who.lower() in SERVICE_ACCOUNTS
+        svc = who.lower() in SERVICE_ACCOUNTS or who.lower() in via_service
+        if e.action == "su" and e.outcome == "success" and who.lower() in SERVICE_ACCOUNTS:
+            via_service.add(str(e.extra.get("target_user", "")).strip().lower())
         if e.action == "useradd" and _setup_account(e):
             e.extra["setup_account"] = _setup_account(e)  # 지우지 않고 표시만(보고서 근거 확인용)
         elif e.action == "useradd" or (e.action == "sudo" and e.outcome == "success" and ACCOUNT_CMD.search(cmd)):
             acct[_account_target(e)].append(e)
-        if e.action in ("sudo", "su") and e.outcome == "success" and (svc or SHELL_ESCAPE.search(cmd)):
+        if e.action in ("sudo", "su") and e.outcome == "success" and (
+                svc or SHELL_ESCAPE.search(cmd) or (e.action == "sudo" and CRED_READ.search(cmd))):
             esc[who].append(e)
         elif e.action in ("sudo", "su") and e.outcome == "failure":
             fail[who].append(e)
     for who, evs in esc.items():
         cmds = ", ".join(sorted({(e.extra.get("command") or f"su → {e.extra.get('target_user', 'root')}")[:60]
                                  for e in evs})[:3])
-        why = "웹 서비스 계정" if who.lower() in SERVICE_ACCOUNTS else "셸 탈출 명령"
+        why = ("웹 서비스 계정" if who.lower() in SERVICE_ACCOUNTS
+               else "웹 서비스 계정에서 su로 넘어간 계정" if who.lower() in via_service
+               else "셸 탈출·자격증명 파일 읽기 명령")
         findings.append(Finding("HOST_PRIV_ESC", evs, f"{why} '{who}'의 권한 상승 {len(evs)}건: {cmds}", who))
     for who, evs in fail.items():
         evs.sort(key=lambda e: e.ts)
@@ -538,7 +548,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                 singles[("CT_DATA_DESTRUCTION", e.actor or "")].append(e)
         if e.extra.get("identity_type") == "Root" and e.extra.get("eventType") != "AwsServiceEvent":
             singles[("CT_ROOT_USAGE", e.src_ip or "")].append(e)
-        if a in IAM_PERSIST:
+        if a in IAM_PERSIST or "db_master_password" in flags:
             singles[("CT_IAM_PERSISTENCE", e.actor or "")].append(e)
         if (a == "ec2:AuthorizeSecurityGroupIngress" and "0.0.0.0/0" in str(params)) or "nacl_open" in flags:
             singles[("CT_SG_OPENED", e.actor or "")].append(e)

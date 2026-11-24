@@ -1,0 +1,1265 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "harrison",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS harrison/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/harrison/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "intranet.mannsmith.harrison.com",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-access.log.1",
+      "kind": "access",
+      "events": 420831
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-access.log.2",
+      "kind": "access",
+      "events": 4154
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-access.log.3",
+      "kind": "access",
+      "events": 5242
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-access.log.4",
+      "kind": "access",
+      "events": 4927
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-access.log.5",
+      "kind": "access",
+      "events": 5240
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-error.log.1",
+      "kind": "weberror",
+      "events": 1347
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-error.log.2",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/apache2/intranet.mannsmith.harrison.com-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 5
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 446366,
+    "parsed_lines": 441762,
+    "attack_lines": 416738,
+    "tp": 415114,
+    "fn": 1624,
+    "fp": 108,
+    "tn": 29520,
+    "recall": 0.996103067154903,
+    "precision": 0.9997398981749522,
+    "false_positive_rate": 0.0036452004860267314,
+    "f1": 0.9979181691427472,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 411826,
+      "flagged": 410249,
+      "line_recall": 0.9961707128738836,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 411826
+     },
+     "wpscan": {
+      "lines": 4868,
+      "flagged": 4840,
+      "line_recall": 0.9942481511914544,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 4868
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 14,
+      "flagged": 14,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 14
+     },
+     "attacker_change_user": {
+      "lines": 5,
+      "flagged": 1,
+      "line_recall": 0.2,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 1
+     },
+     "escalated_command": {
+      "lines": 11,
+      "flagged": 4,
+      "line_recall": 0.36363636363636365,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 4
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_ADMIN_ACCESS": 92,
+     "WEBLOG_UPLOAD_EXEC": 12,
+     "WEBLOG_LARGE_EXFIL": 8,
+     "WEBLOG_ENUM_404": 4,
+     "WEBLOG_CMD_INJECTION": 1
+    },
+    "fp_by_ip": {
+     "10.237.1.238": 84,
+     "192.168.129.2": 24
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 415012,
+     "WEBLOG_IDOR_ENUM": 20690,
+     "WEBLOG_SCANNER": 4846,
+     "WEBLOG_SENSITIVE_FILE": 375,
+     "WEBLOG_ADMIN_ACCESS": 41,
+     "WEBLOG_UPLOAD_EXEC": 25,
+     "WEBLOG_LARGE_EXFIL": 18,
+     "WEBLOG_CMD_INJECTION": 9,
+     "HOST_PRIV_ESC": 5
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:11753",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:173001",
+      "rules": [
+       "WEBLOG_ENUM_404"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:22649",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:303656",
+      "rules": [
+       "WEBLOG_ENUM_404"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:368636",
+      "rules": [
+       "WEBLOG_ENUM_404"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:415903",
+      "rules": [
+       "WEBLOG_ENUM_404"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:415933",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:415978",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:415999",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416088",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416167",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416176",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416223",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416274",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416303",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416426",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416472",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416501",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416514",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416542",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416709",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416753",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416788",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416834",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416863",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416871",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416913",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416927",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:416977",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417154",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417187",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417271",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417315",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417361",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417396",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417419",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417553",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417597",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417623",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:417676",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:314",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:315",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:316",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:317",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:320",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:321",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:323",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:324",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:326",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:327",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:108489",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:110259",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:111202",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:111466",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:113593",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:114439",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:11505",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:116123",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:116228",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.mannsmith.harrison.com-access.log.1:116250",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 4,
+     "truth_attack_ips": 1,
+     "flagged_ips": 4,
+     "unknown_flagged_ips": 2
+    },
+    "recall": 1.0,
+    "precision": 0.5,
+    "false_positive_rate": 0.25,
+    "f1": 0.6666666666666666,
+    "missed": [],
+    "false_positives": [
+     "192.168.129.2"
+    ],
+    "unknown_flagged": [
+     "jward",
+     "www-data"
+    ],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.237.1.238",
+      "malicious": true
+     },
+     {
+      "ip": "192.168.129.2",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.131.215",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.131.55",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS harrison/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/harrison/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/harrison/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/harrison/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.mannsmith.harrison.com",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "mail.mannsmith.harrison.com",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-access.log.1",
+      "kind": "access",
+      "events": 9004
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-access.log.2",
+      "kind": "access",
+      "events": 6886
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-access.log.3",
+      "kind": "access",
+      "events": 9907
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-access.log.4",
+      "kind": "access",
+      "events": 9022
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-access.log.5",
+      "kind": "access",
+      "events": 9213
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/mail.mannsmith.harrison.com-access.log.1",
+      "kind": "access",
+      "events": 12573
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/mail.mannsmith.harrison.com-access.log.2",
+      "kind": "access",
+      "events": 13221
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/mail.mannsmith.harrison.com-access.log.3",
+      "kind": "access",
+      "events": 10305
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/mail.mannsmith.harrison.com-access.log.4",
+      "kind": "access",
+      "events": 10930
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/mail.mannsmith.harrison.com-access.log.5",
+      "kind": "access",
+      "events": 12694
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 1071
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 969
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 925
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 876
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-access.log.5",
+      "kind": "access",
+      "events": 1016
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/cloud.mannsmith.harrison.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/mail.mannsmith.harrison.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 13
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/apache2/proxy-error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 109387,
+    "parsed_lines": 108640,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 6,
+    "tn": 109381,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 5.4851124905153265e-05,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_SCANNER": 6
+    },
+    "fp_by_ip": {
+     "172.28.192.242": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "proxy-access.log.1:104",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:105",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:106",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:107",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:109",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.1:110",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 7,
+     "truth_attack_ips": 0,
+     "flagged_ips": 1,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.14285714285714285,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "172.28.192.242"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.237.1.238",
+      "malicious": false
+     },
+     {
+      "ip": "172.28.192.242",
+      "malicious": false
+     },
+     {
+      "ip": "172.28.193.88",
+      "malicious": false
+     },
+     {
+      "ip": "172.28.195.110",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.129.2",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.131.55",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS harrison/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/harrison/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "other_vhosts_access.log",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4",
+     "other_vhosts_access.log.5"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 9057
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 6932
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 9979
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 9101
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/other_vhosts_access.log.5",
+      "kind": "access",
+      "events": 9273
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/harrison/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 48999,
+    "parsed_lines": 44354,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "tn": 48999,
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {},
+    "fp_by_ip": {},
+    "tp_by_rule": {},
+    "fp_examples": [],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 2,
+     "truth_attack_ips": 0,
+     "flagged_ips": 0,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "missed": [],
+    "false_positives": [],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.237.0.166",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  }
+ }
+}
