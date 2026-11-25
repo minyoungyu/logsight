@@ -11,6 +11,7 @@
 - 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
 - 탐지 문제점 재점검(`docs/탐지_문제점_재점검.md`).
 - 오탐률(S7)·처음 보는 데이터(S6) 개선 방안과 사양서·외부비교 근거 점검(`docs/근거_점검_2026-11-25.md`).
+- 실제 웹 접근 로그로 정상 요청 오탐률을 재는 도구(`scripts/public/eval_reallog.py`: 표시된 줄 분류표 → 라벨 보정 오탐률과 95% 상한)와 EClog CSV 변환기(`scripts/public/eclog_to_combined.py`), 로그 확보 방안 조사(`docs/실제_웹로그_확보_방안.md`).
 - S6·S7 다음 측정 계획 고정(`reports/public/holdout_plan_2026-11-25.json`): 엔진 4d02d88, 데이터·지표·시작 조건을 재기 전에 정함. `eval_splunk_attack_data.py --skip-measured`가 여러 결과 파일을 받음.
 - 처음 보는 공개 데이터를 개발용·보류용으로 나눠 고치기 전·뒤에 한 번씩 잰 결과(`docs/공개데이터_개발보류_측정.md`). 보류용(AIT harrison·shaw) 공격 단계 9/13 → 11/13, 오탐 줄 121 → 115.
 - 새 공개 데이터 찾기와 측정(`docs/새공개데이터_찾기와_측정.md`, `scripts/public/eval_{invictus,camlds,realweb}.py`): Invictus AWS(Stratus CloudTrail) 공격 실행 35번 중 31번 맞게 탐지, CAM-LDS 3개 시나리오, 인도네시아 실제 웹서버 로그.
