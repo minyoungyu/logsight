@@ -3,8 +3,9 @@
 
   python scripts/public/eclog_to_combined.py data/public/eclog/eclog_1day.csv data/public/eclog/access.log
 
-- EClog는 IP를 번호(IP ID)로 바꿔 두었다. 같은 번호는 늘 같은 가짜 주소(100.64.0.0/10, 사설·공인 어디에도
-  쓰이지 않는 CGNAT 대역)로 바꾼다. 그래서 '같은 IP의 연속 요청' 규칙은 그대로 동작한다.
+- EClog는 IP를 ID('1PL'처럼 번호+국가 코드)로 바꿔 두었다. 같은 ID는 늘 같은 가짜 주소(100.64.0.0/10,
+  공인 인터넷에 쓰이지 않는 CGNAT 대역)로 바꾼다.
+- TimeStamp는 .NET ticks다(받은 파일로 확인). 그래서 '같은 IP의 연속 요청' 규칙은 그대로 동작한다.
 - 머리글 이름은 대소문자·밑줄을 무시하고 맞춘다. 필요한 칸을 못 찾으면 머리글을 보여 주고 멈춘다
   (데이터 내용은 보지 않고 머리글만 본다).
 - 원본 데이터와 변환 결과는 저장소에 올리지 않는다(data/는 .gitignore).
@@ -13,7 +14,7 @@ from __future__ import annotations
 
 import csv
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 WANT = {
@@ -48,19 +49,27 @@ def columns(header: list[str]) -> dict[str, int]:
     return out
 
 
-def fake_ip(ip_id: str) -> str:
-    try:
-        n = int(float(ip_id))
-    except ValueError:
-        n = abs(hash(ip_id)) % (1 << 22)  # 숫자가 아니면 같은 실행 안에서만 일관됨
-    n %= 1 << 22  # 100.64.0.0/10 안
+def fake_ip(ip_id: str, seen: dict[str, int]) -> str:
+    """IP ID(EClog 실제 값은 '1PL'처럼 번호+국가 코드)를 처음 나온 순서대로 번호 매겨 가짜 주소로 바꾼다.
+    같은 ID는 늘 같은 주소, 다른 ID는 늘 다른 주소(400만 개까지)."""
+    n = seen.setdefault(ip_id, len(seen) + 1)
+    if n >= 1 << 22:
+        raise SystemExit("IP ID가 너무 많음(100.64.0.0/10을 넘음)")
     return f"100.{64 + (n >> 16)}.{(n >> 8) & 255}.{n & 255}"
+
+
+DOTNET_EPOCH = datetime(1, 1, 1)
 
 
 def apache_time(v: str) -> str:
     v = v.strip()
     dt = None
-    if v.replace(".", "", 1).isdigit():
+    if v.isdigit() and int(v) > 10**17:
+        # .NET DateTime ticks(100ns, 0001-01-01부터). EClog TimeStamp가 이 꼴.
+        # 받은 하루치는 2019-12-10 23:00:00 ~ 12-11 22:59:59(ticks 그대로). 폴란드(UTC+1)의 12월 11일
+        # 하루와 맞으므로 ticks를 UTC로 본다 [추정: 데이터 설명 '11 December'와 범위로 판단]
+        dt = DOTNET_EPOCH.replace(tzinfo=timezone.utc) + timedelta(microseconds=int(v) // 10)
+    elif v.replace(".", "", 1).isdigit():
         x = float(v)
         dt = datetime.fromtimestamp(x / 1000 if x > 1e11 else x, tz=timezone.utc)
     else:
@@ -73,7 +82,7 @@ def apache_time(v: str) -> str:
     if dt is None:
         raise SystemExit(f"시각 형식을 모름: {v!r}")
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)  # [추정] EClog 시각대는 논문 확인 전까지 UTC로 둔다
+        dt = dt.replace(tzinfo=timezone.utc)  # [추정] 시각대가 없는 문자열은 UTC로 둔다
     return dt.strftime("%d/%b/%Y:%H:%M:%S %z")
 
 
@@ -89,6 +98,7 @@ def convert(src: Path, dst: Path) -> int:
         dialect = csv.Sniffer().sniff(sample, delimiters=",;\t")
         r = csv.reader(f, dialect)
         col = columns(next(r))
+        seen: dict[str, int] = {}
         g = lambda row, k, d="-": (row[col[k]] if k in col and col[k] < len(row) and row[col[k]] != "" else d)  # noqa: E731
         for row in r:
             if not row:
@@ -96,7 +106,7 @@ def convert(src: Path, dst: Path) -> int:
             proto = g(row, "proto", "HTTP/1.1")
             if not proto.upper().startswith("HTTP"):
                 proto = f"HTTP/{proto}"
-            out.write(f'{fake_ip(g(row, "ip"))} - - [{apache_time(g(row, "time"))}] '
+            out.write(f'{fake_ip(g(row, "ip"), seen)} - - [{apache_time(g(row, "time"))}] '
                       f'"{g(row, "method")} {q(g(row, "uri"))} {proto}" {g(row, "status")} {g(row, "bytes", "0")} '
                       f'"{q(g(row, "referer"))}" "{q(g(row, "ua"))}"\n')
             n += 1

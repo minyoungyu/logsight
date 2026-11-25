@@ -67,9 +67,9 @@ def test_eclog_converter_keeps_ip_identity(tmp_path):
     m = _load("eclog_to_combined")
     src = tmp_path / "e.csv"
     src.write_text("IpId,UserId,TimeStamp,HttpMethod,Uri,HttpVersion,ResponseCode,Bytes,Referrer,UserAgent\n"
-                   '7,1,2019-12-11 10:00:00,GET,/a?x=1,HTTP/1.1,200,10,-,"Mozilla/5.0 (X11)"\n'
-                   "7,1,2019-12-11 10:00:01,GET,/b,HTTP/1.1,404,0,,curl/8\n"
-                   "8,2,2019-12-11 10:00:02,POST,/c,1.1,302,0,-,UA\n", encoding="utf-8")
+                   '7PL,1,637116552000000000,GET,/a?x=1,HTTP/1.1,200,10,-,"Mozilla/5.0 (X11)"\n'
+                   "7PL,1,2019-12-11 10:00:01,GET,/b,HTTP/1.1,404,0,,curl/8\n"
+                   "8PL,2,2019-12-11 10:00:02,POST,/c,1.1,302,0,-,UA\n", encoding="utf-8")
     dst = tmp_path / "access.log"
     assert m.convert(src, dst) == 3
     lines = dst.read_text(encoding="utf-8").splitlines()
