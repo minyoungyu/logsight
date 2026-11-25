@@ -10,6 +10,7 @@
 - 외부 표준 형식 내보내기: `analyze`가 `report.json`·`report.html` 옆에 `findings.ocsf.json`([OCSF](https://schema.ocsf.io) 1.3.0 Detection Finding, class_uid 2004)을 쓴다. Security Lake·Security Hub·SIEM이 읽는 형식이다. LogFinder만의 값(판정, 판정 주체, 성공·실패 건수)은 `unmapped.logfinder`에 둔다(`logsight/ocsf.py`).
 - 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
 - 탐지 문제점 재점검(`docs/탐지_문제점_재점검.md`).
+- 오탐률(S7)·처음 보는 데이터(S6) 개선 방안과 사양서·외부비교 근거 점검(`docs/근거_점검_2026-11-25.md`).
 - 처음 보는 공개 데이터를 개발용·보류용으로 나눠 고치기 전·뒤에 한 번씩 잰 결과(`docs/공개데이터_개발보류_측정.md`). 보류용(AIT harrison·shaw) 공격 단계 9/13 → 11/13, 오탐 줄 121 → 115.
 - 새 공개 데이터 찾기와 측정(`docs/새공개데이터_찾기와_측정.md`, `scripts/public/eval_{invictus,camlds,realweb}.py`): Invictus AWS(Stratus CloudTrail) 공격 실행 35번 중 31번 맞게 탐지, CAM-LDS 3개 시나리오, 인도네시아 실제 웹서버 로그.
 - 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
@@ -51,6 +52,7 @@
 
 ### Fixed
 
+- 사양서·체크리스트·외부비교의 근거 없는 숫자와 문장 3건(결과 파일 없는 russellmitchell 0.013%, 출처 없는 '심각도 = 확신도 × 영향', 인용 문서에 없는 'SIR 가입 전 결과'), 낡거나 어긋난 6건(russellmitchell 단위, S6 새 표본, 규칙 58개, 제목 v2.3, NFR-14 조합 수, OCSF 내보내기 표시).
 - 서버 권한 상승: 웹 서비스 계정이 su로 넘어간 계정의 sudo, sudo로 `/etc/shadow`·`/root/.ssh/` 읽기를 `HOST_PRIV_ESC`로 잡는다(AIT-LDS에서 놓친 것).
 - 파일 공유 앱(Nextcloud·ownCloud WebDAV, 파일 앱, 공유 링크)에서 사용자가 .zip을 내려받은 것을 `WEBLOG_BACKUP_LEAK`로 잡던 오탐.
 - RDS DB 관리자 비밀번호 재설정(`ModifyDBInstance`·`ModifyDBCluster`의 `masterUserPassword`)을 `CT_IAM_PERSISTENCE`로 잡는다.
