@@ -69,7 +69,7 @@
      "login_paths": [
       "/login"
      ],
-     "trusted_ips": "운영자 공인 IP 1개. 개인 정보라 값은 저장소에 두지 않고 data/ctf/profile.json에만 둔다. 고정 확인용 sha256(IP 문자열)=2b7b41f680029934ab07ee3ca2bc0e50ae80ffe9844b83711814d337c439ebd1. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 거른다(REVERSE_PROXY=false). 사용자 확인 대기"
+     "trusted_ips": "운영자 공인 IP 1개(사용자 확인 2026-11-25T19:34Z). 개인 정보라 값은 저장소에 두지 않고 data/ctf/profile.json에만 둔다. 고정 확인용 sha256(IP 문자열)=991f674d6e8f7b52d3cf316df90b0dccaef26a2e000892b688c07c41463d9358. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 거른다(REVERSE_PROXY=false). 이 IP 말고는 신뢰 IP 없음"
     },
     "measure": "python scripts/public/eval_reallog.py --profile data/ctf/profile.json --review data/ctf/review.tsv --out reports/public/reallog_ctf_main.json, 분류 뒤 --labels로 다시",
     "review_rule_extra": [
