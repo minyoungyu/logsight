@@ -46,6 +46,43 @@
    "second": {
     "data": "한국 소규모 실제 서비스 접근 로그 1개(팀원·동아리·학과·인터뷰 대상 팀). 받기 전에 서비스 이름과 기간, trusted_ips·admin_paths를 이 칸에 적고 커밋한다.",
     "status": "구하는 중"
+   },
+   "third": {
+    "decided_at": "2026-11-25T19:40Z (CTF 본대회 진행 중, 로그를 받거나 열기 전)",
+    "why": "EClog(first)에서 오탐 전부가 WEBLOG_ROBOTS_HIDDEN이었고 그 규칙을 커밋 4e7e04a에서 고쳤다. EClog는 이제 본 데이터라 고친 엔진의 판정은 이 데이터로 한다.",
+    "engine_commit": "4e7e04a2c9e1929706062df5a20487264c0be9a6",
+    "engine_tree_logsight": "0be8c8a96660f710cb91017c4fb8f0e3992e8f1a",
+    "data": "CTF 본대회(11/25 약 13:20 ~ 11/26 21:00 KST) CTFd 컨테이너 stdout(gunicorn 접근 로그, CTFd 3.7.4 기본 ACCESS_LOG='-'). 대회 전 기간 전부. 팀 서버로 가는 트래픽(ALB 로그)은 쓰지 않는다.",
+    "custody": "CTF 운영 스레드가 철거 전에 원본 그대로 /mnt/project-files/ctf-본대회/logs/ 에 저장한다. 측정 전에 아무도 열지 않는다. 받은 파일의 sha256을 결과에 적는다.",
+    "convert": "json-file이면 python scripts/public/docker_json_to_lines.py <id>-json.log... -o data/ctf/access.log (stdout만). docker logs 평문이면 그대로 data/ctf/access.log",
+    "profile": {
+     "name": "CTF 본대회 CTFd",
+     "log_paths": {
+      "access": [
+       "data/ctf/access.log"
+      ]
+     },
+     "year": 2026,
+     "admin_paths": [
+      "/admin"
+     ],
+     "login_paths": [
+      "/login"
+     ],
+     "trusted_ips": "운영자 IP(CTFd 보안 그룹의 운영자 허용 주소). 로그를 열기 전에 CTF 운영 스레드에서 받아 이 칸에 적고 커밋한다"
+    },
+    "measure": "python scripts/public/eval_reallog.py --profile data/ctf/profile.json --review data/ctf/review.tsv --out reports/public/reallog_ctf_main.json, 분류 뒤 --labels로 다시",
+    "review_rule_extra": [
+     "S7.review_rule(A1~A3)을 그대로 쓴다.",
+     "A4 운영자가 아닌 IP가 /admin 아래를 요청한 줄은 응답과 관계없이 attack(CTFd 관리 화면 찔러 보기). reason에 A4와 경로를 적는다.",
+     "플래그 제출(/api/v1/challenges/attempt), 로그인 실패, 점수판 새로고침 같은 대회 사용은 공격 문자열이 없으면 fp로 센다."
+    ],
+    "limits": [
+     "참가자가 보안 대회 참가자라 일반 서비스보다 공격 줄이 많다. 라벨 보정 숫자가 분류에 더 크게 좌우된다.",
+     "우리가 운영한 환경이다. '남이 만든 데이터'는 아니고, 규칙을 고칠 때 본 적 없는 데이터라는 조건만 맞춘다.",
+     "정상 줄이 30,000줄보다 적으면 숫자는 적되 S7 판정은 하지 않는다."
+    ],
+    "report": "S7.review_rule.report와 같다. 그에 더해 WEBLOG_ROBOTS_HIDDEN의 fp 줄 수를 따로 적는다(고친 규칙의 판정)."
    }
   },
   "normal_label": "CSIC: normal 파일의 요청 전부. CAM-LDS: 공격 도구 실행 기록의 공격자 IP·시간 창에 들어가지 않는 줄. 실제 로그: 사람이 공격이 아니라고 확인한 줄(확인 방법을 결과에 적음)",

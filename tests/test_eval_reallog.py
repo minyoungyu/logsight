@@ -77,3 +77,14 @@ def test_eclog_converter_keeps_ip_identity(tmp_path):
     assert ips[0] == ips[1] != ips[2] and ips[0].startswith("100.")
     assert '"GET /a?x=1 HTTP/1.1" 200 10' in lines[0] and "[11/Dec/2019:10:00:00 +0000]" in lines[0]
     assert '"POST /c HTTP/1.1" 302' in lines[2]
+
+
+def test_docker_json_keeps_stdout_only(tmp_path):
+    m = _load("docker_json_to_lines")
+    src = tmp_path / "c-json.log"
+    src.write_text(json.dumps({"log": NORMAL.format(i=1, s=1) + "\n", "stream": "stdout", "time": "t"}) + "\n"
+                   + json.dumps({"log": "[ERROR] boom\n", "stream": "stderr", "time": "t"}) + "\n"
+                   + "not json\n", encoding="utf-8")
+    dst = tmp_path / "access.log"
+    assert m.extract([src], dst) == (1, 2)
+    assert dst.read_text(encoding="utf-8").startswith("203.0.113.1 ")
