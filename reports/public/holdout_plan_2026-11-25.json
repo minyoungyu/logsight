@@ -20,17 +20,49 @@
  },
  "S7": {
   "data_priority": [
+   "0. EClog(doi:10.7910/DVN/Z834IK, CC0) 하루치 eclog_1day.csv 350,683건, 2026-11-26 추가(받기 전)",
    "1. HTTP CSIC 2010 normalTrafficTest(공식 사이트에서만 받음. 2026-11-25 클라우드·사용자 PC 모두 접속 실패)",
    "2. CAM-LDS(zenodo 18861762, CC BY 4.0) 중 아직 받지 않은 시나리오의 Apache 접근 로그",
    "3. 우리 팀·파일럿 고객 서버의 실제 접근 로그(동의를 받고, 저장소에는 숫자만)"
   ],
   "choose_rule": "위 순서에서 먼저 받을 수 있는 것 하나를 쓴다. 받기 전에 어느 것을 쓸지 이 파일 아래 'chosen'에 적고 커밋한다.",
-  "chosen": null,
+  "chosen": {
+   "decided_at": "2026-11-25T19:12Z",
+   "first": {
+    "data": "EClog eclog_1day.csv(md5 원본 CSV 기준은 Dataverse 표기 8542ef2002e49f8a9e594c075758c109가 .tab 변환본이라 받은 파일의 sha256을 결과에 적음)",
+    "convert": "python scripts/public/eclog_to_combined.py <eclog_1day.csv> data/public/eclog/access.log",
+    "profile": {
+     "name": "EClog 1day",
+     "log_paths": {
+      "access": [
+       "data/public/eclog/access.log"
+      ]
+     },
+     "year": 2019,
+     "trusted_ips": []
+    },
+    "measure": "python scripts/public/eval_reallog.py --profile data/public/eclog/profile.json --review data/public/eclog/review.tsv --out reports/public/reallog_eclog_1day.json, 분류 뒤 --labels로 다시"
+   },
+   "second": {
+    "data": "한국 소규모 실제 서비스 접근 로그 1개(팀원·동아리·학과·인터뷰 대상 팀). 받기 전에 서비스 이름과 기간, trusted_ips·admin_paths를 이 칸에 적고 커밋한다.",
+    "status": "구하는 중"
+   }
+  },
   "normal_label": "CSIC: normal 파일의 요청 전부. CAM-LDS: 공격 도구 실행 기록의 공격자 IP·시간 창에 들어가지 않는 줄. 실제 로그: 사람이 공격이 아니라고 확인한 줄(확인 방법을 결과에 적음)",
   "metric": "표시된 정상 줄 / 정상 줄. 원래 숫자와 '라벨 보정' 숫자를 함께 적는다. 라벨 보정은 데이터셋 자체 기록(공격 시각표·도구 로그)으로 공격임이 확인되는 줄만 빼고, 줄마다 근거를 적는다.",
   "minimum_lines": 30000,
   "pass": "원래 숫자가 0.1% 이하. 0건이면 95% 상한(약 3/정상 줄 수)도 적는다.",
-  "csic_note": "CSIC는 POST 본문 제외(현실)와 포함(상한) 두 번 잰다(scripts/public/eval_csic.py). 판정은 본문 제외로 한다."
+  "csic_note": "CSIC는 POST 본문 제외(현실)와 포함(상한) 두 번 잰다(scripts/public/eval_csic.py). 판정은 본문 제외로 한다.",
+  "review_rule": {
+   "attack(실제 공격으로 빼는 줄)": [
+    "A1 알려진 공격 문자열: SQL 삽입(union select, sleep(, ' or 1=1 등), 경로 이동(../, /etc/passwd), 명령 삽입($(, ;wget, |sh 등), Shellshock(() {), 원격 파일 포함(=http로 다른 호스트 스크립트)",
+    "A2 스캐너 도구 User-Agent: sqlmap, nikto, nmap, masscan, zgrab, nuclei, dirbuster, gobuster, wpscan, acunetix 등",
+    "A3 이 사이트가 쓰지 않는 소프트웨어의 알려진 공격 경로(/wp-login.php, /xmlrpc.php, /phpmyadmin, /.env, /.git/, /cgi-bin/, /HNAP1, /boaform, /actuator 등). '쓰지 않음'은 같은 로그에서 그 경로가 늘 404·403인 것으로 판단"
+   ],
+   "fp": "위 셋에 해당하지 않는 줄. 판단이 서지 않으면 fp로 센다(보수적).",
+   "reason": "attack은 reason에 A1·A2·A3 중 무엇인지와 근거 문자열을 적는다.",
+   "report": "원래 오탐률, 라벨 보정 오탐률, 95% 상한을 모두 적는다. 판정(0.1%)은 라벨 보정 숫자로 하고 원래 숫자를 함께 보인다."
+  }
  },
  "after": "한 번 잰 데이터는 그 뒤로 개발 데이터다. 결과를 보고 규칙을 고치면 다음 측정에는 새 계획 파일이 필요하다."
 }
