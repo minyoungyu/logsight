@@ -77,7 +77,8 @@ def main() -> None:
     ap.add_argument("--out", required=True)
     ap.add_argument("--glob", nargs="+", default=["aws_*.yml"],
                     help="detections/cloud 안에서 잴 규칙 파일 패턴(기본 aws_*.yml)")
-    ap.add_argument("--skip-measured", help="이미 잰 결과 JSON. 그 안의 규칙 파일은 건너뛴다(처음 보는 것만 재기)")
+    ap.add_argument("--skip-measured", nargs="+", default=[],
+                    help="이미 잰 결과 JSON(여러 개 가능). 그 안의 규칙 파일은 건너뛴다(처음 보는 것만 재기)")
     a = ap.parse_args()
     cache = Path(a.cache)
     cache.mkdir(parents=True, exist_ok=True)
@@ -85,8 +86,8 @@ def main() -> None:
                             capture_output=True, text=True).stdout.strip()
     rows, seen = [], set()
     skip = set()
-    if a.skip_measured:
-        skip = {r["file"] for r in json.loads(Path(a.skip_measured).read_text(encoding="utf-8"))["rows"]}
+    for sm in a.skip_measured:
+        skip |= {r["file"] for r in json.loads(Path(sm).read_text(encoding="utf-8"))["rows"]}
     files = sorted({y for g in a.glob for y in (Path(a.sc) / "detections" / "cloud").glob(g)})
     for y in files:
         if y.name in skip:

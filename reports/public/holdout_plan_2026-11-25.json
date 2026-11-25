@@ -1,0 +1,36 @@
+{
+ "name": "S6·S7 처음 보는 데이터 측정 계획",
+ "decided_at": "2026-11-25T18:57Z",
+ "engine_commit": "4d02d885f1570948b8c30794fee358967f3873da",
+ "engine_tree_logsight": "95a3c77d7deef741208e56d1c66f0ae1e3984632",
+ "engine_rule": "측정은 engine_commit의 logsight/ 그대로 한다(git worktree). 규칙을 고친 뒤 재려면 데이터를 받기 전에 이 파일의 engine_commit을 새 커밋으로 바꾸는 커밋을 먼저 남긴다. 데이터를 받은 뒤에는 바꾸지 않는다.",
+ "S6": {
+  "data": "splunk/security_content의 detections/cloud 중 aws_*.yml, detect_*aws*.yml, detect_new_open_s3*.yml 가운데 이미 잰 67개(splunk_attack_data.json 52개 + splunk_attack_data_new_before.json 15개)에 없는 규칙의 aws:cloudtrail 시험 데이터",
+  "command": "python scripts/public/eval_splunk_attack_data.py --sc <security_content> --cache <캐시> --glob 'aws_*.yml' 'detect_*aws*.yml' 'detect_new_open_s3*.yml' --skip-measured reports/public/splunk_attack_data.json reports/public/splunk_attack_data_new_before.json --out reports/public/splunk_attack_data_holdout3.json",
+  "start_when": "새 규칙이 10개 이상일 때. 그 전에는 재지 않는다(작은 표본으로 결론을 내지 않음).",
+  "judgement": "판정 기준은 docs/처음보는데이터_측정.md와 같다(맞게 탐지 / 다른 이유로만 걸림 / 놓침). 사람이 표본마다 이유를 적고, 기계 기준 target_rules도 함께 남긴다. 판정은 결과 파일에 칸(judgement, judgement_reason)으로 저장한다.",
+  "metrics": {
+   "primary": "맞게 탐지 / 전체 규칙 수",
+   "secondary": [
+    "Splunk 유형이 TTP인 규칙만(Splunk 문서: TTP만 기본으로 경보를 만듦)",
+    "대상 고객 기준: Bedrock·ECR·SAML 규칙을 뺌(docs/처음보는데이터_측정.md 2026-11-24 기준과 같음)"
+   ],
+   "report": "세 숫자와 95% 윌슨 구간을 모두 적는다. 목표(50%) 판정은 primary로만 한다."
+  }
+ },
+ "S7": {
+  "data_priority": [
+   "1. HTTP CSIC 2010 normalTrafficTest(공식 사이트에서만 받음. 2026-11-25 클라우드·사용자 PC 모두 접속 실패)",
+   "2. CAM-LDS(zenodo 18861762, CC BY 4.0) 중 아직 받지 않은 시나리오의 Apache 접근 로그",
+   "3. 우리 팀·파일럿 고객 서버의 실제 접근 로그(동의를 받고, 저장소에는 숫자만)"
+  ],
+  "choose_rule": "위 순서에서 먼저 받을 수 있는 것 하나를 쓴다. 받기 전에 어느 것을 쓸지 이 파일 아래 'chosen'에 적고 커밋한다.",
+  "chosen": null,
+  "normal_label": "CSIC: normal 파일의 요청 전부. CAM-LDS: 공격 도구 실행 기록의 공격자 IP·시간 창에 들어가지 않는 줄. 실제 로그: 사람이 공격이 아니라고 확인한 줄(확인 방법을 결과에 적음)",
+  "metric": "표시된 정상 줄 / 정상 줄. 원래 숫자와 '라벨 보정' 숫자를 함께 적는다. 라벨 보정은 데이터셋 자체 기록(공격 시각표·도구 로그)으로 공격임이 확인되는 줄만 빼고, 줄마다 근거를 적는다.",
+  "minimum_lines": 30000,
+  "pass": "원래 숫자가 0.1% 이하. 0건이면 95% 상한(약 3/정상 줄 수)도 적는다.",
+  "csic_note": "CSIC는 POST 본문 제외(현실)와 포함(상한) 두 번 잰다(scripts/public/eval_csic.py). 판정은 본문 제외로 한다."
+ },
+ "after": "한 번 잰 데이터는 그 뒤로 개발 데이터다. 결과를 보고 규칙을 고치면 다음 측정에는 새 계획 파일이 필요하다."
+}

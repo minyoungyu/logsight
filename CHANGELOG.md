@@ -11,6 +11,7 @@
 - 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
 - 탐지 문제점 재점검(`docs/탐지_문제점_재점검.md`).
 - 오탐률(S7)·처음 보는 데이터(S6) 개선 방안과 사양서·외부비교 근거 점검(`docs/근거_점검_2026-11-25.md`).
+- S6·S7 다음 측정 계획 고정(`reports/public/holdout_plan_2026-11-25.json`): 엔진 4d02d88, 데이터·지표·시작 조건을 재기 전에 정함. `eval_splunk_attack_data.py --skip-measured`가 여러 결과 파일을 받음.
 - 처음 보는 공개 데이터를 개발용·보류용으로 나눠 고치기 전·뒤에 한 번씩 잰 결과(`docs/공개데이터_개발보류_측정.md`). 보류용(AIT harrison·shaw) 공격 단계 9/13 → 11/13, 오탐 줄 121 → 115.
 - 새 공개 데이터 찾기와 측정(`docs/새공개데이터_찾기와_측정.md`, `scripts/public/eval_{invictus,camlds,realweb}.py`): Invictus AWS(Stratus CloudTrail) 공격 실행 35번 중 31번 맞게 탐지, CAM-LDS 3개 시나리오, 인도네시아 실제 웹서버 로그.
 - 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
