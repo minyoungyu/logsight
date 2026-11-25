@@ -41,7 +41,14 @@
     "시험 이벤트 하나씩 넣으므로 여러 이벤트를 묶는 LogFinder 규칙(반복·순서)은 걸릴 수 없다.",
     "Panther 시험 이벤트는 사람이 만든 표본이라 실제 기록과 필드가 다를 수 있다.",
     "Info 심각도 규칙(목록·조회 기록 등)은 경보 대상이 아닌 것이 많아 primary를 낮춘다. 그래서 Medium 이상을 함께 적는다."
-   ]
+   ],
+   "engine_B": {
+    "commit": "43ee5f01c093b39a25097c0ec344468687ba1656",
+    "tree_logsight": "1e6545f4a4d1346aadc3509b1023ac0612d9db7e",
+    "fixed_at": "2026-11-25T20:25Z, B 반을 재기 전",
+    "command": "python scripts/public/eval_panther.py --pa <panther-analysis e9c67b0> --half B --out reports/public/panther_ct_B.json",
+    "judgement": "A와 같은 기준. 한 번만 재고, 결과를 보고 규칙을 고치면 그 뒤 숫자는 개발 점수"
+   }
   }
  },
  "S7": {
@@ -111,7 +118,8 @@
     ],
     "report": "S7.review_rule.report와 같다. 그에 더해 WEBLOG_ROBOTS_HIDDEN의 fp 줄 수를 따로 적는다(고친 규칙의 판정).",
     "operator": "운영자 공인 IP 1개(값은 개인 정보라 data/ctf/operator_ip에만, sha256=991f674d6e8f7b52d3cf316df90b0dccaef26a2e000892b688c07c41463d9358). 사용자 지시(2026-11-25T19:38Z): 이 IP도 2026-11-26 10:00 KST(01:00Z)부터의 접속은 대회 참가자로 다룬다. 그래서 trusted_ips는 비우고, 그 시각 이전 이 IP의 줄만 측정에서 뺀다(--drop-before). 뺀 줄 수를 결과에 적는다. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 가른다(REVERSE_PROXY=false).",
-    "engine_commit_note": "엔진(logsight/)은 4e7e04a 그대로. 이후 커밋은 측정 스크립트·계획만 바꿈"
+    "engine_commit_note": "엔진(logsight/)은 4e7e04a 그대로. 이후 커밋은 측정 스크립트·계획만 바꿈",
+    "engine_note_2": "11/25 43ee5f0에서 CloudTrail 규칙이 바뀌었으나 웹 규칙(logsight/web)은 그대로. CTF 측정은 계획대로 4e7e04a를 git worktree로 꺼내 잰다"
    }
   },
   "normal_label": "CSIC: normal 파일의 요청 전부. CAM-LDS: 공격 도구 실행 기록의 공격자 IP·시간 창에 들어가지 않는 줄. 실제 로그: 사람이 공격이 아니라고 확인한 줄(확인 방법을 결과에 적음)",
