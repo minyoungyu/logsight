@@ -22,6 +22,7 @@ import math
 import subprocess
 import sys
 from collections import Counter, defaultdict
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -73,8 +74,28 @@ def load_labels(path: Path) -> dict[str, tuple[str, str]]:
     return out
 
 
-def measure(profile: SiteProfile, labels: dict[str, tuple[str, str]] | None = None) -> tuple[dict, list[dict]]:
+def parse_drop(spec: str) -> tuple[str, datetime]:
+    """'IP@ISO시각' → 그 IP의 그 시각 이전 줄을 측정에서 뺀다(운영자가 운영자로 일한 시간).
+    그 시각부터의 같은 IP 줄은 다른 사용자와 똑같이 잰다."""
+    ip, _, until = spec.partition("@")
+    t = datetime.fromisoformat(until)
+    if not ip or t.tzinfo is None:
+        raise SystemExit(f"--drop-before는 IP@시각(시간대 포함) 꼴: {spec}")
+    return ip, t
+
+
+def measure(profile: SiteProfile, labels: dict[str, tuple[str, str]] | None = None,
+            drop: list[tuple[str, datetime]] = ()) -> tuple[dict, list[dict]]:
     events, _ = load_events(profile)
+    dropped = 0
+    if drop:
+        keep = []
+        for e in events:
+            if any(e.src_ip == ip and e.ts < t for ip, t in drop):
+                dropped += 1
+            else:
+                keep.append(e)
+        events = keep
     findings = run_web_detections(events, profile)
     access = [e for e in events if e.source == "access"]
     total = {e.raw_ref for e in access}
@@ -98,6 +119,10 @@ def measure(profile: SiteProfile, labels: dict[str, tuple[str, str]] | None = No
         "flagged_by_rule": dict(by_rule.most_common()),
         "flagged_ips": len(set(ip_of.values())),
     }
+    if drop:
+        res["dropped_operator_lines"] = dropped
+        res["dropped_rule"] = [f"src_ip 해시 {__import__('hashlib').sha256(ip.encode()).hexdigest()[:12]} < {t.isoformat()}"
+                               for ip, t in drop]
     if labels is not None:
         attack = {r for r in flagged if labels.get(r, ("",))[0] == "attack"}
         fp = {r for r in flagged if labels.get(r, ("",))[0] == "fp"}
@@ -124,10 +149,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", required=True, help="결과 JSON(숫자와 위치만)")
     ap.add_argument("--review", help="표시된 줄 분류표 TSV를 쓸 곳(원본 줄 포함. data/ 아래에 둘 것)")
     ap.add_argument("--labels", help="사람이 class·reason을 채운 분류표 TSV")
+    ap.add_argument("--drop-before", action="append", default=[], metavar="IP@ISO",
+                    help="이 IP의 이 시각 이전 줄을 측정에서 뺀다(운영자 시간). 여러 번 줄 수 있다")
     a = ap.parse_args(argv)
     profile = SiteProfile.load(a.profile)
     labels = load_labels(Path(a.labels)) if a.labels else None
-    res, review = measure(profile, labels)
+    res, review = measure(profile, labels, [parse_drop(x) for x in a.drop_before])
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     if a.review:

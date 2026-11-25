@@ -88,3 +88,19 @@ def test_docker_json_keeps_stdout_only(tmp_path):
     dst = tmp_path / "access.log"
     assert m.extract([src], dst) == (1, 2)
     assert dst.read_text(encoding="utf-8").startswith("203.0.113.1 ")
+
+
+def test_drop_before_removes_only_earlier_lines(tmp_path):
+    m = _load("eval_reallog")
+    prof = _profile(tmp_path, [NORMAL.format(i=i, s=i) for i in range(1, 11)] + [ATTACK])
+    out = tmp_path / "o.json"
+    # 공격 줄(03:01:00)보다 이른 시각까지만 빼면 공격 줄은 남는다
+    assert m.main(["--profile", str(prof), "--out", str(out),
+                   "--drop-before", "198.51.100.9@2026-10-22T03:00:30+00:00"]) == 0
+    res = json.loads(out.read_text(encoding="utf-8"))
+    assert res["dropped_operator_lines"] == 0 and res["access_lines"] == 11
+    assert m.main(["--profile", str(prof), "--out", str(out),
+                   "--drop-before", "198.51.100.9@2026-10-22T03:02:00+00:00"]) == 0
+    res = json.loads(out.read_text(encoding="utf-8"))
+    assert res["dropped_operator_lines"] == 1 and res["access_lines"] == 10
+    assert "198.51.100.9" not in out.read_text(encoding="utf-8")

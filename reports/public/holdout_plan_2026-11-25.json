@@ -69,9 +69,9 @@
      "login_paths": [
       "/login"
      ],
-     "trusted_ips": "운영자 공인 IP 1개(사용자 확인 2026-11-25T19:34Z). 개인 정보라 값은 저장소에 두지 않고 data/ctf/profile.json에만 둔다. 고정 확인용 sha256(IP 문자열)=991f674d6e8f7b52d3cf316df90b0dccaef26a2e000892b688c07c41463d9358. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 거른다(REVERSE_PROXY=false). 이 IP 말고는 신뢰 IP 없음"
+     "trusted_ips": []
     },
-    "measure": "python scripts/public/eval_reallog.py --profile data/ctf/profile.json --review data/ctf/review.tsv --out reports/public/reallog_ctf_main.json, 분류 뒤 --labels로 다시",
+    "measure": "python scripts/public/eval_reallog.py --profile data/ctf/profile.json --review data/ctf/review.tsv --out reports/public/reallog_ctf_main.json --drop-before <운영자 IP>@2026-11-26T01:00:00+00:00, 분류 뒤 --labels로 다시",
     "review_rule_extra": [
      "S7.review_rule(A1~A3)을 그대로 쓴다.",
      "A4 운영자가 아닌 IP가 /admin 아래를 요청한 줄은 응답과 관계없이 attack(CTFd 관리 화면 찔러 보기). reason에 A4와 경로를 적는다.",
@@ -83,7 +83,9 @@
      "우리가 운영한 환경이다. '남이 만든 데이터'는 아니고, 규칙을 고칠 때 본 적 없는 데이터라는 조건만 맞춘다.",
      "정상 줄이 30,000줄보다 적으면 숫자는 적되 S7 판정은 하지 않는다."
     ],
-    "report": "S7.review_rule.report와 같다. 그에 더해 WEBLOG_ROBOTS_HIDDEN의 fp 줄 수를 따로 적는다(고친 규칙의 판정)."
+    "report": "S7.review_rule.report와 같다. 그에 더해 WEBLOG_ROBOTS_HIDDEN의 fp 줄 수를 따로 적는다(고친 규칙의 판정).",
+    "operator": "운영자 공인 IP 1개(값은 개인 정보라 data/ctf/operator_ip에만, sha256=991f674d6e8f7b52d3cf316df90b0dccaef26a2e000892b688c07c41463d9358). 사용자 지시(2026-11-25T19:38Z): 이 IP도 2026-11-26 10:00 KST(01:00Z)부터의 접속은 대회 참가자로 다룬다. 그래서 trusted_ips는 비우고, 그 시각 이전 이 IP의 줄만 측정에서 뺀다(--drop-before). 뺀 줄 수를 결과에 적는다. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 가른다(REVERSE_PROXY=false).",
+    "engine_commit_note": "엔진(logsight/)은 4e7e04a 그대로. 이후 커밋은 측정 스크립트·계획만 바꿈"
    }
   },
   "normal_label": "CSIC: normal 파일의 요청 전부. CAM-LDS: 공격 도구 실행 기록의 공격자 IP·시간 창에 들어가지 않는 줄. 실제 로그: 사람이 공격이 아니라고 확인한 줄(확인 방법을 결과에 적음)",
