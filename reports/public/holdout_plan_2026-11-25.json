@@ -16,6 +16,32 @@
     "대상 고객 기준: Bedrock·ECR·SAML 규칙을 뺌(docs/처음보는데이터_측정.md 2026-11-24 기준과 같음)"
    ],
    "report": "세 숫자와 95% 윌슨 구간을 모두 적는다. 목표(50%) 판정은 primary로만 한다."
+  },
+  "panther": {
+   "decided_at": "2026-11-25T20:05Z (시험 이벤트 내용을 보기 전. 규칙 수·시험 수만 셈)",
+   "why": "Splunk 쪽 남은 새 AWS 탐지가 4개뿐이라(71개 중 67개 잼, security_content 689e177) start_when(10개)을 채울 수 없다. Stratus는 11/05 규칙 보강에 쓴 목록이고 Invictus(Stratus 데이터)도 이미 재서 처음 보는 데이터가 아니다. Panther 시험 이벤트는 측정에 쓴 적 없다(docs/사양서_외부비교.md는 규칙 형식만 봄).",
+   "data": "panther-labs/panther-analysis e9c67b0(2026-11-16) rules/aws_cloudtrail_rules: AnalysisType=rule, Enabled≠false, LogTypes에 AWS.CloudTrail. 136개 중 꺼진 15개 제외. 공격 시험 211·정상 시험 251(꺼진 규칙 포함 수)",
+   "split": "규칙 파일 이름의 sha256 첫 바이트 짝수=A, 홀수=B(scripts/public/eval_panther.py half_of). A는 지금 엔진으로 한 번 잰다. B는 봉인: 규칙 보강을 마치고 엔진을 고정한 뒤 한 번만 잰다. B의 시험 내용·Panther 규칙 로직은 보강 중에 보지 않는다.",
+   "engine_A": {
+    "commit": "34d41948ac333f31019f63104fdd7ca4d49b2111",
+    "tree_logsight": "0be8c8a96660f710cb91017c4fb8f0e3992e8f1a"
+   },
+   "command": "python scripts/public/eval_panther.py --pa <panther-analysis e9c67b0> --half A --out reports/public/panther_ct_A.json",
+   "judgement": "사람이 시험마다 판정: 맞게 탐지(LogFinder 규칙의 뜻이 Panther 규칙이 잡으려는 행동과 같음) / 다른 이유로만 걸림 / 놓침. Panther 규칙 하나는 공격 시험 중 하나라도 맞게 탐지면 맞게 탐지.",
+   "metrics": {
+    "primary": "맞게 탐지 규칙 / 공격 시험이 있는 규칙 수 (S6 목표 50%)",
+    "secondary": [
+     "Severity Medium 이상 규칙만(Splunk TTP에 해당하는 구분으로 미리 정함)",
+     "기계 숫자: 아무 규칙이나 걸린 규칙 수",
+     "정상 시험 중 표시된 수(AWS 쪽 오탐 참고, S7 판정에는 쓰지 않음)"
+    ],
+    "report": "모든 숫자에 95% 윌슨 구간. 표본이 작으면 판정 없이 숫자만."
+   },
+   "limits": [
+    "시험 이벤트 하나씩 넣으므로 여러 이벤트를 묶는 LogFinder 규칙(반복·순서)은 걸릴 수 없다.",
+    "Panther 시험 이벤트는 사람이 만든 표본이라 실제 기록과 필드가 다를 수 있다.",
+    "Info 심각도 규칙(목록·조회 기록 등)은 경보 대상이 아닌 것이 많아 primary를 낮춘다. 그래서 Medium 이상을 함께 적는다."
+   ]
   }
  },
  "S7": {
