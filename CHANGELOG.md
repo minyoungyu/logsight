@@ -7,6 +7,8 @@
 
 ### Added
 
+- 병합 전 오탐 검사 `scripts/public/fp_gate.py`: 로컬에 있는 정상 데이터(EClog 하루치, AIT fox·wheeler·russellmitchell, Panther A 반 정상 이벤트)로 규칙별 오탐 줄을 기준(`reports/public/fp_baseline.json`)과 비교하고, 늘면 실패한다. 규칙을 바꾸는 PR은 이걸 돌린 결과를 적는다.
+- S6 새 처음 보는 데이터: Panther AWS CloudTrail 시험 이벤트(`scripts/public/eval_panther.py`). A 반 맞게 탐지 20/64(31%), B 반은 보강 뒤 한 번.
 - S7 처음 본 실제 로그 측정(`docs/실제로그_측정_EClog_2026-11-26.md`, `reports/public/reallog_eclog_1day.json`): EClog 하루치 35만 줄, 라벨 보정 오탐 0.496%로 미달. 오탐 1,740줄 전부 WEBLOG_ROBOTS_HIDDEN(검색엔진 외 크롤러가 평평한 URL의 상품 페이지를 연 것).
 - 외부 표준 형식 내보내기: `analyze`가 `report.json`·`report.html` 옆에 `findings.ocsf.json`([OCSF](https://schema.ocsf.io) 1.3.0 Detection Finding, class_uid 2004)을 쓴다. Security Lake·Security Hub·SIEM이 읽는 형식이다. LogFinder만의 값(판정, 판정 주체, 성공·실패 건수)은 `unmapped.logfinder`에 둔다(`logsight/ocsf.py`).
 - 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
