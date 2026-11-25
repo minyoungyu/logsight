@@ -1,0 +1,1229 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "wardbeck",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS wardbeck/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/wardbeck/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "intranet.hurstwong.wardbeck.info",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.1",
+      "kind": "access",
+      "events": 11262
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.2",
+      "kind": "access",
+      "events": 6158
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.3",
+      "kind": "access",
+      "events": 8773
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.4",
+      "kind": "access",
+      "events": 7434
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.5",
+      "kind": "access",
+      "events": 8474
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-error.log.1",
+      "kind": "weberror",
+      "events": 33
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-error.log.2",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 4
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 8
+     }
+    ],
+    "lines": 46813,
+    "parsed_lines": 42162,
+    "attack_lines": 5344,
+    "tp": 5287,
+    "fn": 57,
+    "fp": 51,
+    "tn": 41418,
+    "recall": 0.9893338323353293,
+    "precision": 0.9904458598726115,
+    "false_positive_rate": 0.0012298343340808797,
+    "f1": 0.9898895337951693,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 4485,
+      "flagged": 4455,
+      "line_recall": 0.9933110367892977,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 4485
+     },
+     "wpscan": {
+      "lines": 799,
+      "flagged": 789,
+      "line_recall": 0.9874843554443054,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER",
+       "WEBLOG_SENSITIVE_FILE"
+      ],
+      "parsed": 799
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 33,
+      "flagged": 33,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 33
+     },
+     "attacker_change_user": {
+      "lines": 5,
+      "flagged": 1,
+      "line_recall": 0.2,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 1
+     },
+     "escalated_command": {
+      "lines": 8,
+      "flagged": 3,
+      "line_recall": 0.375,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 3
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_ADMIN_ACCESS": 42,
+     "WEBLOG_UPLOAD_EXEC": 9,
+     "WEBLOG_LARGE_EXFIL": 6,
+     "WEBLOG_CMD_INJECTION": 1
+    },
+    "fp_by_ip": {
+     "172.21.241.181": 26,
+     "172.21.241.225": 24,
+     "10.132.56.81": 1
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 5195,
+     "WEBLOG_SCANNER": 795,
+     "WEBLOG_IDOR_ENUM": 244,
+     "WEBLOG_SENSITIVE_FILE": 102,
+     "WEBLOG_LARGE_EXFIL": 33,
+     "WEBLOG_UPLOAD_EXEC": 33,
+     "WEBLOG_CMD_INJECTION": 22,
+     "WEBLOG_AUTH_BRUTE": 10,
+     "HOST_PRIV_ESC": 4,
+     "WEBLOG_ADMIN_ACCESS": 1
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10014",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10041",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10066",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10542",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10586",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10610",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10623",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10634",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10662",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10670",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10682",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10716",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10726",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10756",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10845",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10888",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10909",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:10937",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7185",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7761",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7809",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7845",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7883",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7917",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7935",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7993",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8026",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8039",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8310",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8356",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8380",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8585",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8630",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8658",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8741",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8794",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:8964",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:9009",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:9040",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:9082",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:44",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:45",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:46",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:47",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:50",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:51",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:53",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:54",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:1616",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:1617",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:1621",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "service_scan"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:1625",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "service_scan"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:1627",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:1628",
+      "labels": [
+       "service_scan",
+       "foothold"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:4387",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:4507",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:4641",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:5612",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:6768",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hurstwong.wardbeck.info-access.log.1:6774",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 7,
+     "truth_attack_ips": 1,
+     "flagged_ips": 5,
+     "unknown_flagged_ips": 2
+    },
+    "recall": 1.0,
+    "precision": 0.3333333333333333,
+    "false_positive_rate": 0.2857142857142857,
+    "f1": 0.5,
+    "missed": [],
+    "false_positives": [
+     "172.21.241.181",
+     "172.21.241.225"
+    ],
+    "unknown_flagged": [
+     "blord",
+     "www-data"
+    ],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.132.56.81",
+      "malicious": true
+     },
+     {
+      "ip": "172.21.240.147",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.113",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.181",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.225",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.70",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.88",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS wardbeck/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/wardbeck/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.hurstwong.wardbeck.info",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "mail.hurstwong.wardbeck.info",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/cloud.hurstwong.wardbeck.info-access.log.1",
+      "kind": "access",
+      "events": 9841
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/cloud.hurstwong.wardbeck.info-access.log.2",
+      "kind": "access",
+      "events": 10215
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/cloud.hurstwong.wardbeck.info-access.log.3",
+      "kind": "access",
+      "events": 11468
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/cloud.hurstwong.wardbeck.info-access.log.4",
+      "kind": "access",
+      "events": 9473
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/cloud.hurstwong.wardbeck.info-access.log.5",
+      "kind": "access",
+      "events": 13094
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/mail.hurstwong.wardbeck.info-access.log.1",
+      "kind": "access",
+      "events": 16363
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/mail.hurstwong.wardbeck.info-access.log.2",
+      "kind": "access",
+      "events": 18659
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/mail.hurstwong.wardbeck.info-access.log.3",
+      "kind": "access",
+      "events": 20222
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/mail.hurstwong.wardbeck.info-access.log.4",
+      "kind": "access",
+      "events": 19744
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/mail.hurstwong.wardbeck.info-access.log.5",
+      "kind": "access",
+      "events": 19215
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 1466
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 1586
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 1701
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 1610
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-access.log.5",
+      "kind": "access",
+      "events": 1826
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/cloud.hurstwong.wardbeck.info-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/mail.hurstwong.wardbeck.info-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/apache2/proxy-error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 157246,
+    "parsed_lines": 156499,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "tn": 157246,
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {},
+    "fp_by_ip": {},
+    "tp_by_rule": {},
+    "fp_examples": [],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 9,
+     "truth_attack_ips": 0,
+     "flagged_ips": 0,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "missed": [],
+    "false_positives": [],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.132.56.81",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.240.147",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.113",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.181",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.225",
+      "malicious": false
+     },
+     {
+      "ip": "172.21.241.70",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.98.196",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.98.243",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS wardbeck/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/wardbeck/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4",
+     "other_vhosts_access.log.5"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 9917
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 10287
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 11605
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 9567
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/other_vhosts_access.log.5",
+      "kind": "access",
+      "events": 13232
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wardbeck/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 57741,
+    "parsed_lines": 54620,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "tn": 57741,
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {},
+    "fp_by_ip": {},
+    "tp_by_rule": {},
+    "fp_examples": [],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 2,
+     "truth_attack_ips": 0,
+     "flagged_ips": 0,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": null,
+    "false_positive_rate": 0.0,
+    "f1": null,
+    "missed": [],
+    "false_positives": [],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.132.57.136",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  }
+ }
+}

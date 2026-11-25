@@ -40,7 +40,8 @@ def _yaml_fields(text: str) -> dict:
     status = re.search(r"^status:\s*(\S+)", text, re.M)
     kind = re.search(r"^type:\s*(\S+)", text, re.M)
     data = []
-    for m in re.finditer(r"-\s*data:\s*(\S+)\s*\n\s*sourcetype:\s*(\S+)", text):
+    # data 다음에 source: 줄이 끼어 있는 규칙도 있다(2026-11-25에 찾음: 이 모양 10개가 첫 측정에서 빠졌다)
+    for m in re.finditer(r"-\s*data:\s*(\S+)\s*\n(?:\s*source:\s*\S+\s*\n)?\s*sourcetype:\s*(\S+)", text):
         data.append({"url": m.group(1), "sourcetype": m.group(2)})
     srch = text.split("search:", 1)[-1].split("\nhow_to_implement", 1)[0]
     targets = set()
@@ -74,13 +75,22 @@ def main() -> None:
     ap.add_argument("--sc", required=True, help="security_content 폴더(detections/cloud 포함)")
     ap.add_argument("--cache", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--glob", nargs="+", default=["aws_*.yml"],
+                    help="detections/cloud 안에서 잴 규칙 파일 패턴(기본 aws_*.yml)")
+    ap.add_argument("--skip-measured", help="이미 잰 결과 JSON. 그 안의 규칙 파일은 건너뛴다(처음 보는 것만 재기)")
     a = ap.parse_args()
     cache = Path(a.cache)
     cache.mkdir(parents=True, exist_ok=True)
     commit = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
                             capture_output=True, text=True).stdout.strip()
     rows, seen = [], set()
-    for y in sorted((Path(a.sc) / "detections" / "cloud").glob("aws_*.yml")):
+    skip = set()
+    if a.skip_measured:
+        skip = {r["file"] for r in json.loads(Path(a.skip_measured).read_text(encoding="utf-8"))["rows"]}
+    files = sorted({y for g in a.glob for y in (Path(a.sc) / "detections" / "cloud").glob(g)})
+    for y in files:
+        if y.name in skip:
+            continue
         f = _yaml_fields(y.read_text(encoding="utf-8"))
         ct = [d for d in f["data"] if d["sourcetype"] == "aws:cloudtrail"]
         if not ct:
@@ -111,7 +121,8 @@ def main() -> None:
                                "severity": i.get("severity")} for i in res.get("incident_index", [])]}
         rows.append(row)
         print(f"{len(evs):5d} {present:4d} {','.join(hit_rules) or '-':30.30s} {','.join(row['rules']) or '-':45.45s} {f['name']}")
-    out = {"engine_commit": commit, "source": "splunk/security_content detections/cloud aws_*.yml",
+    out = {"engine_commit": commit, "source": "splunk/security_content detections/cloud " + " ".join(a.glob),
+           "skipped_measured": sorted(skip),
            "n_detections": len(rows), "rows": rows}
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")

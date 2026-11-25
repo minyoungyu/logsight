@@ -1,10 +1,17 @@
-# 변경 기록
+# Changelog
 
-이 프로젝트는 [SemVer](https://semver.org/lang/ko/)를 따른다. 버전 번호는 변경 내용이 정한다.
+이 파일은 [Keep a Changelog 1.1.0](https://keepachangelog.com/ko/1.1.0/) 형식을 따르고, 버전은 [Semantic Versioning 2.0.0](https://semver.org/lang/ko/)을 따른다.
+항목 종류는 Added(추가), Changed(바뀜), Deprecated, Removed(제거), Fixed(고침), Security(보안)를 쓴다. 원래 세부 제목(예: CTF 리허설 오탐)은 굵은 글씨로 남겼다.
 
-## 미출시
+## [Unreleased]
 
-### 추가
+### Added
+
+- 외부 표준 형식 내보내기: `analyze`가 `report.json`·`report.html` 옆에 `findings.ocsf.json`([OCSF](https://schema.ocsf.io) 1.3.0 Detection Finding, class_uid 2004)을 쓴다. Security Lake·Security Hub·SIEM이 읽는 형식이다. LogFinder만의 값(판정, 판정 주체, 성공·실패 건수)은 `unmapped.logfinder`에 둔다(`logsight/ocsf.py`).
+- 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
+- 탐지 문제점 재점검(`docs/탐지_문제점_재점검.md`).
+- 처음 보는 공개 데이터를 개발용·보류용으로 나눠 고치기 전·뒤에 한 번씩 잰 결과(`docs/공개데이터_개발보류_측정.md`). 보류용(AIT harrison·shaw) 공격 단계 9/13 → 11/13, 오탐 줄 121 → 115.
+- 새 공개 데이터 찾기와 측정(`docs/새공개데이터_찾기와_측정.md`, `scripts/public/eval_{invictus,camlds,realweb}.py`): Invictus AWS(Stratus CloudTrail) 공격 실행 35번 중 31번 맞게 탐지, CAM-LDS 3개 시나리오, 인도네시아 실제 웹서버 로그.
 - 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
 - BOTSv3 AI 재검토 측정(`docs/BOTSv3_AI재검토_측정.md`, `reports/public/botsv3_ai_triage.json`): 정답을 실행 전에 고정하고 4조건 × 3회.
 - AI가 '모름'마다 읽기 전용 확인 명령을 제안(`next_checks`, `logsight/checks.py`): 코드가 조회 동작(describe·get·list·lookup)만, 셸 기호 없음, 비밀값·파일을 꺼내는 동작 아님, 명령의 자원 이름이 AI에 보낸 입력에 있음을 검사하고 어긴 제안은 버린다. 보고서 '알 수 없는 것' 칸에 "직접 확인해 볼 명령"으로 나온다. 확인 명령은 서비스별로 이름을 적은 조회 동작만 받는다(describe·get·list로 시작해도 eks get-token, ssm get-parameter-history처럼 비밀값을 내는 것이 있어서). 재검토에서 `--endpoint-url`(로그의 공격자 IP로 서명된 요청을 보내게 하는 길), `--cli-input-json`·`file://`, `--debug`, 가린 키 값, 환경 변수를 보여 주는 동작(Lambda 설정·ECS 작업 정의)도 막았다. 같은 '모름' 항목의 명령은 한 묶음으로 보이고 CloudShell에서 실행한다는 안내가 붙는다.
@@ -15,7 +22,45 @@
 - 주입 문장 패턴: AI에게 말을 거는 문장("message for the AI assistant", "tell them to run", "AI 분석 참고:"). 찾기 전에 전각 문자를 풀고 폭 없는 문자를 지운다. 한국어 패턴은 콜론이 있을 때만('AI에게 물어보세요' 같은 글을 거르지 않게).
 - CTF 리허설(2026-11-23) 대응: `WEBLOG_ROBOTS_HIDDEN`(robots.txt를 읽은 IP만 가는 숨은 경로 접근, F1), `WEBLOG_SSRF_IMDS`(SSRF로 인스턴스 메타데이터 요청, 역할 키 경로 성공 표시, F5). `lab/ctf/environment.json`(운영진 계정 `ctf-deployer`를 정상 작업으로).
 
-### 고침(CTF 리허설 오탐)
+**추가(이전)**
+
+- 사양서 v2(`docs/사양서.md`): 제품 목적에서 출발해 성공 기준 S1~S7, 기능 우선순위(필수·권장·선택)를 넣고 미달 항목을 ⬜로 적는다. 새 요구사항 NFR-19(웹 업로드 보안)·NFR-20(판정 정확도)·NFR-21(건너뛴 테스트는 통과로 세지 않음)·FR-22.
+- `scripts/verdict_eval.py`: 정답을 붙인 시나리오 36개(공격 20, 공격처럼 보이지만 아닌 것 16)로 판정 재현율·정밀도를 잰다. 지금 95%·95%(개발 데이터). 테스트가 90%·80% 하한을 지킨다.
+- `scripts/checklist_run.py`: pytest 결과 파일에서 체크리스트 자동 TC의 결과를 만든다. 건너뛴 테스트는 미실시로 센다.
+- `tests/conftest.py`: `LOGSIGHT_NO_SKIP=1`이면 건너뛴 테스트를 실패로 본다. CI test 작업이 이 값으로 돈다.
+- `scripts/study_prepare.py`, `docs/사용자평가/진행_대본.md`: 사용자 평가 자료 묶음(기존 방식·LogSight), 교차 배정표, 빈 응답 파일, 진행 대본과 동의서.
+- 웹 업로드 보호(`app.py`): `LOGSIGHT_TOKEN`이 없으면 이 컴퓨터에서 온 업로드만 받고, 있으면 토큰(헤더 또는 `?token=`으로 한 번 연 뒤의 쿠키)을 요구한다. 다른 사이트에서 보낸 업로드(Origin·Sec-Fetch-Site)를 거부하고, 업로드 크기 상한을 세 경로(`/analyze`, `/web/scan`, `/api/web/scan`) 모두에, 압축 해제 크기 상한(`LOGSIGHT_MAX_UNZIP_MB`, 기본 1024)을 웹 업로드에 둔다. 모든 화면에 CSP(외부 리소스 차단)·nosniff·프레임 금지 헤더, 분석 결과에 `Cache-Control: no-store`.
+- 서버 권한 상승·계정 생성 탐지(auth.log): `HOST_PRIV_ESC`(웹 서비스 계정의 sudo·su, sudo로 root 셸을 여는 명령 — find -exec, python -c, tar --checkpoint-action 등), `HOST_PRIV_ESC_FAIL`(sudo 거부·su 실패), `HOST_ACCOUNT_CREATED`(useradd, sudo로 한 계정 생성·관리자 그룹 추가). 사후 분석과 웹서버 점검이 같은 코드로 본다. sudo·su 줄은 같은 서버·같은 사용자의 직전 SSH 로그인 IP를 붙여 한 사건으로 묶고, 추정임을 `src_ip_from`에 적는다. 웹서버 점검 수정안에 `WEB_FIX_PRIVESC`(sudo 권한 정리·계정 잠금).
+- `CT_CONSOLE_BRUTE`: AWS 콘솔 로그인 10분 안 실패 5건 이상(IP별·사용자별). 30분 안에 성공이 이어지면 심각도 높음.
+- 사양서(`docs/사양서.md`), 외부 제품 비교(`docs/사양서_외부비교.md`), 사양서 기반 테스트 체크리스트(`docs/테스트_체크리스트.md`), 코드 프리즈 판단(`docs/코드프리즈_판단.md`). `scripts/spec_trace.py`가 요구사항 ↔ 테스트 케이스 ↔ 테스트 코드 추적이 끊기지 않았는지 확인하고 테스트가 이를 강제한다.
+- `tests/test_nfr.py`: 1만 건 처리 시간·메모리와 같은 입력 같은 결과(비기능 요구사항).
+- `scripts/demo_e2e_moto.py`: 가짜 AWS에서 경보 → 대기열 → 로그 주입 → 보고서 → 디스코드 → 자동 격리 예고까지 끝에서 끝까지 실행.
+- `docs/시연_실계정.md`: 실제 AWS 계정에서 EC2 없이 경보 → 디스코드를 보여 주는 시연 절차와 정리 방법.
+- 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
+
+### Changed
+
+- CHANGELOG를 Keep a Changelog 1.1.0 형식(Added·Changed·Fixed·Security 등)으로 정리했다. 내용은 바꾸지 않았다.
+
+- NACL 수정안을 사건 서버가 있는 모든 서브넷에 낸다. 서브넷을 모르고 NACL이 여럿이면 첫 NACL을 고르지 않고 '확인 필요'로 둔다. 같은 종류 수정안이 5개를 넘으면 하나로 묶고, AI 입력의 수정안·목록에 상한을 둔다(서브넷 5,000개에서 AI 입력 59만 자 → 2.3만 자).
+- Flow Logs 점검이 서브넷 단위로 켠 것도 켜진 것으로 본다. 우리 서버 IP는 NACL로 막으라고 하지 않는다.
+- 결과 낱말을 나눔(FR-26): 성공(공격이 목적을 이룸) / 통과(WAF·웹서버가 막지 않음) / 허용(방화벽이 연결을 받음) / 실패·차단. nginx 로그만 근거인 사건에는 WAF 수정안을 내지 않는다.
+- 웹 점검 보고서와 경보 통지의 시각에 한국 시간을 함께 적음(NFR-23). 보고서 첫 화면에 원본 로그 일부가 들어 있다는 안내(NFR-24).
+- 문서·화면·배포 설명의 제품 이름을 LogFinder로 통일(FR-31). 배포된 자원이 쓰는 식별자(`X-LogSight-*` 머리글, `LogSightPrincipalArn` 등)는 그대로.
+- 사양서 v2.2: 위 요구사항을 ✅로, 근거 파일이 없던 "CSIC 0.017%"를 지우고 AIT는 처음 본 데이터(fox 0.18%)로, 제품 평가용 점검(11절) 추가.
+
+### Fixed
+
+- 서버 권한 상승: 웹 서비스 계정이 su로 넘어간 계정의 sudo, sudo로 `/etc/shadow`·`/root/.ssh/` 읽기를 `HOST_PRIV_ESC`로 잡는다(AIT-LDS에서 놓친 것).
+- 파일 공유 앱(Nextcloud·ownCloud WebDAV, 파일 앱, 공유 링크)에서 사용자가 .zip을 내려받은 것을 `WEBLOG_BACKUP_LEAK`로 잡던 오탐.
+- RDS DB 관리자 비밀번호 재설정(`ModifyDBInstance`·`ModifyDBCluster`의 `masterUserPassword`)을 `CT_IAM_PERSISTENCE`로 잡는다.
+- 이름에 trail·log가 없는 CloudTrail 저장 버킷에 만료 수명 주기 규칙을 거는 것을 놓치던 문제(같은 기록의 CreateTrail·버킷 정책으로 저장 버킷을 확인해 `CT_LOGGING_TAMPER`로 잡음).
+- 측정 도구: Splunk 규칙 파일에 `source:` 줄이 있으면 시험 데이터를 건너뛰던 오류(11/3 측정에서 10개가 빠졌음).
+
+- ATT&CK 전술이 틀린 규칙 5개(WEBLOG_SCANNER·WEBLOG_ENUM_404·WEBLOG_ROBOTS_HIDDEN은 reconnaissance, WEBLOG_XSS는 execution, FILE_SUSPICIOUS는 command-and-control). 외부 내보내기는 ATT&CK 전술을 쓰고, 보고서 화면의 단계 이름은 대회 뒤에 고친다.
+
+**고침(CTF 리허설 오탐)**
+
 - `WEBLOG_WEBSHELL_ACCESS`: c=·run= 인자는 값이 명령처럼 생겼을 때만 센다. 상품 분류 `category.php?c=mouse`를 본 정상 사용자 7 IP가 '웹셸 접근 높음'으로 잡혔다(11건 → 3건, 실제 공격자 3 IP만 남음).
 - `WEBLOG_SQLI`: UNION SELECT는 SQL 문맥(따옴표·숫자·괄호·주석, 열 목록·NULL·FROM)이 있을 때만. 검색어 `q=union+select+1` 오탐 제거.
 - `HOST_ACCOUNT_CREATED`: 부팅·패키지 설치 계정(UID 1000의 ec2-user 등 cloud-init 기본 계정, 시스템 UID·nologin의 nginx·apache)을 뺌. `bash -c '… useradd hacker 2>/dev/null'`에서 계정 이름을 `2>/dev/null'`로 읽던 것 고침.
@@ -33,30 +78,6 @@
 - AI로 보내기 직전 사건·이벤트 수·크기·받는 곳과 `--no-ai` 안내(NFR-25), 처리 기록 `logsight_audit.jsonl`(FR-21: 입력 파일 SHA-256, AI 호출, 결과, 격리 승인 근거).
 - `scripts/first_screen_check.py`(NFR-22: 1366×768·390×844에서 결론과 먼저 할 일 1번이 스크롤 없이 보이나), `scripts/fix_eval.py`(S5 수정안 개발 점수).
 
-### 바뀜
-- NACL 수정안을 사건 서버가 있는 모든 서브넷에 낸다. 서브넷을 모르고 NACL이 여럿이면 첫 NACL을 고르지 않고 '확인 필요'로 둔다. 같은 종류 수정안이 5개를 넘으면 하나로 묶고, AI 입력의 수정안·목록에 상한을 둔다(서브넷 5,000개에서 AI 입력 59만 자 → 2.3만 자).
-- Flow Logs 점검이 서브넷 단위로 켠 것도 켜진 것으로 본다. 우리 서버 IP는 NACL로 막으라고 하지 않는다.
-- 결과 낱말을 나눔(FR-26): 성공(공격이 목적을 이룸) / 통과(WAF·웹서버가 막지 않음) / 허용(방화벽이 연결을 받음) / 실패·차단. nginx 로그만 근거인 사건에는 WAF 수정안을 내지 않는다.
-- 웹 점검 보고서와 경보 통지의 시각에 한국 시간을 함께 적음(NFR-23). 보고서 첫 화면에 원본 로그 일부가 들어 있다는 안내(NFR-24).
-- 문서·화면·배포 설명의 제품 이름을 LogFinder로 통일(FR-31). 배포된 자원이 쓰는 식별자(`X-LogSight-*` 머리글, `LogSightPrincipalArn` 등)는 그대로.
-- 사양서 v2.2: 위 요구사항을 ✅로, 근거 파일이 없던 "CSIC 0.017%"를 지우고 AIT는 처음 본 데이터(fox 0.18%)로, 제품 평가용 점검(11절) 추가.
-
-### 추가(이전)
-- 사양서 v2(`docs/사양서.md`): 제품 목적에서 출발해 성공 기준 S1~S7, 기능 우선순위(필수·권장·선택)를 넣고 미달 항목을 ⬜로 적는다. 새 요구사항 NFR-19(웹 업로드 보안)·NFR-20(판정 정확도)·NFR-21(건너뛴 테스트는 통과로 세지 않음)·FR-22.
-- `scripts/verdict_eval.py`: 정답을 붙인 시나리오 36개(공격 20, 공격처럼 보이지만 아닌 것 16)로 판정 재현율·정밀도를 잰다. 지금 95%·95%(개발 데이터). 테스트가 90%·80% 하한을 지킨다.
-- `scripts/checklist_run.py`: pytest 결과 파일에서 체크리스트 자동 TC의 결과를 만든다. 건너뛴 테스트는 미실시로 센다.
-- `tests/conftest.py`: `LOGSIGHT_NO_SKIP=1`이면 건너뛴 테스트를 실패로 본다. CI test 작업이 이 값으로 돈다.
-- `scripts/study_prepare.py`, `docs/사용자평가/진행_대본.md`: 사용자 평가 자료 묶음(기존 방식·LogSight), 교차 배정표, 빈 응답 파일, 진행 대본과 동의서.
-- 웹 업로드 보호(`app.py`): `LOGSIGHT_TOKEN`이 없으면 이 컴퓨터에서 온 업로드만 받고, 있으면 토큰(헤더 또는 `?token=`으로 한 번 연 뒤의 쿠키)을 요구한다. 다른 사이트에서 보낸 업로드(Origin·Sec-Fetch-Site)를 거부하고, 업로드 크기 상한을 세 경로(`/analyze`, `/web/scan`, `/api/web/scan`) 모두에, 압축 해제 크기 상한(`LOGSIGHT_MAX_UNZIP_MB`, 기본 1024)을 웹 업로드에 둔다. 모든 화면에 CSP(외부 리소스 차단)·nosniff·프레임 금지 헤더, 분석 결과에 `Cache-Control: no-store`.
-- 서버 권한 상승·계정 생성 탐지(auth.log): `HOST_PRIV_ESC`(웹 서비스 계정의 sudo·su, sudo로 root 셸을 여는 명령 — find -exec, python -c, tar --checkpoint-action 등), `HOST_PRIV_ESC_FAIL`(sudo 거부·su 실패), `HOST_ACCOUNT_CREATED`(useradd, sudo로 한 계정 생성·관리자 그룹 추가). 사후 분석과 웹서버 점검이 같은 코드로 본다. sudo·su 줄은 같은 서버·같은 사용자의 직전 SSH 로그인 IP를 붙여 한 사건으로 묶고, 추정임을 `src_ip_from`에 적는다. 웹서버 점검 수정안에 `WEB_FIX_PRIVESC`(sudo 권한 정리·계정 잠금).
-- `CT_CONSOLE_BRUTE`: AWS 콘솔 로그인 10분 안 실패 5건 이상(IP별·사용자별). 30분 안에 성공이 이어지면 심각도 높음.
-- 사양서(`docs/사양서.md`), 외부 제품 비교(`docs/사양서_외부비교.md`), 사양서 기반 테스트 체크리스트(`docs/테스트_체크리스트.md`), 코드 프리즈 판단(`docs/코드프리즈_판단.md`). `scripts/spec_trace.py`가 요구사항 ↔ 테스트 케이스 ↔ 테스트 코드 추적이 끊기지 않았는지 확인하고 테스트가 이를 강제한다.
-- `tests/test_nfr.py`: 1만 건 처리 시간·메모리와 같은 입력 같은 결과(비기능 요구사항).
-- `scripts/demo_e2e_moto.py`: 가짜 AWS에서 경보 → 대기열 → 로그 주입 → 보고서 → 디스코드 → 자동 격리 예고까지 끝에서 끝까지 실행.
-- `docs/시연_실계정.md`: 실제 AWS 계정에서 EC2 없이 경보 → 디스코드를 보여 주는 시연 절차와 정리 방법.
-- 실제 ufw 로그 표본(`tests/fixtures/ufw/`, low·medium·full)과 재현 스크립트 `lab/ufw/run.sh`, 결과 `docs/ufw_실측.md`.
-
-### 고침
 - AI 재검토에 보내지 않은 사건(점수순 상위 30개 밖)이 규칙 판정 대신 '판단 불가'로 바뀌던 것: 규칙 판정을 그대로 쓴다(BOTSv3 측정에서 23개가 바뀌어 있었다).
 - README의 "근거가 없으면 그 문장을 버린다"를 실제 동작(근거를 떼고 '확인 안 된 근거'로 표시)에 맞게 고침.
 - GuardDuty 결과만 있는 사건을 '보이는 시도 0건은 모두 막히거나 실패, 급하지 않을 수 있습니다'로 적던 것: GuardDuty 결과에는 성공 여부가 없으므로 다른 로그로 확인하라고 적는다(심각도 7 이상이면 확신도 중간). 한 사건에 GuardDuty 결과가 여럿이면 단계마다 첫 결과의 풀이가 반복되던 것도 고침.
@@ -99,55 +120,52 @@
 - VPC Flow 사용자 지정 형식을 파일의 필드 이름 머리줄 순서대로 읽는다. 머리줄이 없으면 기본 형식(14칸)으로 보되, 값이 맞지 않는 줄은 시각 1970년·IP가 아닌 출발지로 잘못 만들지 않고 못 읽은 줄로 센다. `vpc-id`·`subnet-id`·`instance-id`·`pkt-srcaddr` 등은 `extra`에 남긴다(인스턴스 ID는 연결고리로 쓰지 않음).
 - 접속 로그·VPC Flow에서 형식이 맞지 않아 버린 줄 수를 파일별 처리 결과(`files[].unparsed`)와 보고서의 "이렇게 해석했습니다"에 표시한다. 전에는 조용히 버려졌다.
 
-## 0.4.2 (시험판) - 2026-11-06
+## [0.4.2] - 2026-11-06 (시험판)
 
 보고서와 웹 화면 디자인을 바꾼 버전. 분석 결과(문장·숫자·근거·명령)와 JSON 형식은 0.4.1과 같다.
 
-### 바뀜(화면)
+### Changed
+
+**바뀜(화면)**
+
 - HTML 보고서를 사고 보고서 형식으로 바꿨다: 문서번호·분석 대상 표, 번호 붙은 장(요약 → 먼저 할 일 → 로그 범위 → 사건), 괘선 표, 근거는 `↳ 파일:줄`, 끝에 검토자·승인란. 인쇄·PDF에서 색 유지, 두 번째 사건부터 새 쪽. 다크 모드는 없앴다(보고서는 항상 밝게).
 - 웹서버 점검 보고서(`webreport.py`)도 같은 형식과 CSS를 쓴다.
 - 웹 앱 첫 화면·웹서버 점검 화면을 어두운 관제 콘솔형으로 바꾸고, 앱에서 연 보고서·비교 화면 위에 같은 상단 막대를 붙였다.
 - 화면에 보이는 이름을 팀 이름 LogFinder로 바꿨다(보고서 머리말·서명란·바닥글, 웹 앱 제목, 비교 화면, Discord·Slack·이메일 통지). 패키지·명령어(`logsight`)·폴더 이름은 그대로다.
 - 보고서 내용(문장·숫자·근거·명령)과 JSON 형식은 바뀌지 않았다.
 
-## 0.4.1 (시험판) - 2026-11-06
+## [0.4.1] - 2026-11-06 (시험판)
 
 0.4.0의 설정 점검 수정안 오류를 고친 버전. 특히 WAF 수정 명령이 기본 동작이 차단인 웹 방화벽을 열어 버릴 수 있었으니 0.4.0 대신 이 버전을 쓴다.
 
-### 추가
+### Added
+
 - SQL 인젝션 성공 신호를 코드가 판단한다(`detect.sqli_success_signal`). 웹서버·ALB 로그의 응답 크기를 읽어, 같은 경로의 평소 응답과 같으면 "성공 근거 없음", 크게 다르면 "성공 의심", 크기가 없으면 "판단 불가"로 `WEB_SQLI_PATTERN` 설명에 붙인다. AI 판정·설명 프롬프트에는 이 판단을 따르고 2xx만으로 성공이라 쓰지 말라고 적었다.
 
-### 고침(설정 점검)
+### Fixed
+
+**고침(설정 점검)**
+
 - 깨진 environment.json이나 빠진 필드 때문에 분석 전체가 멈추던 문제: 이제 수정안만 건너뛰고 이유를 보고서 '가정'에 적는다.
 - 포트 범위·IPv6·모든 프로토콜 규칙의 보안그룹 revoke 명령이 원래 규칙과 달라 실패하던 문제: `--ip-permissions`로 정확히 같은 규칙을 지우고, 범위가 넓으면 함께 닫히는 포트를 경고한다.
 - 사건 서버에 붙지 않은 보안그룹까지 원인으로 지목하던 문제, NACL을 서버 서브넷과 무관하게 첫 번째 것으로 고르던 문제. `collect environment`가 인스턴스 서브넷을 함께 모은다.
 - WAF 수정 명령이 기본 동작을 `Allow`로 고정해, 기본이 Block인 ACL을 열어 버릴 수 있던 문제.
 - IMDS 설정을 모를 때 "optional"로 단정하던 표시.
 
-## 0.4.0 (시험판) - 2026-11-06
+## [0.4.0] - 2026-11-06 (시험판)
 
 0.3.0 이후 '미출시'에 쌓인 경보 연동·통지·자동 격리·우리 팀 알아보기 등도 이 버전에 들어간다(아래 '추가(제품)' 목록).
 
-### 보안
-- AI 재검토를 로그 속 주입 문장으로부터 보호(`logsight/guard.py`). 공격자가 쓸 수 있는 값(User-Agent, 요청 주소, API 파라미터, SSH 로그인 이름)을 `untrusted` 아래로 옮겨 보내고, 그 안의 지시는 따르지 말라고 시스템 문구에 적었다. 판정·무시를 요구하는 문장을 찾으면 보고서에 "로그에 AI를 속이려는 문장"으로 표시하고, AI가 낮춘 판정을 공격으로 되돌린다. 규칙이 공격으로 본 사건을 AI가 낮추면 "규칙과 의견 다름 · 확인 필요"로 표시하고 '판단 불가'보다 아래로 내리지 않는다. 시키는 대로 하는 가짜 모델로 끝에서 끝까지 시험(`tests/test_guard.py`).
-- CI에 비밀값 검사(gitleaks)를 더했다.
+### Added
 
-### 추가
 - 탐지 공백 보강(개발 데이터): 새 규칙 5개(CT_SECRET_ACCESS 비밀값 대량 조회, CT_INSTANCE_EXEC 인스턴스 원격 명령·접속, CT_SERVERLESS_CHANGE Lambda·SageMaker 변경, CT_DATA_DESTRUCTION 삭제·랜섬웨어·복구 수단 제거, CT_ACCOUNT_SECURITY MFA·비밀번호 정책 약화)와 기존 규칙 5개 범위 확장(로그 끄기, NACL 개방, 다른 계정 공유, IAM 지속성, 목록 조회). Splunk 표본 16→26(개발 데이터), 기존 16개 유지. 운영 작업과 같은 모양의 규칙만 걸린 사건은 '판단 불가'로 둔다. 기록 `docs/탐지공백_보강.md`.
 - 회귀 시험: 처음 보는 데이터(Splunk attack_data)에서 한 번 맞게 잡은 16개를 계속 잡는지(`scripts/public/regress_splunk.py`, 기준 파일은 다시 만들지 않음), 저장소 샘플 결과 고정(`scripts/regress_samples.py`, `tests/regression/samples.json`).
 - 시험판 배포: `pyproject.toml`(`pip install`, `logsight` 명령), `logsight --version`, 태그를 올리면 설치 파일·샘플 보고서·Docker 이미지를 만드는 `.github/workflows/release.yml`. 시험판 안내 `docs/사용자평가/시험판_안내.md`, 이슈 양식 "시험판 의견".
 - Stratus Red Team 공격 재현 준비(`lab/aws/stratus/`): 46개 기법의 예상(잡음 15, 놓침 28, 기준에 따라 3)을 실행 전에 고정하고, 실행·채점 스크립트를 더했다. 실행은 0회.
 - CI: pytest와 커버리지(88%), ruff.
 
-### 고침
-- CI가 unittest만 돌려 함수 형식 시험 9개(`test_triage.py`, `test_gongbang_convert.py`)를 건너뛰고 있었다. 그중 1개는 깨져 있었다(파이프라인 연결 시험). 고치고 pytest로 바꿨다.
-- 쓰지 않는 import·변수 정리(ruff).
-- Lambda 이벤트 이름의 버전 꼬리(`UpdateFunctionCode20150331v2`)를 떼어 규칙이 알아보게 했다.
-- `team.py`의 `datetime.utcnow()` 경고 제거.
-- Docker 이미지 빌드 실패: Dockerfile이 측정 결과 폴더(`reports/`)의 공방전 비교 화면 파일을 복사하려 했지만, 이미지에는 측정 데이터를 넣지 않는 규칙(`.dockerignore`)이 막고 있었다. 복사를 빼고(데모의 `/compare`는 파일이 없다고 안내), 시험이 파일 단위 복사도 잡게 했다.
-- CI: 비공개 저장소의 macOS 실행 시간 한도를 넘어 macOS 작업이 시작되지 못하고 실패로 끝났다. PR마다 Ubuntu·Windows만 돌고 macOS는 직접 실행할 때만 돌게 했다. 브랜치 push와 PR이 같은 커밋을 두 번 돌던 것도 없앴다.
+**추가(제품)**
 
-### 추가(제품)
 - 자동 격리·AI 재검토 보강: 탈취된 인스턴스 역할의 세션을 무효화하는 수정안(`IAM_ROLE_SESSION_REVOKE`, 사람이 실행, 되돌리기 포함). 자동 격리 마감 기본값 5분 → 10분(늦게 도착하는 로그까지 보고 판단). AI가 코드 점검 밖에서 낸 변경 제안은 '검증 안 된 제안'으로 따로 표시. `on-alert --respond`에 집행 경로가 없으면 경고.
 - 경보 연동(`logsight/alert.py`, `logsight watch`, `logsight on-alert`): GuardDuty 결과·CloudWatch 경보·위험 API 호출(EventBridge)을 SQS 대기열로 받아, 경보 시각 앞뒤의 로컬·S3 로그로 분석을 자동 실행하고 `reports/alerts/<시각>_<종류>_<id>/`에 보고서와 통지용 요약(summary.txt)을 남긴다. 등급 기준·중복 경보 무시(cooldown)·실패 시 재시도(DLQ)·보고서 뒤 실행할 통지 명령(`--notify-cmd`) 지원. 배포 템플릿 `deploy/aws/logsight-alerts.yaml`, 설명 `docs/경보_연동.md`. AWS 설정은 바꾸지 않는다(읽기만).
 - 우리 팀 알아보기(`logsight/team.py`, `logsight team`, `--team`): 사람 계정·콘솔 작업·오래 활동·수상한 모습 없음을 모두 만족하는 계정을 우리 팀 후보로 제안하고, 사람이 확인한 계정의 작업만 공격 판정에서 뺀다. 보고서에 후보 카드. 공방전(개발 데이터) 판정 4/7 → 6/7, 처음 보는 Splunk 표본 44개에서 공격자를 후보로 낸 경우 0. 측정 `docs/우리팀_알아보기_측정.md`.
@@ -172,7 +190,8 @@
 - 공격 흐름 그림(`logsight/graph.py`): 사건마다, 그리고 같은 공격 묶음마다 출발지 → 들어온 곳 → 쓴 권한 → AWS 서비스를 번호 붙은 선으로 그리고, 번호별 시각·결과·근거 로그 표를 붙인다. 선은 근거 이벤트로만 만들고, 그린 뒤 모든 이벤트가 어느 선에 들어갔는지 다시 대조해 결과를 그림 아래에 적는다. GuardDuty 결과는 선이 아니라 해당 서버·역할에 붙는 표시다. 서버와 역할 사이 점선은 CloudTrail 세션 이름이나 인스턴스 ID가 그 서버일 때만 그린다.
 - AI 재검토에 로그 범위 요약(`coverage`)을 함께 보낸다. 로그 종류·기간, 빠진 로그 종류, S3 객체 호출 수, 탈취 의심 키의 전체 호출 내역이 들어 있어 '로그에 없음'과 '일어나지 않음'을 구별하게 한다.
 
-### 변경
+### Changed
+
 - EventBridge로 받은 GuardDuty 결과(camelCase 키)도 읽는다. auth.log의 `Invalid user` 줄을 SSH 실패로 센다.
 - VPC 흐름에서 서버 응답(서비스 포트 → 임시 포트)은 포트 스캔으로 세지 않는다.
 - 규칙 판정: 인터넷 스캐너가 관리 포트를 두드린 것만 있는 사건은 '위험 설정'으로, 정상 작업 목록 계정의 위험한 설정 변경은 '정상' 대신 '위험 설정'으로, 목록 계정이라도 키 유출 징후(권한 거부 폭주·여러 IP)가 있으면 '판단 불가'로 둔다. 공방전 채점 점수는 그대로다.
@@ -183,15 +202,29 @@
 - 웹 판정: 약한 성공 신호(웹셸 경로 접근, 큰 응답, 관리자 페이지 접근) 하나만으로는 "침해 가능성 높음"으로 올리지 않는다. 공격 시도나 다른 성공 신호가 같은 사건에 있어야 한다.
 - 웹 로그인 무차별 대입: 로그인 경로를 따로 적지 않았으면 `login`이 든 관리자 경로만 앞부분으로 보고, 나머지 관리자 경로는 정확히 같을 때만 센다.
 
-### 수정
+### Fixed
+
+- CI가 unittest만 돌려 함수 형식 시험 9개(`test_triage.py`, `test_gongbang_convert.py`)를 건너뛰고 있었다. 그중 1개는 깨져 있었다(파이프라인 연결 시험). 고치고 pytest로 바꿨다.
+- 쓰지 않는 import·변수 정리(ruff).
+- Lambda 이벤트 이름의 버전 꼬리(`UpdateFunctionCode20150331v2`)를 떼어 규칙이 알아보게 했다.
+- `team.py`의 `datetime.utcnow()` 경고 제거.
+- Docker 이미지 빌드 실패: Dockerfile이 측정 결과 폴더(`reports/`)의 공방전 비교 화면 파일을 복사하려 했지만, 이미지에는 측정 데이터를 넣지 않는 규칙(`.dockerignore`)이 막고 있었다. 복사를 빼고(데모의 `/compare`는 파일이 없다고 안내), 시험이 파일 단위 복사도 잡게 했다.
+- CI: 비공개 저장소의 macOS 실행 시간 한도를 넘어 macOS 작업이 시작되지 못하고 실패로 끝났다. PR마다 Ubuntu·Windows만 돌고 macOS는 직접 실행할 때만 돌게 했다. 브랜치 push와 PR이 같은 커밋을 두 번 돌던 것도 없앴다.
+
 - ALB 상태 코드 이름을 `http_status`로 바꾼 뒤 API 객체 번호 탐색 규칙(`WEB_OBJECT_ENUM`)이 동작하지 않던 문제.
 - 해시 같은 값의 `c=` 인자와 스크립트가 아닌 경로를 웹셸 명령으로 보던 오탐.
 - `/wp-content/uploads/`처럼 경로 중간에 있는 업로드 폴더의 스크립트 실행을 놓치던 문제.
 - base64로 감춘 셸 명령을 놓치던 문제.
 
-## 0.3.0
+### Security
 
-### 추가
+- AI 재검토를 로그 속 주입 문장으로부터 보호(`logsight/guard.py`). 공격자가 쓸 수 있는 값(User-Agent, 요청 주소, API 파라미터, SSH 로그인 이름)을 `untrusted` 아래로 옮겨 보내고, 그 안의 지시는 따르지 말라고 시스템 문구에 적었다. 판정·무시를 요구하는 문장을 찾으면 보고서에 "로그에 AI를 속이려는 문장"으로 표시하고, AI가 낮춘 판정을 공격으로 되돌린다. 규칙이 공격으로 본 사건을 AI가 낮추면 "규칙과 의견 다름 · 확인 필요"로 표시하고 '판단 불가'보다 아래로 내리지 않는다. 시키는 대로 하는 가짜 모델로 끝에서 끝까지 시험(`tests/test_guard.py`).
+- CI에 비밀값 검사(gitleaks)를 더했다.
+
+## 0.3.0 (태그 없음)
+
+### Added
+
 - 웹서버 침해 판단 엔진(`logsight scan`): nginx·Apache 접속·오류 로그와 인증 로그, 웹 루트 파일 점검.
 - 판정(침해 확인 / 침해 가능성 높음 / 의심 / 근거 없음)과 사건별 공격 흐름, 근거 로그 위치.
 - 비숙련자용 요약 카드(`logsight/web/layman.py`)와 숙련자용 상세 보고서(`logsight/web/expert.py`): 타임라인, IOC, ATT&CK 매핑, 차단 규칙(nginx·iptables·ufw). 차단 규칙은 자동 적용하지 않는다.
@@ -199,18 +232,28 @@
 - 공개 데모 모드(`LOGSIGHT_DEMO=1`): 업로드·API 문서·AI 호출을 끈다.
 - `Makefile`(`make test`, `make smoke`, `make run`).
 
-### 변경
+### Changed
+
 - 없음. 기존 AWS 로그 분석(`logsight analyze`)의 출력은 웹 모듈 추가 전과 같음을 회귀 테스트로 확인했다(`tests/test_regression.py`).
 
-### 수정
-- 없음.
+**호환성 주의**
 
-### 제거
-- 없음.
-
-### 호환성 주의
 - 없음. 새 명령과 새 API만 추가되었고 기존 명령·출력 형식은 그대로다.
 
-## 0.2.0 (태그 `v0.2.0`)
+### Removed
+
+- 없음.
+
+### Fixed
+
+- 없음.
+
+## [0.2.0]
 
 - AWS 로그 분석(CloudTrail, VPC Flow Logs, WAF, ALB, SSH 인증 로그), 규칙 탐지, 사건 묶기, 설정 점검, 보고서.
+
+[Unreleased]: https://github.com/minyoungyu/logsight/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/minyoungyu/logsight/releases/tag/v0.4.2
+[0.4.1]: https://github.com/minyoungyu/logsight/releases/tag/v0.4.1
+[0.4.0]: https://github.com/minyoungyu/logsight/releases/tag/v0.4.0
+[0.2.0]: https://github.com/minyoungyu/logsight/releases/tag/v0.2.0

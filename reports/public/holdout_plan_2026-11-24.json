@@ -1,0 +1,14 @@
+{
+ "seed": "logfinder-holdout-2026-11-25",
+ "dev": [
+  "wardbeck",
+  "wilson"
+ ],
+ "holdout": [
+  "harrison",
+  "shaw"
+ ],
+ "decided_at": "2026-11-24T18:00Z",
+ "engine_commit": "0c383aa",
+ "rule": "holdout은 규칙을 고치는 동안 결과를 보지 않는다. 고치기 전(0c383aa)과 고친 뒤 각각 한 번씩만 잰다."
+}

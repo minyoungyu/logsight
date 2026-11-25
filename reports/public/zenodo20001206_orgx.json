@@ -1,0 +1,36 @@
+{
+ "events": 219154,
+ "sources": {
+  "access": 213182,
+  "weberror": 5969,
+  "auth": 3
+ },
+ "flagged_events": 1671,
+ "findings": 52,
+ "by_rule": {
+  "WEBLOG_UPLOAD_EXEC": 48,
+  "WEBLOG_SQLI": 174,
+  "WEBLOG_TRAVERSAL": 286,
+  "WEBLOG_XSS": 22,
+  "WEBLOG_CMD_INJECTION": 51,
+  "WEBLOG_CSRF_SUSPECT": 7,
+  "WEBLOG_RFI": 14,
+  "WEBLOG_EXPLOIT_PROBE": 2,
+  "WEBLOG_SENSITIVE_FILE": 11,
+  "WEBLOG_IDOR_ENUM": 100,
+  "WEBLOG_ENUM_404": 1182
+ },
+ "keys_per_rule": {
+  "WEBLOG_UPLOAD_EXEC": 1,
+  "WEBLOG_SQLI": 1,
+  "WEBLOG_TRAVERSAL": 1,
+  "WEBLOG_XSS": 1,
+  "WEBLOG_CMD_INJECTION": 1,
+  "WEBLOG_CSRF_SUSPECT": 1,
+  "WEBLOG_RFI": 1,
+  "WEBLOG_EXPLOIT_PROBE": 1,
+  "WEBLOG_SENSITIVE_FILE": 1,
+  "WEBLOG_IDOR_ENUM": 1,
+  "WEBLOG_ENUM_404": 1
+ }
+}

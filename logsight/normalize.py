@@ -871,6 +871,14 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     if action == "s3:PutBucketLifecycle" or action == "s3:PutBucketLifecycleConfiguration":
         if _LOG_BUCKET.search(str(params.get("bucketName", ""))):
             flags.append("log_bucket_expire")
+        elif "Expiration" in txt and params.get("bucketName"):
+            # 이름으로는 로그 버킷인지 모른다. 같은 기록 안에서 CloudTrail 저장 버킷으로 확인되면 detect가 잡는다
+            flags.append(f"expire_bucket:{params['bucketName']}")
+    # CloudTrail이 로그를 쓰는 버킷(추적 생성·변경, 또는 cloudtrail.amazonaws.com에 쓰기를 허용하는 버킷 정책)
+    if action in ("cloudtrail:CreateTrail", "cloudtrail:UpdateTrail") and params.get("s3BucketName"):
+        flags.append(f"trail_bucket:{params['s3BucketName']}")
+    if action == "s3:PutBucketPolicy" and "cloudtrail.amazonaws.com" in txt and params.get("bucketName"):
+        flags.append(f"trail_bucket:{params['bucketName']}")
     if action in ("ec2:CreateNetworkAclEntry", "ec2:ReplaceNetworkAclEntry") \
             and "0.0.0.0/0" in txt and re.search(r'"ruleAction"\s*:\s*"allow"', txt) \
             and not re.search(r'"egress"\s*:\s*true', txt):
@@ -878,6 +886,8 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     if action in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") \
             and re.search(r'"skipFinalSnapshot"\s*:\s*true', txt):
         flags.append("no_final_snapshot")  # 마지막 스냅샷 없이 지움: 되살릴 수 없다
+    if action in ("rds:ModifyDBInstance", "rds:ModifyDBCluster") and '"masterUserPassword"' in txt:
+        flags.append("db_master_password")  # DB 관리자 비밀번호를 새로 정함: 탈취한 키로 DB를 여는 수법
     if action in ("ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath") \
             and re.search(r'"withDecryption"\s*:\s*true', txt):
         flags.append("decrypt")

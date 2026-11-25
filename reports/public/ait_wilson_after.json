@@ -1,0 +1,1436 @@
+{
+ "dataset": "AIT-LDS v2.0",
+ "doi": "10.5281/zenodo.5789064",
+ "license": "CC BY-NC-SA 4.0",
+ "testbed": "wilson",
+ "hosts": {
+  "intranet_server": {
+   "profile": {
+    "name": "AIT-LDS wilson/intranet_server",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/wilson/gather/intranet_server/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "error.log.6",
+     "intranet.hallbrown.wilson.com",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-access.log.1",
+      "kind": "access",
+      "events": 5443
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-access.log.2",
+      "kind": "access",
+      "events": 434598
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-access.log.3",
+      "kind": "access",
+      "events": 5278
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-access.log.4",
+      "kind": "access",
+      "events": 6464
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-access.log.5",
+      "kind": "access",
+      "events": 4733
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-access.log.6",
+      "kind": "access",
+      "events": 7357
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/error.log.6",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-error.log.2",
+      "kind": "weberror",
+      "events": 1337
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-error.log.3",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/apache2/intranet.hallbrown.wilson.com-error.log.4",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/auth.log",
+      "kind": "auth",
+      "events": 5
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/intranet_server/logs/auth.log.1",
+      "kind": "auth",
+      "events": 6
+     }
+    ],
+    "lines": 470026,
+    "parsed_lines": 465242,
+    "attack_lines": 429465,
+    "tp": 427852,
+    "fn": 1613,
+    "fp": 178,
+    "tn": 40383,
+    "recall": 0.9962441642508703,
+    "precision": 0.9995841412985071,
+    "false_positive_rate": 0.004388451961243559,
+    "f1": 0.9979113580837207,
+    "steps": {
+     "service_scan": {
+      "lines": 12,
+      "flagged": 6,
+      "line_recall": 0.5,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER"
+      ],
+      "parsed": 12
+     },
+     "dirb": {
+      "lines": 426178,
+      "flagged": 424600,
+      "line_recall": 0.996297321776347,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_SENSITIVE_FILE",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 426178
+     },
+     "wpscan": {
+      "lines": 3252,
+      "flagged": 3234,
+      "line_recall": 0.9944649446494465,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_ENUM_404",
+       "WEBLOG_IDOR_ENUM",
+       "WEBLOG_SCANNER",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 3252
+     },
+     "webshell_upload": {
+      "lines": 3,
+      "flagged": 0,
+      "line_recall": 0.0,
+      "step_detected": false,
+      "rules": [],
+      "parsed": 3
+     },
+     "webshell_cmd": {
+      "lines": 8,
+      "flagged": 8,
+      "line_recall": 1.0,
+      "step_detected": true,
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_LARGE_EXFIL",
+       "WEBLOG_UPLOAD_EXEC"
+      ],
+      "parsed": 8
+     },
+     "attacker_change_user": {
+      "lines": 5,
+      "flagged": 1,
+      "line_recall": 0.2,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 1
+     },
+     "escalated_command": {
+      "lines": 8,
+      "flagged": 3,
+      "line_recall": 0.375,
+      "step_detected": true,
+      "rules": [
+       "HOST_PRIV_ESC"
+      ],
+      "parsed": 3
+     }
+    },
+    "fp_by_rule": {
+     "WEBLOG_ADMIN_ACCESS": 148,
+     "WEBLOG_UPLOAD_EXEC": 28,
+     "WEBLOG_LARGE_EXFIL": 9,
+     "WEBLOG_ENUM_404": 2,
+     "WEBLOG_CMD_INJECTION": 1
+    },
+    "fp_by_ip": {
+     "10.182.193.78": 94,
+     "172.26.241.140": 74,
+     "172.26.242.84": 10
+    },
+    "tp_by_rule": {
+     "WEBLOG_ENUM_404": 427739,
+     "WEBLOG_IDOR_ENUM": 21098,
+     "WEBLOG_SCANNER": 3240,
+     "WEBLOG_SENSITIVE_FILE": 276,
+     "WEBLOG_ADMIN_ACCESS": 41,
+     "WEBLOG_UPLOAD_EXEC": 19,
+     "WEBLOG_LARGE_EXFIL": 12,
+     "WEBLOG_AUTH_BRUTE": 10,
+     "WEBLOG_CMD_INJECTION": 7,
+     "HOST_PRIV_ESC": 4
+    },
+    "fp_examples": [
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1022",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:105",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1100",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1105",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1136",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1161",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1173",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1180",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1213",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1225",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:128",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1290",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1334",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1364",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1391",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1419",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:1441",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:148",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2477",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2520",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2560",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2606",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2634",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:270",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2926",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2970",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:2992",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3001",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3028",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3038",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3075",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS",
+       "WEBLOG_LARGE_EXFIL"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:316",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3161",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3206",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3293",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:33",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3327",
+      "rules": [
+       "WEBLOG_UPLOAD_EXEC"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3386",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3524",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.1:3531",
+      "rules": [
+       "WEBLOG_ADMIN_ACCESS"
+      ]
+     }
+    ],
+    "fn_examples": [
+     {
+      "ref": "auth.log:188",
+      "labels": [
+       "attacker_change_user",
+       "escalate",
+       "escalated_command",
+       "escalated_sudo_command"
+      ]
+     },
+     {
+      "ref": "auth.log:189",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:190",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:191",
+      "labels": [
+       "attacker_change_user",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:194",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:195",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:197",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "auth.log:198",
+      "labels": [
+       "escalated_command",
+       "escalated_sudo_command",
+       "escalated_sudo_session",
+       "escalate"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:10551",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:108207",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:10843",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:110040",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:111018",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:111294",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:113485",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:114361",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:116112",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:116223",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:116246",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     },
+     {
+      "ref": "intranet.hallbrown.wilson.com-access.log.2:116441",
+      "labels": [
+       "attacker_http",
+       "foothold",
+       "dirb"
+      ]
+     }
+    ]
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 1,
+     "detected": 1,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 8,
+     "truth_attack_ips": 1,
+     "flagged_ips": 5,
+     "unknown_flagged_ips": 2
+    },
+    "recall": 1.0,
+    "precision": 0.3333333333333333,
+    "false_positive_rate": 0.25,
+    "f1": 0.5,
+    "missed": [],
+    "false_positives": [
+     "172.26.241.140",
+     "172.26.242.84"
+    ],
+    "unknown_flagged": [
+     "jwilkinson",
+     "www-data"
+    ],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.182.193.78",
+      "malicious": true
+     },
+     {
+      "ip": "172.26.240.180",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.241.140",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.241.183",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.242.84",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.242.89",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.243.167",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.243.99",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "breached"
+   }
+  },
+  "webserver": {
+   "profile": {
+    "name": "AIT-LDS wilson/webserver",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/wilson/gather/webserver/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/wilson/gather/webserver/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/wilson/gather/webserver/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "cloud.hallbrown.wilson.com",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "error.log.6",
+     "mail.hallbrown.wilson.com",
+     "other_vhosts_access.log"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-access.log.1",
+      "kind": "access",
+      "events": 18204
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-access.log.2",
+      "kind": "access",
+      "events": 19230
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-access.log.3",
+      "kind": "access",
+      "events": 18646
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-access.log.4",
+      "kind": "access",
+      "events": 17500
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-access.log.5",
+      "kind": "access",
+      "events": 14502
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-access.log.6",
+      "kind": "access",
+      "events": 19202
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-access.log.1",
+      "kind": "access",
+      "events": 20363
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-access.log.2",
+      "kind": "access",
+      "events": 19711
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-access.log.3",
+      "kind": "access",
+      "events": 24045
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-access.log.4",
+      "kind": "access",
+      "events": 22341
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-access.log.5",
+      "kind": "access",
+      "events": 22633
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-access.log.6",
+      "kind": "access",
+      "events": 23679
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/other_vhosts_access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-access.log.1",
+      "kind": "access",
+      "events": 2733
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-access.log.2",
+      "kind": "access",
+      "events": 2512
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-access.log.3",
+      "kind": "access",
+      "events": 2799
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-access.log.4",
+      "kind": "access",
+      "events": 2598
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-access.log.5",
+      "kind": "access",
+      "events": 2435
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-access.log.6",
+      "kind": "access",
+      "events": 2700
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/cloud.hallbrown.wilson.com-error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/error.log.6",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/mail.hallbrown.wilson.com-error.log",
+      "kind": "weberror",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-error.log.1",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-error.log.2",
+      "kind": "weberror",
+      "events": 25
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-error.log.3",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-error.log.4",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/apache2/proxy-error.log.5",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/webserver/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 256775,
+    "parsed_lines": 255879,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 12,
+    "tn": 256763,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 4.673352156557297e-05,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_SCANNER": 12
+    },
+    "fp_by_ip": {
+     "10.182.193.78": 6,
+     "192.168.226.71": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "proxy-access.log.2:1044",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1045",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1046",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1047",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1048",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1049",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1050",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1053",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1056",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1057",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1058",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "proxy-access.log.2:1060",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 12,
+     "truth_attack_ips": 0,
+     "flagged_ips": 2,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.16666666666666666,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "10.182.193.78",
+     "192.168.226.71"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.182.193.78",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.240.180",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.241.140",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.241.183",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.242.84",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.242.89",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.243.237",
+      "malicious": false
+     },
+     {
+      "ip": "172.26.243.99",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.224.189",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.224.45",
+      "malicious": false
+     },
+     {
+      "ip": "192.168.226.71",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  },
+  "cloud_share": {
+   "profile": {
+    "name": "AIT-LDS wilson/cloud_share",
+    "stack": "",
+    "webroot": null,
+    "log_paths": {
+     "access": [
+      "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/*access.log*"
+     ],
+     "weberror": [
+      "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/*error.log*"
+     ],
+     "auth": [
+      "<AIT-LDS>/wilson/gather/cloud_share/logs/auth.log*"
+     ]
+    },
+    "trusted_ips": [],
+    "admin_paths": [
+     "/admin",
+     "/administrator",
+     "/wp-login.php",
+     "/wp-admin",
+     "/user/login",
+     "/login",
+     "/bbs/login.php",
+     "/manager/html"
+    ],
+    "login_paths": [],
+    "upload_dirs": [
+     "/uploads",
+     "/upload",
+     "/files",
+     "/data"
+    ],
+    "sensitive_files": [
+     ".env",
+     "config.php",
+     "wp-config.php",
+     "database.yml",
+     "settings.py",
+     "id_rsa",
+     ".git/config",
+     "composer.json"
+    ],
+    "own_hosts": [
+     "127.0.0.1",
+     "localhost",
+     "access.log",
+     "error.log.1",
+     "error.log.2",
+     "error.log.3",
+     "error.log.4",
+     "error.log.5",
+     "error.log.6",
+     "other_vhosts_access.log.1",
+     "other_vhosts_access.log.2",
+     "other_vhosts_access.log.3",
+     "other_vhosts_access.log.4",
+     "other_vhosts_access.log.5",
+     "other_vhosts_access.log.6"
+    ],
+    "private_object_paths": [],
+    "known_activity": [],
+    "large_response_bytes": 50000,
+    "since": null,
+    "until": null,
+    "year": 2022
+   },
+   "line_level": {
+    "files": [
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/access.log",
+      "kind": "access",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/other_vhosts_access.log.1",
+      "kind": "access",
+      "events": 18507
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/other_vhosts_access.log.2",
+      "kind": "access",
+      "events": 19492
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/other_vhosts_access.log.3",
+      "kind": "access",
+      "events": 18892
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/other_vhosts_access.log.4",
+      "kind": "access",
+      "events": 17756
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/other_vhosts_access.log.5",
+      "kind": "access",
+      "events": 14662
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/other_vhosts_access.log.6",
+      "kind": "access",
+      "events": 19390
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/error.log.1",
+      "kind": "weberror",
+      "events": 2
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/error.log.2",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/error.log.3",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/error.log.4",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/error.log.5",
+      "kind": "weberror",
+      "events": 3
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/apache2/error.log.6",
+      "kind": "weberror",
+      "events": 1
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/auth.log",
+      "kind": "auth",
+      "events": 0
+     },
+     {
+      "file": "<AIT-LDS>/wilson/gather/cloud_share/logs/auth.log.1",
+      "kind": "auth",
+      "events": 0
+     }
+    ],
+    "lines": 112419,
+    "parsed_lines": 108714,
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 6,
+    "tn": 112413,
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 5.3371761001254235e-05,
+    "f1": null,
+    "steps": {},
+    "fp_by_rule": {
+     "WEBLOG_SCANNER": 6
+    },
+    "fp_by_ip": {
+     "10.182.193.78": 6
+    },
+    "tp_by_rule": {},
+    "fp_examples": [
+     {
+      "ref": "other_vhosts_access.log.2:6250",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:6252",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:6253",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:6254",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:6257",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     },
+     {
+      "ref": "other_vhosts_access.log.2:6258",
+      "rules": [
+       "WEBLOG_SCANNER"
+      ]
+     }
+    ],
+    "fn_examples": []
+   },
+   "ip_level": {
+    "counts": {
+     "attack_entries": 0,
+     "detected": 0,
+     "missed": 0,
+     "blind_spot_entries": 0,
+     "negative_ips": 3,
+     "truth_attack_ips": 0,
+     "flagged_ips": 1,
+     "unknown_flagged_ips": 0
+    },
+    "recall": null,
+    "precision": 0.0,
+    "false_positive_rate": 0.3333333333333333,
+    "f1": null,
+    "missed": [],
+    "false_positives": [
+     "10.182.193.78"
+    ],
+    "unknown_flagged": [],
+    "blind_spots": [],
+    "truth": [
+     {
+      "ip": "10.182.193.78",
+      "malicious": false
+     },
+     {
+      "ip": "10.182.194.5",
+      "malicious": false
+     },
+     {
+      "ip": "::1",
+      "malicious": false
+     }
+    ],
+    "overall_verdict": "no_evidence"
+   }
+  }
+ }
+}
