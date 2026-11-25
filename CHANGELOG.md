@@ -55,6 +55,7 @@
 
 ### Fixed
 
+- WEBLOG_ROBOTS_HIDDEN 오탐: 스스로 크롤러라고 밝히는 UA(…bot, …crawler, …spider, 애드센스)를 빼고, 숨은 경로를 첫 마디 대신 숫자를 지운 모양으로 비교한다(평평한 URL의 상품 페이지). EClog 하루치 오탐 1,740줄 → 0줄(이미 본 데이터라 개발 점수, `reports/public/reallog_eclog_1day_after_fix_dev.json`).
 - 사양서·체크리스트·외부비교의 근거 없는 숫자와 문장 3건(결과 파일 없는 russellmitchell 0.013%, 출처 없는 '심각도 = 확신도 × 영향', 인용 문서에 없는 'SIR 가입 전 결과'), 낡거나 어긋난 6건(russellmitchell 단위, S6 새 표본, 규칙 58개, 제목 v2.3, NFR-14 조합 수, OCSF 내보내기 표시).
 - 서버 권한 상승: 웹 서비스 계정이 su로 넘어간 계정의 sudo, sudo로 `/etc/shadow`·`/root/.ssh/` 읽기를 `HOST_PRIV_ESC`로 잡는다(AIT-LDS에서 놓친 것).
 - 파일 공유 앱(Nextcloud·ownCloud WebDAV, 파일 앱, 공유 링크)에서 사용자가 .zip을 내려받은 것을 `WEBLOG_BACKUP_LEAK`로 잡던 오탐.
