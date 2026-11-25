@@ -853,6 +853,28 @@ def _accounts(txt: str) -> set[str]:
     return {a or b for a, b in _ACCOUNT.findall(txt)}
 
 
+def _selectors_reduce(params: dict) -> bool:
+    sel = params.get("eventSelectors")
+    adv = params.get("advancedEventSelectors")
+    if sel is None and adv is None:
+        return True  # 무엇을 남기는지 알 수 없으면 줄인 것으로 본다
+    if isinstance(sel, list):
+        if not sel and not adv:
+            return True
+        for x in sel:
+            if not isinstance(x, dict):
+                continue
+            if x.get("includeManagementEvents") is False or str(x.get("readWriteType", "All")) != "All":
+                return True
+            if x.get("excludeManagementEventSources"):
+                return True
+    if isinstance(adv, list):
+        txt = json.dumps(adv)
+        if re.search(r'"Not(?:Equals|StartsWith|EndsWith)"', txt) or '"readOnly"' in txt:
+            return True
+    return False
+
+
 def ct_flags(action: str, params, record: dict) -> list[str]:
     """잘리기 전 전체 파라미터를 보고 규칙이 쓸 표시를 만든다(params는 잘려 저장되므로)."""
     if not isinstance(params, dict) or not params:
@@ -891,6 +913,34 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     if action in ("ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath") \
             and re.search(r'"withDecryption"\s*:\s*true', txt):
         flags.append("decrypt")
+    # 인터넷 공개로 바꾸는 설정(RDS 공개 접근, DB 보안 그룹 전체 허용, CodeBuild 공개 프로젝트)
+    if action.startswith("rds:") and re.search(r'"publiclyAccessible"\s*:\s*true', txt, re.I) and (
+            action.startswith(("rds:Modify", "rds:Create", "rds:Restore"))):
+        flags.append("resource_public")
+    if action.startswith(("rds:Create", "rds:Restore")) and "resource_public" not in flags:
+        resp = record.get("responseElements")
+        if isinstance(resp, dict) and re.search(r'"publiclyAccessible"\s*:\s*true',
+                                                json.dumps(resp, default=str), re.I):
+            flags.append("resource_public")  # 요청에 없어도 응답에서 공개로 만들어졌음을 확인
+    if action == "rds:AuthorizeDBSecurityGroupIngress" and re.search(r'"(?:0\.0\.0\.0/0|::/0)"', txt):
+        flags.append("resource_public")
+    if action == "codebuild:UpdateProjectVisibility" and "PUBLIC_READ" in txt:
+        flags.append("resource_public")
+    # 다른 계정의 KMS 키로 객체를 다시 암호화: 키 주인만 풀 수 있다(랜섬웨어 수법)
+    if action in ("s3:PutObject", "s3:CopyObject") and own:
+        m = re.search(r'"x-amz-server-side-encryption-aws-kms-key-id"\s*:\s*"arn:aws[\w-]*:kms:[\w-]+:(\d{12}):', txt)
+        if m and m.group(1) != own:
+            flags.append("kms_external")
+    # 버킷 접근 기록 끄기: LoggingEnabled 없이 PutBucketLogging
+    if action == "s3:PutBucketLogging" and "LoggingEnabled" not in txt:
+        flags.append("logging_off")
+    # AWS가 유출된 액세스 키에 붙이는 격리 정책(공개 저장소 등에서 키를 발견했을 때)
+    if (action == "iam:PutUserPolicy" and "AWSExposedCredentialPolicy_DO_NOT_REMOVE" in txt) or (
+            action == "iam:AttachUserPolicy" and "AWSCompromisedKeyQuarantine" in txt):
+        flags.append("key_quarantine")
+    # CloudTrail 이벤트 선택기: 관리 이벤트를 빼거나 읽기·쓰기 한쪽만 남기거나 제외 조건을 넣으면 기록이 줄어든다
+    if action == "cloudtrail:PutEventSelectors" and _selectors_reduce(params):
+        flags.append("selectors_reduce")
     if action in ("s3:PutBucketPolicy", "lambda:AddPermission", "lambda:AddLayerVersionPermission",
                   "rds:ModifyDBSnapshotAttribute", "rds:ModifyDBClusterSnapshotAttribute",
                   "ec2:ModifySnapshotAttribute", "ec2:ModifyImageAttribute"):
@@ -924,6 +974,8 @@ def cloudtrail_record_to_event(r: dict, ref: str) -> Event | None:
     aed = r.get("additionalEventData")
     if isinstance(aed, dict) and aed.get("MFAUsed"):
         extra["mfa"] = aed["MFAUsed"]
+    if isinstance(aed, dict) and aed.get("SamlProviderArn"):
+        extra["saml"] = True  # 회사 로그인(IdP)으로 들어옴: MFA는 IdP에서 거친다
     if isinstance(params, dict) and params:
         # 근거 확인에 필요한 대표 파라미터만 남긴다(전체는 원본에 있음)
         extra["params"] = json.dumps({k: params[k] for k in list(params)[:8]},

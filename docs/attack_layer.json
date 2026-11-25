@@ -147,9 +147,9 @@
   {
    "techniqueID": "T1530",
    "tactic": "collection",
-   "score": 2,
+   "score": 3,
    "color": "",
-   "comment": "CT_S3_BULK_READ, WEBLOG_IDOR_ENUM",
+   "comment": "CT_RESOURCE_PUBLIC, CT_S3_BULK_READ, WEBLOG_IDOR_ENUM",
    "enabled": true
   },
   {
@@ -166,6 +166,14 @@
    "score": 2,
    "color": "",
    "comment": "HOST_PRIV_ESC, HOST_PRIV_ESC_FAIL",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1552.001",
+   "tactic": "credential-access",
+   "score": 1,
+   "color": "",
+   "comment": "CT_KEY_EXPOSED",
    "enabled": true
   },
   {
@@ -190,6 +198,14 @@
    "score": 1,
    "color": "",
    "comment": "CT_ACCOUNT_SECURITY",
+   "enabled": true
+  },
+  {
+   "techniqueID": "T1562.001",
+   "tactic": "defense-evasion",
+   "score": 1,
+   "color": "",
+   "comment": "CT_DEFENSE_IMPAIR",
    "enabled": true
   },
   {

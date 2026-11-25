@@ -7,6 +7,7 @@
 
 ### Added
 
+- 규칙 3개: `CT_RESOURCE_PUBLIC`(RDS 공개·DB 보안 그룹 전체 허용·CodeBuild 공개), `CT_DEFENSE_IMPAIR`(WAF 분리·삭제, EBS 기본 암호화 끄기, Bedrock 가드레일 삭제, GuardDuty 신뢰 IP·보관 필터 등), `CT_KEY_EXPOSED`(AWS가 유출 키에 붙이는 격리 정책). 넓힘: SAML 공급자 생성·변경(IAM 지속성)·삭제(계정 보안), RDS 자동 백업 삭제, RDS 활동 스트림 중지·버킷 접근 기록 끄기(기록 끄기), 다른 계정 KMS 키로 다시 암호화(랜섬웨어). 규칙 58→61개.
 - 병합 전 오탐 검사 `scripts/public/fp_gate.py`: 로컬에 있는 정상 데이터(EClog 하루치, AIT fox·wheeler·russellmitchell, Panther A 반 정상 이벤트)로 규칙별 오탐 줄을 기준(`reports/public/fp_baseline.json`)과 비교하고, 늘면 실패한다. 규칙을 바꾸는 PR은 이걸 돌린 결과를 적는다.
 - S6 새 처음 보는 데이터: Panther AWS CloudTrail 시험 이벤트(`scripts/public/eval_panther.py`). A 반 맞게 탐지 20/64(31%), B 반은 보강 뒤 한 번.
 - S7 처음 본 실제 로그 측정(`docs/실제로그_측정_EClog_2026-11-26.md`, `reports/public/reallog_eclog_1day.json`): EClog 하루치 35만 줄, 라벨 보정 오탐 0.496%로 미달. 오탐 1,740줄 전부 WEBLOG_ROBOTS_HIDDEN(검색엔진 외 크롤러가 평평한 URL의 상품 페이지를 연 것).
@@ -57,6 +58,8 @@
 
 ### Fixed
 
+- `CT_CONSOLE_NO_MFA`: SAML(회사 IdP)·역할 전환·SSO 로그인은 MFA를 IdP나 원래 세션에서 거치므로 빼고, 비밀번호로 들어오는 IAM 사용자·루트만 본다.
+- `CT_LOGGING_TAMPER`: CloudTrail 이벤트 선택기를 켜는 변경은 빼고, 관리 이벤트를 빼거나 읽기·쓰기 한쪽만 남기거나 제외 조건을 넣을 때만 잡는다.
 - WEBLOG_ROBOTS_HIDDEN 오탐: 스스로 크롤러라고 밝히는 UA(…bot, …crawler, …spider, 애드센스)를 빼고, 숨은 경로를 첫 마디 대신 숫자를 지운 모양으로 비교한다(평평한 URL의 상품 페이지). EClog 하루치 오탐 1,740줄 → 0줄(이미 본 데이터라 개발 점수, `reports/public/reallog_eclog_1day_after_fix_dev.json`).
 - 사양서·체크리스트·외부비교의 근거 없는 숫자와 문장 3건(결과 파일 없는 russellmitchell 0.013%, 출처 없는 '심각도 = 확신도 × 영향', 인용 문서에 없는 'SIR 가입 전 결과'), 낡거나 어긋난 6건(russellmitchell 단위, S6 새 표본, 규칙 58개, 제목 v2.3, NFR-14 조합 수, OCSF 내보내기 표시).
 - 서버 권한 상승: 웹 서비스 계정이 su로 넘어간 계정의 sudo, sudo로 `/etc/shadow`·`/root/.ssh/` 읽기를 `HOST_PRIV_ESC`로 잡는다(AIT-LDS에서 놓친 것).

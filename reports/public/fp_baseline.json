@@ -19,9 +19,9 @@
   "normal_lines": 103054,
   "fp_lines": 19,
   "fp_by_rule": {
-   "WEBLOG_CMD_INJECTION": 1,
-   "WEBLOG_LARGE_EXFIL": 1,
    "WEBLOG_UPLOAD_EXEC": 1,
+   "WEBLOG_LARGE_EXFIL": 1,
+   "WEBLOG_CMD_INJECTION": 1,
    "WEBLOG_SCANNER": 18
   }
  },
@@ -31,9 +31,9 @@
   "fp_by_rule": {
    "WEBLOG_ADMIN_FORGED": 31,
    "WEBLOG_ADMIN_ACCESS": 5,
-   "WEBLOG_CMD_INJECTION": 1,
-   "WEBLOG_LARGE_EXFIL": 1,
    "WEBLOG_UPLOAD_EXEC": 1,
+   "WEBLOG_LARGE_EXFIL": 1,
+   "WEBLOG_CMD_INJECTION": 1,
    "WEBLOG_SCANNER": 18
   }
  },
@@ -41,11 +41,12 @@
   "normal_lines": 117,
   "fp_lines": 24,
   "fp_by_rule": {
-   "CT_LOGGING_TAMPER": 2,
-   "CT_CONSOLE_NO_MFA": 6,
+   "CT_CONSOLE_NO_MFA": 1,
    "CT_IAM_PERSISTENCE": 5,
-   "CT_DATA_DESTRUCTION": 3,
+   "CT_DATA_DESTRUCTION": 4,
    "CT_SERVERLESS_CHANGE": 2,
+   "CT_LOGGING_TAMPER": 3,
+   "CT_RESOURCE_PUBLIC": 3,
    "CT_ROOT_USAGE": 4,
    "CT_S3_PUBLIC": 1,
    "CT_SECRET_ACCESS": 1,

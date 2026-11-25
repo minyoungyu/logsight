@@ -214,6 +214,17 @@ CASES = {
     "CT_RUN_INSTANCES_BURST": (lambda: aws_rules(burst("RunInstances", 5, src="ec2")),
                                lambda: aws_rules(burst("RunInstances", 5, src="ec2",
                                                        err="Client.InstanceLimitExceeded"))),
+    "CT_RESOURCE_PUBLIC": (lambda: aws_rules([ct(0, "ModifyDBInstance", "rds",
+                                                 params={"dBInstanceIdentifier": "db1", "publiclyAccessible": True})]),
+                           lambda: aws_rules([ct(0, "ModifyDBInstance", "rds",
+                                                 params={"dBInstanceIdentifier": "db1", "publiclyAccessible": False})])),
+    "CT_DEFENSE_IMPAIR": (lambda: aws_rules([ct(0, "DisassociateWebACL", "wafv2",
+                                                params={"resourceArn": "arn:aws:elasticloadbalancing:x"})]),
+                          lambda: aws_rules([ct(0, "AssociateWebACL", "wafv2",
+                                                params={"resourceArn": "arn:aws:elasticloadbalancing:x"})])),
+    "CT_KEY_EXPOSED": (lambda: aws_rules([ct(0, "PutUserPolicy", params={
+                           "userName": "dev", "policyName": "AWSExposedCredentialPolicy_DO_NOT_REMOVE"})]),
+                       lambda: aws_rules([ct(0, "PutUserPolicy", params={"userName": "dev", "policyName": "s3-read"})])),
     "VPC_PORT_SCAN": (lambda: aws_rules(parse_vpcflow("\n".join(vpc(i, ATK, 51000, 20 + i) for i in range(10)))),
                       lambda: aws_rules(parse_vpcflow("\n".join(vpc(i, ATK, 51000, 20 + i) for i in range(9))))),
     "VPC_REMOTE_ADMIN_EXPOSED": (lambda: aws_rules(parse_vpcflow(vpc(0, ATK, 51000, 22))),
@@ -405,3 +416,41 @@ class RuleValidation(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PantherDevFixes(unittest.TestCase):
+    """Panther A 반(11/25)에서 드러난 오탐 두 가지. 입력은 합성."""
+
+    def test_saml_and_role_console_login_not_no_mfa(self):
+        saml = ct(0, "ConsoleLogin", "signin", additionalEventData={
+            "MFAUsed": "No", "SamlProviderArn": f"arn:aws:iam::{ACCT}:saml-provider/okta"})
+        sso = ct(0, "ConsoleLogin", "signin", ident=role(), additionalEventData={"MFAUsed": "No"})
+        self.assertNotIn("CT_CONSOLE_NO_MFA", aws_rules([saml]))
+        self.assertNotIn("CT_CONSOLE_NO_MFA", aws_rules([sso]))
+        self.assertIn("CT_CONSOLE_NO_MFA", aws_rules([ct(0, "ConsoleLogin", "signin", ident=ROOT_ID,
+                                                         additionalEventData={"MFAUsed": "No"})]))
+
+    def test_event_selectors_only_when_logging_shrinks(self):
+        full = {"trailName": "t", "eventSelectors": [{"readWriteType": "All", "includeManagementEvents": True}]}
+        write_only = {"trailName": "t", "eventSelectors": [{"readWriteType": "WriteOnly", "includeManagementEvents": True}]}
+        no_mgmt = {"trailName": "t", "eventSelectors": [{"readWriteType": "All", "includeManagementEvents": False}]}
+        self.assertNotIn("CT_LOGGING_TAMPER", aws_rules([ct(0, "PutEventSelectors", "cloudtrail", params=full)]))
+        self.assertIn("CT_LOGGING_TAMPER", aws_rules([ct(0, "PutEventSelectors", "cloudtrail", params=write_only)]))
+        self.assertIn("CT_LOGGING_TAMPER", aws_rules([ct(0, "PutEventSelectors", "cloudtrail", params=no_mgmt)]))
+
+    def test_key_quarantine_is_not_persistence(self):
+        r = aws_rules([ct(0, "PutUserPolicy", params={"userName": "dev",
+                                                     "policyName": "AWSExposedCredentialPolicy_DO_NOT_REMOVE"})])
+        self.assertIn("CT_KEY_EXPOSED", r)
+        self.assertNotIn("CT_IAM_PERSISTENCE", r)
+
+    def test_sso_managed_saml_and_external_kms(self):
+        sso = {"type": "AssumedRole", "arn": f"arn:aws:sts::{ACCT}:assumed-role/AWSServiceRoleForSSO/sso"}
+        self.assertNotIn("CT_IAM_PERSISTENCE", aws_rules([ct(0, "UpdateSAMLProvider", ident=sso,
+                                                             params={"sAMLProviderArn": "x"})]))
+        self.assertIn("CT_IAM_PERSISTENCE", aws_rules([ct(0, "UpdateSAMLProvider", params={"sAMLProviderArn": "x"})]))
+        ext = {"bucketName": "data", "key": "a",
+               "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:444455556666:key/k"}
+        own = dict(ext, **{"x-amz-server-side-encryption-aws-kms-key-id": f"arn:aws:kms:us-east-1:{ACCT}:key/k"})
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "CopyObject", "s3", params=ext, recipientAccountId=ACCT)]))
+        self.assertNotIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "CopyObject", "s3", params=own, recipientAccountId=ACCT)]))

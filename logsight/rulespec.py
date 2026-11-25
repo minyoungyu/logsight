@@ -198,6 +198,32 @@ SPEC: dict[str, dict] = {
         "fp": ["오토스케일링·배포 파이프라인의 정상 생성"],
         "first": "생성된 인스턴스를 멈추고 종류(고성능 GPU 등)와 리전을 확인한다.",
     },
+    "CT_RESOURCE_PUBLIC": {
+        "logs": "CloudTrail",
+        "when": "RDS 생성·변경·복원에서 publiclyAccessible=true, DB 보안 그룹에 0.0.0.0/0·::/0 허용, "
+                "CodeBuild 프로젝트를 PUBLIC_READ로 전환. 1건으로도",
+        "blind": ["보안 그룹(EC2 SG)으로 DB 포트를 연 것은 CT_SG_OPENED가 맡음",
+                  "공개 상태로 이미 만들어져 있던 자원은 보지 않음(설정 점검이 맡음)"],
+        "fp": ["일부러 공개한 시연용 DB·오픈소스 빌드 프로젝트"],
+        "first": "공개가 의도한 것인지 확인하고, 아니면 공개 설정을 끄고 DB 비밀번호를 바꾼다.",
+    },
+    "CT_DEFENSE_IMPAIR": {
+        "logs": "CloudTrail",
+        "when": "WAF 웹 ACL 분리·삭제, EBS 기본 암호화 끄기, Bedrock 가드레일 삭제, GuardDuty 신뢰 IP 목록 생성·변경·"
+                "보관(ARCHIVE) 필터 생성·관리 계정 분리, Security Hub 표준 끄기, Macie·Inspector 끄기. 1건으로도",
+        "blind": ["WAF 규칙 내용만 바꿔 막지 않게 하는 것은 보지 않음",
+                  "기록 끄기(CloudTrail·Flow Logs 등)는 CT_LOGGING_TAMPER가 맡음"],
+        "fp": ["배포 도구(Terraform 등)가 자원을 다시 만들면서 잠깐 분리·삭제하는 경우. 그 역할을 정상 작업 목록에 넣는다"],
+        "first": "누가 왜 껐는지 확인하고 다시 켠다. 같은 주체의 다른 행동을 본다.",
+    },
+    "CT_KEY_EXPOSED": {
+        "logs": "CloudTrail",
+        "when": "AWS가 유출된 액세스 키의 사용자에게 격리 정책(AWSExposedCredentialPolicy_DO_NOT_REMOVE, "
+                "AWSCompromisedKeyQuarantine)을 붙임. 1건으로도",
+        "blind": ["AWS가 발견하지 못한 유출(비공개 저장소, 메신저 등)은 보지 않음"],
+        "fp": ["거의 없음. 격리 정책은 AWS가 키 노출을 확인했을 때만 붙인다"],
+        "first": "그 키를 바로 비활성화·삭제하고, 키가 노출된 뒤 한 호출을 모두 확인한다.",
+    },
     # ------------------------------------------------------------------ VPC Flow / 서버 방화벽
     "VPC_PORT_SCAN": {
         "logs": "VPC Flow Logs 또는 서버 방화벽 로그",

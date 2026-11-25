@@ -39,6 +39,9 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "CT_UNTRUSTED_IP":    ("T1078.004", "initial-access", "신뢰 목록 밖 IP에서 자격증명 사용", "medium"),
     "CT_CONSOLE_NO_MFA":  ("T1078.004", "initial-access", "MFA 없는 콘솔 로그인", "low"),
     "CT_RUN_INSTANCES_BURST": ("T1496", "impact", "인스턴스 대량 생성(자원 탈취 의심)", "high"),
+    "CT_RESOURCE_PUBLIC": ("T1530", "collection", "RDS·CodeBuild 등 자원을 인터넷에 공개", "high"),
+    "CT_DEFENSE_IMPAIR":  ("T1562.001", "defense-evasion", "WAF·GuardDuty·EBS 암호화 등 보안 장치 해제", "high"),
+    "CT_KEY_EXPOSED":     ("T1552.001", "credential-access", "AWS가 유출된 액세스 키를 격리함(키 노출)", "high"),
     "VPC_PORT_SCAN":      ("T1046", "discovery", "여러 포트에 대한 접속 시도(포트 스캔)", "medium"),
     "VPC_REMOTE_ADMIN_EXPOSED": ("T1133", "initial-access", "외부에서 관리 포트(22/3389) 접속 허용", "medium"),
     "WAF_SQLI_NOT_BLOCKED": ("T1190", "initial-access", "SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW)", "high"),
@@ -95,7 +98,7 @@ STAGE_ORDER = ["discovery", "initial-access", "execution", "credential-access", 
                "impact", "other"]
 
 LOGGING_TAMPER = {"cloudtrail:StopLogging", "cloudtrail:DeleteTrail", "cloudtrail:UpdateTrail",
-                  "cloudtrail:PutEventSelectors", "ec2:DeleteFlowLogs",
+                  "ec2:DeleteFlowLogs", "rds:StopActivityStream",
                   "guardduty:DeleteDetector", "guardduty:UpdateDetector",
                   "wafv2:DeleteLoggingConfiguration", "config:StopConfigurationRecorder",
                   "config:DeleteConfigurationRecorder", "logs:DeleteLogGroup",
@@ -110,7 +113,9 @@ IAM_PERSIST = {"iam:CreateUser", "iam:CreateAccessKey", "iam:CreateLoginProfile"
                "iam:CreateRole", "iam:UpdateAssumeRolePolicy", "iam:CreatePolicyVersion",
                "iam:SetDefaultPolicyVersion", "sts:GetFederationToken",
                "rolesanywhere:CreateTrustAnchor", "rolesanywhere:CreateProfile",
-               "ec2:ImportKeyPair", "ec2:CreateKeyPair"}
+               "ec2:ImportKeyPair", "ec2:CreateKeyPair",
+               # SAML 공급자 만들기·바꾸기: 공격자가 자기 IdP를 붙여 아무 역할로나 들어오는 길(Golden SAML)
+               "iam:CreateSAMLProvider", "iam:UpdateSAMLProvider"}
 DISCOVERY = {"sts:GetCallerIdentity", "s3:ListBuckets", "iam:ListUsers", "iam:ListRoles",
              "iam:ListPolicies", "iam:GetAccountAuthorizationDetails", "iam:ListAccessKeys",
              "iam:ListAttachedUserPolicies", "iam:ListAttachedRolePolicies", "iam:GetUser",
@@ -128,9 +133,18 @@ SERVERLESS = {"lambda:UpdateFunctionCode", "lambda:CreateFunction",
               "sagemaker:CreateNotebookInstanceLifecycleConfig",
               "sagemaker:UpdateNotebookInstanceLifecycleConfig"}
 ACCOUNT_SECURITY = {"iam:DeactivateMFADevice", "iam:DeleteVirtualMFADevice",
-                    "iam:UpdateAccountPasswordPolicy", "iam:DeleteAccountPasswordPolicy"}
+                    "iam:UpdateAccountPasswordPolicy", "iam:DeleteAccountPasswordPolicy",
+                    "iam:DeleteSAMLProvider"}
 DESTROY_ONE = {"kms:ScheduleKeyDeletion", "kms:DisableKey", "backup:DeleteRecoveryPoint",
-               "backup:DeleteBackupVault", "rds:DeleteDBCluster", "rds:DeleteDBInstance"}
+               "backup:DeleteBackupVault", "rds:DeleteDBCluster", "rds:DeleteDBInstance",
+               "rds:DeleteDBInstanceAutomatedBackup", "rds:DeleteDBClusterAutomatedBackup"}
+SAML_CALLS = {"iam:CreateSAMLProvider", "iam:UpdateSAMLProvider", "iam:DeleteSAMLProvider"}
+# 보안 장치를 떼거나 끄는 호출(기록 끄기는 LOGGING_TAMPER). ATT&CK T1562.001
+DEFENSE_IMPAIR = {"wafv2:DisassociateWebACL", "waf-regional:DisassociateWebACL", "wafv2:DeleteWebACL",
+                  "waf-regional:DeleteWebACL", "waf:DeleteWebACL", "ec2:DisableEbsEncryptionByDefault",
+                  "bedrock:DeleteGuardrail", "guardduty:CreateIPSet", "guardduty:UpdateIPSet",
+                  "guardduty:DisassociateFromMasterAccount", "guardduty:DisassociateFromAdministratorAccount",
+                  "securityhub:BatchDisableStandards", "macie2:DisableMacie", "inspector2:Disable"}
 DESTROY_BURST = {"s3:DeleteObject", "s3:DeleteObjects", "ec2:DeregisterImage", "ec2:DeleteSnapshot",
                  "s3:DeleteBucket"}
 ADMIN_PORTS = {22, 3389}
@@ -534,10 +548,11 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
         a = e.action or ""
         params = e.extra.get("params") or {}
         flags = e.extra.get("flags") or ()
-        if a in LOGGING_TAMPER or "log_bucket_expire" in flags or any(
+        if a in LOGGING_TAMPER or "log_bucket_expire" in flags or "logging_off" in flags or (
+                a == "cloudtrail:PutEventSelectors" and ("selectors_reduce" in flags or not params)) or any(
                 fl.startswith("expire_bucket:") and fl.split(":", 1)[1] in trail_buckets for fl in flags):
             singles[("CT_LOGGING_TAMPER", e.src_ip or "")].append(e)
-        if a in ACCOUNT_SECURITY:
+        if a in ACCOUNT_SECURITY and not (a in SAML_CALLS and "AWSServiceRoleForSSO" in (e.actor or "")):
             singles[("CT_ACCOUNT_SECURITY", e.actor or "")].append(e)
         if a in INSTANCE_EXEC or "userdata" in flags:
             singles[("CT_INSTANCE_EXEC", e.actor or "")].append(e)
@@ -547,15 +562,23 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             singles[("CT_SERVERLESS_CHANGE", e.actor or "")].append(e)
         if a == "ec2:GetPasswordData" or (a == "secretsmanager:BatchGetSecretValue" and e.outcome == "success"):
             singles[("CT_SECRET_ACCESS", e.actor or "")].append(e)
-        if a in DESTROY_ONE or "versioning_off" in flags:
+        if a in DESTROY_ONE or "versioning_off" in flags or "kms_external" in flags:
             if a not in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") or "no_final_snapshot" in flags:
                 singles[("CT_DATA_DESTRUCTION", e.actor or "")].append(e)
         if e.extra.get("identity_type") == "Root" and e.extra.get("eventType") != "AwsServiceEvent":
             singles[("CT_ROOT_USAGE", e.src_ip or "")].append(e)
-        if a in IAM_PERSIST or "db_master_password" in flags:
+        if "key_quarantine" in flags:
+            singles[("CT_KEY_EXPOSED", e.actor or "")].append(e)
+        elif (a in IAM_PERSIST or "db_master_password" in flags) and not (
+                a in SAML_CALLS and "AWSServiceRoleForSSO" in (e.actor or "")):
+            # IAM Identity Center(SSO)는 자기 SAML 공급자를 스스로 만들고 바꾼다
             singles[("CT_IAM_PERSISTENCE", e.actor or "")].append(e)
         if (a == "ec2:AuthorizeSecurityGroupIngress" and "0.0.0.0/0" in str(params)) or "nacl_open" in flags:
             singles[("CT_SG_OPENED", e.actor or "")].append(e)
+        if "resource_public" in flags:
+            singles[("CT_RESOURCE_PUBLIC", e.actor or "")].append(e)
+        if a in DEFENSE_IMPAIR or (a == "guardduty:CreateFilter" and "ARCHIVE" in str(params).upper()):
+            singles[("CT_DEFENSE_IMPAIR", e.actor or "")].append(e)
         if a in S3_PUBLIC_CALLS and (e.extra.get("s3_public") or "external" in flags):
             singles[("CT_S3_PUBLIC", e.actor or "")].append(e)
         if a in ("ec2:ModifySnapshotAttribute", "ec2:ModifyImageAttribute") and (
@@ -563,7 +586,9 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
                 a in ("rds:ModifyDBSnapshotAttribute", "rds:ModifyDBClusterSnapshotAttribute")
                 and "external" in flags):
             singles[("CT_SNAPSHOT_SHARE", e.actor or "")].append(e)
-        if a == "signin:ConsoleLogin" and e.extra.get("mfa") == "No" and e.outcome == "success":
+        # 비밀번호로 들어오는 IAM 사용자·루트만 본다. SAML(회사 IdP)·역할 전환·SSO는 MFA를 IdP나 원래 세션에서 거친다
+        if a == "signin:ConsoleLogin" and e.extra.get("mfa") == "No" and e.outcome == "success" \
+                and e.extra.get("identity_type") in ("IAMUser", "Root") and not e.extra.get("saml"):
             singles[("CT_CONSOLE_NO_MFA", e.actor or "")].append(e)
         if trusted and e.src_ip and _is_ip(e.src_ip) and not _ip_in(e.src_ip, trusted) \
                 and e.extra.get("identity_type") in ("IAMUser", "Root"):
