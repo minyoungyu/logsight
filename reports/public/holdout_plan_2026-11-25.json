@@ -69,7 +69,7 @@
      "login_paths": [
       "/login"
      ],
-     "trusted_ips": "운영자 IP(CTFd 보안 그룹의 운영자 허용 주소). 로그를 열기 전에 CTF 운영 스레드에서 받아 이 칸에 적고 커밋한다"
+     "trusted_ips": "운영자 공인 IP 1개. 개인 정보라 값은 저장소에 두지 않고 data/ctf/profile.json에만 둔다. 고정 확인용 sha256(IP 문자열)=2b7b41f680029934ab07ee3ca2bc0e50ae80ffe9844b83711814d337c439ebd1. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 거른다(REVERSE_PROXY=false). 사용자 확인 대기"
     },
     "measure": "python scripts/public/eval_reallog.py --profile data/ctf/profile.json --review data/ctf/review.tsv --out reports/public/reallog_ctf_main.json, 분류 뒤 --labels로 다시",
     "review_rule_extra": [
