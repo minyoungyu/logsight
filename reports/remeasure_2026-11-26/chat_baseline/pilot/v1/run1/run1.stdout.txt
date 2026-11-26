@@ -1,0 +1,1 @@
+{"score": "0/6", "quotes_all_found": true, "n_user_commands": 17, "sources_queried": ["alb.log", "cloudtrail.json", "waf.jsonl"], "seconds": 415.3}

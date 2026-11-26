@@ -247,12 +247,23 @@ def validate_triage(result: dict, payload: dict) -> dict:
     all_refs = set().union(*refs_of.values()) if refs_of else set()
     bad_ids, bad_refs, total_refs = [], 0, 0
     seen, verdicts = set(), []
+    # 걸러 낸 근거를 남긴다. 입력의 다른 사건에 있는 줄(엉뚱한 사건에 붙임)인지,
+    # 입력 어디에도 없는 줄(지어냄)인지 나눠야 측정 숫자를 바르게 쓸 수 있다.
+    dropped: list[dict] = []
+
+    def _drop(ref, where: str, owner: str | None) -> None:
+        dropped.append({"where": where, "ref": ref, "owner_incident": owner,
+                        "in_input": ref in all_refs,
+                        "found_in": sorted(i for i, rs in refs_of.items() if ref in rs)})
     for v in result.get("incidents", []):
         if v.get("id") not in ids or v["id"] in seen:
             bad_ids.append(v.get("id"))
             continue
         seen.add(v["id"])
         ok = [r for r in v.get("evidence", []) if r in refs_of[v["id"]]]
+        for r in v.get("evidence", []):
+            if r not in refs_of[v["id"]]:
+                _drop(r, "incident", v["id"])
         total_refs += len(v.get("evidence", []))
         bad_refs += len(v.get("evidence", [])) - len(ok)
         v["evidence"] = ok
@@ -267,6 +278,9 @@ def validate_triage(result: dict, payload: dict) -> dict:
         c["incident_ids"] = members
         for s in c.get("steps", []):
             ok = [r for r in s.get("evidence", []) if r in all_refs]
+            for r in s.get("evidence", []):
+                if r not in all_refs:
+                    _drop(r, "campaign_step", None)
             total_refs += len(s.get("evidence", []))
             bad_refs += len(s.get("evidence", [])) - len(ok)
             s["evidence"] = ok
@@ -277,6 +291,9 @@ def validate_triage(result: dict, payload: dict) -> dict:
     # 버린 제안은 근거 검증 통과 여부(passed)와 따로 센다. 제안은 판정이 아니기 때문이다.
     result["next_checks"], checks = validate_checks(result.get("next_checks") or [], payload)
     return {"unknown_ids": bad_ids, "evidence_total": total_refs, "evidence_invalid": bad_refs,
+            "evidence_invalid_detail": dropped,
+            "evidence_invalid_not_in_input": sum(1 for d in dropped if not d["in_input"]),
+            "evidence_invalid_other_incident": sum(1 for d in dropped if d["in_input"]),
             "incidents_without_verdict": missing, "next_checks": checks,
             "passed": not bad_ids and not bad_refs and not missing}
 

@@ -20,7 +20,7 @@ bash lab/serve.sh stop
 - 테스트 서버 설정은 일부러 `.phtml` 실행을 허용한다(실제 소형 서버의 흔한 설정 오류 재현).
 - `evaluate.py` — 기대 규칙 재현율과 정상 트래픽 오탐을 센다(기존 무료 도구 비교를 끼울 자리).
 
-런타임 산출물(`logs/`, `runtime/`, `reports/`, `*.sqlite`, 업로드물)은 커밋하지 않는다.
+런타임 산출물(`logs/`, `runtime/`, `reports/`, `*.sqlite`, 업로드물)은 커밋하지 않는다. 그래서 README의 "34/34 단계, 정상 트래픽 오탐 0건"은 결과 파일이 저장소에 없고 `evaluate.py`로 다시 재야 확인된다(2026-11-26 점검). 11/26에 다시 재서 결과를 `reports/remeasure_2026-11-26/lab/`에 커밋했다: **34/35(97%), 오탐 0건**. 놓친 `idor_orders`는 `profiles/shopmall.json`에 `private_object_paths`가 없어 IDOR 규칙이 꺼져 있었기 때문이다.
 서버 없이 보고 싶으면 저장소에 포함된 `samples/web/` 로 바로 돌릴 수 있다:
 
 ```

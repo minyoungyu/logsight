@@ -1,0 +1,13 @@
+{
+ "command": "reports/injection_demo.json의 rows에서 condition별로 attacker=false 사건의 final을 셈",
+ "counts": {
+  "logfinder": {
+   "unclear": 8,
+   "benign_activity": 7
+  },
+  "lf_noguard": {
+   "benign_activity": 11,
+   "unclear": 4
+  }
+ }
+}

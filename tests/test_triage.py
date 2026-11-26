@@ -40,6 +40,12 @@ def test_validate_drops_unknown_ids_and_refs():
     assert res["campaigns"][0]["steps"][0]["evidence"] == ["ct:3"]
     assert v["evidence_invalid"] == 2 and set(v["unknown_ids"]) == {"INC-009", "INC-404"}
     assert v["incidents_without_verdict"] == ["INC-002"] and not v["passed"]
+    # 걸러 낸 근거는 기록된다: 다른 사건의 줄(ct:3)과 입력에 없는 줄(made-up:9)을 나눈다
+    d = {x["ref"]: x for x in v["evidence_invalid_detail"]}
+    assert d["ct:3"]["in_input"] and d["ct:3"]["found_in"] == ["INC-002"]
+    assert d["ct:3"]["owner_incident"] == "INC-001"
+    assert not d["made-up:9"]["in_input"] and d["made-up:9"]["where"] == "campaign_step"
+    assert v["evidence_invalid_not_in_input"] == 1 and v["evidence_invalid_other_incident"] == 1
 
 
 def test_reorder_keeps_rule_order_within_verdict():

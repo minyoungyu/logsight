@@ -1,0 +1,81 @@
+{
+ "model": "claude-opus-5-5",
+ "exchanges": 3,
+ "seconds": 355.3,
+ "score": "0/6",
+ "caught": 0,
+ "n_stages": 6,
+ "quotes_all_found": true,
+ "stages": [
+  {
+   "id": "G1",
+   "caught": false,
+   "quote": "",
+   "reason": "최종 보고서 내용이 비어 있어 WAF가 막은 POST /api/subscriptions 메타데이터 조회 시도를 적은 부분이 없다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G2",
+   "caught": false,
+   "quote": "",
+   "reason": "보고서가 비어 있어 서명 없는 토큰으로 /api/support/... 에 접근한 일을 언급하지 않았다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G3",
+   "caught": false,
+   "quote": "",
+   "reason": "보고서가 비어 있어 KST 14:52~14:54 /download PDF 다운로드에 대한 기술이 없다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G4",
+   "caught": false,
+   "quote": "",
+   "reason": "보고서가 비어 있어 임시 키 ASIA71C2…95CF가 외부 IP에서 쓰인 일을 언급하지 않았다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G5",
+   "caught": false,
+   "quote": "",
+   "reason": "보고서가 비어 있어 states:StartExecution 성공(KST 15:36~16:08)에 대한 기술이 없다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G6",
+   "caught": false,
+   "quote": "",
+   "reason": "보고서가 비어 있어 SSM SendCommand·StartSession 시도와 AccessDenied 거부를 언급하지 않았다.",
+   "quote_found_in_report": true
+  }
+ ],
+ "usage": {
+  "chat_ai": {
+   "input_tokens": 118368,
+   "output_tokens": 26053,
+   "served_by": [
+    "claude-opus-5-5"
+   ]
+  },
+  "user_role": {
+   "input_tokens": 238949,
+   "output_tokens": 9681,
+   "served_by": [
+    "claude-opus-5-5"
+   ]
+  },
+  "judge": {
+   "input_tokens": 1109,
+   "output_tokens": 475,
+   "served_by": [
+    "claude-opus-5-5"
+   ]
+  }
+ },
+ "n_user_commands": 16,
+ "n_user_commands_sent": 10,
+ "sources_sent": [
+  "cloudtrail.json"
+ ]
+}

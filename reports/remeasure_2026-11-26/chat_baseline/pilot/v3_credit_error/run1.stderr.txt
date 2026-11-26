@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/home/user/logsight/scripts/chat_baseline.py", line 263, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/logsight/scripts/chat_baseline.py", line 257, in main
+    r = run_once(Path(a.data), Path(a.out))
+  File "/home/user/logsight/scripts/chat_baseline.py", line 213, in run_once
+    ai = chat_ai_turn(client, history, usage["chat_ai"])
+  File "/home/user/logsight/scripts/chat_baseline.py", line 146, in chat_ai_turn
+    resp = _create(client, model=MODEL, messages=history)
+  File "/home/user/logsight/scripts/chat_baseline.py", line 125, in _create
+    resp = st.get_final_message()
+  File "/usr/local/lib/python3.13/site-packages/anthropic/lib/streaming/_messages.py", line 100, in get_final_message
+    self.until_done()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/lib/streaming/_messages.py", line 127, in until_done
+    consume_sync_iterator(self)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/_utils/_streams.py", line 6, in consume_sync_iterator
+    for _ in iterator:
+             ^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/lib/streaming/_messages.py", line 74, in __iter__
+    for item in self._iterator:
+                ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/lib/streaming/_messages.py", line 138, in __stream__
+    for sse_event in self._raw_stream:
+                     ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/_streaming.py", line 65, in __iter__
+    for item in self._iterator:
+                ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/_streaming.py", line 108, in __stream__
+    raise self._client._make_status_error(
+    ...<3 lines>...
+    )
+anthropic.APIStatusError: {'type': 'error', 'error': {'details': None, 'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011ChQxcs5KUB8DBp7CYFnpF'}

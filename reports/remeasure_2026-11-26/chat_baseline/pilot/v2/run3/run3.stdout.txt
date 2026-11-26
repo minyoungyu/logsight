@@ -1,0 +1,1 @@
+{"score": "0/6", "quotes_all_found": true, "n_user_commands_sent": 5, "sources_sent": ["cloudtrail.json"], "seconds": 353.4}

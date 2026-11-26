@@ -6,6 +6,7 @@
 ## [Unreleased]
 
 ### Added
+- `scripts/evidence_check.py`와 `docs/근거_목록.json`: 문서의 측정 숫자를 결과 파일에서 다시 계산해 대조하고, 문서가 가리키는 `reports/` 경로가 있는지 본다. `tests/test_evidence.py`로 CI에서 돈다. `scripts/ctf_cost.py`: CTF 비용 계산.
 
 - 규칙 성숙도(`logsight/maturity.py`): `rulespec`의 `status`가 experimental인 규칙(시험 중)은 경보·사건에서 빼고 결과의 `experimental` 칸과 보고서 "시험 중 규칙"에만 보인다. 처음 시험 중 규칙은 11/24 이후 넣은 5개(WEBLOG_ROBOTS_HIDDEN, CT_RESOURCE_PUBLIC, CT_DEFENSE_IMPAIR, CT_KEY_EXPOSED, CT_DATA_EXPORT). 근거는 Sigma status, Elastic building block, Splunk Hunting 유형(`docs/개선방법_검증_2026-11-26.md`). S6·S7 주 숫자는 경보 규칙만, 모든 규칙 숫자는 보조로 함께 적는다(`eval_reallog.py`의 `stable_only`, `eval_panther.py`의 `machine_stable`). 승격 기준은 계획 파일 `maturity`.
 - 공개 규칙 목록 2곳 이상(Sigma·Elastic·Splunk)이 다루는 AWS API 보강: `CT_DATA_EXPORT`(VM 내보내기·다른 계정 복제), KMS 키 재료·EFS 삭제, MFA 삭제 끄기, KMS 키 정책 외부 허용, TruffleHog 키 확인(`scripts/public/catalog_coverage.py`). 규칙 61→62개.
@@ -60,6 +61,8 @@
 
 ### Fixed
 
+- 대회 전 기간 근거 점검(`docs/근거_점검_2026-11-26.md`): 규칙 수(56·61 → 62)와 테스트 수(382 → 511)를 문서마다 맞춤, GuardDuty 조사 에이전트 발표 시기(6월), README 주입 시연 문장. 결과 파일이 저장소에 없는 숫자 3개(채팅 AI 3/6, BOTSv3 규칙 측정, 실습 34/34)에 그 사실을 적음. README 측정표에 Panther B 반 43%와 EClog 오탐 0.496%를 더함. 2차 전체 검토(같은 문서 5절): 11/25에 근거 없다고 지운 russellmitchell 0.013%는 결과 파일이 있어 되살림(`reports/public/ait_russellmitchell_2026-11-21.json`), fox 0.30%·target_rules 10/15·129줄·29/52 날짜를 결과 파일 값으로, AI 재검토 155개·실습 결과에 근거 상태 표시, 서버 해킹 통계 출처 추가.
+- 근거 없던 숫자 재측정(`docs/재측정_2026-11-26.md`, 결과 `reports/remeasure_2026-11-26/`): lab 34/35(IDOR 1개 놓침, 실습 프로필 설정 누락), flaws.cloud 2분 3초·2,669MB, BOTSv3 규칙 측정, CTF 비용 $14.72(부가세 포함), 주입 시연 7·8 확인. AI 측정 2개는 키 거절(401)로 못 잼.
 - `CT_CONSOLE_NO_MFA`: SAML(회사 IdP)·역할 전환·SSO 로그인은 MFA를 IdP나 원래 세션에서 거치므로 빼고, 비밀번호로 들어오는 IAM 사용자·루트만 본다.
 - `CT_LOGGING_TAMPER`: CloudTrail 이벤트 선택기를 켜는 변경은 빼고, 관리 이벤트를 빼거나 읽기·쓰기 한쪽만 남기거나 제외 조건을 넣을 때만 잡는다.
 - WEBLOG_ROBOTS_HIDDEN 오탐: 스스로 크롤러라고 밝히는 UA(…bot, …crawler, …spider, 애드센스)를 빼고, 숨은 경로를 첫 마디 대신 숫자를 지운 모양으로 비교한다(평평한 URL의 상품 페이지). EClog 하루치 오탐 1,740줄 → 0줄(이미 본 데이터라 개발 점수, `reports/public/reallog_eclog_1day_after_fix_dev.json`).

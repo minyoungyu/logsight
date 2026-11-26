@@ -4,4 +4,6 @@ useDefault = true
 
 [allowlist]
 description = "문서·시험용 예시 값"
-regexes = ['''(AKIA|ASIA)[A-Z0-9]*EXAMPLE[A-Z0-9]*''', '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''']
+regexes = ['''(AKIA|ASIA)[A-Z0-9]*EXAMPLE[A-Z0-9]*''', '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''',
+  # EC2 인스턴스 ID(i-…)는 비밀값이 아니다. 사건 묶기 키 이름("key")이라 generic-api-key가 잘못 잡는다
+  '''^i-[0-9a-f]{8,17}$''']
