@@ -49,6 +49,18 @@
     "command": "python scripts/public/eval_panther.py --pa <panther-analysis e9c67b0> --half B --out reports/public/panther_ct_B.json",
     "judgement": "A와 같은 기준. 한 번만 재고, 결과를 보고 규칙을 고치면 그 뒤 숫자는 개발 점수"
    }
+  },
+  "ctf_cloudtrail": {
+   "decided_at": "2026-11-26T00:50Z (로그를 받거나 열기 전)",
+   "data": "CTF 본대회 AWS 계정의 CloudTrail(단일 리전, 관리 이벤트 전부, 데이터 이벤트는 플래그 버킷 객체만). 철거 전 CTF 운영 스레드가 원본 그대로 프로젝트 폴더(ctf-본대회/logs/cloudtrail)에 복사. 계정 ID·버킷 이름은 저장소에 적지 않는다.",
+   "label": "공격 = 문제 인스턴스의 역할 세션 자격 증명을 그 인스턴스가 아닌 IP에서 쓴 호출(IMDS SSRF로 빼낸 자격 증명). 인스턴스 IP는 측정 전에 인프라 기록에서 뽑는다. 그 밖의 호출(Terraform·운영자·AWS 서비스)은 정상.",
+   "unit": "공격 세션(자격 증명 키 ID × 출발 IP) 하나 = 1건. LogFinder 경보가 그 세션 호출 중 하나라도 포함하면 탐지. 사람이 판정(맞게 탐지/다른 이유로만/놓침)을 적는다.",
+   "engine": "측정 전 마지막 커밋으로 고정해 이 칸에 적는다(로그를 열기 전).",
+   "limits": [
+    "단일 리전 트레일이라 다른 리전 호출은 없음. IAM·STS 전역 이벤트 포함 범위는 확인 못 함[추정]",
+    "공격 세션 수를 미리 알 수 없어 10건 미만이면 숫자만 적고 판정하지 않음",
+    "S6 정의(Splunk 새 표본)와 다른 종류라 보조 지표로 적는다"
+   ]
   }
  },
  "S7": {
