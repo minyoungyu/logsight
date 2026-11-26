@@ -49,6 +49,25 @@ def load_config(path: str | Path) -> list[dict]:
     return [c for c in chans if c.get("enabled", True)]
 
 
+def dashboard_base(path: str | Path | None = None) -> str | None:
+    """알림에 넣을 대시보드 주소(예: https://logs.example.com). notify.json의 dashboard_url, 없으면 환경변수
+    LOGSIGHT_DASHBOARD_URL. http(s)가 아니면 쓰지 않는다. 주소에 토큰을 넣지 않는다(채팅방에 남기 때문)."""
+    url = None
+    if path:
+        try:
+            d = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+            url = d.get("dashboard_url") if isinstance(d, dict) else None
+        except (OSError, ValueError):
+            url = None
+    url = (url or os.environ.get("LOGSIGHT_DASHBOARD_URL") or "").strip().rstrip("/")
+    return url if url.startswith(("https://", "http://")) and "?" not in url and " " not in url else None
+
+
+def dashboard_link(base: str | None, out: Path) -> str | None:
+    """경보 폴더 하나의 대시보드 주소: <base>/alerts/<폴더 이름>."""
+    return f"{base}/alerts/{Path(out).name}" if base else None
+
+
 def _secret(c: dict, key: str) -> str | None:
     """설정의 key_env(환경변수 이름)를 우선, 없으면 key 값을 그대로."""
     env = c.get(f"{key}_env")
@@ -56,7 +75,7 @@ def _secret(c: dict, key: str) -> str | None:
 
 
 # ------------------------------------------------------------------ 보낼 내용
-def build(alert: dict, result: dict, out: Path, response: dict | None = None) -> dict:
+def build(alert: dict, result: dict, out: Path, response: dict | None = None, link: str | None = None) -> dict:
     """채널 공통 내용. alert는 Alert.summary(), result는 분석 결과."""
     first: list[str] = []
     incidents = []
@@ -75,6 +94,8 @@ def build(alert: dict, result: dict, out: Path, response: dict | None = None) ->
         "incidents": incidents, "first_actions": first[:5],
         "report_dir": str(out), "report_html": str(out / "report.html"),
     }
+    if link:
+        msg["dashboard_url"] = link
     if response and response.get("actions"):
         test = response.get("mode") == "dry-run"
         msg["auto_isolation"] = {"deadline": response["deadline"], "count": len(response["actions"]),
@@ -112,7 +133,10 @@ def text(msg: dict) -> str:
         lines.append(f"{iso['deadline'][11:16]} UTC" + (f"(한국 {dk})" if dk else "") + "까지 확인하지 않으면"
                      + f" 외부에서 만든 {iso['count']}개를 격리"
                      + (" (시험 모드: 기록만)" if iso["dry_run"] else "") + f". 확인: {iso['ack']}")
-    lines.append(f"보고서: {msg['report_html']}")
+    if msg.get("dashboard_url"):
+        lines.append(f"대시보드: {msg['dashboard_url']}")
+    else:
+        lines.append(f"보고서: {msg['report_html']}")
     return "\n".join(lines)
 
 
@@ -158,7 +182,7 @@ def send_discord(c: dict, msg: dict) -> dict:
     color = {"high": 0xD93025, "medium": 0xF29900, "low": 0x5F6368}.get(msg["severity"], 0x5F6368)
     body = {"username": PRODUCT_NAME, "allowed_mentions": {"parse": []},  # @everyone 등 호출 막기
             "embeds": [{"title": msg["title"][:250], "description": text(msg).split("\n", 1)[-1][:3900],  # 첫 줄=제목, 중복 빼기
-                        "color": color}]}
+                        "color": color, **({"url": msg["dashboard_url"]} if msg.get("dashboard_url") else {})}]}
     payload = json.dumps(body, ensure_ascii=False).encode()
     rep = Path(msg.get("report_html") or "-")
     if c.get("attach_report", True) and rep.is_file() and rep.stat().st_size <= DISCORD_MAX_FILE:

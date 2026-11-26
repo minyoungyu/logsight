@@ -6,6 +6,7 @@
 ## [Unreleased]
 
 ### Added
+- 관리자 대시보드 초안(`logsight/dashboard.py`, `docs/관리자_대시보드.md`): 알림 링크 → `/alerts/<경보 폴더>` 요약(등급·숫자·공격 흐름·먼저 고칠 설정) → 상세 보고서. `/alerts` 경보 목록, `/alerts/sample` 합성 샘플, `LOGSIGHT_TOKEN`이 있으면 `/login` 로그인. 숫자는 경보 폴더의 report.json·run.json 값만 쓴다. 통지에 `dashboard_url`(또는 `LOGSIGHT_DASHBOARD_URL`)을 주면 알림에 대시보드 주소가 들어가고 디스코드 카드 제목이 링크가 된다.
 - `scripts/evidence_check.py`와 `docs/근거_목록.json`: 문서의 측정 숫자를 결과 파일에서 다시 계산해 대조하고, 문서가 가리키는 `reports/` 경로가 있는지 본다. `tests/test_evidence.py`로 CI에서 돈다. `scripts/ctf_cost.py`: CTF 비용 계산.
 
 - 규칙 성숙도(`logsight/maturity.py`): `rulespec`의 `status`가 experimental인 규칙(시험 중)은 경보·사건에서 빼고 결과의 `experimental` 칸과 보고서 "시험 중 규칙"에만 보인다. 처음 시험 중 규칙은 11/24 이후 넣은 5개(WEBLOG_ROBOTS_HIDDEN, CT_RESOURCE_PUBLIC, CT_DEFENSE_IMPAIR, CT_KEY_EXPOSED, CT_DATA_EXPORT). 근거는 Sigma status, Elastic building block, Splunk Hunting 유형(`docs/개선방법_검증_2026-11-26.md`). S6·S7 주 숫자는 경보 규칙만, 모든 규칙 숫자는 보조로 함께 적는다(`eval_reallog.py`의 `stable_only`, `eval_panther.py`의 `machine_stable`). 승격 기준은 계획 파일 `maturity`.

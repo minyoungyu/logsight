@@ -14,10 +14,10 @@ from urllib.parse import urlsplit
 
 from fastapi import FastAPI, File, Form, Request
 from fastapi import UploadFile as FUploadFile
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from starlette.datastructures import UploadFile
 
-from logsight import normalize
+from logsight import dashboard, normalize
 from logsight.normalize import PARSERS, load_uploads, parse_tz, parse_when
 from logsight.pipeline import run, run_paths
 from logsight.report import render
@@ -102,7 +102,7 @@ background:var(--red);color:#111;cursor:pointer}button:hover{background:transpar
 """
 CONSOLE_BAR = ("<div class=bar><a class=logo href='/'><i></i>LOGFINDER</a><span>AWS 침해사고 초동 분석</span>"
                "<span class=sp></span><a href='/'>로그 분석</a><a href='/web'>웹서버 점검</a><a href='/compare'>규칙 vs Claude</a>"
-               "{docs}</div>")
+               "<a href='/alerts'>받은 경보</a>{docs}</div>")
 
 PAGE = """<!doctype html><html lang=ko><meta charset=utf-8>
 <meta name=viewport content='width=device-width,initial-scale=1'><title>LogFinder</title>
@@ -199,6 +199,8 @@ def _upload_refusal(request: Request) -> tuple[int, str] | None:
     """업로드(POST)를 받지 않을 이유. 받아도 되면 None."""
     if not _same_origin(request):
         return 403, "다른 사이트에서 보낸 업로드는 받지 않습니다."
+    if request.url.path == "/login":  # 토큰을 처음 넣는 곳이라 토큰을 요구하지 않는다(같은 사이트에서 온 것만)
+        return None
     if TOKEN:
         given = request.headers.get("x-logsight-token") or request.cookies.get("logsight_token") or ""
         if not hmac.compare_digest(given.encode(), TOKEN.encode()):
@@ -225,6 +227,15 @@ async def _guard(request: Request, call_next):
             for k, v in SECURITY_HEADERS.items():
                 resp.headers[k] = v
             return resp
+    if request.method == "GET" and _is_private_dashboard(request.url.path) and not _dashboard_allowed(request):
+        if TOKEN:  # 알림 링크로 처음 들어온 사람은 로그인 화면으로 보냈다가 원래 화면으로 돌려보낸다
+            resp = RedirectResponse(f"/login?next={request.url.path}", status_code=303)
+        else:
+            resp = _error("경보 화면은 이 컴퓨터에서만 볼 수 있습니다. 다른 컴퓨터·알림 링크로 보려면 서버를 "
+                          "LOGSIGHT_TOKEN과 함께 띄우고 /login에서 로그인하세요.", 403)
+        for k, v in SECURITY_HEADERS.items():
+            resp.headers[k] = v
+        return resp
     token_q = request.query_params.get("token")
     resp = await call_next(request)
     if not request.url.path.startswith(("/docs", "/redoc")):  # API 문서 화면은 외부 스크립트를 쓴다
@@ -456,3 +467,114 @@ async def api_web_scan(
     with tempfile.TemporaryDirectory() as d:
         profile = _profile_from_uploads(Path(d), files)
         return JSONResponse(assess(profile, use_ai=not no_ai))
+
+
+# --------------------------------------------------------------- 관리자 대시보드(알림 → 요약 → 상세 보고서)
+# 경보 폴더(logsight watch·on-alert의 --out)를 읽어 보여 준다. 화면의 숫자는 모두 그 폴더의 report.json·run.json 값이다.
+# 경보 보고서에는 내부 IP·계정이 들어 있어 업로드와 같은 규칙으로 막는다: 토큰이 있으면 로그인(쿠키), 없으면 이 컴퓨터만.
+# 공개 데모(LOGSIGHT_DEMO=1)에서는 디스크의 경보를 보여 주지 않고 합성 샘플 경보만 보여 준다.
+ALERTS_DIR = Path(os.environ.get("LOGSIGHT_ALERTS_DIR") or Path(__file__).parent / "reports" / "alerts")
+SAMPLE_ALERT = ROOT / "alerts" / "guardduty_event.json"
+_sample_dir: list[Path] = []
+
+
+def _is_private_dashboard(path: str) -> bool:
+    return (path == "/alerts" or path.startswith("/alerts/")) and not path.startswith("/alerts/sample")
+
+
+def _dashboard_allowed(request: Request) -> bool:
+    if TOKEN:
+        given = request.cookies.get("logsight_token") or request.query_params.get("token") or ""
+        return hmac.compare_digest(given.encode(), TOKEN.encode())
+    return (request.client.host if request.client else "") in LOCAL_HOSTS
+
+
+LOGIN = """<div class=hero><h1>관리자 로그인</h1><p>서버를 띄울 때 정한 LOGSIGHT_TOKEN 값을 넣으세요.
+로그인하면 이 브라우저가 기억하고, 알림의 링크를 누르면 바로 경보 화면이 열립니다.</p></div>
+<form action=/login method=post><input type=hidden name=next value="{next}">
+<label>토큰 <input type=password name=token autocomplete=current-password required autofocus></label>
+{msg}<button>로그인</button></form>"""
+
+
+def _safe_next(n: str | None) -> str:
+    return n if n and _is_private_dashboard(n) and "//" not in n and "\\" not in n else "/alerts"
+
+
+def _login_page(nxt: str, msg: str = "", code: int = 200) -> HTMLResponse:
+    body = LOGIN.replace("{next}", escape(_safe_next(nxt))).replace("{msg}", f"<p style='color:var(--red)'>{escape(msg)}</p>" if msg else "")
+    return HTMLResponse(f"<!doctype html><html lang=ko><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>"
+                        f"<title>로그인 · LogFinder</title><style>{CONSOLE_CSS}</style>{_bar()}<div style='max-width:520px'>{body}</div></html>",
+                        status_code=code)
+
+
+@app.get("/login", response_class=HTMLResponse)
+def login_form(next: str | None = None):  # noqa: A002 - 주소의 매개변수 이름
+    if not TOKEN:
+        return _error("이 서버는 토큰 없이 떠 있어 로그인이 필요 없습니다(이 컴퓨터에서만 경보 화면을 엽니다).", 404)
+    return _login_page(next or "/alerts")
+
+
+@app.post("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    form = await request.form()
+    nxt = _safe_next(str(form.get("next") or ""))
+    if not TOKEN:
+        return _error("이 서버는 토큰 없이 떠 있어 로그인이 필요 없습니다.", 404)
+    if not hmac.compare_digest(str(form.get("token") or "").encode(), TOKEN.encode()):
+        return _login_page(nxt, "토큰이 맞지 않습니다.", 401)
+    resp = RedirectResponse(nxt, status_code=303)
+    resp.set_cookie("logsight_token", TOKEN, httponly=True, samesite="lax", max_age=30 * 24 * 3600,
+                    secure=request.url.scheme == "https")
+    return resp
+
+
+def _sample_alert_dir() -> Path:
+    """합성 샘플 경보(samples/alerts)를 샘플 로그(samples/demo)로 실제 분석해 임시 폴더에 한 번 만든다(AI 끔)."""
+    if not _sample_dir:
+        import tempfile
+
+        from logsight import alert as al
+        ev = al.parse_event(json.loads(SAMPLE_ALERT.read_text(encoding="utf-8")))
+        with _Syslog(year=2026):
+            res = al.handle(ev, al.Options(logs=[str(ROOT / "demo")], out=tempfile.mkdtemp(prefix="logsight_sample_"),
+                                           use_ai=False))
+        _sample_dir.append(Path(res["out"]))
+    return _sample_dir[0]
+
+
+SAMPLE_NOTE = ("합성 샘플입니다. samples/alerts의 GuardDuty 경보를 samples/demo 로그로 지금 실제로 분석한 결과이며(AI 끔), "
+               "IP·계정은 문서용 예약 값입니다. '받은 시각'은 이 화면을 처음 연 시각입니다.")
+
+
+@app.get("/alerts", response_class=HTMLResponse)
+def alerts(min: str = "low"):  # noqa: A002
+    m = min if min in dashboard.SEV_ORDER else "low"
+    items = [] if DEMO else dashboard.list_alerts(ALERTS_DIR, m)
+    return dashboard.render_index(items, CONSOLE_CSS, _bar(), m, sample=True)
+
+
+@app.get("/alerts/sample", response_class=HTMLResponse)
+def alert_sample():
+    d = dashboard.load(_sample_alert_dir())
+    return dashboard.render_alert(d, CONSOLE_CSS, _bar(), "/alerts/sample/report", note=SAMPLE_NOTE)
+
+
+@app.get("/alerts/sample/report", response_class=HTMLResponse)
+def alert_sample_report():
+    return _page_with_back((_sample_alert_dir() / "report.html").read_text(encoding="utf-8"))
+
+
+@app.get("/alerts/{name}", response_class=HTMLResponse)
+def alert_view(name: str):
+    p = None if DEMO else dashboard.folder(ALERTS_DIR, name)
+    if not p:
+        return _error("없는 경보입니다.", 404)
+    return dashboard.render_alert(dashboard.load(p), CONSOLE_CSS, _bar(), f"/alerts/{name}/report")
+
+
+@app.get("/alerts/{name}/report", response_class=HTMLResponse)
+def alert_report(name: str):
+    p = None if DEMO else dashboard.folder(ALERTS_DIR, name)
+    if not p or not (p / "report.html").is_file():
+        return _error("없는 보고서입니다.", 404)
+    return _page_with_back((p / "report.html").read_text(encoding="utf-8"))
