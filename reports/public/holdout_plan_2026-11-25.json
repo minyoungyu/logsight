@@ -169,6 +169,36 @@
    "second_korea": {
     "data": "한국 소규모 실제 서비스 접근 로그 1개(팀원·동아리·학과·인터뷰 대상 팀). 받기 전에 서비스 이름과 기간, trusted_ips·admin_paths를 이 칸에 적고 커밋한다.",
     "status": "구하는 중(운영자 컴퓨터에서 돌리고 전체 줄 수와 표시된 줄만 받는 방식 우선). 받으면 새 계획 칸을 받기 전에 적는다."
+   },
+   "second_y": {
+    "decided_at": "2026-11-26T03:45Z (기관 Y의 요청 내용을 보기 전. zip 파일 이름·크기와 S7.data_precheck의 IP 칸 수만 셈)",
+    "why": "기관 X가 IP 합침으로 판정 불가. 사용자 지시(2026-11-26 10:16 KST 제안, 12:37 KST '시작해')로 같은 데이터셋의 기관 Y를 사전 확인. Y 전체는 7,272,925줄에 IP 914개, 한 값이 79.3%라 data_precheck 불합격. 가상 호스트 19개 중 sub5.domain1.com 하나만 105,925줄에 IP 864개, 가장 많은 값 11.1%로 합격(IPv4 공인 101,996줄, 사설·예약 3,926줄, 루프백 3줄).",
+    "data": "organization-y.zip(md5 b1925ff7f043c391d501cfd404e0df10 일치, sha256 4e0aa82b126ef687a967b1086f449dd4b0aaf78774197bbc4b2082a944878dcf) 안의 organization-y/log/home/sub5.domain1.com/logs/ 의 sub5.domain1.com.access_log.2025_04_16과 sub5.domain1.com.access_log 두 파일. 이 순서로 이어 붙여 data/public/zenodo20001206/y_sub5/access.log. 다른 가상 호스트는 쓰지 않는다.",
+    "custody": "IP가 실제 공인 주소일 수 있어 원본·분류표는 data/ 아래에만 두고 숫자만 커밋한다.",
+    "profile": {
+     "name": "Zenodo 20001206 기관 Y sub5",
+     "log_paths": {
+      "access": [
+       "data/public/zenodo20001206/y_sub5/access.log"
+      ]
+     },
+     "year": 2025,
+     "trusted_ips": []
+    },
+    "engine_commit": "84ae5b2951cd292b701fd9a62fddfeec957faa66",
+    "engine_note": "기관 X와 같은 엔진. 주 숫자는 stable_only, 보조는 모든 규칙.",
+    "format": "OpenLiteSpeed 접근 로그. LogFinder가 읽지 못한 줄이 1%를 넘으면 판정하지 않는다.",
+    "measure": "python scripts/public/eval_reallog.py --profile data/public/zenodo20001206/y_sub5/profile.json --review data/public/zenodo20001206/y_sub5/review.tsv --out reports/public/reallog_zenodo20001206_y_sub5.json, 분류 뒤 --labels로 다시",
+    "review_rule_extra": [
+     "S7.review_rule(A1~A3)에 기관 X 측정 때 더한 예를 미리 넣고 쓴다. A1 추가: waitfor delay, |id, `id`, onerror=, auto_prepend_file, allow_url_include, insert into, ..\\, win.ini, benchmark(, base64 안의 union select. A3 추가: id_rsa, wp-config, .key, .pem, /php-cgi, application.ini.",
+     "A5 organization-y.yaml의 moderate 규칙에 걸리는 줄은 attack(데이터셋 자체 기록). strict만 걸리는 줄은 fp로 세고 수를 따로 적는다.",
+     "그 밖에는 fp(보수적)."
+    ],
+    "limits": [
+     "가상 호스트 하나라 기관 Y 전체를 대표하지 않는다. 다른 호스트를 빼고 이 호스트를 고른 이유는 IP 조건 하나뿐이다(요청 내용은 보지 않음).",
+     "기관 Y는 2025-04-29 권한 상승 사고가 있던 서버라 공격 줄이 많을 수 있다.",
+     "작성자 'Anonim', 출처 검증 불가."
+    ]
    }
   },
   "normal_label": "CSIC: normal 파일의 요청 전부. CAM-LDS: 공격 도구 실행 기록의 공격자 IP·시간 창에 들어가지 않는 줄. 실제 로그: 사람이 공격이 아니라고 확인한 줄(확인 방법을 결과에 적음)",
