@@ -52,3 +52,6 @@ f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/repo
 04c9d192f9eee0324298ca344c7be05c43ca9258:reports/remeasure_2026-11-26/chat_baseline/pilot/v2/run1/score.json:aws-access-token:35
 04c9d192f9eee0324298ca344c7be05c43ca9258:reports/remeasure_2026-11-26/chat_baseline/pilot/v2/run3/score.json:aws-access-token:35
 04c9d192f9eee0324298ca344c7be05c43ca9258:scripts/chat_baseline.py:aws-access-token:99
+# 데이터 파일 해시(access_log_sha256)를 generic-api-key가 잘못 잡음. 743044f는 #55 병합 커밋
+743044fecf857bcde54c98b1a439ae428973f0d2:reports/public/reallog_zenodo20001206_x.json:generic-api-key:113
+31255219dfdded3d84e9bbd3d81d80aa9183df22:reports/public/ctf_main_precheck.json:generic-api-key:6
