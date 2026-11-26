@@ -39,9 +39,10 @@ RULES: dict[str, tuple[str, str, str, str]] = {
     "CT_UNTRUSTED_IP":    ("T1078.004", "initial-access", "신뢰 목록 밖 IP에서 자격증명 사용", "medium"),
     "CT_CONSOLE_NO_MFA":  ("T1078.004", "initial-access", "MFA 없는 콘솔 로그인", "low"),
     "CT_RUN_INSTANCES_BURST": ("T1496", "impact", "인스턴스 대량 생성(자원 탈취 의심)", "high"),
-    "CT_RESOURCE_PUBLIC": ("T1530", "collection", "RDS·CodeBuild 등 자원을 인터넷에 공개", "high"),
+    "CT_RESOURCE_PUBLIC": ("T1530", "collection", "RDS·CodeBuild·KMS 키 등 자원을 인터넷·다른 계정에 공개", "high"),
+    "CT_DATA_EXPORT":     ("T1537", "exfiltration", "VM 내보내기·다른 계정 버킷으로 복제 설정", "high"),
     "CT_DEFENSE_IMPAIR":  ("T1562.001", "defense-evasion", "WAF·GuardDuty·EBS 암호화 등 보안 장치 해제", "high"),
-    "CT_KEY_EXPOSED":     ("T1552.001", "credential-access", "AWS가 유출된 액세스 키를 격리함(키 노출)", "high"),
+    "CT_KEY_EXPOSED":     ("T1552.001", "credential-access", "유출된 액세스 키 신호(AWS 격리 정책, 비밀 탐색 도구의 키 확인)", "high"),
     "VPC_PORT_SCAN":      ("T1046", "discovery", "여러 포트에 대한 접속 시도(포트 스캔)", "medium"),
     "VPC_REMOTE_ADMIN_EXPOSED": ("T1133", "initial-access", "외부에서 관리 포트(22/3389) 접속 허용", "medium"),
     "WAF_SQLI_NOT_BLOCKED": ("T1190", "initial-access", "SQL 인젝션 탐지됐지만 차단 안 됨(COUNT/ALLOW)", "high"),
@@ -137,7 +138,8 @@ ACCOUNT_SECURITY = {"iam:DeactivateMFADevice", "iam:DeleteVirtualMFADevice",
                     "iam:DeleteSAMLProvider"}
 DESTROY_ONE = {"kms:ScheduleKeyDeletion", "kms:DisableKey", "backup:DeleteRecoveryPoint",
                "backup:DeleteBackupVault", "rds:DeleteDBCluster", "rds:DeleteDBInstance",
-               "rds:DeleteDBInstanceAutomatedBackup", "rds:DeleteDBClusterAutomatedBackup"}
+               "rds:DeleteDBInstanceAutomatedBackup", "rds:DeleteDBClusterAutomatedBackup",
+               "kms:DeleteImportedKeyMaterial", "elasticfilesystem:DeleteFileSystem"}
 SAML_CALLS = {"iam:CreateSAMLProvider", "iam:UpdateSAMLProvider", "iam:DeleteSAMLProvider"}
 # 보안 장치를 떼거나 끄는 호출(기록 끄기는 LOGGING_TAMPER). ATT&CK T1562.001
 DEFENSE_IMPAIR = {"wafv2:DisassociateWebACL", "waf-regional:DisassociateWebACL", "wafv2:DeleteWebACL",
@@ -562,7 +564,7 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             singles[("CT_SERVERLESS_CHANGE", e.actor or "")].append(e)
         if a == "ec2:GetPasswordData" or (a == "secretsmanager:BatchGetSecretValue" and e.outcome == "success"):
             singles[("CT_SECRET_ACCESS", e.actor or "")].append(e)
-        if a in DESTROY_ONE or "versioning_off" in flags or "kms_external" in flags:
+        if a in DESTROY_ONE or "versioning_off" in flags or "kms_external" in flags or "mfa_delete_off" in flags:
             if a not in ("rds:DeleteDBInstance", "rds:DeleteDBCluster") or "no_final_snapshot" in flags:
                 singles[("CT_DATA_DESTRUCTION", e.actor or "")].append(e)
         if e.extra.get("identity_type") == "Root" and e.extra.get("eventType") != "AwsServiceEvent":
@@ -575,7 +577,11 @@ def run_detections(events: list[Event], env: dict | None = None) -> list[Finding
             singles[("CT_IAM_PERSISTENCE", e.actor or "")].append(e)
         if (a == "ec2:AuthorizeSecurityGroupIngress" and "0.0.0.0/0" in str(params)) or "nacl_open" in flags:
             singles[("CT_SG_OPENED", e.actor or "")].append(e)
-        if "resource_public" in flags:
+        if a == "ec2:CreateInstanceExportTask" or "replicate_external" in flags:
+            singles[("CT_DATA_EXPORT", e.actor or "")].append(e)
+        if "trufflehog" in (e.extra.get("userAgent") or "").lower():
+            singles[("CT_KEY_EXPOSED", e.actor or "")].append(e)
+        if "resource_public" in flags or (a == "kms:PutKeyPolicy" and "external" in flags):
             singles[("CT_RESOURCE_PUBLIC", e.actor or "")].append(e)
         if a in DEFENSE_IMPAIR or (a == "guardduty:CreateFilter" and "ARCHIVE" in str(params).upper()):
             singles[("CT_DEFENSE_IMPAIR", e.actor or "")].append(e)

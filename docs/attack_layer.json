@@ -155,9 +155,9 @@
   {
    "techniqueID": "T1537",
    "tactic": "exfiltration",
-   "score": 2,
+   "score": 3,
    "color": "",
-   "comment": "CT_S3_PUBLIC, CT_SNAPSHOT_SHARE",
+   "comment": "CT_DATA_EXPORT, CT_S3_PUBLIC, CT_SNAPSHOT_SHARE",
    "enabled": true
   },
   {

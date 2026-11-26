@@ -222,6 +222,12 @@ CASES = {
                                                 params={"resourceArn": "arn:aws:elasticloadbalancing:x"})]),
                           lambda: aws_rules([ct(0, "AssociateWebACL", "wafv2",
                                                 params={"resourceArn": "arn:aws:elasticloadbalancing:x"})])),
+    "CT_DATA_EXPORT": (lambda: aws_rules([ct(0, "PutBucketReplication", "s3", recipientAccountId=ACCT, params={
+                           "bucketName": "data", "ReplicationConfiguration": {"Rule": {"Destination": {
+                               "Bucket": "arn:aws:s3:::x", "Account": "444455556666"}}}})]),
+                       lambda: aws_rules([ct(0, "PutBucketReplication", "s3", recipientAccountId=ACCT, params={
+                           "bucketName": "data", "ReplicationConfiguration": {"Rule": {"Destination": {
+                               "Bucket": "arn:aws:s3:::x", "Account": ACCT}}}})])),
     "CT_KEY_EXPOSED": (lambda: aws_rules([ct(0, "PutUserPolicy", params={
                            "userName": "dev", "policyName": "AWSExposedCredentialPolicy_DO_NOT_REMOVE"})]),
                        lambda: aws_rules([ct(0, "PutUserPolicy", params={"userName": "dev", "policyName": "s3-read"})])),
@@ -454,3 +460,18 @@ class PantherDevFixes(unittest.TestCase):
         own = dict(ext, **{"x-amz-server-side-encryption-aws-kms-key-id": f"arn:aws:kms:us-east-1:{ACCT}:key/k"})
         self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "CopyObject", "s3", params=ext, recipientAccountId=ACCT)]))
         self.assertNotIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "CopyObject", "s3", params=own, recipientAccountId=ACCT)]))
+
+    def test_catalog_consensus_additions(self):
+        """여러 공개 규칙 목록(Sigma·Elastic·Splunk)이 함께 다루는 API(11/26 대조)."""
+        self.assertIn("CT_DATA_EXPORT", aws_rules([ct(0, "CreateInstanceExportTask", "ec2", params={"instanceId": "i-1"})]))
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "DeleteImportedKeyMaterial", "kms", params={"keyId": "k"})]))
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "DeleteFileSystem", "elasticfilesystem",
+                                                           params={"fileSystemId": "fs-1"})]))
+        self.assertIn("CT_DATA_DESTRUCTION", aws_rules([ct(0, "PutBucketVersioning", "s3", params={
+            "bucketName": "d", "VersioningConfiguration": {"Status": "Enabled", "MfaDelete": "Disabled"}})]))
+        self.assertIn("CT_RESOURCE_PUBLIC", aws_rules([ct(0, "PutKeyPolicy", "kms", recipientAccountId=ACCT, params={
+            "keyId": "k", "policy": '{"Statement":[{"Principal":{"AWS":"arn:aws:iam::444455556666:root"}}]}'})]))
+        self.assertNotIn("CT_RESOURCE_PUBLIC", aws_rules([ct(0, "PutKeyPolicy", "kms", recipientAccountId=ACCT, params={
+            "keyId": "k", "policy": '{"Statement":[{"Principal":{"AWS":"arn:aws:iam::%s:root"}}]}' % ACCT})]))
+        self.assertIn("CT_KEY_EXPOSED", aws_rules([ct(0, "GetCallerIdentity", "sts", userAgent="TruffleHog")]))
+        self.assertNotIn("CT_KEY_EXPOSED", aws_rules([ct(0, "GetCallerIdentity", "sts", userAgent="aws-cli/2.15")]))

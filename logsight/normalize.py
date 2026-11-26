@@ -931,6 +931,14 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
         m = re.search(r'"x-amz-server-side-encryption-aws-kms-key-id"\s*:\s*"arn:aws[\w-]*:kms:[\w-]+:(\d{12}):', txt)
         if m and m.group(1) != own:
             flags.append("kms_external")
+    # 버전 관리의 MFA 삭제 보호 끄기: 지운 객체를 MFA 없이 영구 삭제할 수 있게 된다
+    if action == "s3:PutBucketVersioning" and re.search(r'"MfaDelete"\s*:\s*"Disabled"', txt, re.I):
+        flags.append("mfa_delete_off")
+    # 다른 계정 버킷으로 복제 설정(Destination.Account가 우리 계정이 아님)
+    if action == "s3:PutBucketReplication":
+        acc = set(re.findall(r'"Account"\s*:\s*"(\d{12})"', txt))
+        if own and acc - {own}:
+            flags.append("replicate_external")
     # 버킷 접근 기록 끄기: LoggingEnabled 없이 PutBucketLogging
     if action == "s3:PutBucketLogging" and "LoggingEnabled" not in txt:
         flags.append("logging_off")
@@ -941,7 +949,7 @@ def ct_flags(action: str, params, record: dict) -> list[str]:
     # CloudTrail 이벤트 선택기: 관리 이벤트를 빼거나 읽기·쓰기 한쪽만 남기거나 제외 조건을 넣으면 기록이 줄어든다
     if action == "cloudtrail:PutEventSelectors" and _selectors_reduce(params):
         flags.append("selectors_reduce")
-    if action in ("s3:PutBucketPolicy", "lambda:AddPermission", "lambda:AddLayerVersionPermission",
+    if action in ("s3:PutBucketPolicy", "lambda:AddPermission", "lambda:AddLayerVersionPermission", "kms:PutKeyPolicy",
                   "rds:ModifyDBSnapshotAttribute", "rds:ModifyDBClusterSnapshotAttribute",
                   "ec2:ModifySnapshotAttribute", "ec2:ModifyImageAttribute"):
         others = _accounts(txt) - {own} if own else set()

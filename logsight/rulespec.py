@@ -201,7 +201,7 @@ SPEC: dict[str, dict] = {
     "CT_RESOURCE_PUBLIC": {
         "logs": "CloudTrail",
         "when": "RDS 생성·변경·복원에서 publiclyAccessible=true, DB 보안 그룹에 0.0.0.0/0·::/0 허용, "
-                "CodeBuild 프로젝트를 PUBLIC_READ로 전환. 1건으로도",
+                "CodeBuild 프로젝트를 PUBLIC_READ로 전환, KMS 키 정책이 다른 계정·*을 허용. 1건으로도",
         "blind": ["보안 그룹(EC2 SG)으로 DB 포트를 연 것은 CT_SG_OPENED가 맡음",
                   "공개 상태로 이미 만들어져 있던 자원은 보지 않음(설정 점검이 맡음)"],
         "fp": ["일부러 공개한 시연용 DB·오픈소스 빌드 프로젝트"],
@@ -216,12 +216,22 @@ SPEC: dict[str, dict] = {
         "fp": ["배포 도구(Terraform 등)가 자원을 다시 만들면서 잠깐 분리·삭제하는 경우. 그 역할을 정상 작업 목록에 넣는다"],
         "first": "누가 왜 껐는지 확인하고 다시 켠다. 같은 주체의 다른 행동을 본다.",
     },
+    "CT_DATA_EXPORT": {
+        "logs": "CloudTrail",
+        "when": "EC2 CreateInstanceExportTask(VM 이미지를 S3로 내보냄), S3 PutBucketReplication의 대상 계정"
+                "(Destination.Account)이 우리 계정이 아님. 1건으로도",
+        "blind": ["대상 계정을 적지 않은 복제 설정은 버킷 주인을 몰라 보지 않음",
+                  "RDS 스냅샷 내보내기(StartExportTask)는 보지 않음"],
+        "fp": ["조직 안 백업 계정으로의 정상 복제"],
+        "first": "내보낸 위치·복제 대상 계정을 확인하고, 모르는 곳이면 작업·복제 규칙을 지운다.",
+    },
     "CT_KEY_EXPOSED": {
         "logs": "CloudTrail",
         "when": "AWS가 유출된 액세스 키의 사용자에게 격리 정책(AWSExposedCredentialPolicy_DO_NOT_REMOVE, "
-                "AWSCompromisedKeyQuarantine)을 붙임. 1건으로도",
-        "blind": ["AWS가 발견하지 못한 유출(비공개 저장소, 메신저 등)은 보지 않음"],
-        "fp": ["거의 없음. 격리 정책은 AWS가 키 노출을 확인했을 때만 붙인다"],
+                "AWSCompromisedKeyQuarantine)을 붙임, 또는 User-Agent가 TruffleHog(유출 키가 살아 있는지 확인하는 도구)인 호출. 1건으로도",
+        "blind": ["AWS가 발견하지 못한 유출(비공개 저장소, 메신저 등)은 보지 않음",
+                  "User-Agent를 바꾼 키 확인 도구는 보지 않음"],
+        "fp": ["우리 팀이 직접 TruffleHog로 자기 키를 점검한 경우"],
         "first": "그 키를 바로 비활성화·삭제하고, 키가 노출된 뒤 한 호출을 모두 확인한다.",
     },
     # ------------------------------------------------------------------ VPC Flow / 서버 방화벽
