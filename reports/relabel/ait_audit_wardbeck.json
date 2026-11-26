@@ -1,0 +1,119 @@
+{
+ "testbed": "wardbeck",
+ "window_utc": [
+  "2022-01-23T12:10:00+00:00",
+  "2022-01-23T12:55:25+00:00"
+ ],
+ "n_steps": 54,
+ "webshell_paths_from_labels": [
+  "/wp-content/uploads/2022/01/hzclekfpog-1642939939.1495.php"
+ ],
+ "hosts": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": []
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled_lines": 5299,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "intranet.hurstwong.wardbeck.info-access.log.1:7185",
+     "why": "webshell_path",
+     "ts": "2022-01-23T12:54:46+00:00"
+    }
+   ]
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": []
+  }
+ },
+ "score": {
+  "intranet_server": {
+   "ait_labels": {
+    "attack_lines": 5344,
+    "tp": 5287,
+    "fn": 57,
+    "fp": 51,
+    "recall": 0.9893,
+    "precision": 0.9904
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 5345,
+    "tp": 5288,
+    "fn": 57,
+    "fp": 50,
+    "recall": 0.9893,
+    "precision": 0.9906
+   },
+   "gap_lines": 1,
+   "gap_flagged": 1
+  },
+  "webserver": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "gap_lines": 0,
+   "gap_flagged": 0
+  },
+  "cloud_share": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "gap_lines": 0,
+   "gap_flagged": 0
+  }
+ },
+ "summary": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 0
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled": 5299,
+   "labeled_outside_window": 0,
+   "gap_candidates": 1
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 0
+  }
+ }
+}
