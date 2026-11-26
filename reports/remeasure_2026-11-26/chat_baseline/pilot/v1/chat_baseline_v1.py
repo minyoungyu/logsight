@@ -86,7 +86,7 @@ STAGE_DETAIL = {
     "G1": "WAF 로그: 공격자 IP 198.18.7.1(·198.18.7.2)이 웹앱 POST /api/subscriptions 로 내부 주소(메타데이터) 조회를 시도했고 WAF가 막았다(KST 14:10~).",
     "G2": "WAF 로그: 공격자 IP가 서명 없는 토큰으로 EKS 지원 API(/api/support/...)에 접근했다.",
     "G3": "ALB 로그: 공격자 IP가 PageSnap 결과 PDF를 /download 로 내려받았다(KST 14:52~14:54, 성공 응답).",
-    "G4": "CloudTrail: EC2(portal) 인스턴스 역할 임시 키 ASIA71C21DC25EA495CF가 외부 IP(198.18.50.1, 198.18.7.1)에서 쓰였다.",
+    "G4": "CloudTrail: EC2(portal) 인스턴스 역할 임시 키 ASIA71C2…95CF가 외부 IP(198.18.50.1, 198.18.7.1)에서 쓰였다.",
     "G5": "CloudTrail: 그 키로 states:StartExecution(워크플로 실행)이 성공했다(KST 15:36~16:08).",
     "G6": "CloudTrail: 그 키로 SSM(SendCommand·StartSession) 원격 명령·세션을 시도했고 거부(AccessDenied)됐다.",
 }

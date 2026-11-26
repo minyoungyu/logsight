@@ -96,7 +96,7 @@ STAGE_DETAIL = {
     "G1": "WAF 로그: 공격자 IP 198.18.7.1(·198.18.7.2)이 웹앱 POST /api/subscriptions 로 내부 주소(메타데이터) 조회를 시도했고 WAF가 막았다(KST 14:10~).",
     "G2": "WAF 로그: 공격자 IP가 서명 없는 토큰으로 EKS 지원 API(/api/support/...)에 접근했다.",
     "G3": "ALB 로그: 공격자 IP가 PageSnap 결과 PDF를 /download 로 내려받았다(KST 14:52~14:54, 성공 응답).",
-    "G4": "CloudTrail: EC2(portal) 인스턴스 역할 임시 키 ASIA71C21DC25EA495CF가 외부 IP(198.18.50.1, 198.18.7.1)에서 쓰였다.",
+    "G4": "CloudTrail: EC2(portal) 인스턴스 역할 임시 키 {attacker_key}가 외부 IP(198.18.50.1, 198.18.7.1)에서 쓰였다.",
     "G5": "CloudTrail: 그 키로 states:StartExecution(워크플로 실행)이 성공했다(KST 15:36~16:08).",
     "G6": "CloudTrail: 그 키로 SSM(SendCommand·StartSession) 원격 명령·세션을 시도했고 거부(AccessDenied)됐다.",
 }
@@ -179,8 +179,13 @@ def user_turn(client, ai_message: str, convo_for_user: list[dict], workdir: str,
     return reply + (FINAL_REQUEST if final else "")
 
 
+GT_PATH = Path(__file__).resolve().parents[1] / "reports" / "ctf" / "gongbang_ground_truth.json"
+
+
 def judge(client, report: str, usage: dict) -> list[dict]:
-    stages = "\n".join(f"- {k}: {v}" for k, v in STAGE_DETAIL.items())
+    # 공격자 키(가명)는 소스에 적지 않고 정답지에서 읽는다(비밀값 검사가 키 모양을 잡으므로)
+    key = json.loads(GT_PATH.read_text(encoding="utf-8"))["attacker_keys"][0]
+    stages = "\n".join(f"- {k}: {v.format(attacker_key=key)}" for k, v in STAGE_DETAIL.items())
     resp = _create(
         client, model=MODEL, system=JUDGE_SYSTEM,
         messages=[{"role": "user", "content": f"정답지 단계:\n{stages}\n\n최종 보고서:\n\n{report}"}],
@@ -248,7 +253,7 @@ def run_once(data: Path, out: Path) -> dict:
     return result
 
 
-KEY_RE = re.compile(r"\b((?:ASIA|AKIA)[0-9A-Z]{4})[0-9A-Z]{8}([0-9A-Z]{4})\b")
+KEY_RE = re.compile(r"(?<![0-9A-Z])((?:ASIA|AKIA)[0-9A-Z]{4})[0-9A-Z]{8}([0-9A-Z]{4})(?![0-9A-Z])")
 
 
 def mask_keys(text: str) -> str:

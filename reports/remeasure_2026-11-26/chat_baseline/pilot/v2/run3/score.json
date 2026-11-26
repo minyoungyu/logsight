@@ -32,7 +32,7 @@
    "id": "G4",
    "caught": false,
    "quote": "sourceIPAddress는 있지만 분석하지 못함",
-   "reason": "portal EC2 역할이 이상한 호출을 했다는 점은 짚었다. 그러나 임시 키 ASIA71C21DC25EA495CF와 외부 IP(198.18.50.1, 198.18.7.1)에서 쓰였다는 사실은 확인하지 않았고, IP는 분석하지 못했다고 스스로 밝혔다.",
+   "reason": "portal EC2 역할이 이상한 호출을 했다는 점은 짚었다. 그러나 임시 키 ASIA71C2…95CF와 외부 IP(198.18.50.1, 198.18.7.1)에서 쓰였다는 사실은 확인하지 않았고, IP는 분석하지 못했다고 스스로 밝혔다.",
    "quote_found_in_report": true
   },
   {

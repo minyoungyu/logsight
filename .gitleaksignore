@@ -47,3 +47,8 @@ f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/repo
 f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:aws-access-token:16970
 f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:aws-access-token:17081
 f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:aws-access-token:17193
+# 04c9d19의 채팅 AI 기준선 파일에 남은 공방전 공격자 키 가명(convert_gongbang.py가 만든 ASIA+해시, 실제 키 아님). 다음 커밋에서 소스는 정답지에서 읽게 바꾸고 기록은 앞 8자·뒤 4자로 가렸다.
+04c9d192f9eee0324298ca344c7be05c43ca9258:reports/remeasure_2026-11-26/chat_baseline/pilot/v1/chat_baseline_v1.py:aws-access-token:89
+04c9d192f9eee0324298ca344c7be05c43ca9258:reports/remeasure_2026-11-26/chat_baseline/pilot/v2/run1/score.json:aws-access-token:35
+04c9d192f9eee0324298ca344c7be05c43ca9258:reports/remeasure_2026-11-26/chat_baseline/pilot/v2/run3/score.json:aws-access-token:35
+04c9d192f9eee0324298ca344c7be05c43ca9258:scripts/chat_baseline.py:aws-access-token:99
