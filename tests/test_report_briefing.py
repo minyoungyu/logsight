@@ -242,6 +242,9 @@ class SelfLogTests(unittest.TestCase):
         from logsight.__main__ import main
         with tempfile.TemporaryDirectory() as d:
             os.environ.pop("ANTHROPIC_API_KEY", None)
+            # 다른 시험(예: test_pipeline의 AI 모의 호출)이 남긴 전송 기록을 비운다. 실제 명령은 실행마다 새 프로세스라 해당 없음
+            from logsight import aisend
+            aisend.SENT.clear()
             with redirect_stderr(io.StringIO()), unittest.mock.patch("sys.stdout", new=io.StringIO()):
                 main(["analyze", str(ROOT / "samples/combined"), "--no-ai", "--out", d])
             lines = Path(d, "logsight_audit.jsonl").read_text(encoding="utf-8").splitlines()
