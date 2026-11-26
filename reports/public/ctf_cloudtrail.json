@@ -1,0 +1,30 @@
+{
+ "plan": "S6.ctf_cloudtrail",
+ "engine_commit": "84ae5b2951cd292b701fd9a62fddfeec957faa66",
+ "input": {
+  "files": 535,
+  "records": 11524,
+  "from": "2026-11-25T01:22:55Z",
+  "to": "2026-11-26T16:11:32Z"
+ },
+ "label_inputs": "인스턴스 IP는 Terraform 상태에서 뽑음(팀 인스턴스 10개, 공인 IP 없음·사설 서브넷, 인터넷 경로 없이 VPC 엔드포인트만). 값은 저장소에 적지 않는다",
+ "team_role_calls": 7756,
+ "team_role_calls_from_own_instance": 7756,
+ "attack_sessions": 0,
+ "judgement": null,
+ "why": "공격 세션 0건 < 10건(limits). 외부 참가자 접속이 없었음",
+ "reference_not_judged": {
+  "note": "정상만 있는 데이터에서 LogFinder가 낸 경보(참고). 모두 운영 자동화 IAM 사용자 하나(배포·점검 스크립트)의 호출",
+  "findings": 13,
+  "stable": 13,
+  "experimental": 0,
+  "by_rule": {
+   "CT_DISCOVERY_BURST": 8,
+   "CT_LOGGING_TAMPER": 2,
+   "CT_SECRET_ACCESS": 1,
+   "CT_SG_OPENED": 1,
+   "CT_INSTANCE_EXEC": 1
+  },
+  "fix_in_product": "설치 때 known_activity·trusted 행위자로 운영 자동화 사용자를 등록하면 빠지는 종류"
+ }
+}
