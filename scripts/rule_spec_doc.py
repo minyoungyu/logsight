@@ -11,9 +11,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from logsight.detect import RULES  # noqa: E402
+from logsight.maturity import experimental_rules, status  # noqa: E402
 from logsight.rulespec import SPEC  # noqa: E402
 
 SEV = {"high": "높음", "medium": "중간", "low": "낮음"}
+ST = {"stable": "경보", "experimental": "시험 중"}
 
 
 def render() -> str:
@@ -32,15 +34,18 @@ def render() -> str:
            "예전 사후 분석 이름 WEB_SQLI_PATTERN·WEB_PATH_PROBE·WEB_OBJECT_ENUM은 WEBLOG_SQLI·WEBLOG_ENUM_404·"
            "WEBLOG_IDOR_ENUM으로 합쳤다(저장된 결과는 detect.RULE_ALIASES로 읽는다). WEBLOG_CSRF_SUSPECT는 사이트 이름(`web.own_hosts` "
            "또는 ALB 로그의 Host)을 알 때만 돈다.",
+           f"**상태:** 시험 중(experimental) 규칙 {len(experimental_rules())}개는 경보·사건에 넣지 않고 결과의 "
+           "'시험 중 규칙' 칸에만 보인다. 오탐 검사(fp_gate) 정상 데이터 3개 이상에서 오탐 0.01% 이하이고 외부 데이터에서 "
+           "실제 공격을 1번 이상 잡으면 stable로 올린다(Sigma status의 experimental·stable 구분을 따름).",
            "",
-           "| 규칙 | 이름 | 단계 | ATT&CK | 심각도 | 로그 |",
-           "|---|---|---|---|---|---|"]
+           "| 규칙 | 이름 | 단계 | ATT&CK | 심각도 | 상태 | 로그 |",
+           "|---|---|---|---|---|---|---|"]
     for r, (tech, stage, name, sev) in RULES.items():
-        out.append(f"| [{r}](#{r.lower()}) | {name} | {stage} | {tech} | {SEV.get(sev, sev)} | {SPEC[r]['logs']} |")
+        out.append(f"| [{r}](#{r.lower()}) | {name} | {stage} | {tech} | {SEV.get(sev, sev)} | {ST[status(r)]} | {SPEC[r]['logs']} |")
     out.append("")
     for r, (tech, stage, name, sev) in RULES.items():
         s = SPEC[r]
-        out += [f"## {r}", "", f"**{name}** · {stage} · {tech} · 심각도 {SEV.get(sev, sev)}", "",
+        out += [f"## {r}", "", f"**{name}** · {stage} · {tech} · 심각도 {SEV.get(sev, sev)} · {ST[status(r)]}", "",
                 f"- 로그: {s['logs']}", f"- 조건: {s['when']}", "- 사각지대:"]
         out += [f"  - {x}" for x in s["blind"]]
         out.append("- 오탐:")

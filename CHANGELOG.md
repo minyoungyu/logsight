@@ -7,6 +7,8 @@
 
 ### Added
 
+- 규칙 성숙도(`logsight/maturity.py`): `rulespec`의 `status`가 experimental인 규칙(시험 중)은 경보·사건에서 빼고 결과의 `experimental` 칸과 보고서 "시험 중 규칙"에만 보인다. 처음 시험 중 규칙은 11/24 이후 넣은 5개(WEBLOG_ROBOTS_HIDDEN, CT_RESOURCE_PUBLIC, CT_DEFENSE_IMPAIR, CT_KEY_EXPOSED, CT_DATA_EXPORT). 근거는 Sigma status, Elastic building block, Splunk Hunting 유형(`docs/개선방법_검증_2026-11-26.md`). S6·S7 주 숫자는 경보 규칙만, 모든 규칙 숫자는 보조로 함께 적는다(`eval_reallog.py`의 `stable_only`, `eval_panther.py`의 `machine_stable`). 승격 기준은 계획 파일 `maturity`.
+- 공개 규칙 목록 2곳 이상(Sigma·Elastic·Splunk)이 다루는 AWS API 보강: `CT_DATA_EXPORT`(VM 내보내기·다른 계정 복제), KMS 키 재료·EFS 삭제, MFA 삭제 끄기, KMS 키 정책 외부 허용, TruffleHog 키 확인(`scripts/public/catalog_coverage.py`). 규칙 61→62개.
 - 규칙 3개: `CT_RESOURCE_PUBLIC`(RDS 공개·DB 보안 그룹 전체 허용·CodeBuild 공개), `CT_DEFENSE_IMPAIR`(WAF 분리·삭제, EBS 기본 암호화 끄기, Bedrock 가드레일 삭제, GuardDuty 신뢰 IP·보관 필터 등), `CT_KEY_EXPOSED`(AWS가 유출 키에 붙이는 격리 정책). 넓힘: SAML 공급자 생성·변경(IAM 지속성)·삭제(계정 보안), RDS 자동 백업 삭제, RDS 활동 스트림 중지·버킷 접근 기록 끄기(기록 끄기), 다른 계정 KMS 키로 다시 암호화(랜섬웨어). 규칙 58→61개.
 - 병합 전 오탐 검사 `scripts/public/fp_gate.py`: 로컬에 있는 정상 데이터(EClog 하루치, AIT fox·wheeler·russellmitchell, Panther A 반 정상 이벤트)로 규칙별 오탐 줄을 기준(`reports/public/fp_baseline.json`)과 비교하고, 늘면 실패한다. 규칙을 바꾸는 PR은 이걸 돌린 결과를 적는다.
 - S6 새 처음 보는 데이터: Panther AWS CloudTrail 시험 이벤트(`scripts/public/eval_panther.py`). A 반 맞게 탐지 20/64(31%), B 반은 보강 뒤 한 번.

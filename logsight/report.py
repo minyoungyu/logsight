@@ -613,6 +613,20 @@ def quiet_admin_card(result: dict) -> str:
             f"관리자 접근은 모두 경보로 올라옵니다.</div><ul>{rows}</ul></div>")
 
 
+def experimental_card(result: dict) -> str:
+    """시험 중 규칙이 찾은 것(경보로 올리지 않음). 웹서버 점검 보고서도 쓴다."""
+    ex = result.get("experimental") or []
+    if not ex:
+        return ""
+    from .detect import RULES
+    rows = "".join(f"<li><b>{escape(RULES.get(x['rule'], ('', '', x['rule']))[2])}</b> ({escape(x['rule'])}) · "
+                   f"{escape(x['key'] or '-')} · {x['n']:,}건 · {escape(x['detail'])}</li>" for x in ex)
+    return (f"<h2 id=experimental>시험 중 규칙이 찾은 것 {len(ex)}건</h2><div class='card small'>"
+            "<div>아직 정상 데이터 검증을 마치지 않은 규칙이라 경보로 올리지 않았습니다. 오탐일 수 있지만 "
+            "실제 공격일 수도 있으니 아는 활동인지 한 번 확인하세요.</div>"
+            f"<ul>{rows}</ul></div>")
+
+
 def _glossary_card(body: str) -> str:
     """본문에 나온 낯선 말 풀이(사양서 FR-28)."""
     import re
@@ -675,6 +689,8 @@ def render(result: dict, title: str | None = None) -> str:
         nav.append("<a href='#excluded'>판정에서 뺀 활동</a>")
     if result.get("quiet_admin"):
         nav.append("<a href='#quiet-admin'>알리지 않은 관리자 접근</a>")
+    if result.get("experimental"):
+        nav.append("<a href='#experimental'>시험 중 규칙</a>")
     nav.append("</nav>")
     h.append("<div class=shell>" + "".join(nav) + "<main>" + header)
 
@@ -737,6 +753,7 @@ def render(result: dict, title: str | None = None) -> str:
         h.append("</table></div>")
     h.append(_excluded_card(result))
     h.append(quiet_admin_card(result))
+    h.append(experimental_card(result))
     h.append(f"<div class=sign><div>분석 · {PRODUCT} (자동 생성)</div><div>검토자</div><div>승인</div></div>"
              f"<footer><span>{PRODUCT} · {doc_no}</span><span>판단마다 근거 로그 위치(파일:줄)를 붙였습니다. "
              "수정안은 자동 적용되지 않습니다.</span></footer></main></div></html>")

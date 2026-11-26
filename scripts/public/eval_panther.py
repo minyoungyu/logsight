@@ -31,9 +31,11 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from logsight.detect import run_detections  # noqa: E402
+from logsight.maturity import experimental_rules  # noqa: E402
 from logsight.normalize import parse_cloudtrail  # noqa: E402
 
 MEDIUM_UP = {"Medium", "High", "Critical"}
+EXP = experimental_rules()
 
 
 def half_of(stem: str) -> str:
@@ -72,7 +74,7 @@ def flag_one(log: dict) -> list[str]:
 def measure(pa: Path, half: str) -> dict:
     items, per_rule = [], []
     for stem, d in rules(pa, half):
-        pos_hit = pos_n = 0
+        pos_hit = pos_n = pos_st = 0
         for t in d.get("Tests") or []:
             log = t.get("Log")
             if not isinstance(log, dict):
@@ -85,15 +87,19 @@ def measure(pa: Path, half: str) -> dict:
             if exp:
                 pos_n += 1
                 pos_hit += bool(hit)
+                pos_st += bool(set(hit) - EXP)
         if pos_n:
             per_rule.append({"rule": d.get("RuleID", stem), "file": stem, "severity": d.get("Severity"),
-                             "positive_tests": pos_n, "positive_flagged": pos_hit})
+                             "positive_tests": pos_n, "positive_flagged": pos_hit,
+                             "positive_flagged_stable": pos_st})
     pos = [i for i in items if i["expected"]]
     neg = [i for i in items if not i["expected"]]
     r_hit = sum(r["positive_flagged"] > 0 for r in per_rule)
     mu = [r for r in per_rule if r["severity"] in MEDIUM_UP]
     mu_hit = sum(r["positive_flagged"] > 0 for r in mu)
     n_flag = sum(bool(i["logfinder_rules"]) for i in neg)
+    s_hit = sum(r["positive_flagged_stable"] > 0 for r in per_rule)
+    s_mu = sum(r["positive_flagged_stable"] > 0 for r in mu)
     return {
         "dataset": "panther-labs/panther-analysis rules/aws_cloudtrail_rules (Apache-2.0)",
         "panther_commit": subprocess.run(["git", "-C", str(pa), "rev-parse", "HEAD"],
@@ -109,6 +115,13 @@ def measure(pa: Path, half: str) -> dict:
             "positive_tests": len(pos), "positive_flagged": sum(bool(i["logfinder_rules"]) for i in pos),
             "negative_tests": len(neg), "negative_flagged": n_flag,
             "negative_flagged_rules": dict(Counter(r for i in neg for r in i["logfinder_rules"]).most_common()),
+        },
+        # 규칙 성숙도(계획 maturity): 주 숫자는 경보(stable) 규칙만. 위 machine은 모든 규칙(보조)
+        "machine_stable": {
+            "experimental_rules": sorted(EXP),
+            "rules_any_flagged": s_hit, "rules_rate": s_hit / len(per_rule) if per_rule else None,
+            "rules_ci95": wilson(s_hit, len(per_rule)), "medium_up_flagged": s_mu,
+            "negative_flagged": sum(bool(set(i["logfinder_rules"]) - EXP) for i in neg),
         },
         "per_rule": per_rule,
         "items": items,

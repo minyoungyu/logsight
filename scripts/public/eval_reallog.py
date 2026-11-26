@@ -28,6 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from logsight.maturity import experimental_rules  # noqa: E402
 from logsight.web.webdetect import run_web_detections  # noqa: E402
 from logsight.web.webpipeline import load_events  # noqa: E402
 from logsight.web.webprofile import SiteProfile  # noqa: E402
@@ -139,6 +140,20 @@ def measure(profile: SiteProfile, labels: dict[str, tuple[str, str]] | None = No
             "fp_by_rule": dict(Counter(r for ref in fp for r in flagged[ref]).most_common()),
             "attack_reasons": dict(Counter(labels[r][1] for r in attack).most_common()),
         })
+    # 규칙 성숙도(계획 maturity): 주 숫자는 경보(stable) 규칙이 표시한 줄, 위 숫자는 모든 규칙(보조)
+    exp = experimental_rules()
+    st = {r for r, rs in flagged.items() if rs - exp}
+    sk = len(st)
+    stable = {"experimental_rules": sorted(exp), "flagged_lines": sk, "raw_rate": sk / n if n else None,
+              "raw_upper95": upper95(sk, n)}
+    if labels is not None:
+        s_fp = {r for r in st if labels.get(r, ("",))[0] == "fp"}
+        s_todo = {r for r in st if labels.get(r, ("",))[0] not in ("fp", "attack")}
+        stable.update({"fp_lines": len(s_fp), "unclassified_flagged": len(s_todo),
+                       "corrected_rate": len(s_fp) / normal if normal else None,
+                       "corrected_upper95": upper95(len(s_fp), normal),
+                       "corrected_rate_if_unclassified_fp": (len(s_fp) + len(s_todo)) / normal if normal else None})
+    res["stable_only"] = stable
     review = [{"ref": r, "rules": ",".join(sorted(flagged[r])), "src_ip": ip_of.get(r, "-")} for r in sorted(flagged)]
     return res, review
 
@@ -170,6 +185,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"접근 로그 {res['access_lines']:,}줄 · 표시 {res['flagged_lines']:,}줄 · 원래 오탐률 {pct(res['raw_rate'])}"
           f" (95% 상한 {pct(res['raw_upper95'])})")
     if labels is not None:
+        so = res["stable_only"]
+        print(f"[주] 경보 규칙만: 오탐 {so['fp_lines']:,} · 미분류 {so['unclassified_flagged']:,} · 라벨 보정 "
+              f"{pct(so['corrected_rate'])} (95% 상한 {pct(so['corrected_upper95'])})")
         print(f"실제 공격으로 뺌 {res['confirmed_attack_lines']:,} · 오탐 {res['fp_lines']:,} · 미분류 {res['unclassified_flagged']:,}"
               f" · 라벨 보정 {pct(res['corrected_rate'])} (95% 상한 {pct(res['corrected_upper95'])},"
               f" 미분류를 오탐으로 치면 {pct(res['corrected_rate_if_unclassified_fp'])})")
