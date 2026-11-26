@@ -6,7 +6,7 @@
 1. docs/근거_목록.json의 숫자마다: 결과 파일이 있는지, 파일에서 다시 계산한 값이 같은지, 문서에 그 문구가 있는지.
 2. README·docs·lab 문서에 적힌 `reports/...` 경로가 실제로 있는지(명령 예시 경로는 path_allowlist에 이유와 함께 적는다).
 3. 사양서(docs/사양서.md) 성공 기준(S)·비기능(NFR) 표의 '지금' 칸에 적힌 측정 숫자마다
-   (가) 사양서를 가리키는 근거 항목의 quote 안에 그 숫자가 있거나 (나) spec_unbacked에 이유와 함께 적혀 있는지.
+   (가) 같은 행에 있는, 사양서를 가리키는 근거 항목의 quote 안에 그 숫자가 있거나 (나) spec_unbacked에 이유와 함께 적혀 있는지.
    어느 쪽도 아니면 실패한다. 근거 파일 없이 숫자를 사양서에 새로 쓰면 CI가 막는다.
 """
 from __future__ import annotations
@@ -139,6 +139,16 @@ _CONF = re.compile(r"95%(?= ?(?:구간|상한|\d))")
 _ROW = re.compile(r"^\|\s*(S\d+|NFR-\d+)\s*\|(.*)$")
 
 
+def spec_rows(text: str) -> dict[str, str]:
+    """사양서 S·NFR 표의 {행 ID: 그 행 전체}."""
+    out = {}
+    for line in text.splitlines():
+        m = _ROW.match(line.strip())
+        if m:
+            out[m.group(1)] = line.strip()
+    return out
+
+
 def spec_numbers(text: str) -> list[tuple[str, str]]:
     """사양서 S·NFR 표 '지금' 칸의 (행 ID, 측정 숫자) 목록."""
     out = []
@@ -162,9 +172,11 @@ def check_spec(reg: dict) -> list[str]:
     text = (ROOT / SPEC).read_text(encoding="utf-8")
     quotes = [c["quote"] for c in reg["claims"] if c["doc"] == SPEC]
     unbacked = {(u["row"], u["token"]) for u in reg.get("spec_unbacked", [])}
+    rows = spec_rows(text)
     errs = []
     for row, tok in spec_numbers(text):
-        if (row, tok) in unbacked or any(tok in q for q in quotes):
+        # 같은 행에 있는 quote만 인정한다(다른 행의 같은 숫자로 통과하지 않게)
+        if (row, tok) in unbacked or any(tok in q and q in rows[row] for q in quotes):
             continue
         errs.append(f"{SPEC} {row}: '{tok}'의 근거 항목이 없음(근거_목록.json claims에 결과 파일과 함께 더하거나,"
                     f" 파일이 없으면 spec_unbacked에 이유를 적을 것)")

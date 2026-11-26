@@ -37,3 +37,15 @@ def test_spec_unbacked_needs_reason_and_must_still_exist(monkeypatch, tmp_path):
     errs = evidence_check.check_spec({"claims": [], "spec_unbacked": [
         {"row": "NFR-03", "token": "0.6초", "reason": ""}, {"row": "NFR-03", "token": "9.9초", "reason": "옛 값"}]})
     assert any("이유가 비어" in e for e in errs) and any("더는 없음" in e for e in errs)
+
+
+def test_spec_number_needs_quote_in_same_row(monkeypatch, tmp_path):
+    """다른 행에 같은 숫자의 근거가 있어도, 그 행에 근거가 없으면 실패한다."""
+    spec = ("| S1 | a | b | c | 재현율 95%(19/20) | 🟡 |\n"
+            "| NFR-20 | a | b | c | 새 세트 95% | 🟡 |\n")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / evidence_check.SPEC).write_text(spec, encoding="utf-8")
+    monkeypatch.setattr(evidence_check, "ROOT", tmp_path)
+    errs = evidence_check.check_spec({"claims": [{"id": "x", "doc": evidence_check.SPEC,
+                                                  "quote": "재현율 95%(19/20)"}], "spec_unbacked": []})
+    assert len(errs) == 1 and "NFR-20" in errs[0]
