@@ -1,0 +1,81 @@
+{
+ "model": "claude-opus-5-5",
+ "exchanges": 3,
+ "seconds": 588.8,
+ "score": "3/6",
+ "caught": 3,
+ "n_stages": 6,
+ "quotes_all_found": true,
+ "stages": [
+  {
+   "id": "G1",
+   "caught": false,
+   "quote": "포털 앱의 취약점(SSRF 등)을 통한 자격 증명 탈취",
+   "reason": "WAF 로그에서 POST /api/subscriptions로 메타데이터 조회를 시도했다가 차단된 사실은 보고서에 없다. SSRF는 추정으로만 적혀 있다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G2",
+   "caught": false,
+   "quote": "",
+   "reason": "서명 없는 토큰으로 /api/support/... EKS 지원 API에 접근한 내용이 보고서에 없다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G3",
+   "caught": false,
+   "quote": "PageSnap S3 결과 버킷 | 조회 1회 거부. 데이터 유출 흔적은 없습니다.",
+   "reason": "ALB 로그상 /download로 PDF를 내려받은 일(14:52~14:54, 성공)을 보고서는 잡지 못했다. 오히려 유출 흔적이 없다고 판단해 정답과 다르다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G4",
+   "caught": true,
+   "quote": "**`ASIA…95CF` 키는 인스턴스에서 한 번도 쓰이지 않았고, 외부 IP 두 곳(7.1, 50.1)에서만 13번 쓰였습니다.**",
+   "reason": "포털 인스턴스 역할 임시 키(…95CF)가 외부 IP 198.18.7.1과 198.18.50.1에서 쓰였다고 확정해 적었다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G5",
+   "caught": true,
+   "quote": "| **15:36 (06:36:22)** | **7.1** | **탈취한 포털 역할로 `StartExecution`** | **성공** |",
+   "reason": "탈취한 키로 StartExecution이 15:36~16:08 KST에 9회 성공했다고 시각과 함께 적었다.",
+   "quote_found_in_report": true
+  },
+  {
+   "id": "G6",
+   "caught": true,
+   "quote": "| 16:11–16:12 (07:11) | 7.1 | SSM `SendCommand` 2회 | 거부 |",
+   "reason": "같은 키로 SSM StartSession과 SendCommand를 시도했고 모두 거부됐다고 시각·IP와 함께 적었다.",
+   "quote_found_in_report": true
+  }
+ ],
+ "usage": {
+  "chat_ai": {
+   "input_tokens": 103332,
+   "output_tokens": 48992,
+   "served_by": [
+    "claude-opus-5-5"
+   ]
+  },
+  "user_role": {
+   "input_tokens": 413190,
+   "output_tokens": 13028,
+   "served_by": [
+    "claude-opus-5-5"
+   ]
+  },
+  "judge": {
+   "input_tokens": 8909,
+   "output_tokens": 753,
+   "served_by": [
+    "claude-opus-5-5"
+   ]
+  }
+ },
+ "n_user_commands": 27,
+ "n_user_commands_sent": 19,
+ "sources_sent": [
+  "cloudtrail.json"
+ ]
+}
