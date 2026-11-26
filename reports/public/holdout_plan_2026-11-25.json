@@ -61,7 +61,12 @@
     "공격 세션 수를 미리 알 수 없어 10건 미만이면 숫자만 적고 판정하지 않음",
     "S6 정의(Splunk 새 표본)와 다른 종류라 보조 지표로 적는다"
    ],
-   "engine_note": "로그를 열기 전 고정. 주 숫자는 경보(stable) 규칙만, 보조는 모든 규칙. 라벨과 맞는 규칙(CT_INSTANCE_CRED_OUTSIDE·CT_INSTANCE_CRED_MULTI_IP)은 stable"
+   "engine_note": "로그를 열기 전 고정. 주 숫자는 경보(stable) 규칙만, 보조는 모든 규칙. 라벨과 맞는 규칙(CT_INSTANCE_CRED_OUTSIDE·CT_INSTANCE_CRED_MULTI_IP)은 stable",
+   "result": {
+    "at": "2026-11-26T16:50Z",
+    "file": "reports/public/ctf_cloudtrail.json",
+    "outcome": "공격 세션 0건(팀 역할 호출 7,756건이 모두 각 인스턴스 사설 IP). limits대로 판정하지 않음"
+   }
   }
  },
  "S7": {
@@ -164,7 +169,12 @@
     "operator": "운영자 공인 IP 1개(값은 개인 정보라 data/ctf/operator_ip에만, sha256=991f674d6e8f7b52d3cf316df90b0dccaef26a2e000892b688c07c41463d9358). 사용자 지시(2026-11-25T19:38Z): 이 IP도 2026-11-26 10:00 KST(01:00Z)부터의 접속은 대회 참가자로 다룬다. 그래서 trusted_ips는 비우고, 그 시각 이전 이 IP의 줄만 측정에서 뺀다(--drop-before). 뺀 줄 수를 결과에 적는다. CTFd 보안 그룹은 80/tcp를 0.0.0.0/0에 열어 SG로는 운영자를 가를 수 없어 로그의 원격 IP로 가른다(REVERSE_PROXY=false).",
     "engine_commit_note": "엔진(logsight/)은 4e7e04a 그대로. 이후 커밋은 측정 스크립트·계획만 바꿈",
     "engine_note_2": "11/25 43ee5f0에서 CloudTrail 규칙이 바뀌었으나 웹 규칙(logsight/web)은 그대로. CTF 측정은 계획대로 4e7e04a를 git worktree로 꺼내 잰다",
-    "engine_note_3": "11/26 규칙 성숙도 도입으로 엔진을 84ae5b2에 다시 고정(로그를 열기 전). logsight/web/webdetect.py 등 웹 탐지 코드는 4e7e04a와 같고(바뀐 것은 webpipeline·webreport의 시험 중 분리뿐), 모든 규칙 숫자는 4e7e04a와 같게 나온다. 주 숫자는 eval_reallog.py의 stable_only(시험 중 WEBLOG_ROBOTS_HIDDEN 제외), 보조는 모든 규칙"
+    "engine_note_3": "11/26 규칙 성숙도 도입으로 엔진을 84ae5b2에 다시 고정(로그를 열기 전). logsight/web/webdetect.py 등 웹 탐지 코드는 4e7e04a와 같고(바뀐 것은 webpipeline·webreport의 시험 중 분리뿐), 모든 규칙 숫자는 4e7e04a와 같게 나온다. 주 숫자는 eval_reallog.py의 stable_only(시험 중 WEBLOG_ROBOTS_HIDDEN 제외), 보조는 모든 규칙",
+    "result": {
+     "at": "2026-11-26T16:50Z",
+     "file": "reports/public/ctf_main_precheck.json",
+     "outcome": "재지 않음(판정 없음). 사전 확인(S7.data_precheck) 불합격: 첫 칸 서로 다른 값 99개(<100), 가장 많은 값 96.9%(>50%). 접근 로그 17,102줄로 limits의 30,000줄에도 못 미침. 운영 스레드 기록상 점수판 로그인·제출 0건(외부 참가자 접속 없음)"
+    }
    },
    "second_korea": {
     "data": "한국 소규모 실제 서비스 접근 로그 1개(팀원·동아리·학과·인터뷰 대상 팀). 받기 전에 서비스 이름과 기간, trusted_ips·admin_paths를 이 칸에 적고 커밋한다.",
