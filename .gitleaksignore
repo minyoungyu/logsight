@@ -3,3 +3,22 @@
 74298cceac816bba63de1bd8bad28bb99c0012e3:samples/guardduty_only/guardduty_findings.json:aws-access-token:78
 74298cceac816bba63de1bd8bad28bb99c0012e3:samples/guardduty_only/guardduty_findings.json:aws-access-token:113
 9eb4c1a461568328b46444227812674a33a36af1:reports/public/reallog_zenodo20001206_x.json:generic-api-key:113
+# f075477에 들어간 flaws.cloud 공개 데이터셋(2017~2020, 공개 CTF 계정)의 액세스 키 ID. 다음 커밋에서 앞 8자·뒤 4자만 남기게 가렸다.
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:aws-access-token:16524
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:aws-access-token:8670
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:16190
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:16301
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:16412
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:16748
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:16859
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:16970
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:17081
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:17193
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:8336
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:8447
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:8558
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:8894
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9005
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9116
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9227
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9339
