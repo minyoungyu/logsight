@@ -1,0 +1,10 @@
+{
+ "n_events": 10000,
+ "dense": false,
+ "elapsed_s": 0.6,
+ "peak_mb": 16,
+ "n_incidents": 0,
+ "cpus": 4,
+ "python": "3.13.18",
+ "memory_note": "tracemalloc 최대값(파이썬이 잡은 메모리). 프로세스 전체 RSS와 다름"
+}

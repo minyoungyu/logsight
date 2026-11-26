@@ -1,6 +1,7 @@
 """보고서 첫 화면 확인(사양서 NFR-22): 두 화면 크기에서 결론 문장과 먼저 할 일 1번이 스크롤 없이 보이나.
 
     python scripts/first_screen_check.py reports/x/report.html [다른 보고서 ...]
+    python scripts/first_screen_check.py --json 결과.json reports/x/report.html ...   # 결과를 파일로도 남김
 
 헤드리스 브라우저(Playwright)가 필요하다. 없으면 건너뛴다고 알리고 종료 코드 2를 돌려준다.
 """
@@ -36,6 +37,9 @@ def check(paths: list[str]) -> list[dict]:
 
 
 def main(argv: list[str]) -> int:
+    out = None
+    if argv[:1] == ["--json"]:
+        out, argv = argv[1], argv[2:]
     if not argv:
         print(__doc__)
         return 2
@@ -48,6 +52,10 @@ def main(argv: list[str]) -> int:
         where = f"아래쪽 {r['bottom']}px / 화면 {r['height']}px" if r["bottom"] is not None else "요소 없음"
         print(f"{'통과' if r['ok'] else '실패'}  {r['size']}  {r['target']}  ({where})  {r['file']}")
     bad = [r for r in rows if not r["ok"]]
+    if out:
+        import json
+        Path(out).write_text(json.dumps({"n_checks": len(rows), "n_ok": len(rows) - len(bad), "rows": rows},
+                                        ensure_ascii=False, indent=1), encoding="utf-8")
     print("첫 화면 확인 통과" if not bad else f"실패 {len(bad)}건")
     return 1 if bad else 0
 

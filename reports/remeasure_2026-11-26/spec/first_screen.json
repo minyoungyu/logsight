@@ -1,0 +1,102 @@
+{
+ "n_checks": 12,
+ "n_ok": 12,
+ "rows": [
+  {
+   "file": "reports/combined/report.html",
+   "size": "데스크톱 1366×768",
+   "target": "결론 문장",
+   "ok": true,
+   "bottom": 277,
+   "height": 768
+  },
+  {
+   "file": "reports/combined/report.html",
+   "size": "데스크톱 1366×768",
+   "target": "먼저 할 일 1번",
+   "ok": true,
+   "bottom": 357,
+   "height": 768
+  },
+  {
+   "file": "reports/combined/report.html",
+   "size": "휴대폰 390×844",
+   "target": "결론 문장",
+   "ok": true,
+   "bottom": 345,
+   "height": 844
+  },
+  {
+   "file": "reports/combined/report.html",
+   "size": "휴대폰 390×844",
+   "target": "먼저 할 일 1번",
+   "ok": true,
+   "bottom": 451,
+   "height": 844
+  },
+  {
+   "file": "reports/demo/report.html",
+   "size": "데스크톱 1366×768",
+   "target": "결론 문장",
+   "ok": true,
+   "bottom": 277,
+   "height": 768
+  },
+  {
+   "file": "reports/demo/report.html",
+   "size": "데스크톱 1366×768",
+   "target": "먼저 할 일 1번",
+   "ok": true,
+   "bottom": 357,
+   "height": 768
+  },
+  {
+   "file": "reports/demo/report.html",
+   "size": "휴대폰 390×844",
+   "target": "결론 문장",
+   "ok": true,
+   "bottom": 345,
+   "height": 844
+  },
+  {
+   "file": "reports/demo/report.html",
+   "size": "휴대폰 390×844",
+   "target": "먼저 할 일 1번",
+   "ok": true,
+   "bottom": 451,
+   "height": 844
+  },
+  {
+   "file": "reports/web_demo/report.html",
+   "size": "데스크톱 1366×768",
+   "target": "결론 문장",
+   "ok": true,
+   "bottom": 251,
+   "height": 768
+  },
+  {
+   "file": "reports/web_demo/report.html",
+   "size": "데스크톱 1366×768",
+   "target": "먼저 할 일 1번",
+   "ok": true,
+   "bottom": 381,
+   "height": 768
+  },
+  {
+   "file": "reports/web_demo/report.html",
+   "size": "휴대폰 390×844",
+   "target": "결론 문장",
+   "ok": true,
+   "bottom": 321,
+   "height": 844
+  },
+  {
+   "file": "reports/web_demo/report.html",
+   "size": "휴대폰 390×844",
+   "target": "먼저 할 일 1번",
+   "ok": true,
+   "bottom": 586,
+   "height": 844
+  }
+ ]
+}
