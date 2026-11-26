@@ -1,0 +1,25 @@
+{
+ "profile": "EClog 1day",
+ "engine_commit": "(이 파일과 같은 커밋)",
+ "access_lines": 350683,
+ "flagged_lines": 9,
+ "raw_rate": 2.5664203853622788e-05,
+ "raw_upper95": 4.878001145362827e-05,
+ "flagged_by_rule": {
+  "WEBLOG_SCANNER": 7,
+  "WEBLOG_SENSITIVE_FILE": 2
+ },
+ "flagged_ips": 4,
+ "confirmed_attack_lines": 9,
+ "fp_lines": 0,
+ "unclassified_flagged": 0,
+ "corrected_rate": 0.0,
+ "corrected_upper95": 1.0954783976291018e-05,
+ "corrected_rate_if_unclassified_fp": 0.0,
+ "fp_by_rule": {},
+ "attack_reasons": {
+  "A2 스캐너 UA zgrab": 7,
+  "A3 FreePBX 경로 /admin/config.php(같은 로그에서 늘 404) + password 배열 인증 우회 시도": 2
+ },
+ "note": "개발 점수: 규칙 수정(WEBLOG_ROBOTS_HIDDEN) 뒤 이미 본 EClog로 다시 잰 값. S7 판정에 쓰지 않음. 판정은 S7.chosen.third(CTF 본대회 CTFd 로그)로"
+}

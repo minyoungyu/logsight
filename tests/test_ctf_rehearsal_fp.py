@@ -118,6 +118,30 @@ class ImdsAndRobotsTests(unittest.TestCase):
                              line("/static/style.css", ip="203.0.113.50", sec=12)]
         self.assertNotIn("WEBLOG_ROBOTS_HIDDEN", rules(ls))
 
+    def test_robots_self_declared_crawler_not_flagged(self):
+        # EClog(11/26): MJ12bot·SemrushBot·TurnitinBot이 robots.txt 뒤 안 본 상품 페이지를 연 것이 오탐 전부
+        for ua in ("Mozilla/5.0 (compatible; MJ12bot/v1.4.8; http://mj12bot.com/)",
+                   "TurnitinBot (https://turnitin.com/robot/crawlerinfo.html)",
+                   "Mozilla/5.0 (compatible; VelenPublicWebCrawler/1.0)", "Mediapartners-Google"):
+            ls = self._site() + [line("/robots.txt", ip="203.0.113.50", sec=10, ua=ua),
+                                 line("/9cf787dfb273/", ip="203.0.113.50", sec=11, ua=ua)]
+            self.assertNotIn("WEBLOG_ROBOTS_HIDDEN", rules(ls), ua)
+
+    def test_robots_flat_url_same_shape_not_flagged(self):
+        # 사람은 /p-12.html을 봤고, robots.txt를 읽은 IP는 아무도 안 본 /p-5824.html을 염 → 같은 모양이라 공개 경로
+        ls = self._site() + [line("/p-12.html", ip="198.51.100.31", sec=5),
+                             line("/robots.txt", ip="203.0.113.50", sec=10),
+                             line("/p-5824.html", ip="203.0.113.50", sec=11)]
+        self.assertNotIn("WEBLOG_ROBOTS_HIDDEN", rules(ls))
+
+    def test_robots_hidden_token_still_flagged_with_flat_urls(self):
+        ls = self._site() + [line("/p-12.html", ip="198.51.100.31", sec=5),
+                             line("/robots.txt", ip="203.0.113.50", sec=10),
+                             line("/p-5824.html", ip="203.0.113.50", sec=11),
+                             line("/9cf787dfb273/", ip="203.0.113.50", sec=12)]
+        fs = [f for f in findings(ls) if f.rule == "WEBLOG_ROBOTS_HIDDEN"]
+        self.assertEqual([len(f.events) for f in fs], [1])
+
     def test_robots_hidden_needs_failed_access_excluded(self):
         ls = self._site() + [line("/robots.txt", ip="203.0.113.50", sec=10),
                              line("/9cf787dfb273/", ip="203.0.113.50", sec=11, st=401)]

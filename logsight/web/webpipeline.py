@@ -19,6 +19,7 @@ from ..correlate import build_incidents, group_repeats
 from ..explain import VERDICT_KO as ATTACK_KO, mark_known, rule_triage
 from ..detect import RULES
 from .weblog import parse_access, parse_weberror, parse_auth
+from .. import maturity
 from .webdetect import quiet_admin_summary, run_web_detections
 from .webscan import scan_webroot
 from .webanalyze import analyze_web, rule_verdict, VERDICT_KO, VERDICT_RANK
@@ -82,7 +83,7 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
                 e.extra["webshell_path"] = "/" + e.extra.get("path", "").lstrip("/")
     events.extend(file_events)
 
-    findings = run_web_detections(events, profile) + file_findings
+    findings, trial = maturity.split(run_web_detections(events, profile) + file_findings)  # 시험 중 규칙은 따로
     # 사후 분석과 같은 처리 단계: 정상 작업 목록 표시 → 사건 묶기 → 반복 사건 접기 → 규칙 재검토(공격 축 판정)
     n_known = mark_known(events, {"trusted_ips": profile.trusted_ips, "known_activity": profile.known_activity})
     mask(events)  # 보고서·AI로 나가기 전 민감정보 마스킹
@@ -129,6 +130,7 @@ def assess(profile: SiteProfile, *, top: int = 10, use_ai: bool = True,
         "n_groups": len(groups),
         "n_known": n_known,
         "quiet_admin": quiet_admin_summary(events),
+        "experimental": maturity.summary(trial),
         "incident_index": [{**{k: i[k] for k in ("id", "start", "end", "severity", "stages", "src_ips", "n_events")},
                             "repeats": i.get("repeats", 1),
                             "pii": bool(pii_risk([{"incident": i}])),

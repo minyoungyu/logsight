@@ -2,3 +2,4 @@
 74298cceac816bba63de1bd8bad28bb99c0012e3:tests/test_gd_types.py:aws-access-token:60
 74298cceac816bba63de1bd8bad28bb99c0012e3:samples/guardduty_only/guardduty_findings.json:aws-access-token:78
 74298cceac816bba63de1bd8bad28bb99c0012e3:samples/guardduty_only/guardduty_findings.json:aws-access-token:113
+9eb4c1a461568328b46444227812674a33a36af1:reports/public/reallog_zenodo20001206_x.json:generic-api-key:113

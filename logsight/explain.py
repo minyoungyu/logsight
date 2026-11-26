@@ -28,7 +28,8 @@ HYGIENE_RULES = {"CT_ROOT_USAGE", "CT_CONSOLE_NO_MFA"}
 # 공격 행동이 아니라 "열려 있음"을 보여 주는 규칙(인터넷 스캐너가 열린 관리 포트에 접속)
 EXPOSURE_RULES = {"VPC_REMOTE_ADMIN_EXPOSED", "GD_FINDING"}
 # 정상 작업 목록의 계정이 했어도 위험한 설정 변경
-RISKY_CHANGE_RULES = {"CT_SG_OPENED", "CT_S3_PUBLIC", "CT_SNAPSHOT_SHARE", "CT_LOGGING_TAMPER", "CT_ACCOUNT_SECURITY"}
+RISKY_CHANGE_RULES = {"CT_SG_OPENED", "CT_S3_PUBLIC", "CT_SNAPSHOT_SHARE", "CT_LOGGING_TAMPER", "CT_ACCOUNT_SECURITY",
+                      "CT_RESOURCE_PUBLIC", "CT_DEFENSE_IMPAIR", "CT_DATA_EXPORT"}
 # 운영자가 평소 하는 작업과 모양이 같은 규칙(SSM 명령, 함수 배포). 이것만 있으면 공격이라 단정하지 않는다
 OPS_RULES = {"CT_INSTANCE_EXEC", "CT_SERVERLESS_CHANGE"}
 # 자격증명 오용 규칙
@@ -425,6 +426,10 @@ def describe_finding(f: dict, inc: dict) -> str:
         "CT_S3_PUBLIC": f"{who}에서 S3 버킷을 누구나 읽거나 쓸 수 있게 공개했습니다.",
         "CT_SNAPSHOT_SHARE": f"{who}에서 디스크 스냅샷·이미지를 다른 계정과 공유했습니다. 데이터 반출 경로가 될 수 있습니다.",
         "CT_RUN_INSTANCES_BURST": f"인스턴스를 짧은 시간에 {n}대 만들었습니다(코인 채굴 등 자원 탈취 의심).",
+        "CT_RESOURCE_PUBLIC": f"{who}에서 데이터베이스·빌드 프로젝트 같은 자원을 인터넷에 공개했습니다.",
+        "CT_DEFENSE_IMPAIR": f"{who}에서 WAF·GuardDuty·암호화 같은 보안 장치를 떼거나 껐습니다. 공격자가 흔적을 숨기거나 막힌 길을 여는 수법입니다.",
+        "CT_KEY_EXPOSED": "이 계정의 액세스 키가 외부에 노출된 신호가 있습니다(AWS 격리 정책 또는 유출 키 확인 도구). 키가 이미 도용됐을 수 있습니다.",
+        "CT_DATA_EXPORT": f"{who}에서 가상 머신을 내보내거나 다른 계정 버킷으로 복제를 설정했습니다. 데이터 반출 경로가 될 수 있습니다.",
         "VPC_PORT_SCAN": f"{who}에서 서버 포트 {len({e.get('dst_port') for e in evs})}개에 접속을 시도했습니다(포트 스캔). "
                          f"그중 {ok}건은 허용됐습니다.",
         "VPC_REMOTE_ADMIN_EXPOSED": f"{who}에서 관리 포트({ports or '22/3389'})로 접속한 것이 {ok}건 허용됐습니다. "

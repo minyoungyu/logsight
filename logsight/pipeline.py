@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 
 from .analyze import analyze, build_payload
+from . import maturity
 from .config_audit import audit
 from .correlate import build_incidents, group_repeats
 from .detect import run_detections, shared_private_ips
@@ -43,7 +44,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
     set_vpc_cidrs(env)  # 고객 VPC 대역도 사내로 본다(모든 모듈이 같은 기준)
     enrich(events, env)
     n_known = mark_known(events, env)  # 설정의 정상 작업 목록과 맞는 이벤트 표시(지우지 않음)
-    findings = run_detections(events, env)
+    findings, trial = maturity.split(run_detections(events, env))  # 시험 중 규칙은 경보·사건에서 뺀다
     team_info = _team(events, env)
     incidents = build_incidents(events, findings, window_min=window_min, env=env)
     groups = group_repeats(incidents)  # 반복 사건은 대표 하나로 접어서 상위 N개를 고른다
@@ -105,6 +106,7 @@ def run(events: list[Event], env: dict | None = None, *, file_stats: list[dict] 
         "team": team_info,
         "excluded_activity": excluded_summary(events),
         "quiet_admin": quiet_admin_summary(events),
+        "experimental": maturity.summary(trial),
         "assumptions": _assumptions(by_source, env, file_stats or [],
                                     sum(1 for e in events if e.extra.get("behind_proxy")))
         + _ambiguous_note(events)

@@ -78,7 +78,11 @@ IMDS_TARGET = re.compile(
 IMDS_SECRET = re.compile(r"(?i)/(?:iam/security-credentials|identity-credentials|user-data|"
                          r"computeMetadata/v1/instance/service-accounts)")
 # 검색엔진 봇(robots.txt를 읽고 페이지를 돌아다니는 것이 정상인 것)
-CRAWLER_UA = re.compile(r"(?i)googlebot|bingbot|yeti|daum|duckduckbot|baiduspider|yandex|applebot|slurp")
+CRAWLER_UA = re.compile(r"(?i)googlebot|bingbot|yeti|daum|duckduckbot|baiduspider|yandex|applebot|slurp"
+                        # 스스로 크롤러라고 밝히는 UA(MJ12bot, SemrushBot, TurnitinBot, …Crawler, 애드센스).
+                        # 11/26 EClog 실제 로그에서 이런 크롤러가 robots.txt 뒤 상품 페이지를 돈 것이 오탐 전부였다.
+                        # UA는 꾸밀 수 있으므로 이 목록은 '숨은 경로' 규칙에서만 쓴다.
+                        r"|(?:bot|crawler|spider)\b|mediapartners-google")
 # robots.txt를 읽은 뒤 숨은 경로를 열어 본 것으로 볼 시간 폭
 ROBOTS_FOLLOW_SPAN = timedelta(minutes=30)
 _STATIC_EXT = re.compile(r"(?i)\.(?:css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|map|webp)$")
@@ -607,6 +611,13 @@ def _first_seg(path: str) -> str:
     return "/" + seg if seg else "/"
 
 
+def _seg_shape(path: str) -> str:
+    """첫 마디에서 숫자 묶음을 0으로 바꾼 모양(/p-5824.html → /p-0.html). URL이 평평한 사이트에서
+    사람이 안 본 상품·글 페이지를 숨은 경로로 보지 않으려고 '같은 모양이 공개돼 있는지'로 비교한다.
+    무작위 토큰 경로(/9cf787dfb273 → /0cf0dfb0)는 모양도 따로라 그대로 잡힌다."""
+    return re.sub(r"\d+", "0", _first_seg(path))
+
+
 def _robots_hidden(access: list[Event], trusted: list[str]) -> list[Finding]:
     """robots.txt를 읽은 IP가 ROBOTS_FOLLOW_SPAN 안에, robots.txt를 먼저 읽지 않은 다른 사용자는 아무도 가지 않은
     경로(첫 마디 기준)를 열어 2xx를 받으면 잡는다. robots.txt 본문은 로그에 없으므로 '그 경로를 robots.txt
@@ -624,7 +635,7 @@ def _robots_hidden(access: list[Event], trusted: list[str]) -> list[Finding]:
     # 첫 마디별로 robots.txt를 읽지 않은 사용자(또는 읽기 전의 요청)가 간 적 있는지
     public: set[str] = set()
     for e in access:
-        seg = _first_seg(e.extra.get("path", ""))
+        seg = _seg_shape(e.extra.get("path", ""))
         rt = reads.get(e.src_ip or "?")
         if not rt or e.ts < min(rt):
             public.add(seg)
@@ -642,7 +653,7 @@ def _robots_hidden(access: list[Event], trusted: list[str]) -> list[Finding]:
                 continue
             path = e.extra.get("path", "")
             seg = _first_seg(path)
-            if seg in public or seg in ("/", "/robots.txt") or _STATIC_EXT.search(path):
+            if _seg_shape(path) in public or seg in ("/", "/robots.txt") or _STATIC_EXT.search(path):
                 continue
             if any(timedelta(0) <= e.ts - t <= ROBOTS_FOLLOW_SPAN for t in rts):
                 hits.append(e)

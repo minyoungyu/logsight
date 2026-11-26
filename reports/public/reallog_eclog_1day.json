@@ -1,0 +1,33 @@
+{
+ "profile": "EClog 1day",
+ "engine_commit": "6970554",
+ "access_lines": 350683,
+ "flagged_lines": 1749,
+ "raw_rate": 0.004987410282220695,
+ "raw_upper95": 0.005226052794577463,
+ "flagged_by_rule": {
+  "WEBLOG_ROBOTS_HIDDEN": 1740,
+  "WEBLOG_SCANNER": 7,
+  "WEBLOG_SENSITIVE_FILE": 2
+ },
+ "flagged_ips": 42,
+ "confirmed_attack_lines": 9,
+ "fp_lines": 1740,
+ "unclassified_flagged": 0,
+ "corrected_rate": 0.0049618734208980424,
+ "corrected_upper95": 0.0051999248124320165,
+ "corrected_rate_if_unclassified_fp": 0.0049618734208980424,
+ "fp_by_rule": {
+  "WEBLOG_ROBOTS_HIDDEN": 1740
+ },
+ "attack_reasons": {
+  "A2 스캐너 UA zgrab": 7,
+  "A3 FreePBX 경로 /admin/config.php(같은 로그에서 늘 404) + password 배열 인증 우회 시도": 2
+ },
+ "input": "EClog eclog_1day.csv (Dataverse doi:10.7910/DVN/Z834IK, 'Comma Separated Values (Original File Format)')",
+ "input_sha256": "6bedb360e292f2bdb090555b776b1d1ad9250686b409fb4879f4a3f7c744dbf1",
+ "engine_tree_logsight": "95a3c77",
+ "plan": "reports/public/holdout_plan_2026-11-25.json S7.chosen.first",
+ "measured_at": "2026-11-25T19:22Z",
+ "verdict_vs_0.1pct": "불합격(라벨 보정 0.496%)"
+}

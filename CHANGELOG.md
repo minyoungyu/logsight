@@ -7,9 +7,18 @@
 
 ### Added
 
+- 규칙 성숙도(`logsight/maturity.py`): `rulespec`의 `status`가 experimental인 규칙(시험 중)은 경보·사건에서 빼고 결과의 `experimental` 칸과 보고서 "시험 중 규칙"에만 보인다. 처음 시험 중 규칙은 11/24 이후 넣은 5개(WEBLOG_ROBOTS_HIDDEN, CT_RESOURCE_PUBLIC, CT_DEFENSE_IMPAIR, CT_KEY_EXPOSED, CT_DATA_EXPORT). 근거는 Sigma status, Elastic building block, Splunk Hunting 유형(`docs/개선방법_검증_2026-11-26.md`). S6·S7 주 숫자는 경보 규칙만, 모든 규칙 숫자는 보조로 함께 적는다(`eval_reallog.py`의 `stable_only`, `eval_panther.py`의 `machine_stable`). 승격 기준은 계획 파일 `maturity`.
+- 공개 규칙 목록 2곳 이상(Sigma·Elastic·Splunk)이 다루는 AWS API 보강: `CT_DATA_EXPORT`(VM 내보내기·다른 계정 복제), KMS 키 재료·EFS 삭제, MFA 삭제 끄기, KMS 키 정책 외부 허용, TruffleHog 키 확인(`scripts/public/catalog_coverage.py`). 규칙 61→62개.
+- 규칙 3개: `CT_RESOURCE_PUBLIC`(RDS 공개·DB 보안 그룹 전체 허용·CodeBuild 공개), `CT_DEFENSE_IMPAIR`(WAF 분리·삭제, EBS 기본 암호화 끄기, Bedrock 가드레일 삭제, GuardDuty 신뢰 IP·보관 필터 등), `CT_KEY_EXPOSED`(AWS가 유출 키에 붙이는 격리 정책). 넓힘: SAML 공급자 생성·변경(IAM 지속성)·삭제(계정 보안), RDS 자동 백업 삭제, RDS 활동 스트림 중지·버킷 접근 기록 끄기(기록 끄기), 다른 계정 KMS 키로 다시 암호화(랜섬웨어). 규칙 58→61개.
+- 병합 전 오탐 검사 `scripts/public/fp_gate.py`: 로컬에 있는 정상 데이터(EClog 하루치, AIT fox·wheeler·russellmitchell, Panther A 반 정상 이벤트)로 규칙별 오탐 줄을 기준(`reports/public/fp_baseline.json`)과 비교하고, 늘면 실패한다. 규칙을 바꾸는 PR은 이걸 돌린 결과를 적는다.
+- S6 새 처음 보는 데이터: Panther AWS CloudTrail 시험 이벤트(`scripts/public/eval_panther.py`). A 반 맞게 탐지 20/64(31%), B 반은 보강 뒤 한 번.
+- S7 처음 본 실제 로그 측정(`docs/실제로그_측정_EClog_2026-11-26.md`, `reports/public/reallog_eclog_1day.json`): EClog 하루치 35만 줄, 라벨 보정 오탐 0.496%로 미달. 오탐 1,740줄 전부 WEBLOG_ROBOTS_HIDDEN(검색엔진 외 크롤러가 평평한 URL의 상품 페이지를 연 것).
 - 외부 표준 형식 내보내기: `analyze`가 `report.json`·`report.html` 옆에 `findings.ocsf.json`([OCSF](https://schema.ocsf.io) 1.3.0 Detection Finding, class_uid 2004)을 쓴다. Security Lake·Security Hub·SIEM이 읽는 형식이다. LogFinder만의 값(판정, 판정 주체, 성공·실패 건수)은 `unmapped.logfinder`에 둔다(`logsight/ocsf.py`).
 - 규칙이 덮는 ATT&CK 기법을 [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) 레이어로(`docs/attack_layer.json`, `scripts/attack_layer.py`). 기법 이름·전술은 MITRE 공식 STIX(v15.1)에서 뽑은 `logsight/attack_v15.py`로 맞춘다.
 - 탐지 문제점 재점검(`docs/탐지_문제점_재점검.md`).
+- 오탐률(S7)·처음 보는 데이터(S6) 개선 방안과 사양서·외부비교 근거 점검(`docs/근거_점검_2026-11-25.md`).
+- 실제 웹 접근 로그로 정상 요청 오탐률을 재는 도구(`scripts/public/eval_reallog.py`: 표시된 줄 분류표 → 라벨 보정 오탐률과 95% 상한)와 EClog CSV 변환기(`scripts/public/eclog_to_combined.py`), 로그 확보 방안 조사(`docs/실제_웹로그_확보_방안.md`).
+- S6·S7 다음 측정 계획 고정(`reports/public/holdout_plan_2026-11-25.json`): 엔진 4d02d88, 데이터·지표·시작 조건을 재기 전에 정함. `eval_splunk_attack_data.py --skip-measured`가 여러 결과 파일을 받음.
 - 처음 보는 공개 데이터를 개발용·보류용으로 나눠 고치기 전·뒤에 한 번씩 잰 결과(`docs/공개데이터_개발보류_측정.md`). 보류용(AIT harrison·shaw) 공격 단계 9/13 → 11/13, 오탐 줄 121 → 115.
 - 새 공개 데이터 찾기와 측정(`docs/새공개데이터_찾기와_측정.md`, `scripts/public/eval_{invictus,camlds,realweb}.py`): Invictus AWS(Stratus CloudTrail) 공격 실행 35번 중 31번 맞게 탐지, CAM-LDS 3개 시나리오, 인도네시아 실제 웹서버 로그.
 - 프롬프트 주입 시연(`lab/injection_demo/make_logs.py`, `scripts/injection_demo.py`, `docs/프롬프트주입_시연.md`): 같은 공격 로그에 주입 문장 4종을 심어 채팅 AI(3모델)·LogFinder(방어 켬·끔)·'속은 AI 흉내'를 비교. 오늘 모델은 45번 모두 속지 않았고, 속았다고 가정하면 방어가 주입 3종을 '공격'으로 되돌린다.
@@ -51,6 +60,10 @@
 
 ### Fixed
 
+- `CT_CONSOLE_NO_MFA`: SAML(회사 IdP)·역할 전환·SSO 로그인은 MFA를 IdP나 원래 세션에서 거치므로 빼고, 비밀번호로 들어오는 IAM 사용자·루트만 본다.
+- `CT_LOGGING_TAMPER`: CloudTrail 이벤트 선택기를 켜는 변경은 빼고, 관리 이벤트를 빼거나 읽기·쓰기 한쪽만 남기거나 제외 조건을 넣을 때만 잡는다.
+- WEBLOG_ROBOTS_HIDDEN 오탐: 스스로 크롤러라고 밝히는 UA(…bot, …crawler, …spider, 애드센스)를 빼고, 숨은 경로를 첫 마디 대신 숫자를 지운 모양으로 비교한다(평평한 URL의 상품 페이지). EClog 하루치 오탐 1,740줄 → 0줄(이미 본 데이터라 개발 점수, `reports/public/reallog_eclog_1day_after_fix_dev.json`).
+- 사양서·체크리스트·외부비교의 근거 없는 숫자와 문장 3건(결과 파일 없는 russellmitchell 0.013%, 출처 없는 '심각도 = 확신도 × 영향', 인용 문서에 없는 'SIR 가입 전 결과'), 낡거나 어긋난 6건(russellmitchell 단위, S6 새 표본, 규칙 58개, 제목 v2.3, NFR-14 조합 수, OCSF 내보내기 표시).
 - 서버 권한 상승: 웹 서비스 계정이 su로 넘어간 계정의 sudo, sudo로 `/etc/shadow`·`/root/.ssh/` 읽기를 `HOST_PRIV_ESC`로 잡는다(AIT-LDS에서 놓친 것).
 - 파일 공유 앱(Nextcloud·ownCloud WebDAV, 파일 앱, 공유 링크)에서 사용자가 .zip을 내려받은 것을 `WEBLOG_BACKUP_LEAK`로 잡던 오탐.
 - RDS DB 관리자 비밀번호 재설정(`ModifyDBInstance`·`ModifyDBCluster`의 `masterUserPassword`)을 `CT_IAM_PERSISTENCE`로 잡는다.

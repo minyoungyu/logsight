@@ -1,0 +1,2985 @@
+{
+ "dataset": "panther-labs/panther-analysis rules/aws_cloudtrail_rules (Apache-2.0)",
+ "panther_commit": "e9c67b0820fda3031778b116b58bc660bf7f2d03",
+ "engine_commit": "f2907826e03dc2fe5173da0bdfb650818abc9f9a",
+ "half": "A",
+ "machine": {
+  "rules_with_positive_tests": 64,
+  "rules_any_flagged": 32,
+  "rules_rate": 0.5,
+  "rules_ci95": [
+   0.381,
+   0.619
+  ],
+  "medium_up_rules": 32,
+  "medium_up_flagged": 24,
+  "medium_up_ci95": [
+   0.5789,
+   0.8675
+  ],
+  "positive_tests": 96,
+  "positive_flagged": 46,
+  "negative_tests": 117,
+  "negative_flagged": 24,
+  "negative_flagged_rules": {
+   "CT_IAM_PERSISTENCE": 5,
+   "CT_DATA_DESTRUCTION": 4,
+   "CT_ROOT_USAGE": 4,
+   "CT_LOGGING_TAMPER": 3,
+   "CT_RESOURCE_PUBLIC": 3,
+   "CT_SERVERLESS_CHANGE": 2,
+   "CT_CONSOLE_NO_MFA": 1,
+   "CT_S3_PUBLIC": 1,
+   "CT_SECRET_ACCESS": 1,
+   "CT_INSTANCE_EXEC": 1
+  }
+ },
+ "per_rule": [
+  {
+   "rule": "AWS.Bedrock.GuardrailUpdateDelete",
+   "file": "aws_bedrock_guardrail_update_delete",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.Account.Discovery",
+   "file": "aws_cloudtrail_account_discovery",
+   "severity": "Info",
+   "positive_tests": 3,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.Created",
+   "file": "aws_cloudtrail_created",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.EventSelectorsDisabled",
+   "file": "aws_cloudtrail_event_selectors_disabled",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.Password.Policy.Discovery",
+   "file": "aws_cloudtrail_password_policy_discovery",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.EnableRegion",
+   "file": "aws_cloudtrail_region_enabled",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckSendQuota",
+   "file": "aws_cloudtrail_ses_check_send_quota",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckSESSendingEnabled",
+   "file": "aws_cloudtrail_ses_check_ses_sending_enabled",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.ListIdentities",
+   "file": "aws_cloudtrail_ses_list_identities",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.UserAccessKeyAuth",
+   "file": "aws_cloudtrail_useraccesskeyauth",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.CodebuildProjectMadePublic",
+   "file": "aws_codebuild_made_public",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.ConfigService.Created",
+   "file": "aws_config_service_created",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "positive_tests": 3,
+   "positive_flagged": 3
+  },
+  {
+   "rule": "AWS.Console.RootLogin",
+   "file": "aws_console_root_login",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.Console.Sign-In",
+   "file": "aws_console_signin",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.DownloadInstanceUserData",
+   "file": "aws_ec2_download_instance_user_data",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.EBS.Encryption.Disabled",
+   "file": "aws_ec2_ebs_encryption_disabled",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.EC2.NetworkACLModified",
+   "file": "aws_ec2_network_acl_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.RouteTableModified",
+   "file": "aws_ec2_route_table_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.Startup.Script.Change",
+   "file": "aws_ec2_startup_script_change",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.EC2.StopInstances",
+   "file": "aws_ec2_stopinstances",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.VPCModified",
+   "file": "aws_ec2_vpc_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.Vulnerable.XZ.Image.Launched",
+   "file": "aws_ec2_vulnerable_xz_image_launched",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMAnythingChanged",
+   "file": "aws_iam_anything_changed",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.IAM.AttachAdminUserPolicy",
+   "file": "aws_iam_attach_admin_user_policy",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.IAM.CreateRole",
+   "file": "aws_iam_create_role",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.IAM.PolicyModified",
+   "file": "aws_iam_policy_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.IAMUser.ReconAccessDenied",
+   "file": "aws_iam_user_recon_denied",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.IPSet.Modified",
+   "file": "aws_ipset_modified",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.IAM.AccessKeyCompromised",
+   "file": "aws_key_compromised",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.KMS.CustomerManagedKeyLoss",
+   "file": "aws_kms_cmk_loss",
+   "severity": "Info",
+   "positive_tests": 3,
+   "positive_flagged": 3
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "positive_tests": 3,
+   "positive_flagged": 3
+  },
+  {
+   "rule": "AWS.RDS.ActivityStreamStopped",
+   "file": "aws_rds_activity_stream_stopped",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.AutomatedBackupDeleted",
+   "file": "aws_rds_automated_backup_deleted",
+   "severity": "Critical",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.RDS.IAMRoleAdded",
+   "file": "aws_rds_iam_role_added",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.InstanceDeletion",
+   "file": "aws_rds_instance_deletion",
+   "severity": "High",
+   "positive_tests": 3,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.InstanceMadePublic",
+   "file": "aws_rds_instance_made_public",
+   "severity": "Critical",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.RDS.LogFileDownloaded",
+   "file": "aws_rds_log_file_downloaded",
+   "severity": "Low",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.MasterPasswordUpdated",
+   "file": "aws_rds_master_pass_updated",
+   "severity": "Low",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.PublicRestore",
+   "file": "aws_rds_publicrestore",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.SecurityGroupIngressAuthorized",
+   "file": "aws_rds_security_group_ingress_authorized",
+   "severity": "Medium",
+   "positive_tests": 3,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.SnapshotCopiedCrossRegion",
+   "file": "aws_rds_snapshot_copied_cross_region",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.SnapshotEnumeration",
+   "file": "aws_rds_snapshot_enumeration",
+   "severity": "Low",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.SnapshotExport",
+   "file": "aws_rds_snapshot_export",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.RootAccessKeyCreated",
+   "file": "aws_root_access_key_created",
+   "severity": "Critical",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.CloudTrail.RootPasswordChanged",
+   "file": "aws_root_password_changed",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.S3.BucketDeleted",
+   "file": "aws_s3_bucket_deleted",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.BucketPolicyModified",
+   "file": "aws_s3_bucket_policy_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.CopyObject.CrossAccount.Encryption.KMS",
+   "file": "aws_s3_copy_object_cross_account_kms",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.S3.DeleteObject",
+   "file": "aws_s3_delete_object",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.DeleteObjects",
+   "file": "aws_s3_delete_objects",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.DeletePublicAccessBlock",
+   "file": "aws_s3_delete_public_access_block",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "positive_tests": 5,
+   "positive_flagged": 3
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "positive_tests": 2,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.Suspicious.SAML.Activity",
+   "file": "aws_saml_activity",
+   "severity": "Medium",
+   "positive_tests": 3,
+   "positive_flagged": 3
+  },
+  {
+   "rule": "AWS.SecretsManager.RetrieveSecrets",
+   "file": "aws_secretsmanager_retrieve_secrets",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.SecretsManager.BatchRetrieveSecretsCatchAll",
+   "file": "aws_secretsmanager_retrieve_secrets_catchall",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.SecurityConfigurationChange",
+   "file": "aws_security_configuration_change",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.SSM.DistributedCommand",
+   "file": "aws_ssm_distributed_command",
+   "severity": "Info",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.IAM.CredentialsUpdated",
+   "file": "aws_update_credentials",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.AccessDenied",
+   "file": "aws_vpce_access_denied",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.WAF.Disassociation",
+   "file": "aws_waf_disassociation",
+   "severity": "Critical",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "Retrieve.SSO.access.token",
+   "file": "retrieve_sso_access_token",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  }
+ ],
+ "items": [
+  {
+   "rule": "AWS.Bedrock.GuardrailUpdateDelete",
+   "file": "aws_bedrock_guardrail_update_delete",
+   "severity": "Medium",
+   "test": "Guardrail Updated",
+   "expected": true,
+   "eventName": "UpdateGuardrail",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Bedrock.GuardrailUpdateDelete",
+   "file": "aws_bedrock_guardrail_update_delete",
+   "severity": "Medium",
+   "test": "Guardrail Deleted",
+   "expected": true,
+   "eventName": "DeleteGuardrail",
+   "logfinder_rules": [
+    "CT_DEFENSE_IMPAIR"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Bedrock.GuardrailUpdateDelete",
+   "file": "aws_bedrock_guardrail_update_delete",
+   "severity": "Medium",
+   "test": "List Guardrails",
+   "expected": false,
+   "eventName": "ListGuardrails",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Account.Discovery",
+   "file": "aws_cloudtrail_account_discovery",
+   "severity": "Info",
+   "test": "DescribeAccount",
+   "expected": true,
+   "eventName": "DescribeAccount",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Account.Discovery",
+   "file": "aws_cloudtrail_account_discovery",
+   "severity": "Info",
+   "test": "GetAlternateContact",
+   "expected": true,
+   "eventName": "GetAlternateContact",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Account.Discovery",
+   "file": "aws_cloudtrail_account_discovery",
+   "severity": "Info",
+   "test": "GetContactInformation",
+   "expected": true,
+   "eventName": "GetContactInformation",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Created",
+   "file": "aws_cloudtrail_created",
+   "severity": "Info",
+   "test": "CloudTrail Was Created",
+   "expected": true,
+   "eventName": "CreateTrail",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Created",
+   "file": "aws_cloudtrail_created",
+   "severity": "Info",
+   "test": "KMS Decrypt Event",
+   "expected": false,
+   "eventName": "Decrypt",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Created",
+   "file": "aws_cloudtrail_created",
+   "severity": "Info",
+   "test": "Error Creating CloudTrail",
+   "expected": false,
+   "eventName": "CreateTrail",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.EventSelectorsDisabled",
+   "file": "aws_cloudtrail_event_selectors_disabled",
+   "severity": "Medium",
+   "test": "Event Selector Disabled",
+   "expected": true,
+   "eventName": "PutEventSelectors",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.EventSelectorsDisabled",
+   "file": "aws_cloudtrail_event_selectors_disabled",
+   "severity": "Medium",
+   "test": "Event Selector Enabled",
+   "expected": false,
+   "eventName": "PutEventSelectors",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.EventSelectorsDisabled",
+   "file": "aws_cloudtrail_event_selectors_disabled",
+   "severity": "Medium",
+   "test": "Uninteresting Event Type",
+   "expected": false,
+   "eventName": "GetEventSelectors",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Password.Policy.Discovery",
+   "file": "aws_cloudtrail_password_policy_discovery",
+   "severity": "Info",
+   "test": "Non-Discovery Event",
+   "expected": false,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Password.Policy.Discovery",
+   "file": "aws_cloudtrail_password_policy_discovery",
+   "severity": "Info",
+   "test": "Password Discovery ARN",
+   "expected": true,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Password.Policy.Discovery",
+   "file": "aws_cloudtrail_password_policy_discovery",
+   "severity": "Info",
+   "test": "Password Discovery Service",
+   "expected": false,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.EnableRegion",
+   "file": "aws_cloudtrail_region_enabled",
+   "severity": "Medium",
+   "test": "EnableRegion",
+   "expected": true,
+   "eventName": "EnableRegion",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.EnableRegion",
+   "file": "aws_cloudtrail_region_enabled",
+   "severity": "Medium",
+   "test": "Other Event",
+   "expected": false,
+   "eventName": "ListBucket",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckSendQuota",
+   "file": "aws_cloudtrail_ses_check_send_quota",
+   "severity": "Info",
+   "test": "GetSendQuota Event",
+   "expected": true,
+   "eventName": "GetSendQuota",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckSendQuota",
+   "file": "aws_cloudtrail_ses_check_send_quota",
+   "severity": "Info",
+   "test": "GetSendQuota from Trusted Advisor (Should Not Alert)",
+   "expected": false,
+   "eventName": "GetSendQuota",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckSESSendingEnabled",
+   "file": "aws_cloudtrail_ses_check_ses_sending_enabled",
+   "severity": "Info",
+   "test": "CheckSendingEnabled Event",
+   "expected": true,
+   "eventName": "GetAccountSendingEnabled",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.ListIdentities",
+   "file": "aws_cloudtrail_ses_list_identities",
+   "severity": "Info",
+   "test": "ListIdentities Event",
+   "expected": true,
+   "eventName": "ListIdentities",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UserAccessKeyAuth",
+   "file": "aws_cloudtrail_useraccesskeyauth",
+   "severity": "Info",
+   "test": "Access Key Action Failed",
+   "expected": false,
+   "eventName": "ListFunctions20150331",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UserAccessKeyAuth",
+   "file": "aws_cloudtrail_useraccesskeyauth",
+   "severity": "Info",
+   "test": "Access Key Action Success",
+   "expected": true,
+   "eventName": "GetCallerIdentity",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UserAccessKeyAuth",
+   "file": "aws_cloudtrail_useraccesskeyauth",
+   "severity": "Info",
+   "test": "Console Login",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UserAccessKeyAuth",
+   "file": "aws_cloudtrail_useraccesskeyauth",
+   "severity": "Info",
+   "test": "No Access Key",
+   "expected": false,
+   "eventName": "AssumeRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.CodebuildProjectMadePublic",
+   "file": "aws_codebuild_made_public",
+   "severity": "High",
+   "test": "CodeBuild Project Made Public",
+   "expected": true,
+   "eventName": "UpdateProjectVisibility",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.CodebuildProjectMadePublic",
+   "file": "aws_codebuild_made_public",
+   "severity": "High",
+   "test": "CodeBuild Project Made Private",
+   "expected": false,
+   "eventName": "UpdateProjectVisibility",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.CodebuildProjectMadePublic",
+   "file": "aws_codebuild_made_public",
+   "severity": "High",
+   "test": "Not a UpdateProjectVisibility event",
+   "expected": false,
+   "eventName": "CreateProject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.ConfigService.Created",
+   "file": "aws_config_service_created",
+   "severity": "Info",
+   "test": "Config Recorder Delivery Channel Created",
+   "expected": true,
+   "eventName": "PutDeliveryChannel",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.ConfigService.Created",
+   "file": "aws_config_service_created",
+   "severity": "Info",
+   "test": "Config Recorder Deleted",
+   "expected": false,
+   "eventName": "DeleteDeliveryChannel",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.ConfigService.Created",
+   "file": "aws_config_service_created",
+   "severity": "Info",
+   "test": "Error Creating Config Recorder Delivery Channel",
+   "expected": false,
+   "eventName": "PutDeliveryChannel",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA Login - IAM User",
+   "expected": true,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA Login - IAM User Unknown Account",
+   "expected": true,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA Login - Root User",
+   "expected": true,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "MFA Login - SAML",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "MFA Login",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA - Login Failed",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA - authenticated from session with MFA",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA Login - New User",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "AWS SSOv2 Login",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "AssumeRole from MFA User Session",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.LoginWithoutMFA",
+   "file": "aws_console_login_without_mfa",
+   "severity": "High",
+   "test": "No MFA - IAM Role and External IDP",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.RootLogin",
+   "file": "aws_console_root_login",
+   "severity": "High",
+   "test": "Successful Root Login",
+   "expected": true,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.RootLogin",
+   "file": "aws_console_root_login",
+   "severity": "High",
+   "test": "Non-Login Event",
+   "expected": false,
+   "eventName": "DescribeTable",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.Sign-In",
+   "file": "aws_console_signin",
+   "severity": "Info",
+   "test": "Test-94439c",
+   "expected": true,
+   "eventName": "Authenticate",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.DownloadInstanceUserData",
+   "file": "aws_ec2_download_instance_user_data",
+   "severity": "Medium",
+   "test": "Unsuccessful Attempt",
+   "expected": true,
+   "eventName": "DescribeInstanceAttribute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.DownloadInstanceUserData",
+   "file": "aws_ec2_download_instance_user_data",
+   "severity": "Medium",
+   "test": "Successful Attempt",
+   "expected": true,
+   "eventName": "DescribeInstanceAttribute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.DownloadInstanceUserData",
+   "file": "aws_ec2_download_instance_user_data",
+   "severity": "Medium",
+   "test": "Panther Cloud Security Scanning",
+   "expected": false,
+   "eventName": "DescribeInstanceAttribute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.EBS.Encryption.Disabled",
+   "file": "aws_ec2_ebs_encryption_disabled",
+   "severity": "Medium",
+   "test": "DisableEbsEncryptionByDefault Event",
+   "expected": true,
+   "eventName": "DisableEbsEncryptionByDefault",
+   "logfinder_rules": [
+    "CT_DEFENSE_IMPAIR"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.EBS.Encryption.Disabled",
+   "file": "aws_ec2_ebs_encryption_disabled",
+   "severity": "Medium",
+   "test": "Non Matching Event",
+   "expected": false,
+   "eventName": "DescribeInstanceStatus",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.NetworkACLModified",
+   "file": "aws_ec2_network_acl_modified",
+   "severity": "Info",
+   "test": "Network ACL Modified",
+   "expected": true,
+   "eventName": "CreateNetworkAclEntry",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.NetworkACLModified",
+   "file": "aws_ec2_network_acl_modified",
+   "severity": "Info",
+   "test": "Network ACL Not Modified",
+   "expected": false,
+   "eventName": "DescribeNetworkAcls",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.NetworkACLModified",
+   "file": "aws_ec2_network_acl_modified",
+   "severity": "Info",
+   "test": "Error Modifying Network ACL",
+   "expected": false,
+   "eventName": "CreateNetworkAclEntry",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.RouteTableModified",
+   "file": "aws_ec2_route_table_modified",
+   "severity": "Info",
+   "test": "Route Table Modified",
+   "expected": true,
+   "eventName": "CreateRoute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.RouteTableModified",
+   "file": "aws_ec2_route_table_modified",
+   "severity": "Info",
+   "test": "Route Table Not Modified",
+   "expected": false,
+   "eventName": "DescribeRouteTables",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.RouteTableModified",
+   "file": "aws_ec2_route_table_modified",
+   "severity": "Info",
+   "test": "Error Modifying Route Table",
+   "expected": false,
+   "eventName": "CreateRoute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Startup.Script.Change",
+   "file": "aws_ec2_startup_script_change",
+   "severity": "High",
+   "test": "ModifyInstanceAttribute-NoUserData",
+   "expected": false,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Startup.Script.Change",
+   "file": "aws_ec2_startup_script_change",
+   "severity": "High",
+   "test": "ModifyInstanceAttributeUserdata",
+   "expected": true,
+   "eventName": "ModifyInstanceAttribute",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Startup.Script.Change",
+   "file": "aws_ec2_startup_script_change",
+   "severity": "High",
+   "test": "NoModifyInstanceAttribute",
+   "expected": false,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.StopInstances",
+   "file": "aws_ec2_stopinstances",
+   "severity": "Info",
+   "test": "CloudTrail Instances Were Stopped",
+   "expected": true,
+   "eventName": "StopInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.StopInstances",
+   "file": "aws_ec2_stopinstances",
+   "severity": "Info",
+   "test": "CloudTrail Instances Were Started",
+   "expected": false,
+   "eventName": "StartInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.StopInstances",
+   "file": "aws_ec2_stopinstances",
+   "severity": "Info",
+   "test": "Error Stopping CloudTrail Instances",
+   "expected": false,
+   "eventName": "StopInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.VPCModified",
+   "file": "aws_ec2_vpc_modified",
+   "severity": "Info",
+   "test": "VPC Modified",
+   "expected": true,
+   "eventName": "CreateVpc",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.VPCModified",
+   "file": "aws_ec2_vpc_modified",
+   "severity": "Info",
+   "test": "VPC Not Modified",
+   "expected": false,
+   "eventName": "DescribeVpcs",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.VPCModified",
+   "file": "aws_ec2_vpc_modified",
+   "severity": "Info",
+   "test": "Error Modifying VPC",
+   "expected": false,
+   "eventName": "CreateVpc",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Vulnerable.XZ.Image.Launched",
+   "file": "aws_ec2_vulnerable_xz_image_launched",
+   "severity": "High",
+   "test": "Single vulnerable AMI Launched",
+   "expected": true,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Vulnerable.XZ.Image.Launched",
+   "file": "aws_ec2_vulnerable_xz_image_launched",
+   "severity": "High",
+   "test": "Multiple vulnerable AMIs Launched",
+   "expected": true,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Vulnerable.XZ.Image.Launched",
+   "file": "aws_ec2_vulnerable_xz_image_launched",
+   "severity": "High",
+   "test": "Non-vulnerable AMI Launched",
+   "expected": false,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMAnythingChanged",
+   "file": "aws_iam_anything_changed",
+   "severity": "Info",
+   "test": "IAM Change",
+   "expected": true,
+   "eventName": "AttachRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMAnythingChanged",
+   "file": "aws_iam_anything_changed",
+   "severity": "Info",
+   "test": "IAM Read Only Activity",
+   "expected": false,
+   "eventName": "DescribePolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMAnythingChanged",
+   "file": "aws_iam_anything_changed",
+   "severity": "Info",
+   "test": "Error Making IAM Change",
+   "expected": false,
+   "eventName": "AttachRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.AttachAdminUserPolicy",
+   "file": "aws_iam_attach_admin_user_policy",
+   "severity": "Info",
+   "test": "IAM User Policy Attached with Administrator Access",
+   "expected": true,
+   "eventName": "AttachUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.AttachAdminUserPolicy",
+   "file": "aws_iam_attach_admin_user_policy",
+   "severity": "Info",
+   "test": "IAM User Policy Attached without Administrator Access",
+   "expected": false,
+   "eventName": "AttachUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.CreateRole",
+   "file": "aws_iam_create_role",
+   "severity": "Info",
+   "test": "IAM Role Created",
+   "expected": true,
+   "eventName": "CreateRole",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.CreateRole",
+   "file": "aws_iam_create_role",
+   "severity": "Info",
+   "test": "IAM Role Not Created",
+   "expected": false,
+   "eventName": "AttachUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.PolicyModified",
+   "file": "aws_iam_policy_modified",
+   "severity": "Info",
+   "test": "IAM Policy Change",
+   "expected": true,
+   "eventName": "DeleteGroupPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.PolicyModified",
+   "file": "aws_iam_policy_modified",
+   "severity": "Info",
+   "test": "Not IAM Policy Change",
+   "expected": false,
+   "eventName": "DescribeTable",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.PolicyModified",
+   "file": "aws_iam_policy_modified",
+   "severity": "Info",
+   "test": "IAM Policy Change Error",
+   "expected": false,
+   "eventName": "DeleteGroupPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAMUser.ReconAccessDenied",
+   "file": "aws_iam_user_recon_denied",
+   "severity": "Info",
+   "test": "Unauthorized API Call",
+   "expected": true,
+   "eventName": "GetRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAMUser.ReconAccessDenied",
+   "file": "aws_iam_user_recon_denied",
+   "severity": "Info",
+   "test": "Unauthorized API Call from Within AWS (FQDN)",
+   "expected": false,
+   "eventName": "CreateServiceLinkedRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAMUser.ReconAccessDenied",
+   "file": "aws_iam_user_recon_denied",
+   "severity": "Info",
+   "test": "Authorized API Call",
+   "expected": false,
+   "eventName": "CreateServiceLinkedRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAMUser.ReconAccessDenied",
+   "file": "aws_iam_user_recon_denied",
+   "severity": "Info",
+   "test": "Unauthorized API Call - From AWS console",
+   "expected": false,
+   "eventName": "GetRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IPSet.Modified",
+   "file": "aws_ipset_modified",
+   "severity": "High",
+   "test": "CreateIPSet Event",
+   "expected": true,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IPSet.Modified",
+   "file": "aws_ipset_modified",
+   "severity": "High",
+   "test": "UpdateIPSet",
+   "expected": true,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IPSet.Modified",
+   "file": "aws_ipset_modified",
+   "severity": "High",
+   "test": "NotIPSet",
+   "expected": false,
+   "eventName": null,
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.AccessKeyCompromised",
+   "file": "aws_key_compromised",
+   "severity": "High",
+   "test": "An AWS IAM Access Key was Compromised",
+   "expected": true,
+   "eventName": "PutUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.AccessKeyCompromised",
+   "file": "aws_key_compromised",
+   "severity": "High",
+   "test": "Request Param is null",
+   "expected": false,
+   "eventName": "PutUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.KMS.CustomerManagedKeyLoss",
+   "file": "aws_kms_cmk_loss",
+   "severity": "Info",
+   "test": "KMS Key Disabled",
+   "expected": true,
+   "eventName": "DisableKey",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.KMS.CustomerManagedKeyLoss",
+   "file": "aws_kms_cmk_loss",
+   "severity": "Info",
+   "test": "KMS Key Scheduled For Deletion",
+   "expected": true,
+   "eventName": "ScheduleKeyDeletion",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.KMS.CustomerManagedKeyLoss",
+   "file": "aws_kms_cmk_loss",
+   "severity": "Info",
+   "test": "KMS Key Non Deletion Event",
+   "expected": false,
+   "eventName": "Decrypt",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.KMS.CustomerManagedKeyLoss",
+   "file": "aws_kms_cmk_loss",
+   "severity": "Info",
+   "test": "KMS Key Scheduled For Deletion - missing resources",
+   "expected": true,
+   "eventName": "ScheduleKeyDeletion",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.KMS.CustomerManagedKeyLoss",
+   "file": "aws_kms_cmk_loss",
+   "severity": "Info",
+   "test": "KMS Disable Key Error",
+   "expected": false,
+   "eventName": "DisableKey",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "test": "IAM User Updates Lambda Code",
+   "expected": true,
+   "eventName": "UpdateFunctionCode20150331v2",
+   "logfinder_rules": [
+    "CT_SERVERLESS_CHANGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "test": "AssumedRole Updates Lambda Code (Normal CI/CD)",
+   "expected": false,
+   "eventName": "UpdateFunctionCode20150331",
+   "logfinder_rules": [
+    "CT_SERVERLESS_CHANGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "test": "SSO AssumedRole Updates Lambda Code",
+   "expected": true,
+   "eventName": "UpdateFunctionCode20150331v2",
+   "logfinder_rules": [
+    "CT_SERVERLESS_CHANGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "test": "FederatedUser Updates Lambda Code",
+   "expected": true,
+   "eventName": "UpdateFunctionCode20150331v2",
+   "logfinder_rules": [
+    "CT_SERVERLESS_CHANGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "test": "AssumedRole Updates Lambda Code v2 (Normal CI/CD)",
+   "expected": false,
+   "eventName": "UpdateFunctionCode20150331v2",
+   "logfinder_rules": [
+    "CT_SERVERLESS_CHANGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionCode",
+   "file": "aws_overwrite_lambda_code",
+   "severity": "High",
+   "test": "Delete Function Event",
+   "expected": false,
+   "eventName": "DeleteFunction",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ActivityStreamStopped",
+   "file": "aws_rds_activity_stream_stopped",
+   "severity": "High",
+   "test": "Activity Stream Stopped Successfully",
+   "expected": true,
+   "eventName": "StopActivityStream",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ActivityStreamStopped",
+   "file": "aws_rds_activity_stream_stopped",
+   "severity": "High",
+   "test": "Activity Stream Stop Failed",
+   "expected": false,
+   "eventName": "StopActivityStream",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ActivityStreamStopped",
+   "file": "aws_rds_activity_stream_stopped",
+   "severity": "High",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "StartActivityStream",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.AutomatedBackupDeleted",
+   "file": "aws_rds_automated_backup_deleted",
+   "severity": "Critical",
+   "test": "Automated Backup Deleted",
+   "expected": true,
+   "eventName": "DeleteDBInstanceAutomatedBackup",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.AutomatedBackupDeleted",
+   "file": "aws_rds_automated_backup_deleted",
+   "severity": "Critical",
+   "test": "Cluster Automated Backup Deleted",
+   "expected": true,
+   "eventName": "DeleteDBClusterAutomatedBackup",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.AutomatedBackupDeleted",
+   "file": "aws_rds_automated_backup_deleted",
+   "severity": "Critical",
+   "test": "Automated Backup Deletion Failed",
+   "expected": false,
+   "eventName": "DeleteDBInstanceAutomatedBackup",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.AutomatedBackupDeleted",
+   "file": "aws_rds_automated_backup_deleted",
+   "severity": "Critical",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "CreateDBInstanceReadReplica",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.IAMRoleAdded",
+   "file": "aws_rds_iam_role_added",
+   "severity": "Medium",
+   "test": "Role Added to DB Instance",
+   "expected": true,
+   "eventName": "AddRoleToDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.IAMRoleAdded",
+   "file": "aws_rds_iam_role_added",
+   "severity": "Medium",
+   "test": "Role Added to DB Cluster",
+   "expected": true,
+   "eventName": "AddRoleToDBCluster",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.IAMRoleAdded",
+   "file": "aws_rds_iam_role_added",
+   "severity": "Medium",
+   "test": "Role Addition Failed",
+   "expected": false,
+   "eventName": "AddRoleToDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.IAMRoleAdded",
+   "file": "aws_rds_iam_role_added",
+   "severity": "Medium",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "RemoveRoleFromDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceDeletion",
+   "file": "aws_rds_instance_deletion",
+   "severity": "High",
+   "test": "RDS Instance Deleted With Final Snapshot",
+   "expected": true,
+   "eventName": "DeleteDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceDeletion",
+   "file": "aws_rds_instance_deletion",
+   "severity": "High",
+   "test": "RDS Instance Deleted Without Final Snapshot - Critical",
+   "expected": true,
+   "eventName": "DeleteDBInstance",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceDeletion",
+   "file": "aws_rds_instance_deletion",
+   "severity": "High",
+   "test": "RDS Cluster Deleted",
+   "expected": true,
+   "eventName": "DeleteDBCluster",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceDeletion",
+   "file": "aws_rds_instance_deletion",
+   "severity": "High",
+   "test": "RDS Deletion Failed - Access Denied",
+   "expected": false,
+   "eventName": "DeleteDBInstance",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceDeletion",
+   "file": "aws_rds_instance_deletion",
+   "severity": "High",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceMadePublic",
+   "file": "aws_rds_instance_made_public",
+   "severity": "Critical",
+   "test": "RDS Instance Made Public",
+   "expected": true,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceMadePublic",
+   "file": "aws_rds_instance_made_public",
+   "severity": "Critical",
+   "test": "RDS Cluster Made Public with Security Group Changes",
+   "expected": true,
+   "eventName": "ModifyDBCluster",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceMadePublic",
+   "file": "aws_rds_instance_made_public",
+   "severity": "Critical",
+   "test": "RDS Instance Made Private - No Alert",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceMadePublic",
+   "file": "aws_rds_instance_made_public",
+   "severity": "Critical",
+   "test": "RDS Modification Without Public Access Change",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceMadePublic",
+   "file": "aws_rds_instance_made_public",
+   "severity": "Critical",
+   "test": "RDS Modification Failed",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.LogFileDownloaded",
+   "file": "aws_rds_log_file_downloaded",
+   "severity": "Low",
+   "test": "Error Log Downloaded",
+   "expected": true,
+   "eventName": "DownloadDBLogFilePortion",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.LogFileDownloaded",
+   "file": "aws_rds_log_file_downloaded",
+   "severity": "Low",
+   "test": "Audit Log Downloaded from External IP",
+   "expected": true,
+   "eventName": "DownloadDBLogFilePortion",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.LogFileDownloaded",
+   "file": "aws_rds_log_file_downloaded",
+   "severity": "Low",
+   "test": "Download Failed",
+   "expected": false,
+   "eventName": "DownloadDBLogFilePortion",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.LogFileDownloaded",
+   "file": "aws_rds_log_file_downloaded",
+   "severity": "Low",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "DescribeDBLogFiles",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.MasterPasswordUpdated",
+   "file": "aws_rds_master_pass_updated",
+   "severity": "Low",
+   "test": "Allocated storage modified",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.MasterPasswordUpdated",
+   "file": "aws_rds_master_pass_updated",
+   "severity": "Low",
+   "test": "Master pass modified",
+   "expected": true,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.PublicRestore",
+   "file": "aws_rds_publicrestore",
+   "severity": "High",
+   "test": "Not-Restore-RDS-Request",
+   "expected": false,
+   "eventName": "CreateDBInstance",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.PublicRestore",
+   "file": "aws_rds_publicrestore",
+   "severity": "High",
+   "test": "RDS-Restore-Not-Public",
+   "expected": false,
+   "eventName": "RestoreDBInstanceFromDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.PublicRestore",
+   "file": "aws_rds_publicrestore",
+   "severity": "High",
+   "test": "RDS-Restore-Public",
+   "expected": true,
+   "eventName": "RestoreDBInstanceFromDBSnapshot",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SecurityGroupIngressAuthorized",
+   "file": "aws_rds_security_group_ingress_authorized",
+   "severity": "Medium",
+   "test": "Ingress Authorized from Specific CIDR",
+   "expected": true,
+   "eventName": "AuthorizeDBSecurityGroupIngress",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SecurityGroupIngressAuthorized",
+   "file": "aws_rds_security_group_ingress_authorized",
+   "severity": "Medium",
+   "test": "Ingress Authorized from Public Internet - Critical",
+   "expected": true,
+   "eventName": "AuthorizeDBSecurityGroupIngress",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SecurityGroupIngressAuthorized",
+   "file": "aws_rds_security_group_ingress_authorized",
+   "severity": "Medium",
+   "test": "Ingress Authorized from EC2 Security Group",
+   "expected": true,
+   "eventName": "AuthorizeDBSecurityGroupIngress",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SecurityGroupIngressAuthorized",
+   "file": "aws_rds_security_group_ingress_authorized",
+   "severity": "Medium",
+   "test": "Authorization Failed",
+   "expected": false,
+   "eventName": "AuthorizeDBSecurityGroupIngress",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SecurityGroupIngressAuthorized",
+   "file": "aws_rds_security_group_ingress_authorized",
+   "severity": "Medium",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "RevokeDBSecurityGroupIngress",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotCopiedCrossRegion",
+   "file": "aws_rds_snapshot_copied_cross_region",
+   "severity": "Medium",
+   "test": "Snapshot Copied Cross-Region",
+   "expected": true,
+   "eventName": "CopyDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotCopiedCrossRegion",
+   "file": "aws_rds_snapshot_copied_cross_region",
+   "severity": "Medium",
+   "test": "Cluster Snapshot Copied Cross-Region",
+   "expected": true,
+   "eventName": "CopyDBClusterSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotCopiedCrossRegion",
+   "file": "aws_rds_snapshot_copied_cross_region",
+   "severity": "Medium",
+   "test": "Snapshot Copied Within Same Region - No Alert",
+   "expected": false,
+   "eventName": "CopyDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotCopiedCrossRegion",
+   "file": "aws_rds_snapshot_copied_cross_region",
+   "severity": "Medium",
+   "test": "Copy Failed",
+   "expected": false,
+   "eventName": "CopyDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotEnumeration",
+   "file": "aws_rds_snapshot_enumeration",
+   "severity": "Low",
+   "test": "Snapshot Enumeration with Public Flag",
+   "expected": true,
+   "eventName": "DescribeDBSnapshots",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotEnumeration",
+   "file": "aws_rds_snapshot_enumeration",
+   "severity": "Low",
+   "test": "Cluster Snapshot Enumeration with Shared Flag",
+   "expected": true,
+   "eventName": "DescribeDBClusterSnapshots",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotEnumeration",
+   "file": "aws_rds_snapshot_enumeration",
+   "severity": "Low",
+   "test": "Normal Snapshot Query - No Public or Shared Flag",
+   "expected": false,
+   "eventName": "DescribeDBSnapshots",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotEnumeration",
+   "file": "aws_rds_snapshot_enumeration",
+   "severity": "Low",
+   "test": "Query Failed",
+   "expected": false,
+   "eventName": "DescribeDBSnapshots",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotExport",
+   "file": "aws_rds_snapshot_export",
+   "severity": "High",
+   "test": "RDS Snapshot Export Started",
+   "expected": true,
+   "eventName": "StartExportTask",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotExport",
+   "file": "aws_rds_snapshot_export",
+   "severity": "High",
+   "test": "RDS Snapshot Export to Suspicious Bucket",
+   "expected": true,
+   "eventName": "StartExportTask",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotExport",
+   "file": "aws_rds_snapshot_export",
+   "severity": "High",
+   "test": "RDS Snapshot Export Failed",
+   "expected": false,
+   "eventName": "StartExportTask",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotExport",
+   "file": "aws_rds_snapshot_export",
+   "severity": "High",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "CreateDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.RootAccessKeyCreated",
+   "file": "aws_root_access_key_created",
+   "severity": "Critical",
+   "test": "Root Access Key Created",
+   "expected": true,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE",
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.RootAccessKeyCreated",
+   "file": "aws_root_access_key_created",
+   "severity": "Critical",
+   "test": "Root Created Access Key For User",
+   "expected": false,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE",
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "test": "Root Activity - CreateServiceLinkedRole",
+   "expected": false,
+   "eventName": "CreateServiceLinkedRole",
+   "logfinder_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "test": "Root Activity",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "test": "IAMUser Activity",
+   "expected": false,
+   "eventName": "GetBucketAcl",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "test": "Root User Failed Activity",
+   "expected": false,
+   "eventName": "ExternalIdPDirectoryLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "test": "Successful Root Login",
+   "expected": true,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Root.Activity",
+   "file": "aws_root_activity",
+   "severity": "High",
+   "test": "Root Read-Only Enumeration",
+   "expected": false,
+   "eventName": "ListAccessKeys",
+   "logfinder_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.RootPasswordChanged",
+   "file": "aws_root_password_changed",
+   "severity": "High",
+   "test": "Root Password Changed",
+   "expected": true,
+   "eventName": "PasswordUpdated",
+   "logfinder_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.RootPasswordChanged",
+   "file": "aws_root_password_changed",
+   "severity": "High",
+   "test": "Root Password Change Failed",
+   "expected": false,
+   "eventName": "PasswordUpdated",
+   "logfinder_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.BucketDeleted",
+   "file": "aws_s3_bucket_deleted",
+   "severity": "Info",
+   "test": "An S3 Bucket was deleted",
+   "expected": true,
+   "eventName": "DeleteBucket",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.BucketDeleted",
+   "file": "aws_s3_bucket_deleted",
+   "severity": "Info",
+   "test": "S3 Bucket Deletion Failed",
+   "expected": false,
+   "eventName": "DeleteBucket",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.BucketDeleted",
+   "file": "aws_s3_bucket_deleted",
+   "severity": "Info",
+   "test": "An S3 Object Deleted",
+   "expected": false,
+   "eventName": "DeleteObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.BucketPolicyModified",
+   "file": "aws_s3_bucket_policy_modified",
+   "severity": "Info",
+   "test": "S3 Bucket Policy Modified",
+   "expected": true,
+   "eventName": "PutBucketAcl",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.BucketPolicyModified",
+   "file": "aws_s3_bucket_policy_modified",
+   "severity": "Info",
+   "test": "S3 Bucket Policy Modified Error Response",
+   "expected": false,
+   "eventName": "PutBucketAcl",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.BucketPolicyModified",
+   "file": "aws_s3_bucket_policy_modified",
+   "severity": "Info",
+   "test": "S3 Bucket Policy Not Modified",
+   "expected": false,
+   "eventName": "GetBucketPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.CopyObject.CrossAccount.Encryption.KMS",
+   "file": "aws_s3_copy_object_cross_account_kms",
+   "severity": "High",
+   "test": "In-Place Copy with KMS Key Change",
+   "expected": true,
+   "eventName": "CopyObject",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.CopyObject.CrossAccount.Encryption.KMS",
+   "file": "aws_s3_copy_object_cross_account_kms",
+   "severity": "High",
+   "test": "Copy with Same Account Owner",
+   "expected": false,
+   "eventName": "CopyObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteObject",
+   "file": "aws_s3_delete_object",
+   "severity": "Info",
+   "test": "DeleteObject",
+   "expected": true,
+   "eventName": "DeleteObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteObject",
+   "file": "aws_s3_delete_object",
+   "severity": "Info",
+   "test": "Other Event",
+   "expected": false,
+   "eventName": "ListBucket",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteObjects",
+   "file": "aws_s3_delete_objects",
+   "severity": "Info",
+   "test": "DeleteObjects",
+   "expected": true,
+   "eventName": "DeleteObjects",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteObjects",
+   "file": "aws_s3_delete_objects",
+   "severity": "Info",
+   "test": "Other Event",
+   "expected": false,
+   "eventName": "ListBucket",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeletePublicAccessBlock",
+   "file": "aws_s3_delete_public_access_block",
+   "severity": "Medium",
+   "test": "Public Access Block Deleted Successfully",
+   "expected": true,
+   "eventName": "DeleteBucketPublicAccessBlock",
+   "logfinder_rules": [
+    "CT_S3_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeletePublicAccessBlock",
+   "file": "aws_s3_delete_public_access_block",
+   "severity": "Medium",
+   "test": "Public Access Block Deletion Failed",
+   "expected": false,
+   "eventName": "DeleteBucketPublicAccessBlock",
+   "logfinder_rules": [
+    "CT_S3_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeletePublicAccessBlock",
+   "file": "aws_s3_delete_public_access_block",
+   "severity": "Medium",
+   "test": "Different S3 Event",
+   "expected": false,
+   "eventName": "PutBucketPublicAccessBlock",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeletePublicAccessBlock",
+   "file": "aws_s3_delete_public_access_block",
+   "severity": "Medium",
+   "test": "Non-S3 Event",
+   "expected": false,
+   "eventName": "DeleteBucketPublicAccessBlock",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "Match - Bucket Logging Disabled",
+   "expected": true,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "Match - Versioning Suspended",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "Match - Versioning Disabled (alternate status value)",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "Match - MFA Delete Disabled",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "Match - Versioning Suspended and MFA Delete Disabled in Single Call",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "No Match - Bucket Logging Enabled",
+   "expected": false,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "No Match - Versioning Enabled",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "No Match - MFA Delete Enabled",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "No Match - Failed API Call (Access Denied)",
+   "expected": false,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SecurityControlDisabling",
+   "file": "aws_s3_security_control_disabling",
+   "severity": "High",
+   "test": "No Match - Non-S3 Event",
+   "expected": false,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "test": "Versioning Suspended Successfully",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "test": "Versioning Disabled Successfully",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "test": "Versioning Change Failed",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [
+    "CT_DATA_DESTRUCTION"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "test": "Versioning Enabled",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "test": "Different S3 Event",
+   "expected": false,
+   "eventName": "DeleteBucketEncryption",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.SuspendVersioning",
+   "file": "aws_s3_suspend_versioning",
+   "severity": "Low",
+   "test": "Non-S3 Event",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Suspicious.SAML.Activity",
+   "file": "aws_saml_activity",
+   "severity": "Medium",
+   "test": "CreateSAMLProvider",
+   "expected": true,
+   "eventName": "CreateSAMLProvider",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Suspicious.SAML.Activity",
+   "file": "aws_saml_activity",
+   "severity": "Medium",
+   "test": "DeleteSAMLProvider",
+   "expected": true,
+   "eventName": "DeleteSAMLProvider",
+   "logfinder_rules": [
+    "CT_ACCOUNT_SECURITY"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Suspicious.SAML.Activity",
+   "file": "aws_saml_activity",
+   "severity": "Medium",
+   "test": "Non Target Event",
+   "expected": false,
+   "eventName": "ListAccessKeys",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Suspicious.SAML.Activity",
+   "file": "aws_saml_activity",
+   "severity": "Medium",
+   "test": "UpdateSAMLProvider",
+   "expected": true,
+   "eventName": "UpdateSAMLProvider",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Suspicious.SAML.Activity",
+   "file": "aws_saml_activity",
+   "severity": "Medium",
+   "test": "Activity from AWSSSO Service Managed Role",
+   "expected": false,
+   "eventName": "CreateSAMLProvider",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecretsManager.RetrieveSecrets",
+   "file": "aws_secretsmanager_retrieve_secrets",
+   "severity": "Info",
+   "test": "GetSecretValue Denied",
+   "expected": true,
+   "eventName": "GetSecretValue",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecretsManager.BatchRetrieveSecretsCatchAll",
+   "file": "aws_secretsmanager_retrieve_secrets_catchall",
+   "severity": "Info",
+   "test": "BatchGetSecretValue Catch-All",
+   "expected": true,
+   "eventName": "BatchGetSecretValue",
+   "logfinder_rules": [
+    "CT_SECRET_ACCESS"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecretsManager.BatchRetrieveSecretsCatchAll",
+   "file": "aws_secretsmanager_retrieve_secrets_catchall",
+   "severity": "Info",
+   "test": "BatchGetSecretValue Catch-All with other filters",
+   "expected": false,
+   "eventName": "BatchGetSecretValue",
+   "logfinder_rules": [
+    "CT_SECRET_ACCESS"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SecurityConfigurationChange",
+   "file": "aws_security_configuration_change",
+   "severity": "Medium",
+   "test": "Security Configuration Changed",
+   "expected": true,
+   "eventName": "DeleteTrail",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SecurityConfigurationChange",
+   "file": "aws_security_configuration_change",
+   "severity": "Medium",
+   "test": "Security Configuration Not Changed",
+   "expected": false,
+   "eventName": "DescribeTrail",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SecurityConfigurationChange",
+   "file": "aws_security_configuration_change",
+   "severity": "Medium",
+   "test": "Non Security Configuration Change",
+   "expected": false,
+   "eventName": "PutPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SecurityConfigurationChange",
+   "file": "aws_security_configuration_change",
+   "severity": "Medium",
+   "test": "Security Configuration Not Changed - Error",
+   "expected": false,
+   "eventName": "DeleteTrail",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SecurityConfigurationChange",
+   "file": "aws_security_configuration_change",
+   "severity": "Medium",
+   "test": "Security Configuration Changed - Allowlisted User",
+   "expected": false,
+   "eventName": "DeleteRule",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DistributedCommand",
+   "file": "aws_ssm_distributed_command",
+   "severity": "Info",
+   "test": "Send Command to Many Instances at Once",
+   "expected": true,
+   "eventName": "SendCommand",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DistributedCommand",
+   "file": "aws_ssm_distributed_command",
+   "severity": "Info",
+   "test": "Single Command Send, Many Cached IDs",
+   "expected": true,
+   "eventName": "SendCommand",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DistributedCommand",
+   "file": "aws_ssm_distributed_command",
+   "severity": "Info",
+   "test": "Single Command Send, No Cached IDs",
+   "expected": false,
+   "eventName": "SendCommand",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DistributedCommand",
+   "file": "aws_ssm_distributed_command",
+   "severity": "Info",
+   "test": "Unrelated Event",
+   "expected": false,
+   "eventName": "DescribeInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.CredentialsUpdated",
+   "file": "aws_update_credentials",
+   "severity": "Info",
+   "test": "User Password Was Changed",
+   "expected": true,
+   "eventName": "ChangePassword",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.CredentialsUpdated",
+   "file": "aws_update_credentials",
+   "severity": "Info",
+   "test": "MFA Device Was Created",
+   "expected": false,
+   "eventName": "CreateVirtualMFADevice",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.CredentialsUpdated",
+   "file": "aws_update_credentials",
+   "severity": "Info",
+   "test": "User Password Change Error",
+   "expected": false,
+   "eventName": "ChangePassword",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.AccessDenied",
+   "file": "aws_vpce_access_denied",
+   "severity": "Medium",
+   "test": "VPC Endpoint Access Denied",
+   "expected": true,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.AccessDenied",
+   "file": "aws_vpce_access_denied",
+   "severity": "Medium",
+   "test": "Not VPC Endpoint Event",
+   "expected": false,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.AccessDenied",
+   "file": "aws_vpce_access_denied",
+   "severity": "Medium",
+   "test": "VPC Endpoint Event Without Error",
+   "expected": false,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.WAF.Disassociation",
+   "file": "aws_waf_disassociation",
+   "severity": "Critical",
+   "test": "WAF-Disassociate",
+   "expected": true,
+   "eventName": "DisassociateWebACL",
+   "logfinder_rules": [
+    "CT_DEFENSE_IMPAIR"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.WAF.Disassociation",
+   "file": "aws_waf_disassociation",
+   "severity": "Critical",
+   "test": "WAF - List WebACLs",
+   "expected": false,
+   "eventName": "ListWebACLs",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "Retrieve.SSO.access.token",
+   "file": "retrieve_sso_access_token",
+   "severity": "Info",
+   "test": "Retrieve SSO access token",
+   "expected": true,
+   "eventName": "CreateToken",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  }
+ ],
+ "note": "개발 점수: A 반 결과를 보고 규칙을 보강한 뒤 같은 A 반으로 다시 잰 값. S6 판정에 쓰지 않음(판정은 B 반)",
+ "judged_dev": {
+  "correct": 32,
+  "rules": 64,
+  "medium_up_correct": 24,
+  "medium_up_rules": 32,
+  "how": "걸린 규칙 32개 모두 Panther 규칙 행동과 뜻이 같음(AccessKeyCompromised는 이제 CT_KEY_EXPOSED로 맞게 탐지)"
+ }
+}

@@ -1,0 +1,2771 @@
+{
+ "dataset": "panther-labs/panther-analysis rules/aws_cloudtrail_rules (Apache-2.0)",
+ "panther_commit": "e9c67b0820fda3031778b116b58bc660bf7f2d03",
+ "engine_commit": "3bee1b7287f7ea05d5a9dbe07a0ce90d84b4810d",
+ "half": "B",
+ "machine": {
+  "rules_with_positive_tests": 56,
+  "rules_any_flagged": 26,
+  "rules_rate": 0.4642857142857143,
+  "rules_ci95": [
+   0.3402,
+   0.593
+  ],
+  "medium_up_rules": 33,
+  "medium_up_flagged": 14,
+  "medium_up_ci95": [
+   0.2724,
+   0.5919
+  ],
+  "positive_tests": 90,
+  "positive_flagged": 33,
+  "negative_tests": 110,
+  "negative_flagged": 26,
+  "negative_flagged_rules": {
+   "CT_IAM_PERSISTENCE": 10,
+   "CT_SNAPSHOT_SHARE": 5,
+   "CT_LOGGING_TAMPER": 5,
+   "CT_S3_PUBLIC": 2,
+   "CT_CONSOLE_NO_MFA": 1,
+   "CT_ROOT_USAGE": 1,
+   "CT_INSTANCE_EXEC": 1,
+   "CT_RESOURCE_PUBLIC": 1,
+   "CT_SG_OPENED": 1
+  }
+ },
+ "per_rule": [
+  {
+   "rule": "AWS.Lambda.UpdateFunctionConfiguration",
+   "file": "aws_add_malicious_lambda_extension",
+   "severity": "High",
+   "positive_tests": 3,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.Potential.Backdoor.Lambda",
+   "file": "aws_backdoor_lambda_function",
+   "severity": "Info",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.Bedrock.DeleteModelInvocationLoggingConfiguration",
+   "file": "aws_bedrock_deletemodelinvocationloggingconfiguration",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.AttemptToLeaveOrg",
+   "file": "aws_cloudtrail_attempt_to_leave_org",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.LoginProfileCreatedOrModified",
+   "file": "aws_cloudtrail_loginprofilecreatedormodified",
+   "severity": "Low",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckIdentityVerifications",
+   "file": "aws_cloudtrail_ses_check_identity_verifications",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.ShortLifecycle",
+   "file": "aws_cloudtrail_short_lifecycle",
+   "severity": "Info",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.CloudTrail.Stopped",
+   "file": "aws_cloudtrail_stopped",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.ConfigService.DisabledDeleted",
+   "file": "aws_config_service_disabled_deleted",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.Console.GetSigninToken.Abuse",
+   "file": "aws_console_getsignintoken",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.Console.RootLoginFailed",
+   "file": "aws_console_root_login_failed",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.DNSLogsDeleted",
+   "file": "aws_dns_logs_deleted",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.EC2.GatewayModified",
+   "file": "aws_ec2_gateway_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.LaunchUnusualEC2Instances",
+   "file": "aws_ec2_launch_unusual_ec2_instances",
+   "severity": "Info",
+   "positive_tests": 3,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.ManyPasswordReadAttempts",
+   "file": "aws_ec2_many_passwors_read_attempts",
+   "severity": "Info",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.EC2.Monitoring",
+   "file": "aws_ec2_monitoring",
+   "severity": "Info",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.MultiInstanceConnect",
+   "file": "aws_ec2_multi_instance_connect",
+   "severity": "Info",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.EC2.SecurityGroupModified",
+   "file": "aws_ec2_security_group_modified",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "positive_tests": 6,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.IAM.AttachAdminRolePolicy",
+   "file": "aws_iam_attach_admin_role_policy",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.IAM.BackdoorRole",
+   "file": "aws_iam_backdoor_role",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMCompromisedKeyQuarantine",
+   "file": "aws_iam_compromised_key_quarantine",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.IAM.CreateUser",
+   "file": "aws_iam_create_user",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.IAM.Backdoor.User.Keys",
+   "file": "aws_iam_user_key_created",
+   "severity": "Medium",
+   "positive_tests": 3,
+   "positive_flagged": 3
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.Macie.Evasion",
+   "file": "aws_macie_evasion",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.NetworkACLPermissiveEntry",
+   "file": "aws_network_acl_permissive_entry",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.ClusterFailover",
+   "file": "aws_rds_cluster_failover",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "positive_tests": 3,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.RDS.InstanceRebooted",
+   "file": "aws_rds_instance_rebooted",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.ManualSnapshotCreated",
+   "file": "aws_rds_manual_snapshot_created",
+   "severity": "Low",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.SnapshotDeleted",
+   "file": "aws_rds_snapshot_deleted",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.RDS.SnapshotShared",
+   "file": "aws_rds_snapshot_shared",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "positive_tests": 5,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.S3.CopyObjectToExternalAccountBucket",
+   "file": "aws_s3_copy_object_to_external_account_bucket",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.CopyObjectWithClientSideEncryption",
+   "file": "aws_s3_copy_object_with_client_side_encryption",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketEncryption",
+   "file": "aws_s3_delete_bucket_encryption",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketReplication",
+   "file": "aws_s3_delete_bucket_replication",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.DisableBucketLogging",
+   "file": "aws_s3_disable_bucket_logging",
+   "severity": "Low",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.S3.RansomwareNoteUpload",
+   "file": "aws_s3_ransomware_note_upload",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.SecretsManager.BatchRetrieveSecrets",
+   "file": "aws_secretsmanager_retrieve_secrets_batch",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.SecretsManager.RetrieveSecretsMultiRegion",
+   "file": "aws_secretsmanager_retrieve_secrets_multiregion",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.SecurityHub.Finding.Evasion",
+   "file": "aws_securityhub_finding_evasion",
+   "severity": "High",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.SnapshotMadePublic",
+   "file": "aws_snapshot_made_public",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 2
+  },
+  {
+   "rule": "AWS.SSM.DecryptSSMParams",
+   "file": "aws_ssm_decrypt_ssm_params",
+   "severity": "Medium",
+   "positive_tests": 3,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.STS.GetCallerIdentity.TruffleHog",
+   "file": "aws_sts_getcalleridentity_trufflehog",
+   "severity": "Medium",
+   "positive_tests": 2,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.STS.GetSessionToken.Misuse",
+   "file": "aws_sts_getsessiontoken_misuse",
+   "severity": "Low",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.UnauthorizedAPICall",
+   "file": "aws_unauthorized_api_call",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.User.Login.Profile.Modified",
+   "file": "aws_user_login_profile_modified",
+   "severity": "High",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.VPCFlow.LogsDeleted",
+   "file": "aws_vpc_flow_logs_deleted",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.ExternalPrincipal",
+   "file": "aws_vpce_external_principal",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.S3ExternalIP",
+   "file": "aws_vpce_s3_external_ip",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.SensitiveAPICalls",
+   "file": "aws_vpce_sensitive_api_calls",
+   "severity": "Medium",
+   "positive_tests": 1,
+   "positive_flagged": 1
+  },
+  {
+   "rule": "Sign-in.with.AWS.CLI.prompt",
+   "file": "signin_with_aws_cli_prompt",
+   "severity": "Info",
+   "positive_tests": 1,
+   "positive_flagged": 0
+  }
+ ],
+ "items": [
+  {
+   "rule": "AWS.Lambda.UpdateFunctionConfiguration",
+   "file": "aws_add_malicious_lambda_extension",
+   "severity": "High",
+   "test": "IAM User Updates Lambda Configuration with Layers",
+   "expected": true,
+   "eventName": "UpdateFunctionConfiguration20150331v2",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionConfiguration",
+   "file": "aws_add_malicious_lambda_extension",
+   "severity": "High",
+   "test": "AssumedRole Updates Lambda Configuration with Layers (Normal CI/CD)",
+   "expected": false,
+   "eventName": "UpdateFunctionConfiguration20150331v2",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionConfiguration",
+   "file": "aws_add_malicious_lambda_extension",
+   "severity": "High",
+   "test": "SSO AssumedRole Updates Lambda Configuration with Layers",
+   "expected": true,
+   "eventName": "UpdateFunctionConfiguration20150331v2",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionConfiguration",
+   "file": "aws_add_malicious_lambda_extension",
+   "severity": "High",
+   "test": "FederatedUser Updates Lambda Configuration with Layers",
+   "expected": true,
+   "eventName": "UpdateFunctionConfiguration20150331v2",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Lambda.UpdateFunctionConfiguration",
+   "file": "aws_add_malicious_lambda_extension",
+   "severity": "High",
+   "test": "Lambda Update Function Configuration without Layers",
+   "expected": false,
+   "eventName": "UpdateFunctionConfiguration20150331v2",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "test": "AMI Made Public",
+   "expected": true,
+   "eventName": "ModifyImageAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SNAPSHOT_SHARE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "test": "AMI Not Made Public",
+   "expected": false,
+   "eventName": "ModifyImageAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "test": "AMI Launch Permissions Not Modified",
+   "expected": false,
+   "eventName": "ModifyImageAttribute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "test": "AMI Added to User",
+   "expected": false,
+   "eventName": "ModifyImageAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "test": "Error Making AMI Public",
+   "expected": false,
+   "eventName": "ModifyImageAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.AMIModifiedForPublicAccess",
+   "file": "aws_ami_modified_for_public_access",
+   "severity": "Medium",
+   "test": "Access Granted To Unknown User",
+   "expected": true,
+   "eventName": "ModifyImageAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SNAPSHOT_SHARE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.Potential.Backdoor.Lambda",
+   "file": "aws_backdoor_lambda_function",
+   "severity": "Info",
+   "test": "Lambda Add Permission Event",
+   "expected": true,
+   "eventName": "AddPermission20150331",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Potential.Backdoor.Lambda",
+   "file": "aws_backdoor_lambda_function",
+   "severity": "Info",
+   "test": "Lambda Add Permission Event v2",
+   "expected": true,
+   "eventName": "AddPermission20150331v2",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Potential.Backdoor.Lambda",
+   "file": "aws_backdoor_lambda_function",
+   "severity": "Info",
+   "test": "Lambda Remove Permission Event",
+   "expected": false,
+   "eventName": "RemovePermission",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Bedrock.DeleteModelInvocationLoggingConfiguration",
+   "file": "aws_bedrock_deletemodelinvocationloggingconfiguration",
+   "severity": "Medium",
+   "test": "Model Invocation Logging Configuration Deleted",
+   "expected": true,
+   "eventName": "DeleteModelInvocationLoggingConfiguration",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.Bedrock.DeleteModelInvocationLoggingConfiguration",
+   "file": "aws_bedrock_deletemodelinvocationloggingconfiguration",
+   "severity": "Medium",
+   "test": "List Guardrails",
+   "expected": false,
+   "eventName": "ListGuardrails",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.AttemptToLeaveOrg",
+   "file": "aws_cloudtrail_attempt_to_leave_org",
+   "severity": "Info",
+   "test": "Failed Attempt to Leave Org",
+   "expected": true,
+   "eventName": "LeaveOrganization",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.LoginProfileCreatedOrModified",
+   "file": "aws_cloudtrail_loginprofilecreatedormodified",
+   "severity": "Low",
+   "test": "ChangeOwnPassword",
+   "expected": false,
+   "eventName": "UpdateLoginProfile",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.LoginProfileCreatedOrModified",
+   "file": "aws_cloudtrail_loginprofilecreatedormodified",
+   "severity": "Low",
+   "test": "User changed password for other",
+   "expected": true,
+   "eventName": "UpdateLoginProfile",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.SES.CheckIdentityVerifications",
+   "file": "aws_cloudtrail_ses_check_identity_verifications",
+   "severity": "Info",
+   "test": "GetIdentityVerificationStatus Event",
+   "expected": true,
+   "eventName": "GetIdentityVerificationAttributes",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ShortLifecycle",
+   "file": "aws_cloudtrail_short_lifecycle",
+   "severity": "Info",
+   "test": "1-Day Lifecycle Rule on Known CT Bucket",
+   "expected": true,
+   "eventName": "PutBucketLifecycle",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.ShortLifecycle",
+   "file": "aws_cloudtrail_short_lifecycle",
+   "severity": "Info",
+   "test": "1-Day Lifecycle Rule on Assumed CT Bucket",
+   "expected": true,
+   "eventName": "PutBucketLifecycle",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.ShortLifecycle",
+   "file": "aws_cloudtrail_short_lifecycle",
+   "severity": "Info",
+   "test": "Disabled 1-Day Lifecycle Rule on Known CT Bucket",
+   "expected": false,
+   "eventName": "PutBucketLifecycle",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ShortLifecycle",
+   "file": "aws_cloudtrail_short_lifecycle",
+   "severity": "Info",
+   "test": "730-Day Lifecycle Rule on Known CT Bucket",
+   "expected": false,
+   "eventName": "PutBucketLifecycle",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ShortLifecycle",
+   "file": "aws_cloudtrail_short_lifecycle",
+   "severity": "Info",
+   "test": "Completely Unrelated Event",
+   "expected": false,
+   "eventName": "GetBucketLifecycle",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Stopped",
+   "file": "aws_cloudtrail_stopped",
+   "severity": "Medium",
+   "test": "CloudTrail Was Stopped",
+   "expected": true,
+   "eventName": "StopLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.Stopped",
+   "file": "aws_cloudtrail_stopped",
+   "severity": "Medium",
+   "test": "CloudTrail Was Started",
+   "expected": false,
+   "eventName": "StartLogging",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.Stopped",
+   "file": "aws_cloudtrail_stopped",
+   "severity": "Medium",
+   "test": "Error Stopping CloudTrail",
+   "expected": false,
+   "eventName": "StopLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.ConfigService.DisabledDeleted",
+   "file": "aws_config_service_disabled_deleted",
+   "severity": "Medium",
+   "test": "Config Recorder Delivery Channel Created",
+   "expected": false,
+   "eventName": "PutDeliveryChannel",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.ConfigService.DisabledDeleted",
+   "file": "aws_config_service_disabled_deleted",
+   "severity": "Medium",
+   "test": "Config Recorder Deleted",
+   "expected": true,
+   "eventName": "DeleteDeliveryChannel",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.ConfigService.DisabledDeleted",
+   "file": "aws_config_service_disabled_deleted",
+   "severity": "Medium",
+   "test": "Error Deleting Config Recorder",
+   "expected": false,
+   "eventName": "DeleteDeliveryChannel",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.GetSigninToken.Abuse",
+   "file": "aws_console_getsignintoken",
+   "severity": "Medium",
+   "test": "Suspicious GetSigninToken",
+   "expected": true,
+   "eventName": "GetSigninToken",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.GetSigninToken.Abuse",
+   "file": "aws_console_getsignintoken",
+   "severity": "Medium",
+   "test": "Legitimate SSO Portal GetSigninToken",
+   "expected": false,
+   "eventName": "GetSigninToken",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.GetSigninToken.Abuse",
+   "file": "aws_console_getsignintoken",
+   "severity": "Medium",
+   "test": "Legitimate SSO Portal GetSigninToken (Go client)",
+   "expected": false,
+   "eventName": "GetSigninToken",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.GetSigninToken.Abuse",
+   "file": "aws_console_getsignintoken",
+   "severity": "Medium",
+   "test": "Unrelated Signin Event",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.RootLoginFailed",
+   "file": "aws_console_root_login_failed",
+   "severity": "High",
+   "test": "Failed Root Login",
+   "expected": true,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_ROOT_USAGE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.Console.RootLoginFailed",
+   "file": "aws_console_root_login_failed",
+   "severity": "High",
+   "test": "Successful Login",
+   "expected": false,
+   "eventName": "ConsoleLogin",
+   "logfinder_rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_ROOT_USAGE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Console.RootLoginFailed",
+   "file": "aws_console_root_login_failed",
+   "severity": "High",
+   "test": "Non-Login Event",
+   "expected": false,
+   "eventName": "DescribeTable",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.DNSLogsDeleted",
+   "file": "aws_dns_logs_deleted",
+   "severity": "Info",
+   "test": "Logs Deleted",
+   "expected": true,
+   "eventName": "DeleteResolverQueryLogConfig",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.EC2.GatewayModified",
+   "file": "aws_ec2_gateway_modified",
+   "severity": "Info",
+   "test": "Network Gateway Modified",
+   "expected": true,
+   "eventName": "AttachInternetGateway",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.GatewayModified",
+   "file": "aws_ec2_gateway_modified",
+   "severity": "Info",
+   "test": "Network Gateway Not Modified",
+   "expected": false,
+   "eventName": "DescribeRouteTables",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.GatewayModified",
+   "file": "aws_ec2_gateway_modified",
+   "severity": "Info",
+   "test": "Error Modifying Network Gateway",
+   "expected": false,
+   "eventName": "AttachInternetGateway",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.LaunchUnusualEC2Instances",
+   "file": "aws_ec2_launch_unusual_ec2_instances",
+   "severity": "Info",
+   "test": "Successful Unusual EC2",
+   "expected": true,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.LaunchUnusualEC2Instances",
+   "file": "aws_ec2_launch_unusual_ec2_instances",
+   "severity": "Info",
+   "test": "Failed Unusual EC2",
+   "expected": true,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.LaunchUnusualEC2Instances",
+   "file": "aws_ec2_launch_unusual_ec2_instances",
+   "severity": "Info",
+   "test": "Successful Unusual EC2 (Dictionary)",
+   "expected": true,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.ManyPasswordReadAttempts",
+   "file": "aws_ec2_many_passwors_read_attempts",
+   "severity": "Info",
+   "test": "Unsuccessful Attempt",
+   "expected": true,
+   "eventName": "GetPasswordData",
+   "logfinder_rules": [
+    "CT_SECRET_ACCESS"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SECRET_ACCESS의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.EC2.ManyPasswordReadAttempts",
+   "file": "aws_ec2_many_passwors_read_attempts",
+   "severity": "Info",
+   "test": "Successful Attempt",
+   "expected": true,
+   "eventName": "GetPasswordData",
+   "logfinder_rules": [
+    "CT_SECRET_ACCESS"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SECRET_ACCESS의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.EC2.ManyPasswordReadAttempts",
+   "file": "aws_ec2_many_passwors_read_attempts",
+   "severity": "Info",
+   "test": "Unrelated Event",
+   "expected": false,
+   "eventName": "AssumeRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Monitoring",
+   "file": "aws_ec2_monitoring",
+   "severity": "Info",
+   "test": "CopyImage",
+   "expected": true,
+   "eventName": "CreateImage",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Monitoring",
+   "file": "aws_ec2_monitoring",
+   "severity": "Info",
+   "test": "RunInstance",
+   "expected": false,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Monitoring",
+   "file": "aws_ec2_monitoring",
+   "severity": "Info",
+   "test": "RunInstance - Dry Run ",
+   "expected": false,
+   "eventName": "RunInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Monitoring",
+   "file": "aws_ec2_monitoring",
+   "severity": "Info",
+   "test": "CopyImage - UserIdentity Null",
+   "expected": true,
+   "eventName": "CreateImage",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.MultiInstanceConnect",
+   "file": "aws_ec2_multi_instance_connect",
+   "severity": "Info",
+   "test": "Public SSH Key Sent Successfully - Counts Toward Threshold",
+   "expected": true,
+   "eventName": "SendSSHPublicKey",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_INSTANCE_EXEC의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.EC2.MultiInstanceConnect",
+   "file": "aws_ec2_multi_instance_connect",
+   "severity": "Info",
+   "test": "Public SSH Key Sent Successfully to Same Instance - Also Counts",
+   "expected": true,
+   "eventName": "SendSSHPublicKey",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_INSTANCE_EXEC의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.EC2.MultiInstanceConnect",
+   "file": "aws_ec2_multi_instance_connect",
+   "severity": "Info",
+   "test": "Public SSH Key Not Sent Successfully",
+   "expected": false,
+   "eventName": "SendSSHPublicKey",
+   "logfinder_rules": [
+    "CT_INSTANCE_EXEC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.MultiInstanceConnect",
+   "file": "aws_ec2_multi_instance_connect",
+   "severity": "Info",
+   "test": "Unrelated Event",
+   "expected": false,
+   "eventName": "CreateNetworkAclEntry",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.SecurityGroupModified",
+   "file": "aws_ec2_security_group_modified",
+   "severity": "Info",
+   "test": "Security Group Modified",
+   "expected": true,
+   "eventName": "AuthorizeSecurityGroupIngress",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.SecurityGroupModified",
+   "file": "aws_ec2_security_group_modified",
+   "severity": "Info",
+   "test": "Security Group Not Modified",
+   "expected": false,
+   "eventName": "DescribeSecurityGroups",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.SecurityGroupModified",
+   "file": "aws_ec2_security_group_modified",
+   "severity": "Info",
+   "test": "Error Mofidying Security Group",
+   "expected": false,
+   "eventName": "AuthorizeSecurityGroupIngress",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "CreateTrafficMirrorFilter",
+   "expected": true,
+   "eventName": "CreateTrafficMirrorFilter",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "CreateTrafficMirrorFilterRule",
+   "expected": true,
+   "eventName": "CreateTrafficMirrorFilterRule",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "CreateTrafficMirrorSession",
+   "expected": true,
+   "eventName": "CreateTrafficMirrorSession",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "CreateTrafficMirrorTarget",
+   "expected": true,
+   "eventName": "CreateTrafficMirrorTarget",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "DeleteTrafficMirrorTarget",
+   "expected": true,
+   "eventName": "DeleteTrafficMirrorTarget",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "DescribeTrafficMirrorTargets",
+   "expected": false,
+   "eventName": "DescribeTrafficMirrorTargets",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "ModifyTrafficMirrorSession",
+   "expected": true,
+   "eventName": "ModifyTrafficMirrorSession",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "UnrelatedEvent",
+   "expected": false,
+   "eventName": "UpdateProjectVisibility",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.EC2.Traffic.Mirroring",
+   "file": "aws_ec2_traffic_mirroring",
+   "severity": "Medium",
+   "test": "AWS Config Runs DescribeTrafficMirrorTargets",
+   "expected": false,
+   "eventName": "DescribeTrafficMirrorTargets",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.AttachAdminRolePolicy",
+   "file": "aws_iam_attach_admin_role_policy",
+   "severity": "Info",
+   "test": "IAM Role Policy Attached with Administrator Access",
+   "expected": true,
+   "eventName": "AttachRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.IAM.AttachAdminRolePolicy",
+   "file": "aws_iam_attach_admin_role_policy",
+   "severity": "Info",
+   "test": "IAM Role Policy Attached without Administrator Access",
+   "expected": false,
+   "eventName": "AttachRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.BackdoorRole",
+   "file": "aws_iam_backdoor_role",
+   "severity": "Medium",
+   "test": "IAM Role Policy Updated to Allow Internet Access",
+   "expected": true,
+   "eventName": "UpdateAssumeRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.IAM.BackdoorRole",
+   "file": "aws_iam_backdoor_role",
+   "severity": "Medium",
+   "test": "IAM Role Policy Updated Without Internet Access",
+   "expected": false,
+   "eventName": "UpdateAssumeRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.BackdoorRole",
+   "file": "aws_iam_backdoor_role",
+   "severity": "Medium",
+   "test": "IAM Role Policy Updated With No Policy Document",
+   "expected": false,
+   "eventName": "UpdateAssumeRolePolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMCompromisedKeyQuarantine",
+   "file": "aws_iam_compromised_key_quarantine",
+   "severity": "High",
+   "test": "AttachUserPolicy AWSCompromisedKeyQuarantineV2-true",
+   "expected": true,
+   "eventName": "AttachUserPolicy",
+   "logfinder_rules": [
+    "CT_KEY_EXPOSED"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_KEY_EXPOSED의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.IAMCompromisedKeyQuarantine",
+   "file": "aws_iam_compromised_key_quarantine",
+   "severity": "High",
+   "test": "PutUserPolicy-false",
+   "expected": false,
+   "eventName": "PutUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.CreateUser",
+   "file": "aws_iam_create_user",
+   "severity": "Info",
+   "test": "IAM User Created",
+   "expected": true,
+   "eventName": "CreateUser",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.IAM.CreateUser",
+   "file": "aws_iam_create_user",
+   "severity": "Info",
+   "test": "IAM User Not Created",
+   "expected": false,
+   "eventName": "AttachUserPolicy",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.Backdoor.User.Keys",
+   "file": "aws_iam_user_key_created",
+   "severity": "Medium",
+   "test": "user1 create keys for user1",
+   "expected": false,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.IAM.Backdoor.User.Keys",
+   "file": "aws_iam_user_key_created",
+   "severity": "Medium",
+   "test": "user1 create keys for user2",
+   "expected": true,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.IAM.Backdoor.User.Keys",
+   "file": "aws_iam_user_key_created",
+   "severity": "Medium",
+   "test": "jackson create keys for jack",
+   "expected": true,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.IAM.Backdoor.User.Keys",
+   "file": "aws_iam_user_key_created",
+   "severity": "Medium",
+   "test": "jack create keys for jackson",
+   "expected": true,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.IAM.Backdoor.User.Keys",
+   "file": "aws_iam_user_key_created",
+   "severity": "Medium",
+   "test": "CreateKey returns error code",
+   "expected": false,
+   "eventName": "CreateAccessKey",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "IMDS Credentials Used From Public IP",
+   "expected": true,
+   "eventName": "DescribeInstances",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "Normal EC2 Workload From Private IP",
+   "expected": false,
+   "eventName": "PutObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "AWS Service Hostname as Source IP",
+   "expected": false,
+   "eventName": "Decrypt",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "Legitimate SSM Activity",
+   "expected": false,
+   "eventName": "UpdateInstanceInformation",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "AWS Internal Source IP",
+   "expected": false,
+   "eventName": "SendHeartbeat",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "AWS Service InvokedBy on behalf of instance",
+   "expected": false,
+   "eventName": "DescribeInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "SSM Messages Service Source",
+   "expected": false,
+   "eventName": "CreateControlChannel",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "RegisterManagedInstance Event",
+   "expected": false,
+   "eventName": "RegisterManagedInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "Non-Instance Role",
+   "expected": false,
+   "eventName": "DescribeInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.IMDSCredentialExfiltration",
+   "file": "aws_imds_credential_exfiltration",
+   "severity": "High",
+   "test": "IMDS Credentials Used From Amazon.com ASN Source IP",
+   "expected": true,
+   "eventName": "DescribeInstances",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Macie.Evasion",
+   "file": "aws_macie_evasion",
+   "severity": "Medium",
+   "test": "ListMembers",
+   "expected": false,
+   "eventName": "ListMembers",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Macie.Evasion",
+   "file": "aws_macie_evasion",
+   "severity": "Medium",
+   "test": "UpdateSession",
+   "expected": true,
+   "eventName": "UpdateMacieSession",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.Macie.Evasion",
+   "file": "aws_macie_evasion",
+   "severity": "Medium",
+   "test": "UpdateSession (Macie v1 event)",
+   "expected": true,
+   "eventName": "UpdateMacieSession",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.NetworkACLPermissiveEntry",
+   "file": "aws_network_acl_permissive_entry",
+   "severity": "Medium",
+   "test": "Overly Permissive Entry Added",
+   "expected": true,
+   "eventName": "CreateNetworkAclEntry",
+   "logfinder_rules": [
+    "CT_SG_OPENED"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SG_OPENED의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.NetworkACLPermissiveEntry",
+   "file": "aws_network_acl_permissive_entry",
+   "severity": "Medium",
+   "test": "Not Overly Permissive Entry Added",
+   "expected": false,
+   "eventName": "CreateNetworkAclEntry",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.NetworkACLPermissiveEntry",
+   "file": "aws_network_acl_permissive_entry",
+   "severity": "Medium",
+   "test": "Error Adding Overly Permissive Entry",
+   "expected": false,
+   "eventName": "CreateNetworkAclEntry",
+   "logfinder_rules": [
+    "CT_SG_OPENED"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ClusterFailover",
+   "file": "aws_rds_cluster_failover",
+   "severity": "Medium",
+   "test": "DB Cluster Failover Initiated",
+   "expected": true,
+   "eventName": "FailoverDBCluster",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ClusterFailover",
+   "file": "aws_rds_cluster_failover",
+   "severity": "Medium",
+   "test": "Global Cluster Failover",
+   "expected": true,
+   "eventName": "FailoverGlobalCluster",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ClusterFailover",
+   "file": "aws_rds_cluster_failover",
+   "severity": "Medium",
+   "test": "Failover Failed",
+   "expected": false,
+   "eventName": "FailoverDBCluster",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ClusterFailover",
+   "file": "aws_rds_cluster_failover",
+   "severity": "Medium",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "ModifyDBCluster",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "test": "RDS Instance Deletion Protection Disabled",
+   "expected": true,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "test": "RDS Cluster Deletion Protection Disabled with Backup Changes - Critical",
+   "expected": true,
+   "eventName": "ModifyDBCluster",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "test": "RDS Deletion Protection Disabled and Made Public - Critical",
+   "expected": true,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [
+    "CT_RESOURCE_PUBLIC"
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "삭제 보호 끄기가 아니라 같은 요청의 공개 설정(publiclyAccessible)으로 CT_RESOURCE_PUBLIC이 걸림"
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "test": "RDS Deletion Protection Enabled - No Alert",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "test": "RDS Modification Without Deletion Protection Change",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.DeletionProtectionDisabled",
+   "file": "aws_rds_deletion_protection_disabled",
+   "severity": "High",
+   "test": "RDS Modification Failed",
+   "expected": false,
+   "eventName": "ModifyDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceRebooted",
+   "file": "aws_rds_instance_rebooted",
+   "severity": "Medium",
+   "test": "DB Instance Rebooted",
+   "expected": true,
+   "eventName": "RebootDBInstance",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceRebooted",
+   "file": "aws_rds_instance_rebooted",
+   "severity": "Medium",
+   "test": "DB Cluster Rebooted with Failover",
+   "expected": true,
+   "eventName": "RebootDBCluster",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceRebooted",
+   "file": "aws_rds_instance_rebooted",
+   "severity": "Medium",
+   "test": "Reboot Failed",
+   "expected": false,
+   "eventName": "RebootDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.InstanceRebooted",
+   "file": "aws_rds_instance_rebooted",
+   "severity": "Medium",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "StartDBInstance",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ManualSnapshotCreated",
+   "file": "aws_rds_manual_snapshot_created",
+   "severity": "Low",
+   "test": "Manual Snapshot Created",
+   "expected": true,
+   "eventName": "CreateDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ManualSnapshotCreated",
+   "file": "aws_rds_manual_snapshot_created",
+   "severity": "Low",
+   "test": "Public Snapshot Created",
+   "expected": true,
+   "eventName": "CreateDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ManualSnapshotCreated",
+   "file": "aws_rds_manual_snapshot_created",
+   "severity": "Low",
+   "test": "Automated Snapshot Created",
+   "expected": false,
+   "eventName": "CreateDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.ManualSnapshotCreated",
+   "file": "aws_rds_manual_snapshot_created",
+   "severity": "Low",
+   "test": "Awsbackup Snapshot Created",
+   "expected": false,
+   "eventName": "CreateDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotDeleted",
+   "file": "aws_rds_snapshot_deleted",
+   "severity": "High",
+   "test": "DB Snapshot Deleted",
+   "expected": true,
+   "eventName": "DeleteDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotDeleted",
+   "file": "aws_rds_snapshot_deleted",
+   "severity": "High",
+   "test": "DB Cluster Snapshot Deleted",
+   "expected": true,
+   "eventName": "DeleteDBClusterSnapshot",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotDeleted",
+   "file": "aws_rds_snapshot_deleted",
+   "severity": "High",
+   "test": "Snapshot Deletion Failed",
+   "expected": false,
+   "eventName": "DeleteDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotDeleted",
+   "file": "aws_rds_snapshot_deleted",
+   "severity": "High",
+   "test": "Different RDS Event",
+   "expected": false,
+   "eventName": "CreateDBSnapshot",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.RDS.SnapshotShared",
+   "file": "aws_rds_snapshot_shared",
+   "severity": "High",
+   "test": "Snapshot shared with another account",
+   "expected": true,
+   "eventName": "ModifyDBSnapshotAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SNAPSHOT_SHARE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.RDS.SnapshotShared",
+   "file": "aws_rds_snapshot_shared",
+   "severity": "High",
+   "test": "Snapshot shared with no accounts",
+   "expected": false,
+   "eventName": "ModifyDBSnapshotAttribute",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "ECR Made Public",
+   "expected": true,
+   "eventName": "SetRepositoryPolicy",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "S3 Made Publicly Accessible",
+   "expected": true,
+   "eventName": "PutBucketPolicy",
+   "logfinder_rules": [
+    "CT_S3_PUBLIC"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_S3_PUBLIC의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "S3 Not Made Publicly Accessible",
+   "expected": false,
+   "eventName": "PutBucketPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Null Request Parameters",
+   "expected": false,
+   "eventName": "PutBucketPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "S3 Failed to make Publicly Accessible",
+   "expected": false,
+   "eventName": "PutBucketPolicy",
+   "logfinder_rules": [
+    "CT_S3_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Empty Policy Payload",
+   "expected": false,
+   "eventName": "SetQueueAttributes",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Invalid JSON Policy (Should Not Alert)",
+   "expected": false,
+   "eventName": "PutBucketPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Multiple Conditions All Restrictive (Should Not Alert)",
+   "expected": false,
+   "eventName": "PutResourcePolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Public Finding Keywords (Should Alert)",
+   "expected": true,
+   "eventName": "CreateElasticsearchDomain",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Wildcard Principal No Conditions (Should Alert)",
+   "expected": true,
+   "eventName": "PutKeyPolicy",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Mixed Conditions Some Restrictive (Should Alert)",
+   "expected": true,
+   "eventName": "SetQueueAttributes",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "All Restrictive Conditions Types (Should Not Alert)",
+   "expected": false,
+   "eventName": "PutBucketPolicy",
+   "logfinder_rules": [
+    "CT_S3_PUBLIC"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "Secrets Manager Restricted Access (Should Not Alert)",
+   "expected": false,
+   "eventName": "PutResourcePolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.ResourceMadePublic",
+   "file": "aws_resource_made_public",
+   "severity": "Medium",
+   "test": "KMS Key Restricted Access (Should Not Alert)",
+   "expected": false,
+   "eventName": "PutKeyPolicy",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.CopyObjectToExternalAccountBucket",
+   "file": "aws_s3_copy_object_to_external_account_bucket",
+   "severity": "Medium",
+   "test": "S3 CopyObject to External Account Bucket",
+   "expected": true,
+   "eventName": "CopyObject",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.CopyObjectToExternalAccountBucket",
+   "file": "aws_s3_copy_object_to_external_account_bucket",
+   "severity": "Medium",
+   "test": "S3 CopyObject Same Account",
+   "expected": false,
+   "eventName": "CopyObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.CopyObjectWithClientSideEncryption",
+   "file": "aws_s3_copy_object_with_client_side_encryption",
+   "severity": "Medium",
+   "test": "CopyObject with client-side encryption",
+   "expected": true,
+   "eventName": "CopyObject",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.CopyObjectWithClientSideEncryption",
+   "file": "aws_s3_copy_object_with_client_side_encryption",
+   "severity": "Medium",
+   "test": "CopyObject without client-side encryption",
+   "expected": false,
+   "eventName": "CopyObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketEncryption",
+   "file": "aws_s3_delete_bucket_encryption",
+   "severity": "Medium",
+   "test": "Bucket Encryption Deleted Successfully",
+   "expected": true,
+   "eventName": "DeleteBucketEncryption",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketEncryption",
+   "file": "aws_s3_delete_bucket_encryption",
+   "severity": "Medium",
+   "test": "Bucket Encryption Deletion Failed",
+   "expected": false,
+   "eventName": "DeleteBucketEncryption",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketEncryption",
+   "file": "aws_s3_delete_bucket_encryption",
+   "severity": "Medium",
+   "test": "Different S3 Event",
+   "expected": false,
+   "eventName": "PutBucketEncryption",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketEncryption",
+   "file": "aws_s3_delete_bucket_encryption",
+   "severity": "Medium",
+   "test": "Non-S3 Event",
+   "expected": false,
+   "eventName": "DeleteBucketEncryption",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketReplication",
+   "file": "aws_s3_delete_bucket_replication",
+   "severity": "Medium",
+   "test": "Bucket Replication Deleted Successfully",
+   "expected": true,
+   "eventName": "DeleteBucketReplication",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketReplication",
+   "file": "aws_s3_delete_bucket_replication",
+   "severity": "Medium",
+   "test": "Bucket Replication Deletion Failed",
+   "expected": false,
+   "eventName": "DeleteBucketReplication",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketReplication",
+   "file": "aws_s3_delete_bucket_replication",
+   "severity": "Medium",
+   "test": "Different S3 Event",
+   "expected": false,
+   "eventName": "PutBucketReplication",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DeleteBucketReplication",
+   "file": "aws_s3_delete_bucket_replication",
+   "severity": "Medium",
+   "test": "Non-S3 Event",
+   "expected": false,
+   "eventName": "DeleteBucketReplication",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableBucketLogging",
+   "file": "aws_s3_disable_bucket_logging",
+   "severity": "Low",
+   "test": "Bucket Logging Disabled Successfully",
+   "expected": true,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.S3.DisableBucketLogging",
+   "file": "aws_s3_disable_bucket_logging",
+   "severity": "Low",
+   "test": "Bucket Logging Disabled - Failed",
+   "expected": false,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableBucketLogging",
+   "file": "aws_s3_disable_bucket_logging",
+   "severity": "Low",
+   "test": "Bucket Logging Enabled",
+   "expected": false,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableBucketLogging",
+   "file": "aws_s3_disable_bucket_logging",
+   "severity": "Low",
+   "test": "Logging Field Missing",
+   "expected": false,
+   "eventName": "PutBucketLogging",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "test": "MFA Delete Disabled Successfully",
+   "expected": true,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "test": "MFA Delete Disabled - Failed",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "test": "MFA Delete Enabled",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "test": "Different S3 Event",
+   "expected": false,
+   "eventName": "DeleteBucketEncryption",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "test": "Non-S3 Event",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.DisableMfaDelete",
+   "file": "aws_s3_disable_mfa_delete",
+   "severity": "Low",
+   "test": "MFA Delete Field Missing",
+   "expected": false,
+   "eventName": "PutBucketVersioning",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.RansomwareNoteUpload",
+   "file": "aws_s3_ransomware_note_upload",
+   "severity": "Medium",
+   "test": "Ransomware Note - HOW_TO_DECRYPT_FILES.txt",
+   "expected": true,
+   "eventName": "PutObject",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.S3.RansomwareNoteUpload",
+   "file": "aws_s3_ransomware_note_upload",
+   "severity": "Medium",
+   "test": "Normal File Upload - quarterly_report.pdf",
+   "expected": false,
+   "eventName": "PutObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecretsManager.BatchRetrieveSecrets",
+   "file": "aws_secretsmanager_retrieve_secrets_batch",
+   "severity": "Info",
+   "test": "BatchGetSecretValue",
+   "expected": true,
+   "eventName": "BatchGetSecretValue",
+   "logfinder_rules": [
+    "CT_SECRET_ACCESS"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SECRET_ACCESS의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.SecretsManager.RetrieveSecretsMultiRegion",
+   "file": "aws_secretsmanager_retrieve_secrets_multiregion",
+   "severity": "Info",
+   "test": "BatchGetSecretValue in us-east-1",
+   "expected": true,
+   "eventName": "BatchGetSecretValue",
+   "logfinder_rules": [
+    "CT_SECRET_ACCESS"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SECRET_ACCESS의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.SecretsManager.RetrieveSecretsMultiRegion",
+   "file": "aws_secretsmanager_retrieve_secrets_multiregion",
+   "severity": "Info",
+   "test": "Non-batch GetSecretValue event - no match",
+   "expected": false,
+   "eventName": "GetSecretValue",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecurityHub.Finding.Evasion",
+   "file": "aws_securityhub_finding_evasion",
+   "severity": "High",
+   "test": "CreateInsight",
+   "expected": false,
+   "eventName": "CreateInsight",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecurityHub.Finding.Evasion",
+   "file": "aws_securityhub_finding_evasion",
+   "severity": "High",
+   "test": "DeleteInsight",
+   "expected": true,
+   "eventName": "DeleteInsight",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SecurityHub.Finding.Evasion",
+   "file": "aws_securityhub_finding_evasion",
+   "severity": "High",
+   "test": "UpdateFindings",
+   "expected": true,
+   "eventName": "UpdateFindings",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SnapshotMadePublic",
+   "file": "aws_snapshot_made_public",
+   "severity": "Medium",
+   "test": "Snapshot Made Publicly Accessible",
+   "expected": true,
+   "eventName": "ModifySnapshotAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SNAPSHOT_SHARE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.SnapshotMadePublic",
+   "file": "aws_snapshot_made_public",
+   "severity": "Medium",
+   "test": "Snapshot Not Made Publicly Accessible",
+   "expected": false,
+   "eventName": "ModifySnapshotAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SnapshotMadePublic",
+   "file": "aws_snapshot_made_public",
+   "severity": "Medium",
+   "test": "Error Making Snapshot Publicly Accessible",
+   "expected": false,
+   "eventName": "ModifySnapshotAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.SnapshotMadePublic",
+   "file": "aws_snapshot_made_public",
+   "severity": "Medium",
+   "test": "Snapshot Mader Available to Single Person",
+   "expected": true,
+   "eventName": "ModifySnapshotAttribute",
+   "logfinder_rules": [
+    "CT_SNAPSHOT_SHARE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_SNAPSHOT_SHARE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.SSM.DecryptSSMParams",
+   "file": "aws_ssm_decrypt_ssm_params",
+   "severity": "Medium",
+   "test": "Single Secret Accessed in Single Event",
+   "expected": true,
+   "eventName": "GetParameter",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DecryptSSMParams",
+   "file": "aws_ssm_decrypt_ssm_params",
+   "severity": "Medium",
+   "test": "Multiple Secrets Accessed in Same Event",
+   "expected": true,
+   "eventName": "GetParameters",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DecryptSSMParams",
+   "file": "aws_ssm_decrypt_ssm_params",
+   "severity": "Medium",
+   "test": "Multiple Secrets Accessed in Same Event With Prior Cached Parameters",
+   "expected": true,
+   "eventName": "GetParameters",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DecryptSSMParams",
+   "file": "aws_ssm_decrypt_ssm_params",
+   "severity": "Medium",
+   "test": "Accessed Parameters Aren't Encrypted",
+   "expected": false,
+   "eventName": "GetParameters",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.SSM.DecryptSSMParams",
+   "file": "aws_ssm_decrypt_ssm_params",
+   "severity": "Medium",
+   "test": "Unrelated Event",
+   "expected": false,
+   "eventName": "DescribeParameters",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetCallerIdentity.TruffleHog",
+   "file": "aws_sts_getcalleridentity_trufflehog",
+   "severity": "Medium",
+   "test": "TruffleHog GetCallerIdentity",
+   "expected": true,
+   "eventName": "GetCallerIdentity",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetCallerIdentity.TruffleHog",
+   "file": "aws_sts_getcalleridentity_trufflehog",
+   "severity": "Medium",
+   "test": "TruffleHog User Agent Variant",
+   "expected": true,
+   "eventName": "GetCallerIdentity",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetCallerIdentity.TruffleHog",
+   "file": "aws_sts_getcalleridentity_trufflehog",
+   "severity": "Medium",
+   "test": "Normal GetCallerIdentity",
+   "expected": false,
+   "eventName": "GetCallerIdentity",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetCallerIdentity.TruffleHog",
+   "file": "aws_sts_getcalleridentity_trufflehog",
+   "severity": "Medium",
+   "test": "Different STS Event with TruffleHog Agent",
+   "expected": false,
+   "eventName": "AssumeRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetSessionToken.Misuse",
+   "file": "aws_sts_getsessiontoken_misuse",
+   "severity": "Low",
+   "test": "GetSessionToken by IAM User",
+   "expected": true,
+   "eventName": "GetSessionToken",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetSessionToken.Misuse",
+   "file": "aws_sts_getsessiontoken_misuse",
+   "severity": "Low",
+   "test": "GetSessionToken Failed",
+   "expected": false,
+   "eventName": "GetSessionToken",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetSessionToken.Misuse",
+   "file": "aws_sts_getsessiontoken_misuse",
+   "severity": "Low",
+   "test": "GetSessionToken by Assumed Role",
+   "expected": false,
+   "eventName": "GetSessionToken",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.STS.GetSessionToken.Misuse",
+   "file": "aws_sts_getsessiontoken_misuse",
+   "severity": "Low",
+   "test": "Unrelated STS Event",
+   "expected": false,
+   "eventName": "AssumeRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UnauthorizedAPICall",
+   "file": "aws_unauthorized_api_call",
+   "severity": "Info",
+   "test": "Unauthorized API Call from Within AWS (IP)",
+   "expected": true,
+   "eventName": "CreateServiceLinkedRole",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UnauthorizedAPICall",
+   "file": "aws_unauthorized_api_call",
+   "severity": "Info",
+   "test": "Unauthorized API Call from Within AWS (FQDN)",
+   "expected": false,
+   "eventName": "CreateServiceLinkedRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.UnauthorizedAPICall",
+   "file": "aws_unauthorized_api_call",
+   "severity": "Info",
+   "test": "Authorized API Call",
+   "expected": false,
+   "eventName": "CreateServiceLinkedRole",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.User.Login.Profile.Modified",
+   "file": "aws_user_login_profile_modified",
+   "severity": "High",
+   "test": "ChangeOwnPassword",
+   "expected": false,
+   "eventName": "UpdateLoginProfile",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.User.Login.Profile.Modified",
+   "file": "aws_user_login_profile_modified",
+   "severity": "High",
+   "test": "User changed password for other",
+   "expected": true,
+   "eventName": "UpdateLoginProfile",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_IAM_PERSISTENCE의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.User.Login.Profile.Modified",
+   "file": "aws_user_login_profile_modified",
+   "severity": "High",
+   "test": "User changed password for other reset required",
+   "expected": false,
+   "eventName": "UpdateLoginProfile",
+   "logfinder_rules": [
+    "CT_IAM_PERSISTENCE"
+   ],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.VPCFlow.LogsDeleted",
+   "file": "aws_vpc_flow_logs_deleted",
+   "severity": "Info",
+   "test": "Logs Deleted",
+   "expected": true,
+   "eventName": "DeleteFlowLogs",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "맞게 탐지",
+   "judgement_reason": "LogFinder 규칙 CT_LOGGING_TAMPER의 뜻이 Panther 규칙 행동과 같음"
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.ExternalPrincipal",
+   "file": "aws_vpce_external_principal",
+   "severity": "Medium",
+   "test": "External Principal Access",
+   "expected": true,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.ExternalPrincipal",
+   "file": "aws_vpce_external_principal",
+   "severity": "Medium",
+   "test": "Same Account Access",
+   "expected": false,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.ExternalPrincipal",
+   "file": "aws_vpce_external_principal",
+   "severity": "Medium",
+   "test": "Non-VPC Event",
+   "expected": false,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.S3ExternalIP",
+   "file": "aws_vpce_s3_external_ip",
+   "severity": "Medium",
+   "test": "External IP Access",
+   "expected": true,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.S3ExternalIP",
+   "file": "aws_vpce_s3_external_ip",
+   "severity": "Medium",
+   "test": "Internal IP Access",
+   "expected": false,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.S3ExternalIP",
+   "file": "aws_vpce_s3_external_ip",
+   "severity": "Medium",
+   "test": "Not S3 Service",
+   "expected": false,
+   "eventName": "DescribeInstances",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.SensitiveAPICalls",
+   "file": "aws_vpce_sensitive_api_calls",
+   "severity": "Medium",
+   "test": "CloudTrail API Call Via VPC Endpoint",
+   "expected": true,
+   "eventName": "UpdateTrail",
+   "logfinder_rules": [
+    "CT_LOGGING_TAMPER"
+   ],
+   "judgement": "다른 이유로만 걸림",
+   "judgement_reason": "VPC 엔드포인트 경유 민감 API가 아니라 UpdateTrail 자체를 기록 변경(CT_LOGGING_TAMPER)으로 잡음"
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.SensitiveAPICalls",
+   "file": "aws_vpce_sensitive_api_calls",
+   "severity": "Medium",
+   "test": "Regular S3 API Call (Not Sensitive)",
+   "expected": false,
+   "eventName": "GetObject",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "AWS.CloudTrail.VPCE.SensitiveAPICalls",
+   "file": "aws_vpce_sensitive_api_calls",
+   "severity": "Medium",
+   "test": "API Call Without VPC Endpoint",
+   "expected": false,
+   "eventName": "ListAllMyBuckets",
+   "logfinder_rules": [],
+   "judgement": "",
+   "judgement_reason": ""
+  },
+  {
+   "rule": "Sign-in.with.AWS.CLI.prompt",
+   "file": "signin_with_aws_cli_prompt",
+   "severity": "Info",
+   "test": "Test-291327",
+   "expected": true,
+   "eventName": "ListApplications",
+   "logfinder_rules": [],
+   "judgement": "놓침",
+   "judgement_reason": ""
+  }
+ ],
+ "judged": {
+  "judged_at": "2026-11-25T20:30Z",
+  "rules": 56,
+  "correct": 24,
+  "rate": 0.42857142857142855,
+  "ci95": [
+   0.3077,
+   0.5586
+  ],
+  "other_reason_only": 2,
+  "missed": 30,
+  "medium_up_rules": 33,
+  "medium_up_correct": 12,
+  "medium_up_rate": 0.36363636363636365,
+  "medium_up_ci95": [
+   0.2219,
+   0.5338
+  ],
+  "verdict_vs_50pct": "미달"
+ }
+}
