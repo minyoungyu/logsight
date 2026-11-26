@@ -60,7 +60,7 @@
 
 ### Fixed
 
-- 대회 전 기간 근거 점검(`docs/근거_점검_2026-11-26.md`): 규칙 수(56·61 → 62)와 테스트 수(382 → 511)를 문서마다 맞춤, GuardDuty 조사 에이전트 발표 시기(6월), README 주입 시연 문장. 결과 파일이 저장소에 없는 숫자 3개(채팅 AI 3/6, BOTSv3 규칙 측정, 실습 34/34)에 그 사실을 적음. README 측정표에 Panther B 반 43%와 EClog 오탐 0.496%를 더함.
+- 대회 전 기간 근거 점검(`docs/근거_점검_2026-11-26.md`): 규칙 수(56·61 → 62)와 테스트 수(382 → 511)를 문서마다 맞춤, GuardDuty 조사 에이전트 발표 시기(6월), README 주입 시연 문장. 결과 파일이 저장소에 없는 숫자 3개(채팅 AI 3/6, BOTSv3 규칙 측정, 실습 34/34)에 그 사실을 적음. README 측정표에 Panther B 반 43%와 EClog 오탐 0.496%를 더함. 2차 전체 검토(같은 문서 5절): 11/25에 근거 없다고 지운 russellmitchell 0.013%는 결과 파일이 있어 되살림(`reports/public/ait_russellmitchell_2026-11-21.json`), fox 0.30%·target_rules 10/15·129줄·29/52 날짜를 결과 파일 값으로, AI 재검토 155개·실습 결과에 근거 상태 표시, 서버 해킹 통계 출처 추가.
 - `CT_CONSOLE_NO_MFA`: SAML(회사 IdP)·역할 전환·SSO 로그인은 MFA를 IdP나 원래 세션에서 거치므로 빼고, 비밀번호로 들어오는 IAM 사용자·루트만 본다.
 - `CT_LOGGING_TAMPER`: CloudTrail 이벤트 선택기를 켜는 변경은 빼고, 관리 이벤트를 빼거나 읽기·쓰기 한쪽만 남기거나 제외 조건을 넣을 때만 잡는다.
 - WEBLOG_ROBOTS_HIDDEN 오탐: 스스로 크롤러라고 밝히는 UA(…bot, …crawler, …spider, 애드센스)를 빼고, 숨은 경로를 첫 마디 대신 숫자를 지운 모양으로 비교한다(평평한 URL의 상품 페이지). EClog 하루치 오탐 1,740줄 → 0줄(이미 본 데이터라 개발 점수, `reports/public/reallog_eclog_1day_after_fix_dev.json`).
