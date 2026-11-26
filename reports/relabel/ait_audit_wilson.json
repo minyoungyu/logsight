@@ -1,0 +1,211 @@
+{
+ "testbed": "wilson",
+ "window_utc": [
+  "2022-02-07T10:57:00+00:00",
+  "2022-02-07T11:48:52+00:00"
+ ],
+ "n_steps": 35,
+ "webshell_paths_from_labels": [
+  "/wp-content/uploads/2022/02/zpinqklqgo-1644232829.6164.php"
+ ],
+ "hosts": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "other_vhosts_access.log.2:6250",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.2:6252",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.2:6253",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.2:6254",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.2:6257",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.2:6258",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    }
+   ]
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled_lines": 428116,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "intranet.hallbrown.wilson.com-access.log.2:429702",
+     "why": "webshell_path",
+     "ts": "2022-02-07T11:48:08+00:00"
+    }
+   ]
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "proxy-access.log.2:1044",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1045",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1046",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1047",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1048",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1049",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1050",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1053",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:33+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1056",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1057",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1058",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.2:1060",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-07T10:59:34+00:00"
+    }
+   ]
+  }
+ },
+ "score": {
+  "intranet_server": {
+   "ait_labels": {
+    "attack_lines": 429465,
+    "tp": 427852,
+    "fn": 1613,
+    "fp": 178,
+    "recall": 0.9962,
+    "precision": 0.9996
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 429466,
+    "tp": 427853,
+    "fn": 1613,
+    "fp": 177,
+    "recall": 0.9962,
+    "precision": 0.9996
+   },
+   "gap_lines": 1,
+   "gap_flagged": 1
+  },
+  "webserver": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 12,
+    "recall": null,
+    "precision": 0.0
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 12,
+    "tp": 12,
+    "fn": 0,
+    "fp": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gap_lines": 12,
+   "gap_flagged": 12
+  },
+  "cloud_share": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 6,
+    "recall": null,
+    "precision": 0.0
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 6,
+    "tp": 6,
+    "fn": 0,
+    "fp": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gap_lines": 6,
+   "gap_flagged": 6
+  }
+ },
+ "summary": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 6
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled": 428116,
+   "labeled_outside_window": 0,
+   "gap_candidates": 1
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 12
+  }
+ }
+}

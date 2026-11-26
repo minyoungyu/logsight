@@ -1,0 +1,211 @@
+{
+ "testbed": "wheeler",
+ "window_utc": [
+  "2022-01-30T07:35:00+00:00",
+  "2022-01-30T17:52:19+00:00"
+ ],
+ "n_steps": 36,
+ "webshell_paths_from_labels": [
+  "/wp-content/uploads/2022/01/blupxljcmk-1643529407.9648.php"
+ ],
+ "hosts": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "other_vhosts_access.log.1:818",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.1:819",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.1:820",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.1:823",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.1:825",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log.1:827",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    }
+   ]
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled_lines": 431560,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "intranet.flores.wheeler.biz-access.log.1:433104",
+     "why": "webshell_path",
+     "ts": "2022-01-30T17:51:41+00:00"
+    }
+   ]
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "proxy-access.log.1:149",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:150",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:151",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:152",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:153",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:154",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:18+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:158",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:159",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:160",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:163",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:164",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:165",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-30T07:39:19+00:00"
+    }
+   ]
+  }
+ },
+ "score": {
+  "intranet_server": {
+   "ait_labels": {
+    "attack_lines": 432906,
+    "tp": 431296,
+    "fn": 1610,
+    "fp": 37,
+    "recall": 0.9963,
+    "precision": 0.9999
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 432907,
+    "tp": 431297,
+    "fn": 1610,
+    "fp": 36,
+    "recall": 0.9963,
+    "precision": 0.9999
+   },
+   "gap_lines": 1,
+   "gap_flagged": 1
+  },
+  "webserver": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 12,
+    "recall": null,
+    "precision": 0.0
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 12,
+    "tp": 12,
+    "fn": 0,
+    "fp": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gap_lines": 12,
+   "gap_flagged": 12
+  },
+  "cloud_share": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 6,
+    "recall": null,
+    "precision": 0.0
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 6,
+    "tp": 6,
+    "fn": 0,
+    "fp": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gap_lines": 6,
+   "gap_flagged": 6
+  }
+ },
+ "summary": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 6
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled": 431560,
+   "labeled_outside_window": 0,
+   "gap_candidates": 1
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 12
+  }
+ }
+}

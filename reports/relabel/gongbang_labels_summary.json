@@ -1,0 +1,116 @@
+{
+ "generated": "2026-11-26T15:36:36Z",
+ "inputs": {
+  "cloudtrail.json": "87ea2740d66e9c53697426cf57cbebd26bd6ccee0eba8e82faf0748b02ca98ae",
+  "waf.jsonl": "e1e89f3e7d6829f6b42c1a854c2e7be9f3809de862d01e963d10299f56310fc0",
+  "alb.log": "d7eb9e91c6c6c6857e904b3c07ba95ac673e62c49df6bf4a37a2d048d82e134e",
+  "waf_raw": "75e66573ebde416f527734c1c959e4447fb971c8639f5b071c1e924e14335dee",
+  "aws_ip_ranges_createDate": "2026-11-26-12-47-05"
+ },
+ "anchors": {
+  "ip:198.18.50.1": {
+   "rule": "id.ip.stolen_key_user",
+   "n_evidence": 4,
+   "evidence": [
+    "cloudtrail.json:10036",
+    "cloudtrail.json:10094",
+    "cloudtrail.json:10126",
+    "cloudtrail.json:10142"
+   ]
+  },
+  "ip:198.18.7.1": {
+   "rule": "id.ip.waf_managed_ssrf",
+   "n_evidence": 53,
+   "evidence": [
+    "waf.jsonl:118",
+    "waf.jsonl:119",
+    "waf.jsonl:131",
+    "waf.jsonl:132",
+    "waf.jsonl:141",
+    "waf.jsonl:143",
+    "waf.jsonl:147",
+    "waf.jsonl:150",
+    "waf.jsonl:151",
+    "waf.jsonl:155"
+   ]
+  },
+  "ip:198.18.7.2": {
+   "rule": "id.ip.waf_managed_ssrf",
+   "n_evidence": 16,
+   "evidence": [
+    "waf.jsonl:374",
+    "waf.jsonl:375",
+    "waf.jsonl:377",
+    "waf.jsonl:380",
+    "waf.jsonl:382",
+    "waf.jsonl:384",
+    "waf.jsonl:389",
+    "waf.jsonl:394",
+    "waf.jsonl:397",
+    "waf.jsonl:398"
+   ]
+  },
+  "key:ASIA71C2********95CF": {
+   "rule": "id.key.instance_outside",
+   "n_evidence": 13,
+   "evidence": [
+    "cloudtrail.json:10028",
+    "cloudtrail.json:10036",
+    "cloudtrail.json:10043",
+    "cloudtrail.json:10051",
+    "cloudtrail.json:10094",
+    "cloudtrail.json:10125",
+    "cloudtrail.json:10126",
+    "cloudtrail.json:10132",
+    "cloudtrail.json:10135",
+    "cloudtrail.json:10137"
+   ]
+  }
+ },
+ "waf_subrule_join": {
+  "ok": 432
+ },
+ "by_class": {
+  "attack": 566,
+  "uncertain": 132,
+  "normal": 10079
+ },
+ "by_rule": {
+  "origin.ip": 553,
+  "uncertain.waf.no_attacker_link": 39,
+  "step.waf.recon_path": 11,
+  "step.waf.EC2MetaDataSSRF_BODY": 110,
+  "step.waf.GenericRFI_BODY": 10,
+  "step.waf.case_id_probe": 6,
+  "step.alb.job_403": 6,
+  "uncertain.alb.no_attacker_link": 10,
+  "step.alb.job_404": 12,
+  "normal.defender_iam_user": 5602,
+  "normal.role_inside_aws": 3495,
+  "normal.aws_service": 864,
+  "normal.unknown_identity_inside_aws": 20,
+  "normal.defender_ip": 26,
+  "normal.root_defender_subnet": 72,
+  "uncertain.root_unattributed": 77,
+  "step.ct.s3_from_attacker_ip": 1,
+  "uncertain.ct.unattributed": 6,
+  "origin.key": 13,
+  "step.ct.instance_key_outside": 13,
+  "step.ct.states_start_ok": 9,
+  "step.ct.ssm_denied": 4
+ },
+ "by_label": {
+  "attacker_http": 505,
+  "recon": 11,
+  "web_recon": 11,
+  "foothold": 84,
+  "ssrf_imds": 55,
+  "rfi": 5,
+  "idor_probe": 24,
+  "attacker": 61,
+  "collection_attempt": 1,
+  "credential_misuse": 13,
+  "execution": 9,
+  "lateral_attempt": 4
+ }
+}

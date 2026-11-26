@@ -1,0 +1,28 @@
+{
+ "engine_commit": "6970554",
+ "lines": {
+  "uncertain": 11,
+  "unparsed": 4,
+  "attack": 9,
+  "unlabeled": 350659
+ },
+ "flagged_lines": 1749,
+ "flagged_by_class": {
+  "attack": 9,
+  "unlabeled": 1740
+ },
+ "attack_lines_flagged": "9/9",
+ "attack_lines_missed": [],
+ "fp_lines_assuming_unlabeled_normal": 1740,
+ "fp_rate": 0.004962029070646176,
+ "fp_upper95": 0.005200083433365933,
+ "fp_rate_if_uncertain_normal": 0.0049618734208980424,
+ "fp_by_rule": {
+  "WEBLOG_ROBOTS_HIDDEN": 1740
+ },
+ "attack_by_rule": {
+  "WEBLOG_SCANNER": 7,
+  "WEBLOG_SENSITIVE_FILE": 2
+ },
+ "uncertain_flagged_by_rule": {}
+}

@@ -1,0 +1,150 @@
+{
+ "testbed": "santos",
+ "window_utc": [
+  "2022-01-17T11:15:00+00:00",
+  "2022-01-17T11:58:57+00:00"
+ ],
+ "n_steps": 59,
+ "webshell_paths_from_labels": [
+  "/wp-content/uploads/2022/01/yvmuplzucm-1642418578.1653.php"
+ ],
+ "hosts": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "other_vhosts_access.log:2508",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-17T11:21:46+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log:2509",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-17T11:21:46+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log:2510",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-17T11:21:46+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log:2512",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-17T11:21:46+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log:2514",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-17T11:21:46+00:00"
+    },
+    {
+     "ref": "other_vhosts_access.log:2516",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-01-17T11:21:46+00:00"
+    }
+   ]
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled_lines": 7794,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "intranet.smith.santos.com-access.log:8324",
+     "why": "webshell_path",
+     "ts": "2022-01-17T11:58:04+00:00"
+    }
+   ]
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": []
+  }
+ },
+ "score": {
+  "intranet_server": {
+   "ait_labels": {
+    "attack_lines": 7848,
+    "tp": 7782,
+    "fn": 66,
+    "fp": 13,
+    "recall": 0.9916,
+    "precision": 0.9983
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 7849,
+    "tp": 7783,
+    "fn": 66,
+    "fp": 12,
+    "recall": 0.9916,
+    "precision": 0.9985
+   },
+   "gap_lines": 1,
+   "gap_flagged": 1
+  },
+  "webserver": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "gap_lines": 0,
+   "gap_flagged": 0
+  },
+  "cloud_share": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 6,
+    "recall": null,
+    "precision": 0.0
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 6,
+    "tp": 6,
+    "fn": 0,
+    "fp": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gap_lines": 6,
+   "gap_flagged": 6
+  }
+ },
+ "summary": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 6
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled": 7794,
+   "labeled_outside_window": 0,
+   "gap_candidates": 1
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 0
+  }
+ }
+}
