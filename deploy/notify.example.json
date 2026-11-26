@@ -1,5 +1,6 @@
 {
  "_comment": "쓸 채널만 남긴다. 주소·비밀번호는 환경변수에 넣고 여기에는 환경변수 이름만 쓴다. 확인: python -m logsight notify-test notify.json",
+ "dashboard_url": "https://logs.example.com",
  "channels": [
   {"type": "email", "smtp_host": "email-smtp.ap-northeast-2.amazonaws.com", "smtp_port": 587,
    "user_env": "LOGSIGHT_SMTP_USER", "password_env": "LOGSIGHT_SMTP_PASSWORD",

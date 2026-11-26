@@ -335,7 +335,11 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
         resp = rs.prepare(rs.Responder(rcfg), alert.summary(), rs.iter_records(paths, since, until), out,
                           now=now())
     done = now()
-    text = summary_text(alert, result, out)
+    link = None
+    if opt.notify or os.environ.get("LOGSIGHT_DASHBOARD_URL"):
+        from .notify import dashboard_base, dashboard_link
+        link = dashboard_link(dashboard_base(opt.notify), out)
+    text = summary_text(alert, result, out, link)
     if resp:
         from .respond import summary_lines
         extra = summary_lines(resp, out)
@@ -354,7 +358,7 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
         from . import notify as nt
         try:
             channels = nt.load_config(opt.notify)
-            run_info["notify_channels"] = nt.send_all(channels, nt.build(alert.summary(), result, out, resp))
+            run_info["notify_channels"] = nt.send_all(channels, nt.build(alert.summary(), result, out, resp, link))
         except (OSError, ValueError) as exc:
             run_info["notify_channels"] = [{"ok": False, "error": f"설정 오류: {exc}"}]
     if opt.notify_cmd:
@@ -364,7 +368,7 @@ def handle(alert: Alert, opt: Options, *, s3=None, session=None,
     return {"status": "done", "out": str(out), **run_info}
 
 
-def summary_text(alert: Alert, result: dict, out: Path) -> str:
+def summary_text(alert: Alert, result: dict, out: Path, link: str | None = None) -> str:
     """통지용 짧은 요약(문자 한 통·이메일 제목+본문에 들어갈 길이). 원본 로그·키는 넣지 않는다."""
     sev = {"high": "높음", "medium": "중간", "low": "낮음"}
     lines = [f"[{PRODUCT_NAME}] {sev[alert.severity]} 경보: {alert.title[:80]}",
@@ -377,6 +381,8 @@ def summary_text(alert: Alert, result: dict, out: Path) -> str:
         lines.append(f"- {inc['id']} [{sev.get(inc['severity'], inc['severity'])}] "
                      f"{'→'.join(STAGE_KO.get(x, x) for x in inc['stages'][:4])}" + (f" / 먼저: {first[:40]}" if first else ""))
     lines.append("참고: CloudTrail(약 5분)·Flow Logs(약 10분)는 S3 전달이 늦어 경보 직전 몇 분은 빠졌을 수 있음")
+    if link:
+        lines.append(f"대시보드: {link}")
     lines.append(f"보고서: {out / 'report.html'}")
     return "\n".join(lines) + "\n"
 
