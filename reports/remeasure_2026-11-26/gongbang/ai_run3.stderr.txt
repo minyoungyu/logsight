@@ -1,0 +1,1 @@
+[AI 전송] 재검토: 사건 8개 · 이벤트 76건 · 약 39.6KB → Anthropic API(api.anthropic.com), 모델 claude-opus-5-5. 비밀번호·토큰·키는 가린 뒤 보냅니다. 보내지 않으려면 --no-ai로 실행하세요.

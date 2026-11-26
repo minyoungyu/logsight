@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/user/logsight/scripts/chat_baseline.py", line 263, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/logsight/scripts/chat_baseline.py", line 257, in main
+    r = run_once(Path(a.data), Path(a.out))
+  File "/home/user/logsight/scripts/chat_baseline.py", line 213, in run_once
+    ai = chat_ai_turn(client, history, usage["chat_ai"])
+  File "/home/user/logsight/scripts/chat_baseline.py", line 146, in chat_ai_turn
+    resp = _create(client, model=MODEL, messages=history)
+  File "/home/user/logsight/scripts/chat_baseline.py", line 124, in _create
+    with client.messages.stream(max_tokens=64000, **kw) as st:
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/lib/streaming/_messages.py", line 185, in __enter__
+    raw_stream = self.__api_request()
+  File "/usr/local/lib/python3.13/site-packages/anthropic/_base_client.py", line 1696, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/_base_client.py", line 1247, in request
+    return self._request(cast_to, options, stream=stream, stream_cls=stream_cls)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/anthropic/_base_client.py", line 1350, in _request
+    raise self._make_status_error_from_response(response) from None
+anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011ChQxdkbfXkksGbUxmymj2'}
