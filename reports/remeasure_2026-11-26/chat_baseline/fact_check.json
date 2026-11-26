@@ -1,0 +1,111 @@
+{
+ "what": "최종 보고서의 IP·API 이름·초 단위 시각을 원본 로그와 대조. 해석·결론은 보지 않음",
+ "runs": [
+  {
+   "run": "run1",
+   "n_checked": {
+    "ip": 4,
+    "time": 15,
+    "api": 7
+   },
+   "candidates": [
+    {
+     "kind": "time",
+     "value": "07:03:43",
+     "review": "explained",
+     "note": "실행 이름 test-run-1791702223의 유닉스 시각을 UTC로 바꾼 값이다(계산 맞음)."
+    },
+    {
+     "kind": "api",
+     "value": "GetFunction",
+     "review": "explained",
+     "note": "CloudTrail은 lambda:GetFunction을 GetFunction20150331v2로 남긴다(포털 18회). 같은 호출이다."
+    },
+    {
+     "kind": "api",
+     "value": "GetFunctionConfiguration",
+     "review": "explained",
+     "note": "CloudTrail 이름은 GetFunctionConfiguration20150331v2다. 같은 호출이다."
+    }
+   ],
+   "n_unexplained": 0
+  },
+  {
+   "run": "run2",
+   "n_checked": {
+    "ip": 4,
+    "time": 16,
+    "api": 17
+   },
+   "candidates": [
+    {
+     "kind": "time",
+     "value": "07:03:43",
+     "review": "explained",
+     "note": "실행 이름 test-run-1791702223의 유닉스 시각을 UTC로 바꾼 값이다(계산 맞음)."
+    },
+    {
+     "kind": "api",
+     "value": "AdminDisableUser",
+     "review": "explained",
+     "note": "조치 권고('실행하세요')와 '막은 기록이 없다'는 문장에 쓰였다. 로그에 0건이므로 맞는 진술이다."
+    },
+    {
+     "kind": "api",
+     "value": "AdminUserGlobalSignOut",
+     "review": "explained",
+     "note": "조치 권고('실행하세요')에 쓰였다. 로그의 사실을 주장한 것이 아니다."
+    },
+    {
+     "kind": "api",
+     "value": "GetCredentialsForIdentity",
+     "review": "explained",
+     "note": "'기록이 없다'는 문장에 쓰였다. 로그에 실제로 0건이므로 맞는 진술이다."
+    },
+    {
+     "kind": "api",
+     "value": "GetFunction",
+     "review": "explained",
+     "note": "CloudTrail은 lambda:GetFunction을 GetFunction20150331v2로 남긴다(포털 18회). 같은 호출이다."
+    },
+    {
+     "kind": "api",
+     "value": "GetId",
+     "review": "explained",
+     "note": "'기록이 없다'는 문장에 쓰였다. 로그에 실제로 0건이므로 맞는 진술이다."
+    },
+    {
+     "kind": "api",
+     "value": "ModifyInstanceMetadataOptions",
+     "review": "explained",
+     "note": "'IMDS 설정 변경은 이 이벤트인데 로그에 없으니 IMDSv2 적용 여부는 모른다'는 문장이다. 로그에 0건이므로 맞는 진술이다."
+    }
+   ],
+   "n_unexplained": 0
+  },
+  {
+   "run": "run3",
+   "n_checked": {
+    "ip": 5,
+    "time": 26,
+    "api": 8
+   },
+   "candidates": [
+    {
+     "kind": "time",
+     "value": "07:03:43",
+     "review": "explained",
+     "note": "실행 이름 test-run-1791702223의 유닉스 시각을 UTC로 바꾼 값이다(계산 맞음)."
+    },
+    {
+     "kind": "time",
+     "value": "07:05:44",
+     "review": "explained",
+     "note": "실행 이름 test-run-1791702344의 유닉스 시각을 UTC로 바꾼 값이다(계산 맞음)."
+    }
+   ],
+   "n_unexplained": 0
+  }
+ ],
+ "n_unexplained_total": 0
+}
