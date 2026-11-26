@@ -1,0 +1,106 @@
+{
+ "cases": 6,
+ "root_total": 16,
+ "root_hit": 16,
+ "root_rate": 1.0,
+ "unrelated_total": 0,
+ "rows": [
+  {
+   "sample": "combined",
+   "incident": "INC-001",
+   "story": "SSH 22 전체 공개 → 대입 로그인, WAF SQLi 규칙 COUNT → SSRF, IMDSv1 → 역할 키 유출, 역할 권한 과다 → S3 읽기",
+   "root": [
+    "IAM_OVERBROAD",
+    "IMDSV1_ENABLED",
+    "SG_ADMIN_PORT_OPEN",
+    "WAF_SQLI_COUNT"
+   ],
+   "hit": [
+    "IAM_OVERBROAD",
+    "IMDSV1_ENABLED",
+    "SG_ADMIN_PORT_OPEN",
+    "WAF_SQLI_COUNT"
+   ],
+   "missed": [],
+   "unrelated": []
+  },
+  {
+   "sample": "combined",
+   "incident": "INC-002",
+   "story": "포트 훑기 뒤 22 허용, nginx 앞단(WAF 없음)으로 SQLi 시도",
+   "root": [
+    "SG_ADMIN_PORT_OPEN",
+    "WEB_FIX_SQLI"
+   ],
+   "hit": [
+    "SG_ADMIN_PORT_OPEN",
+    "WEB_FIX_SQLI"
+   ],
+   "missed": [],
+   "unrelated": []
+  },
+  {
+   "sample": "combined",
+   "incident": "INC-003",
+   "story": "막힌 단발 시도: 수정안이 없어야 함",
+   "root": [],
+   "hit": [],
+   "missed": [],
+   "unrelated": []
+  },
+  {
+   "sample": "demo",
+   "incident": "INC-001",
+   "story": "combined INC-001과 같은 이야기, 웹 로그는 ALB",
+   "root": [
+    "IAM_OVERBROAD",
+    "IMDSV1_ENABLED",
+    "SG_ADMIN_PORT_OPEN",
+    "WAF_SQLI_COUNT"
+   ],
+   "hit": [
+    "IAM_OVERBROAD",
+    "IMDSV1_ENABLED",
+    "SG_ADMIN_PORT_OPEN",
+    "WAF_SQLI_COUNT"
+   ],
+   "missed": [],
+   "unrelated": []
+  },
+  {
+   "sample": "free",
+   "incident": "INC-001",
+   "story": "무료 구성(호스트 방화벽 + nginx): 22 공개, WAF 없음, SQLi",
+   "root": [
+    "SG_ADMIN_PORT_OPEN",
+    "WEB_FIX_SQLI",
+    "WEB_NO_WAF"
+   ],
+   "hit": [
+    "SG_ADMIN_PORT_OPEN",
+    "WEB_FIX_SQLI",
+    "WEB_NO_WAF"
+   ],
+   "missed": [],
+   "unrelated": []
+  },
+  {
+   "sample": "guardduty",
+   "incident": "INC-001",
+   "story": "GuardDuty 결과 2개(역할 키 외부 사용, SSH 대입)만 있는 입력",
+   "root": [
+    "IAM_OVERBROAD",
+    "IMDSV1_ENABLED",
+    "SG_ADMIN_PORT_OPEN"
+   ],
+   "hit": [
+    "IAM_OVERBROAD",
+    "IMDSV1_ENABLED",
+    "SG_ADMIN_PORT_OPEN"
+   ],
+   "missed": [],
+   "unrelated": []
+  }
+ ],
+ "note": "개발 점수(규칙을 만들며 본 샘플). S5 달성으로 세지 않음"
+}

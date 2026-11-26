@@ -2,6 +2,7 @@
 대용량 처리 성능 측정용: 정상(일상) CloudTrail 레코드를 N건 만들어 gzip 파일로 쓰고
 파이프라인 처리 시간과 메모리를 잰다. 공격 데이터가 아니라 처리량 측정용 부하 데이터다.
   python scripts/bench.py 200000
+  python scripts/bench.py 200000 --json 결과.json   # 결과를 파일로도 남김(문서 숫자의 근거 파일)
 """
 from __future__ import annotations
 
@@ -57,4 +58,13 @@ if __name__ == "__main__":
         t = time.time()
         res = run_paths([d], use_ai=False)
         peak = tracemalloc.get_traced_memory()[1] / 1e6
-        print(f"{n:,}건: {time.time() - t:.1f}초, 최대 메모리 {peak:.0f}MB, 사건 {res['n_incidents']}건")
+        elapsed = time.time() - t
+        print(f"{n:,}건: {elapsed:.1f}초, 최대 메모리 {peak:.0f}MB, 사건 {res['n_incidents']}건")
+        if "--json" in sys.argv:
+            import os
+            import platform
+            Path(sys.argv[sys.argv.index("--json") + 1]).write_text(json.dumps({
+                "n_events": n, "dense": dense, "elapsed_s": round(elapsed, 1), "peak_mb": round(peak),
+                "n_incidents": res["n_incidents"], "cpus": os.cpu_count(), "python": platform.python_version(),
+                "memory_note": "tracemalloc 최대값(파이썬이 잡은 메모리). 프로세스 전체 RSS와 다름"},
+                ensure_ascii=False, indent=1), encoding="utf-8")

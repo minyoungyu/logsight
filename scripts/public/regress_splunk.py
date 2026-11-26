@@ -62,6 +62,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", required=True)
     ap.add_argument("--base", default=str(BASE))
+    ap.add_argument("--json", help="결과를 이 파일에도 남김(문서 숫자의 근거 파일)")
     a = ap.parse_args()
     cache = Path(a.cache)
     cache.mkdir(parents=True, exist_ok=True)
@@ -85,6 +86,14 @@ def main() -> int:
             gained.append((row["detection"], sorted(now - was)))
     print(f"기준 커밋 {base['engine_commit']} · 탐지 규칙 {len(base['rows'])}개 기준")
     print(f"기준에서 맞게 탐지한 것 중 계속 잡음 {kept}개 · 더는 못 잡음 {len(lost)}개 · 새로 잡음 {len(gained)}개(개발 데이터로 셈)")
+    if a.json:
+        Path(a.json).write_text(json.dumps({
+            "base": str(Path(a.base).relative_to(ROOT)) if Path(a.base).is_absolute() else a.base,
+            "base_engine_commit": base["engine_commit"], "n_detections": len(base["rows"]),
+            "kept": kept, "lost": [{"detection": n, "rules": r} for n, r in lost],
+            "gained": [{"detection": n, "rules": r} for n, r in gained],
+            "note": "새로 잡은 것은 놓친 목록을 보고 고친 결과라 개발 점수. 처음 보는 데이터 점수로 세지 않음"},
+            ensure_ascii=False, indent=1), encoding="utf-8")
     for name, rules in lost:
         print(f"  [회귀] {name}: {', '.join(rules)}")
     for name, rules in gained:

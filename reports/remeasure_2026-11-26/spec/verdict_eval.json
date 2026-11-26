@@ -1,0 +1,471 @@
+{
+  "n_cases": 36,
+  "n_attack": 20,
+  "n_not_attack": 16,
+  "TP": 19,
+  "FN": 1,
+  "FP": 1,
+  "TN": 15,
+  "recall": 0.95,
+  "precision": 0.95,
+  "accuracy": 0.944,
+  "rows": [
+    {
+      "id": "A01",
+      "label": "attack",
+      "what": "유출 키로 외부에서 정찰 뒤 새 액세스 키 생성",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_DISCOVERY_BURST",
+        "CT_IAM_PERSISTENCE"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A02",
+      "label": "attack",
+      "what": "서버 역할 임시 키를 외부 IP에서 사용해 S3 대량 읽기",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_S3_BULK_READ"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A03",
+      "label": "attack",
+      "what": "SSH 무차별 대입 뒤 로그인 성공",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "SSH_BRUTE_FORCE",
+        "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A04",
+      "label": "attack",
+      "what": "SSH 무차별 대입(실패만, 시도)",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "SSH_BRUTE_FORCE"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A05",
+      "label": "attack",
+      "what": "웹 SQL 인젝션 성공 응답",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "WEBLOG_SCANNER",
+        "WEBLOG_SQLI"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A06",
+      "label": "attack",
+      "what": "경로 조작으로 /etc/passwd 읽기",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "WEBLOG_TRAVERSAL"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A07",
+      "label": "attack",
+      "what": "업로드한 웹셸로 명령 실행",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "WEBLOG_TRAVERSAL",
+        "WEBLOG_UPLOAD_EXEC",
+        "WEBLOG_WEBSHELL_ACCESS"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A08",
+      "label": "attack",
+      "what": "유출 키로 CloudTrail 끄기",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_LOGGING_TAMPER"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A09",
+      "label": "attack",
+      "what": "AWS 콘솔 로그인 연속 실패 뒤 성공",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_CONSOLE_BRUTE",
+        "CT_CONSOLE_NO_MFA"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A10",
+      "label": "attack",
+      "what": "유출 키로 권한 탐색(권한 거부 폭주)",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_ACCESS_DENIED_BURST"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A11",
+      "label": "attack",
+      "what": "웹 서비스 계정이 sudo find -exec로 root 셸",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "HOST_PRIV_ESC"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A12",
+      "label": "attack",
+      "what": "SSH 대입 성공 뒤 sudo useradd로 계정 생성",
+      "predicted": "attack",
+      "verdicts": [
+        "attack",
+        "attack"
+      ],
+      "rules": [
+        "HOST_ACCOUNT_CREATED",
+        "SSH_BRUTE_FORCE",
+        "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A13",
+      "label": "attack",
+      "what": "유출 키로 버킷 데이터 삭제",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "FN"
+    },
+    {
+      "id": "A14",
+      "label": "attack",
+      "what": "유출 키로 비밀값 대량 조회",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_SECRET_ACCESS"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A15",
+      "label": "attack",
+      "what": "같은 서버 역할 키가 여러 외부 IP에서 쓰임",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_INSTANCE_CRED_MULTI_IP"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A16",
+      "label": "attack",
+      "what": "GuardDuty 높음: 서버 키 외부 사용",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "GD_FINDING"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A17",
+      "label": "attack",
+      "what": "웹 취약점 스캐너 대량 탐색",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "WEBLOG_ENUM_404",
+        "WEBLOG_SCANNER",
+        "WEBLOG_SENSITIVE_FILE"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A18",
+      "label": "attack",
+      "what": "명령 주입",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "WEBLOG_CMD_INJECTION",
+        "WEBLOG_TRAVERSAL"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A19",
+      "label": "attack",
+      "what": "유출 키로 IAM 사용자 만들고 관리자 권한 붙이기",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "CT_IAM_PERSISTENCE"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "A20",
+      "label": "attack",
+      "what": "웹 로그인 대입 뒤 성공",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "WEBLOG_AUTH_BRUTE",
+        "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "outcome": "TP"
+    },
+    {
+      "id": "B01",
+      "label": "not_attack",
+      "what": "확인된 팀원이 콘솔에서 IAM 목록을 많이 조회",
+      "predicted": "not_attack",
+      "verdicts": [
+        "benign_activity"
+      ],
+      "rules": [
+        "CT_DISCOVERY_BURST"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B02",
+      "label": "not_attack",
+      "what": "배포 자동화(CI) 역할이 함수 코드 갱신",
+      "predicted": "not_attack",
+      "verdicts": [
+        "unclear"
+      ],
+      "rules": [
+        "CT_SERVERLESS_CHANGE"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B03",
+      "label": "not_attack",
+      "what": "루트로 콘솔 로그인(MFA 있음)해 결제 화면만 봄",
+      "predicted": "not_attack",
+      "verdicts": [
+        "risky_not_attack"
+      ],
+      "rules": [
+        "CT_ROOT_USAGE"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B04",
+      "label": "not_attack",
+      "what": "인터넷 스캐너가 SSH 포트에 접속만 함(로그인 없음)",
+      "predicted": "not_attack",
+      "verdicts": [
+        "risky_not_attack",
+        "risky_not_attack",
+        "risky_not_attack",
+        "risky_not_attack",
+        "risky_not_attack"
+      ],
+      "rules": [
+        "VPC_REMOTE_ADMIN_EXPOSED"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B05",
+      "label": "not_attack",
+      "what": "평범한 쇼핑몰 방문(검색어에 select·etc 같은 낱말)",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "TN"
+    },
+    {
+      "id": "B06",
+      "label": "not_attack",
+      "what": "관리자가 평소처럼 sudo apt update",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "TN"
+    },
+    {
+      "id": "B07",
+      "label": "not_attack",
+      "what": "운영자 역할이 SSM으로 서버 명령 실행",
+      "predicted": "not_attack",
+      "verdicts": [
+        "unclear"
+      ],
+      "rules": [
+        "CT_INSTANCE_EXEC"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B08",
+      "label": "not_attack",
+      "what": "서버 역할 키로 다른 리전 출구에서 신원 확인만",
+      "predicted": "not_attack",
+      "verdicts": [
+        "unclear"
+      ],
+      "rules": [
+        "CT_INSTANCE_CRED_MULTI_IP"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B09",
+      "label": "not_attack",
+      "what": "확인 안 된 팀원이 MFA 없이 콘솔 로그인",
+      "predicted": "not_attack",
+      "verdicts": [
+        "risky_not_attack"
+      ],
+      "rules": [
+        "CT_CONSOLE_NO_MFA"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B10",
+      "label": "not_attack",
+      "what": "사무실에서 SSH 로그인 한 번(실패 없음)",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "TN"
+    },
+    {
+      "id": "B11",
+      "label": "not_attack",
+      "what": "확인된 팀원이 버킷을 공개로 바꿈(위험 설정)",
+      "predicted": "not_attack",
+      "verdicts": [
+        "risky_not_attack"
+      ],
+      "rules": [
+        "CT_S3_PUBLIC"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B12",
+      "label": "not_attack",
+      "what": "SSH 오타 2번 뒤 사무실에서 로그인",
+      "predicted": "attack",
+      "verdicts": [
+        "attack"
+      ],
+      "rules": [
+        "SSH_SUCCESS_AFTER_FAIL"
+      ],
+      "outcome": "FP"
+    },
+    {
+      "id": "B13",
+      "label": "not_attack",
+      "what": "내부 모니터링 서버가 관리자 상태 페이지를 주기적으로 조회",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "TN"
+    },
+    {
+      "id": "B14",
+      "label": "not_attack",
+      "what": "확인된 팀원이 CI용 액세스 키 생성",
+      "predicted": "not_attack",
+      "verdicts": [
+        "benign_activity"
+      ],
+      "rules": [
+        "CT_IAM_PERSISTENCE"
+      ],
+      "outcome": "TN"
+    },
+    {
+      "id": "B15",
+      "label": "not_attack",
+      "what": "검색 엔진 봇의 일반 크롤링",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "TN"
+    },
+    {
+      "id": "B16",
+      "label": "not_attack",
+      "what": "확인된 팀원이 보안그룹에 사무실 IP만 SSH 허용",
+      "predicted": "not_attack",
+      "verdicts": [],
+      "rules": [],
+      "outcome": "TN"
+    }
+  ]
+}

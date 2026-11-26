@@ -1,0 +1,100 @@
+{
+ "base": "reports/public/splunk_attack_data.json",
+ "base_engine_commit": "20e4562",
+ "n_detections": 52,
+ "kept": 16,
+ "lost": [],
+ "gained": [
+  {
+   "detection": "AWS Bedrock Delete GuardRails",
+   "rules": [
+    "CT_DEFENSE_IMPAIR"
+   ]
+  },
+  {
+   "detection": "AWS Bedrock Delete Model Invocation Logging Configuration",
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "detection": "AWS Console Login Failed During MFA Challenge",
+   "rules": [
+    "CT_CONSOLE_BRUTE"
+   ]
+  },
+  {
+   "detection": "AWS Defense Evasion PutBucketLifecycle",
+   "rules": [
+    "CT_LOGGING_TAMPER"
+   ]
+  },
+  {
+   "detection": "AWS Disable Bucket Versioning",
+   "rules": [
+    "CT_DATA_DESTRUCTION"
+   ]
+  },
+  {
+   "detection": "AWS EC2 Multiple SSH Public Keys Uploaded by a Single Identity",
+   "rules": [
+    "CT_INSTANCE_EXEC"
+   ]
+  },
+  {
+   "detection": "AWS EC2 Startup Script Modified on Stopped Instance",
+   "rules": [
+    "CT_INSTANCE_EXEC"
+   ]
+  },
+  {
+   "detection": "AWS High Number Of Failed Authentications For User",
+   "rules": [
+    "CT_CONSOLE_BRUTE"
+   ]
+  },
+  {
+   "detection": "AWS Lambda UpdateFunctionCode",
+   "rules": [
+    "CT_SERVERLESS_CHANGE"
+   ]
+  },
+  {
+   "detection": "AWS Multi-Factor Authentication Disabled",
+   "rules": [
+    "CT_ACCOUNT_SECURITY"
+   ]
+  },
+  {
+   "detection": "AWS Multiple Failed MFA Requests For User",
+   "rules": [
+    "CT_CONSOLE_BRUTE"
+   ]
+  },
+  {
+   "detection": "AWS Network Access Control List Created with All Open Ports",
+   "rules": [
+    "CT_SG_OPENED"
+   ]
+  },
+  {
+   "detection": "AWS Password Policy Changes",
+   "rules": [
+    "CT_ACCOUNT_SECURITY"
+   ]
+  },
+  {
+   "detection": "AWS SAML Update identity provider",
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  {
+   "detection": "AWS SetDefaultPolicyVersion",
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  }
+ ],
+ "note": "새로 잡은 것은 놓친 목록을 보고 고친 결과라 개발 점수. 처음 보는 데이터 점수로 세지 않음"
+}
