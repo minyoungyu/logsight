@@ -1,0 +1,1442 @@
+{
+ "generated_at": "2026-11-26T04:38:25Z",
+ "site": {
+  "name": "테스트 게시판 (board)",
+  "stack": "nginx + php-fpm + sqlite",
+  "webroot": "lab/sites/board",
+  "sensitive": [
+   ".env",
+   "config.php",
+   "wp-config.php",
+   "database.yml",
+   "settings.py",
+   "id_rsa",
+   ".git/config",
+   "composer.json"
+  ]
+ },
+ "overall_verdict": "likely_breached",
+ "overall_verdict_ko": "침해 가능성 높음",
+ "files": [
+  {
+   "file": "lab/logs/board_access.log",
+   "kind": "access",
+   "events": 30
+  },
+  {
+   "file": "lab/logs/board_error.log",
+   "kind": "weberror",
+   "events": 30
+  }
+ ],
+ "n_events": 60,
+ "events_by_source": {
+  "access": 30,
+  "weberror": 30
+ },
+ "n_flagged": 22,
+ "n_findings": 8,
+ "rule_counts": {
+  "WEBLOG_AUTH_BRUTE": {
+   "findings": 1,
+   "events": 13,
+   "title": "웹 로그인 무차별 대입"
+  },
+  "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": {
+   "findings": 1,
+   "events": 13,
+   "title": "로그인 연속 실패 뒤 성공"
+  },
+  "WEBLOG_SQLI": {
+   "findings": 1,
+   "events": 4,
+   "title": "웹 요청에 SQL 인젝션 패턴"
+  },
+  "WEBLOG_CMD_INJECTION": {
+   "findings": 1,
+   "events": 4,
+   "title": "운영체제 명령 삽입 시도"
+  },
+  "WEBLOG_ADMIN_FORGED": {
+   "findings": 1,
+   "events": 4,
+   "title": "로그인 없이 관리자 영역 접근(쿠키 위조 의심)"
+  },
+  "WEBLOG_ADMIN_ACCESS": {
+   "findings": 1,
+   "events": 4,
+   "title": "관리자 영역 접근 성공(기본 계정 로그인 의심)"
+  },
+  "WEBLOG_TRAVERSAL": {
+   "findings": 2,
+   "events": 2,
+   "title": "경로 조작·파일 열람(../, 민감 파일) 시도"
+  }
+ },
+ "n_incidents": 4,
+ "n_groups": 4,
+ "n_known": 0,
+ "quiet_admin": [],
+ "experimental": [],
+ "incident_index": [
+  {
+   "id": "INC-001",
+   "start": "2026-11-26T04:38:21+00:00",
+   "end": "2026-11-26T04:38:21+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "198.51.100.65"
+   ],
+   "n_events": 4,
+   "repeats": 1,
+   "pii": false,
+   "attack_verdict": "attack",
+   "attack_verdict_ko": "공격 의심"
+  },
+  {
+   "id": "INC-002",
+   "start": "2026-11-26T04:38:21+00:00",
+   "end": "2026-11-26T04:38:21+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access",
+    "credential-access"
+   ],
+   "src_ips": [
+    "198.51.100.66"
+   ],
+   "n_events": 13,
+   "repeats": 1,
+   "pii": false,
+   "attack_verdict": "attack",
+   "attack_verdict_ko": "공격 의심"
+  },
+  {
+   "id": "INC-003",
+   "start": "2026-11-26T04:38:21+00:00",
+   "end": "2026-11-26T04:38:21+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "198.51.100.63"
+   ],
+   "n_events": 4,
+   "repeats": 1,
+   "pii": false,
+   "attack_verdict": "attack",
+   "attack_verdict_ko": "공격 의심"
+  },
+  {
+   "id": "INC-004",
+   "start": "2026-11-26T04:38:21+00:00",
+   "end": "2026-11-26T04:38:21+00:00",
+   "severity": "high",
+   "stages": [
+    "initial-access"
+   ],
+   "src_ips": [
+    "198.51.100.64"
+   ],
+   "n_events": 1,
+   "repeats": 1,
+   "pii": false,
+   "attack_verdict": "attack",
+   "attack_verdict_ko": "공격 의심"
+  }
+ ],
+ "rule_triage": {
+  "mode": "rules",
+  "incidents": [
+   {
+    "id": "INC-001",
+    "evidence": [
+     "board_access.log:15",
+     "board_access.log:14",
+     "board_access.log:16",
+     "board_access.log:17"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "경로 조작·파일 열람(../, 민감 파일) 시도, 운영체제 명령 삽입 시도, 로그인 없이 관리자 영역 접근(쿠키 위조 의심). 결과: 성공 4건."
+   },
+   {
+    "id": "INC-002",
+    "evidence": [
+     "board_access.log:18",
+     "board_access.log:19",
+     "board_access.log:20",
+     "board_access.log:21",
+     "board_access.log:22",
+     "board_access.log:23"
+    ],
+    "verdict": "attack",
+    "confidence": "high",
+    "reason": "웹 로그인 무차별 대입, 로그인 연속 실패 뒤 성공. 결과: 성공 1건, 실패·차단 12건."
+   },
+   {
+    "id": "INC-003",
+    "evidence": [
+     "board_access.log:9",
+     "board_access.log:10",
+     "board_access.log:11",
+     "board_access.log:12"
+    ],
+    "verdict": "attack",
+    "confidence": "medium",
+    "reason": "웹 요청에 SQL 인젝션 패턴. 결과: 통과 4건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."
+   },
+   {
+    "id": "INC-004",
+    "evidence": [
+     "board_access.log:13"
+    ],
+    "verdict": "attack",
+    "confidence": "low",
+    "reason": "경로 조작·파일 열람(../, 민감 파일) 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   }
+  ],
+  "campaigns": [
+   {
+    "incident_ids": [
+     "INC-001",
+     "INC-004"
+    ],
+    "link_reason": "같은 /24 대역·같은 수법, 2시간 안(추정)",
+    "summary": "공격 의심 사건 2개 (INC-001, INC-004)"
+   },
+   {
+    "incident_ids": [
+     "INC-002"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   },
+   {
+    "incident_ids": [
+     "INC-003"
+    ],
+    "link_reason": "사건 하나",
+    "summary": "공격 의심 사건 1개"
+   }
+  ],
+  "cannot_tell": [
+   "CloudTrail 로그가 없어 AWS 계정에서 누가 어떤 API를 썼는지 알 수 없습니다.",
+   "VPC Flow 로그가 없어 어느 IP가 서버에 접속했고 데이터가 밖으로 나갔는지 알 수 없습니다.",
+   "WAF 로그가 없어 웹 공격 요청이 막혔는지 알 수 없습니다.",
+   "ALB 로그가 없어 웹 요청이 어떤 응답을 받았는지 알 수 없습니다.",
+   "SSH 인증 로그가 없어 누가 서버에 로그인했는지 알 수 없습니다.",
+   "INC-001의 활동이 로그가 끝나는 무렵(11-26 04:38 UTC(한국 13:38))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다.",
+   "INC-002의 활동이 로그가 끝나는 무렵(11-26 04:38 UTC(한국 13:38))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다.",
+   "INC-003의 활동이 로그가 끝나는 무렵(11-26 04:38 UTC(한국 13:38))까지 이어집니다. 그 뒤에도 계속됐는지는 알 수 없습니다."
+  ],
+  "coverage": {
+   "sources": {
+    "access": {
+     "n_events": 30,
+     "first": "2026-11-26T04:38:21+00:00",
+     "last": "2026-11-26T04:38:21+00:00"
+    },
+    "weberror": {
+     "n_events": 30,
+     "first": "2026-11-26T04:38:21+00:00",
+     "last": "2026-11-26T04:38:21+00:00"
+    }
+   },
+   "missing_sources": [
+    "cloudtrail",
+    "vpcflow",
+    "waf",
+    "alb",
+    "sshauth"
+   ],
+   "cloudtrail_s3_object_calls": 0,
+   "suspected_keys": []
+  },
+  "validation": {
+   "passed": true,
+   "note": "규칙 판정은 입력 ref만 씁니다"
+  },
+  "meta": {
+   "model": "rules",
+   "usage": {}
+  }
+ },
+ "results": [
+  {
+   "incident": {
+    "start": "2026-11-26T04:38:21+00:00",
+    "end": "2026-11-26T04:38:21+00:00",
+    "severity": "high",
+    "score": 379,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "198.51.100.65"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 4,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "WEBLOG_TRAVERSAL",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "경로 조작·파일 열람(../, 민감 파일) 시도",
+      "severity": "high",
+      "detail": "1건(성공 1, 실패·거부 0)",
+      "key": "198.51.100.65",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 1,
+      "evidence": [
+       "board_access.log:15"
+      ]
+     },
+     {
+      "rule": "WEBLOG_CMD_INJECTION",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "운영체제 명령 삽입 시도",
+      "severity": "high",
+      "detail": "4건(성공 4, 실패·거부 0)",
+      "key": "198.51.100.65",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 4,
+      "evidence": [
+       "board_access.log:14",
+       "board_access.log:15",
+       "board_access.log:16",
+       "board_access.log:17"
+      ]
+     },
+     {
+      "rule": "WEBLOG_ADMIN_FORGED",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "로그인 없이 관리자 영역 접근(쿠키 위조 의심)",
+      "severity": "high",
+      "detail": "이 IP의 로그인 기록 없이 관리자 페이지 4건 열람",
+      "key": "198.51.100.65",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 4,
+      "evidence": [
+       "board_access.log:14",
+       "board_access.log:15",
+       "board_access.log:16",
+       "board_access.log:17"
+      ]
+     },
+     {
+      "rule": "WEBLOG_ADMIN_ACCESS",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "관리자 영역 접근 성공(기본 계정 로그인 의심)",
+      "severity": "high",
+      "detail": "4건(성공 4, 실패·거부 0)",
+      "key": "198.51.100.65",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 4,
+      "evidence": [
+       "board_access.log:14",
+       "board_access.log:15",
+       "board_access.log:16",
+       "board_access.log:17"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "board_access.log:15",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /admin/tools.php?host=127.0.0.1%3bcat+%2fetc%2fpasswd",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.65",
+      "rules": [
+       "WEBLOG_TRAVERSAL",
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_ADMIN_FORGED",
+       "WEBLOG_ADMIN_ACCESS"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     },
+     {
+      "ref": "board_access.log:14",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /admin/tools.php?host=127.0.0.1%3bid",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.65",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_ADMIN_FORGED",
+       "WEBLOG_ADMIN_ACCESS"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     },
+     {
+      "ref": "board_access.log:16",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /admin/tools.php?host=x%7cid",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.65",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_ADMIN_FORGED",
+       "WEBLOG_ADMIN_ACCESS"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     },
+     {
+      "ref": "board_access.log:17",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /admin/tools.php?host=x%3buname+-a",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.65",
+      "rules": [
+       "WEBLOG_CMD_INJECTION",
+       "WEBLOG_ADMIN_FORGED",
+       "WEBLOG_ADMIN_ACCESS"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-001",
+    "repeats": 1,
+    "first_seen": "2026-11-26T04:38:21+00:00",
+    "last_seen": "2026-11-26T04:38:21+00:00",
+    "repeat_ids": []
+   },
+   "report": {
+    "verdict": "likely_breached",
+    "summary": "11-26 04:38 UTC(한국 13:38) 198.51.100.65의 활동 4건이 하나로 이어진다. 흐름: 초기 침투. 공격이 성공했을 가능성이 큰 근거가 보인다.",
+    "severity": "high",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "경로 조작·파일 열람(../, 민감 파일) 시도 — 1건(성공 1, 실패·거부 0) (대상: 198.51.100.65)",
+      "evidence": [
+       "board_access.log:15"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "운영체제 명령 삽입 시도 — 4건(성공 4, 실패·거부 0) (대상: 198.51.100.65)",
+      "evidence": [
+       "board_access.log:14",
+       "board_access.log:15",
+       "board_access.log:16",
+       "board_access.log:17"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "로그인 없이 관리자 영역 접근(쿠키 위조 의심) — 이 IP의 로그인 기록 없이 관리자 페이지 4건 열람 (대상: 198.51.100.65)",
+      "evidence": [
+       "board_access.log:14",
+       "board_access.log:15",
+       "board_access.log:16",
+       "board_access.log:17"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "관리자 영역 접근 성공(기본 계정 로그인 의심) — 4건(성공 4, 실패·거부 0) (대상: 198.51.100.65)",
+      "evidence": [
+       "board_access.log:14",
+       "board_access.log:15",
+       "board_access.log:16",
+       "board_access.log:17"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "id": "WEB_FIX_INPUT",
+      "action": "입력값 검증·경로 제한 적용: /admin/tools.php(host)",
+      "target": "app",
+      "priority": "soon",
+      "resource": "/admin/tools.php(host)",
+      "detail": "/admin/tools.php(host)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+      "evidence": [
+       "board_access.log:15"
+      ]
+     },
+     {
+      "id": "WEB_FIX_LOG_RETENTION",
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "resource": "웹·인증 로그",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "성공했을 가능성이 큰 근거가 있지만 웹 로그는 요청 본문과 응답 내용을 남기지 않아 확정하지 못했다. 응답 크기·서버 오류 로그와 DB 기록을 함께 확인한다."
+    ],
+    "attack_verdict": "attack",
+    "attack_verdict_reason": "경로 조작·파일 열람(../, 민감 파일) 시도, 운영체제 명령 삽입 시도, 로그인 없이 관리자 영역 접근(쿠키 위조 의심). 결과: 성공 4건."
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 4379,
+    "validation": {
+     "evidence_total": 14,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-11-26T04:38:21+00:00",
+    "end": "2026-11-26T04:38:21+00:00",
+    "severity": "high",
+    "score": 379,
+    "stages": [
+     "initial-access",
+     "credential-access"
+    ],
+    "src_ips": [
+     "198.51.100.66"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 13,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "WEBLOG_AUTH_BRUTE",
+      "technique": "T1110",
+      "stage": "credential-access",
+      "title": "웹 로그인 무차별 대입",
+      "severity": "medium",
+      "detail": "10분 안에 로그인 POST 13건",
+      "key": "198.51.100.66",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 13,
+      "evidence": [
+       "board_access.log:18",
+       "board_access.log:19",
+       "board_access.log:20",
+       "board_access.log:21",
+       "board_access.log:22",
+       "board_access.log:23",
+       "board_access.log:24",
+       "board_access.log:25",
+       "board_access.log:26",
+       "board_access.log:27",
+       "board_access.log:28",
+       "board_access.log:29",
+       "board_access.log:30"
+      ]
+     },
+     {
+      "rule": "WEBLOG_AUTH_SUCCESS_AFTER_FAIL",
+      "technique": "T1078",
+      "stage": "initial-access",
+      "title": "로그인 연속 실패 뒤 성공",
+      "severity": "high",
+      "detail": "로그인 실패 12건 뒤 성공 추정(응답 302)",
+      "key": "198.51.100.66",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 13,
+      "evidence": [
+       "board_access.log:18",
+       "board_access.log:19",
+       "board_access.log:20",
+       "board_access.log:21",
+       "board_access.log:22",
+       "board_access.log:23",
+       "board_access.log:24",
+       "board_access.log:25",
+       "board_access.log:26",
+       "board_access.log:27",
+       "board_access.log:28",
+       "board_access.log:29",
+       "board_access.log:30"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "board_access.log:18",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:19",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:20",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:21",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:22",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:23",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:24",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:25",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:26",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:27",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:28",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:29",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 401
+     },
+     {
+      "ref": "board_access.log:30",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "POST /bbs/login.php",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.66",
+      "rules": [
+       "WEBLOG_AUTH_BRUTE",
+       "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 302
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-002",
+    "repeats": 1,
+    "first_seen": "2026-11-26T04:38:21+00:00",
+    "last_seen": "2026-11-26T04:38:21+00:00",
+    "repeat_ids": []
+   },
+   "report": {
+    "verdict": "likely_breached",
+    "summary": "11-26 04:38 UTC(한국 13:38) 198.51.100.66의 활동 13건이 하나로 이어진다. 흐름: 초기 침투 → 자격증명 탈취. 공격이 성공했을 가능성이 큰 근거가 보인다.",
+    "severity": "high",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "credential-access",
+      "technique": "T1110",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "웹 로그인 무차별 대입 — 10분 안에 로그인 POST 13건 (대상: 198.51.100.66)",
+      "evidence": [
+       "board_access.log:18",
+       "board_access.log:19",
+       "board_access.log:20",
+       "board_access.log:21",
+       "board_access.log:22",
+       "board_access.log:23",
+       "board_access.log:24",
+       "board_access.log:25"
+      ]
+     },
+     {
+      "stage": "initial-access",
+      "technique": "T1078",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "로그인 연속 실패 뒤 성공 — 로그인 실패 12건 뒤 성공 추정(응답 302) (대상: 198.51.100.66)",
+      "evidence": [
+       "board_access.log:18",
+       "board_access.log:19",
+       "board_access.log:20",
+       "board_access.log:21",
+       "board_access.log:22",
+       "board_access.log:23",
+       "board_access.log:24",
+       "board_access.log:25"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "id": "WEB_FIX_ACCOUNT",
+      "action": "탈취 의심 계정 잠그고 비밀번호·키 교체: 로그에 계정 이름 없음",
+      "target": "account",
+      "priority": "now",
+      "resource": "로그에 계정 이름 없음",
+      "detail": "로그인에 성공한 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다(공격 출발지 198.51.100.66). 가능하면 다중 인증을 켠다.",
+      "evidence": [
+       "board_access.log:18",
+       "board_access.log:19",
+       "board_access.log:20",
+       "board_access.log:21",
+       "board_access.log:22",
+       "board_access.log:23"
+      ]
+     },
+     {
+      "id": "WEB_FIX_RATE_LIMIT",
+      "action": "비정상 출발지 차단·요청 제한: 198.51.100.66",
+      "target": "network",
+      "priority": "soon",
+      "resource": "198.51.100.66",
+      "detail": "공격 출발지 198.51.100.66를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다.",
+      "evidence": []
+     },
+     {
+      "id": "WEB_FIX_LOG_RETENTION",
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "resource": "웹·인증 로그",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "성공했을 가능성이 큰 근거가 있지만 웹 로그는 요청 본문과 응답 내용을 남기지 않아 확정하지 못했다. 응답 크기·서버 오류 로그와 DB 기록을 함께 확인한다."
+    ],
+    "attack_verdict": "attack",
+    "attack_verdict_reason": "웹 로그인 무차별 대입, 로그인 연속 실패 뒤 성공. 결과: 성공 1건, 실패·차단 12건."
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 7953,
+    "validation": {
+     "evidence_total": 22,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-11-26T04:38:21+00:00",
+    "end": "2026-11-26T04:38:21+00:00",
+    "severity": "high",
+    "score": 349,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "198.51.100.63"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 4,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "WEBLOG_SQLI",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "웹 요청에 SQL 인젝션 패턴",
+      "severity": "high",
+      "detail": "4건(성공 4, 실패·거부 0) · 성공 근거 없음: 2xx 4건 모두 평소 응답(48바이트)과 크기가 비슷함(같은 페이지로 보임)",
+      "key": "198.51.100.63",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 4,
+      "evidence": [
+       "board_access.log:9",
+       "board_access.log:10",
+       "board_access.log:11",
+       "board_access.log:12"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "board_access.log:9",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /bbs/list.php?id=0+UNION+SELECT+uid%2cpw+FROM+members",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.63",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     },
+     {
+      "ref": "board_access.log:10",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /bbs/list.php?id=1+AND+1%3d1",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.63",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     },
+     {
+      "ref": "board_access.log:11",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /bbs/list.php?id=1%3b+DROP+TABLE+x--",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.63",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     },
+     {
+      "ref": "board_access.log:12",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /bbs/list.php?id=0+UNION+SELECT+uid%2cpw+FROM+members--+-",
+      "outcome": "success",
+      "status": "success",
+      "disposition": "none",
+      "src_ip": "198.51.100.63",
+      "rules": [
+       "WEBLOG_SQLI"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 200
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-003",
+    "repeats": 1,
+    "first_seen": "2026-11-26T04:38:21+00:00",
+    "last_seen": "2026-11-26T04:38:21+00:00",
+    "repeat_ids": []
+   },
+   "report": {
+    "verdict": "suspicious",
+    "summary": "11-26 04:38 UTC(한국 13:38) 198.51.100.63의 활동 4건이 하나로 이어진다. 흐름: 초기 침투. 공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "웹 요청에 SQL 인젝션 패턴 — 4건(성공 4, 실패·거부 0) · 성공 근거 없음: 2xx 4건 모두 평소 응답(48바이트)과 크기가 비슷함(같은 페이지로 보임) (대상: 198.51.100.63)",
+      "evidence": [
+       "board_access.log:9",
+       "board_access.log:10",
+       "board_access.log:11",
+       "board_access.log:12"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "id": "WEB_FIX_SQLI",
+      "action": "SQL 인젝션 취약 코드 수정: /bbs/list.php(id)",
+      "target": "app",
+      "priority": "soon",
+      "resource": "/bbs/list.php(id)",
+      "detail": "/bbs/list.php(id)의 파라미터를 매개변수화된 질의(prepared statement)로 바꾸고, DB 계정 권한을 최소화한다.",
+      "evidence": [
+       "board_access.log:9",
+       "board_access.log:10",
+       "board_access.log:11",
+       "board_access.log:12"
+      ]
+     },
+     {
+      "id": "WEB_FIX_LOG_RETENTION",
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "resource": "웹·인증 로그",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 공격이 성공했는지는 사람이 확인해야 한다. 웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다."
+    ],
+    "attack_verdict": "attack",
+    "attack_verdict_reason": "웹 요청에 SQL 인젝션 패턴. 결과: 통과 4건. 연결 허용·요청 통과는 있지만 공격이 성공한 근거는 아직 없습니다."
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 2752,
+    "validation": {
+     "evidence_total": 8,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  },
+  {
+   "incident": {
+    "start": "2026-11-26T04:38:21+00:00",
+    "end": "2026-11-26T04:38:21+00:00",
+    "severity": "high",
+    "score": 296,
+    "stages": [
+     "initial-access"
+    ],
+    "src_ips": [
+     "198.51.100.64"
+    ],
+    "instances": [],
+    "actors": [],
+    "sources": [
+     "access"
+    ],
+    "n_events": 1,
+    "n_known": 0,
+    "known_labels": [],
+    "findings": [
+     {
+      "rule": "WEBLOG_TRAVERSAL",
+      "technique": "T1190",
+      "stage": "initial-access",
+      "title": "경로 조작·파일 열람(../, 민감 파일) 시도",
+      "severity": "high",
+      "detail": "1건(성공 0, 실패·거부 1)",
+      "key": "198.51.100.64",
+      "first": "2026-11-26T04:38:21+00:00",
+      "last": "2026-11-26T04:38:21+00:00",
+      "n_events": 1,
+      "evidence": [
+       "board_access.log:13"
+      ]
+     }
+    ],
+    "events": [
+     {
+      "ref": "board_access.log:13",
+      "ts": "2026-11-26T04:38:21+00:00",
+      "source": "access",
+      "action": "GET /bbs/download.php?file=..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd",
+      "outcome": "client-error",
+      "status": "failure",
+      "disposition": "none",
+      "src_ip": "198.51.100.64",
+      "rules": [
+       "WEBLOG_TRAVERSAL"
+      ],
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      "http_status": 404
+     }
+    ],
+    "omitted_events": 0,
+    "context": {
+     "n_events": 0,
+     "top_actions": [],
+     "sources": {}
+    },
+    "id": "INC-004",
+    "repeats": 1,
+    "first_seen": "2026-11-26T04:38:21+00:00",
+    "last_seen": "2026-11-26T04:38:21+00:00",
+    "repeat_ids": []
+   },
+   "report": {
+    "verdict": "suspicious",
+    "summary": "11-26 04:38 UTC(한국 13:38) 198.51.100.64의 활동 1건이 하나로 이어진다. 흐름: 초기 침투. 공격 시도는 보이지만 성공 근거는 로그에서 확인되지 않는다.",
+    "severity": "medium",
+    "confidence": "medium",
+    "attack_flow": [
+     {
+      "stage": "initial-access",
+      "technique": "T1190",
+      "time": "2026-11-26T04:38:21+00:00",
+      "what": "경로 조작·파일 열람(../, 민감 파일) 시도 — 1건(성공 0, 실패·거부 1) (대상: 198.51.100.64)",
+      "evidence": [
+       "board_access.log:13"
+      ]
+     }
+    ],
+    "root_causes": [],
+    "remediation": [
+     {
+      "id": "WEB_FIX_INPUT",
+      "action": "입력값 검증·경로 제한 적용: /bbs/download.php(file)",
+      "target": "app",
+      "priority": "soon",
+      "resource": "/bbs/download.php(file)",
+      "detail": "/bbs/download.php(file)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다.",
+      "evidence": [
+       "board_access.log:13"
+      ]
+     },
+     {
+      "id": "WEB_FIX_LOG_RETENTION",
+      "action": "로그 보존 기간 늘리기",
+      "target": "server",
+      "priority": "later",
+      "resource": "웹·인증 로그",
+      "detail": "웹·인증 로그 보관 기간을 늘려(기본 14일은 너무 짧다) 다음 사고 때 더 멀리 되짚을 수 있게 한다.",
+      "evidence": []
+     }
+    ],
+    "unknowns": [
+     "규칙 기반 분석이라 공격이 성공했는지는 사람이 확인해야 한다. 웹 로그는 보통 POST 본문을 남기지 않아 공격 성공을 로그만으로 단정하기 어렵다."
+    ],
+    "attack_verdict": "attack",
+    "attack_verdict_reason": "경로 조작·파일 열람(../, 민감 파일) 시도. 보이는 시도 1건은 모두 막히거나 실패했습니다. 공격 시도이지만 급하지 않을 수 있습니다."
+   },
+   "meta": {
+    "mode": "rules",
+    "model": null,
+    "payload_chars": 1330,
+    "validation": {
+     "evidence_total": 2,
+     "evidence_invalid": 0,
+     "steps_without_evidence": 0,
+     "passed": true
+    }
+   }
+  }
+ ],
+ "timing": {
+  "detect_correlate_s": 0.01,
+  "total_s": 0.01
+ },
+ "simple": {
+  "verdict": "likely_breached",
+  "verdict_ko": "침해 가능성 높음",
+  "headline": "서버가 뚫렸을 가능성이 큽니다. 아래 '지금 할 일'부터 처리하세요.",
+  "period": "2026-11-26 04:38 ~ 04:38 (UTC)",
+  "n_incidents": 4,
+  "now": [
+   {
+    "action": "탈취 의심 계정 잠그고 비밀번호·키 교체: 로그에 계정 이름 없음",
+    "priority": "지금",
+    "detail": "로그인에 성공한 계정의 세션을 끊고 비밀번호와 SSH 키를 바꾼다(공격 출발지 198.51.100.66). 가능하면 다중 인증을 켠다."
+   },
+   {
+    "action": "입력값 검증·경로 제한 적용: /admin/tools.php(host)",
+    "priority": "곧",
+    "detail": "/admin/tools.php(host)에서 파일 경로·외부 URL·명령에 사용자 입력이 그대로 들어가지 않게 막고, 화이트리스트로 검증한다."
+   },
+   {
+    "action": "비정상 출발지 차단·요청 제한: 198.51.100.66",
+    "priority": "곧",
+    "detail": "공격 출발지 198.51.100.66를 방화벽/fail2ban으로 제한하고, 로그인·관리자 경로에 접근 제어와 시도 제한을 둔다."
+   }
+  ],
+  "note": "자동 판정입니다. 중요한 결정 전에는 원본 로그와 상세 보고서를 함께 확인하세요.",
+  "injection": false
+ },
+ "expert": {
+  "timeline": [
+   {
+    "incident": "INC-001",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1190",
+    "rule": "WEBLOG_TRAVERSAL",
+    "what": "1건(성공 1, 실패·거부 0)",
+    "key": "198.51.100.65",
+    "evidence": [
+     "board_access.log:15"
+    ]
+   },
+   {
+    "incident": "INC-001",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1190",
+    "rule": "WEBLOG_CMD_INJECTION",
+    "what": "4건(성공 4, 실패·거부 0)",
+    "key": "198.51.100.65",
+    "evidence": [
+     "board_access.log:14",
+     "board_access.log:15",
+     "board_access.log:16",
+     "board_access.log:17"
+    ]
+   },
+   {
+    "incident": "INC-001",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1078",
+    "rule": "WEBLOG_ADMIN_FORGED",
+    "what": "이 IP의 로그인 기록 없이 관리자 페이지 4건 열람",
+    "key": "198.51.100.65",
+    "evidence": [
+     "board_access.log:14",
+     "board_access.log:15",
+     "board_access.log:16",
+     "board_access.log:17"
+    ]
+   },
+   {
+    "incident": "INC-001",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1078",
+    "rule": "WEBLOG_ADMIN_ACCESS",
+    "what": "4건(성공 4, 실패·거부 0)",
+    "key": "198.51.100.65",
+    "evidence": [
+     "board_access.log:14",
+     "board_access.log:15",
+     "board_access.log:16",
+     "board_access.log:17"
+    ]
+   },
+   {
+    "incident": "INC-002",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "credential-access",
+    "technique": "T1110",
+    "rule": "WEBLOG_AUTH_BRUTE",
+    "what": "10분 안에 로그인 POST 13건",
+    "key": "198.51.100.66",
+    "evidence": [
+     "board_access.log:18",
+     "board_access.log:19",
+     "board_access.log:20",
+     "board_access.log:21",
+     "board_access.log:22",
+     "board_access.log:23"
+    ]
+   },
+   {
+    "incident": "INC-002",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1078",
+    "rule": "WEBLOG_AUTH_SUCCESS_AFTER_FAIL",
+    "what": "로그인 실패 12건 뒤 성공 추정(응답 302)",
+    "key": "198.51.100.66",
+    "evidence": [
+     "board_access.log:18",
+     "board_access.log:19",
+     "board_access.log:20",
+     "board_access.log:21",
+     "board_access.log:22",
+     "board_access.log:23"
+    ]
+   },
+   {
+    "incident": "INC-003",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1190",
+    "rule": "WEBLOG_SQLI",
+    "what": "4건(성공 4, 실패·거부 0) · 성공 근거 없음: 2xx 4건 모두 평소 응답(48바이트)과 크기가 비슷함(같은 페이지로 보임)",
+    "key": "198.51.100.63",
+    "evidence": [
+     "board_access.log:9",
+     "board_access.log:10",
+     "board_access.log:11",
+     "board_access.log:12"
+    ]
+   },
+   {
+    "incident": "INC-004",
+    "time": "2026-11-26T04:38:21+00:00",
+    "stage": "initial-access",
+    "technique": "T1190",
+    "rule": "WEBLOG_TRAVERSAL",
+    "what": "1건(성공 0, 실패·거부 1)",
+    "key": "198.51.100.64",
+    "evidence": [
+     "board_access.log:13"
+    ]
+   }
+  ],
+  "iocs": {
+   "ips": [
+    "198.51.100.63",
+    "198.51.100.64",
+    "198.51.100.65",
+    "198.51.100.66"
+   ],
+   "user_agents": [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"
+   ],
+   "paths": []
+  },
+  "mitre": [
+   {
+    "technique": "T1078",
+    "title": "로그인 연속 실패 뒤 성공",
+    "stage": "initial-access"
+   },
+   {
+    "technique": "T1110",
+    "title": "웹 로그인 무차별 대입",
+    "stage": "credential-access"
+   },
+   {
+    "technique": "T1190",
+    "title": "경로 조작·파일 열람(../, 민감 파일) 시도",
+    "stage": "initial-access"
+   }
+  ],
+  "block_rules": {
+   "nginx": [
+    "deny 198.51.100.63;",
+    "deny 198.51.100.64;",
+    "deny 198.51.100.65;",
+    "deny 198.51.100.66;"
+   ],
+   "iptables": [
+    "iptables -I INPUT -s 198.51.100.63 -j DROP",
+    "iptables -I INPUT -s 198.51.100.64 -j DROP",
+    "iptables -I INPUT -s 198.51.100.65 -j DROP",
+    "iptables -I INPUT -s 198.51.100.66 -j DROP"
+   ],
+   "ufw": [
+    "ufw deny from 198.51.100.63",
+    "ufw deny from 198.51.100.64",
+    "ufw deny from 198.51.100.65",
+    "ufw deny from 198.51.100.66"
+   ]
+  },
+  "block_rules_note": "자동 적용하지 않습니다. 검토 후 직접 넣고, 관리자 IP가 막히지 않는지 먼저 확인하세요.",
+  "rule_titles": {
+   "WEBLOG_TRAVERSAL": "경로 조작·파일 열람(../, 민감 파일) 시도",
+   "WEBLOG_CMD_INJECTION": "운영체제 명령 삽입 시도",
+   "WEBLOG_ADMIN_FORGED": "로그인 없이 관리자 영역 접근(쿠키 위조 의심)",
+   "WEBLOG_ADMIN_ACCESS": "관리자 영역 접근 성공(기본 계정 로그인 의심)",
+   "WEBLOG_AUTH_BRUTE": "웹 로그인 무차별 대입",
+   "WEBLOG_AUTH_SUCCESS_AFTER_FAIL": "로그인 연속 실패 뒤 성공",
+   "WEBLOG_SQLI": "웹 요청에 SQL 인젝션 패턴"
+  }
+ }
+}

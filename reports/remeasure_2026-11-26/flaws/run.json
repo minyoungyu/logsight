@@ -1,0 +1,8 @@
+{
+ "returncode": 0,
+ "elapsed_s": 123.2,
+ "max_rss_mb": 2669,
+ "cpu_count": 4,
+ "python": "3.13.18",
+ "stderr_tail": ""
+}

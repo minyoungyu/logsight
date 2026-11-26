@@ -1,0 +1,25 @@
+{
+ "_설명": "문서에 쓴 측정 숫자와 그 근거 파일. scripts/evidence_check.py가 (1) 파일이 있는지 (2) 파일에서 다시 계산한 값이 expect와 같은지 (3) 문서에 quote 문구가 그대로 있는지 본다. 새 측정 숫자를 문서에 쓰면 여기에 한 줄 더한다.",
+ "path_allowlist": {
+  "reports/combined/findings.ocsf.json": "README의 명령 실행 결과 예시 경로",
+  "reports/public/csic2010.json": "CSIC는 사이트 접속 불가로 미측정. 명령 예시",
+  "reports/stratus/report.json": "Stratus 실행 뒤 만들어지는 경로(명령 예시)"
+ },
+ "claims": [
+  {"id": "lab-recall", "doc": "docs/재측정_2026-11-26.md", "quote": "34/35 = 97%", "file": "reports/remeasure_2026-11-26/lab/eval.json", "values": {"tp": 34, "fn": 1, "benign_fp": 0}},
+  {"id": "flaws-events", "doc": "docs/재측정_2026-11-26.md", "quote": "의심 527,584 · 탐지 1,678 · 사건 1,897 → 1,519", "file": "reports/remeasure_2026-11-26/flaws/report.json", "values": {"n_events": 1939207, "n_flagged": 527584, "n_findings": 1678, "n_incidents": 1897, "n_groups": 1519}},
+  {"id": "flaws-time", "doc": "docs/재측정_2026-11-26.md", "quote": "2분 3초(123.2초), 최대 메모리 2,669MB", "file": "reports/remeasure_2026-11-26/flaws/run.json", "values": {"elapsed_s": 123.2, "max_rss_mb": 2669, "returncode": 0}},
+  {"id": "botsv3-events", "doc": "docs/재측정_2026-11-26.md", "quote": "195,891건, 사건 53", "file": "reports/remeasure_2026-11-26/botsv3/report_no_list.json", "values": {"n_events": 195891}, "count": {"path": "rule_triage.incidents", "expect": 53}},
+  {"id": "botsv3-verdicts-nolist", "doc": "docs/재측정_2026-11-26.md", "quote": "공격 12·위험 설정 41", "file": "reports/remeasure_2026-11-26/botsv3/report_no_list.json", "verdicts": {"path": "rule_triage.incidents", "expect": {"attack": 12, "risky_not_attack": 41}}},
+  {"id": "botsv3-verdicts-list", "doc": "docs/재측정_2026-11-26.md", "quote": "공격 8·위험 설정 43·정상 2", "file": "reports/remeasure_2026-11-26/botsv3/report_staff_list.json", "verdicts": {"path": "rule_triage.incidents", "expect": {"attack": 8, "risky_not_attack": 43, "benign_activity": 2}}},
+  {"id": "ctf-cost", "doc": "docs/재측정_2026-11-26.md", "quote": "$13.38, 부가세 포함 $14.72, 하루 $10.04", "file": "reports/remeasure_2026-11-26/ctf/cost.json", "values": {"subtotal_usd": 13.38, "with_vat_usd": 14.72, "per_day_usd_before_vat": 10.04}},
+  {"id": "injection-office-admin", "doc": "docs/프롬프트주입_시연.md", "quote": "15번 중 7번 '정상 활동', 8번 '판단 불가'", "file": "reports/remeasure_2026-11-26/injection_office_admin.json", "values": {"counts.logfinder.benign_activity": 7, "counts.logfinder.unclear": 8}},
+  {"id": "rm-2026-11-21", "doc": "docs/테스트_체크리스트.md", "quote": "11/21 재측정 0.013%(13/103,054", "file": "reports/public/ait_russellmitchell_2026-11-21.json", "host_sum": {"fp": 13, "fp+tn": 103054}},
+  {"id": "fox-before-fix", "doc": "docs/공개데이터셋_독립측정.md", "quote": "0.136%(223/163,782", "file": "reports/public/ait_fox_before_fix.json", "host_sum": {"fp": 223, "fp+tn": 163782}},
+  {"id": "fox-after-fix", "doc": "docs/공개데이터셋_독립측정.md", "quote": "**0.029% (47)**", "file": "reports/public/ait_fox_after_fix.json", "host_sum": {"fp": 47, "fp+tn": 163782}},
+  {"id": "fp-baseline", "doc": "docs/개선방법_검증_2026-11-26.md", "quote": "121줄 = 0.0136%", "file": "reports/public/fp_baseline.json", "sum_fields": {"fields": ["eclog_1day.fp_lines", "ait_fox.fp_lines", "ait_russellmitchell.fp_lines", "ait_wheeler.fp_lines"], "expect": 121}},
+  {"id": "splunk-new-before", "doc": "docs/근거_점검_2026-11-25.md", "quote": "기계 기준 `target_rules`는 9/15", "file": "reports/public/splunk_attack_data_new_before.json", "nonempty": {"path": "rows", "field": "target_rules", "expect": 9, "total": 15}},
+  {"id": "gongbang-ai-run1", "doc": "docs/공방전_AI재검토_측정.md", "quote": "근거 56개, 7/7", "file": "reports/ctf/gongbang_ai.json", "values": {"ai_triage.validation.evidence_total": 56, "ai_triage.validation.evidence_invalid": 0, "ai_triage.verdict_accuracy": "7/7"}},
+  {"id": "rule-count", "doc": "README.md", "quote": "62", "rule_count": 62}
+ ]
+}

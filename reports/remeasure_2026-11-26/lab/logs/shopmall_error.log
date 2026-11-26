@@ -1,0 +1,140 @@
+2026/11/26 04:38:20 [info] 2431#2431: *1 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:20 [info] 2431#2431: *3 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *5 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *6 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *8 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *10 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *12 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *14 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *15 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *17 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *19 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *21 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *23 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *24 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *26 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *28 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *30 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *32 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *34 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *36 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *37 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *39 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *41 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *59 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /wp-login.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *59 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *61 "/home/user/logsight/lab/sites/shopmall/wp-admin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /wp-admin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *61 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *62 "/home/user/logsight/lab/sites/shopmall/administrator/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /administrator/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *62 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *63 "/home/user/logsight/lab/sites/shopmall/phpmyadmin/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /phpmyadmin/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *63 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *64 open() "/home/user/logsight/lab/sites/shopmall/.git/HEAD" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /.git/HEAD HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *64 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *65 open() "/home/user/logsight/lab/sites/shopmall/backup.zip" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /backup.zip HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *65 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *66 "/home/user/logsight/lab/sites/shopmall/old/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /old/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *66 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *67 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /test.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *67 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *69 open() "/home/user/logsight/lab/sites/shopmall/config.bak" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /config.bak HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *69 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *70 open() "/home/user/logsight/lab/sites/shopmall/manager/html" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /manager/html HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *70 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *71 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /xmlrpc.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *71 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *73 "/home/user/logsight/lab/sites/shopmall/vendor/phpunit/index.php" is not found (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /vendor/phpunit/ HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *73 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *74 open() "/home/user/logsight/lab/sites/shopmall/server-status" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /server-status HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *74 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *75 open() "/home/user/logsight/lab/sites/shopmall/.svn/entries" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /.svn/entries HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *75 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *76 open() "/home/user/logsight/lab/sites/shopmall/cgi-bin/test.cgi" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /cgi-bin/test.cgi HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *76 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *77 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /shell.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *77 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *79 open() "/home/user/logsight/lab/sites/shopmall/db.sql" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /db.sql HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *79 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *80 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.50, server: , request: "GET /info.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *80 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *82 open() "/home/user/logsight/lab/sites/shopmall/api/v1/users" failed (2: No such file or directory), client: 198.51.100.50, server: , request: "GET /api/v1/users HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *82 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *83 open() "/home/user/logsight/lab/sites/shopmall/.env" failed (2: No such file or directory), client: 198.51.100.25, server: , request: "GET /.env HTTP/1.1", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *83 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *84 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.25, server: , request: "GET /config.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *84 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [error] 2431#2431: *86 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 198.51.100.25, server: , request: "GET /wp-config.php HTTP/1.1", upstream: "fastcgi://unix:/home/user/logsight/lab/runtime/php.sock:", host: "127.0.0.1:8081"
+2026/11/26 04:38:21 [info] 2431#2431: *86 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *88 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *89 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *91 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *93 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *95 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *105 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *107 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *109 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *111 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *113 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *115 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *117 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *121 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *123 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *133 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *135 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *137 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *139 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *141 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *143 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *145 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *147 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *149 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *151 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *153 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *155 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *157 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *159 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *161 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *163 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *191 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *193 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *195 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *197 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:21 [info] 2431#2431: *199 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *201 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *203 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *205 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *207 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *211 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *213 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *215 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *217 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *219 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *221 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *223 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *225 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *227 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *229 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *231 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *233 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *235 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *237 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *239 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *241 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *243 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *245 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *247 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *249 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *251 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *253 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *255 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *257 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *259 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *261 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *263 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *265 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *267 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *268 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *269 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *270 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *272 client 127.0.0.1 closed keepalive connection
+2026/11/26 04:38:22 [info] 2431#2431: *274 client 127.0.0.1 closed keepalive connection

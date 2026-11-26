@@ -1,0 +1,17 @@
+{
+ "hours": 32,
+ "items_usd": {
+  "EC2 t3.small": 9.293,
+  "EBS gp3": 0.757,
+  "ALB 시간": 0.806,
+  "ALB LCU(가정)": 0.256,
+  "공인 IPv4(ALB AZ별 + EC2)": 0.48,
+  "VPC 인터페이스 엔드포인트": 1.248,
+  "WAF ACL·규칙": 0.482,
+  "WAF 요청(가정)": 0.06
+ },
+ "subtotal_usd": 13.38,
+ "with_vat_usd": 14.72,
+ "per_day_usd_before_vat": 10.04,
+ "not_counted": "S3 저장·요청, CloudTrail 두 번째 사본 없음(첫 추적 무료), Flow Logs→S3 전송량, 데이터 전송, CloudShell"
+}
