@@ -22,3 +22,9 @@ f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/repo
 f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9116
 f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9227
 f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:9339
+# 같은 커밋의 EC2 인스턴스 ID(i-…, 비밀값 아님). CI의 gitleaks 버전이 .gitleaks.toml의 인스턴스 ID 허용 규칙을 다르게 볼 수 있어 따로 적는다.
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:19992
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:21644
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:22539
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:23517
+f075477062072d398b7b9c9ef5e297e6ac8aa27e:reports/remeasure_2026-11-26/flaws/report.json:generic-api-key:24941
