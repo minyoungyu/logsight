@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "docs" / "근거_목록.json"
-PATH_RE = re.compile(r"(reports/[A-Za-z0-9_./\-가-힣]+?\.(?:json|md|html|txt|csv))")
+PATH_RE = re.compile(r"(reports/[A-Za-z0-9_./\-가-힣]+?\.(?:jsonl(?:\.gz)?|json|md|html|txt|csv))(?![A-Za-z])")
 
 
 def _get(obj, dotted: str):

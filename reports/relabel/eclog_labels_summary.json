@@ -1,0 +1,35 @@
+{
+ "input": "access.log",
+ "input_sha256": "cd3fe4c26038ceb266d53abe9077c7f1d9b52cd23aaeaab4776b7d02c56205a5",
+ "criteria": "reports/public/holdout_plan_2026-11-25.json S7.review_rule A1~A3",
+ "a3_paths_seen": {
+  "/wp-login.php": {
+   "301": 2,
+   "302": 2
+  },
+  "/admin/config.php": {
+   "404": 2
+  }
+ },
+ "a3_paths_unused_here": [
+  "/admin/config.php"
+ ],
+ "n_lines": 350683,
+ "by_class": {
+  "unlabeled": 350659,
+  "uncertain": 11,
+  "unparsed": 4,
+  "attack": 9
+ },
+ "file_note": "jsonl에는 unlabeled가 아닌 줄만 있다",
+ "by_rule": {
+  "U.a3_path_not_always_404": 4,
+  "U.non_http_bytes": 7,
+  "A2": 7,
+  "A3_extra": 2
+ },
+ "by_label": {
+  "scanner_ua": 7,
+  "unused_software_path": 2
+ }
+}

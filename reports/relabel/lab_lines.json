@@ -1,0 +1,294 @@
+{
+ "lines": {
+  "uncertain": 2,
+  "normal": 30,
+  "attack": 117
+ },
+ "flagged_by_class": {
+  "attack": 87
+ },
+ "scenarios_any_rule": "22/25",
+ "attack_lines_flagged": "87/117",
+ "normal_lines_flagged": "0/30",
+ "uncertain": {
+  "shopmall_access.log:1": {
+   "class": "uncertain",
+   "rule": "lab.ip_not_in_script",
+   "ip": "127.0.0.1"
+  },
+  "shopmall_access.log:84": {
+   "class": "uncertain",
+   "rule": "lab.ip_not_in_script",
+   "ip": "127.0.0.1"
+  }
+ },
+ "scenarios": [
+  {
+   "scenario": "backup_leak",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_BACKUP_LEAK"
+   ]
+  },
+  {
+   "scenario": "brute_login",
+   "site": "board",
+   "lines": 13,
+   "flagged_lines": 13,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_AUTH_BRUTE",
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+   ]
+  },
+  {
+   "scenario": "brute_login",
+   "site": "shopmall",
+   "lines": 16,
+   "flagged_lines": 16,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_AUTH_BRUTE",
+    "WEBLOG_AUTH_SUCCESS_AFTER_FAIL"
+   ]
+  },
+  {
+   "scenario": "cmd_injection",
+   "site": "board",
+   "lines": 4,
+   "flagged_lines": 4,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_ADMIN_ACCESS",
+    "WEBLOG_ADMIN_FORGED",
+    "WEBLOG_CMD_INJECTION",
+    "WEBLOG_TRAVERSAL"
+   ]
+  },
+  {
+   "scenario": "csrf_admin_delete",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_CSRF_SUSPECT"
+   ]
+  },
+  {
+   "scenario": "default_admin_takeover",
+   "site": "shopmall",
+   "lines": 3,
+   "flagged_lines": 2,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_ADMIN_ACCESS",
+    "WEBLOG_LARGE_EXFIL"
+   ]
+  },
+  {
+   "scenario": "dir_listing",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_DIR_LISTING"
+   ]
+  },
+  {
+   "scenario": "exploit_probe",
+   "site": "shopmall",
+   "lines": 2,
+   "flagged_lines": 2,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_EXPLOIT_PROBE"
+   ]
+  },
+  {
+   "scenario": "forged_admin",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_ADMIN_ACCESS",
+    "WEBLOG_ADMIN_FORGED",
+    "WEBLOG_LARGE_EXFIL"
+   ]
+  },
+  {
+   "scenario": "git_exposure",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_BACKUP_LEAK",
+    "WEBLOG_SENSITIVE_FILE"
+   ]
+  },
+  {
+   "scenario": "idor_orders",
+   "site": "shopmall",
+   "lines": 25,
+   "flagged_lines": 0,
+   "any_rule": false,
+   "rules": []
+  },
+  {
+   "scenario": "log_poisoning_rce",
+   "site": "shopmall",
+   "lines": 2,
+   "flagged_lines": 2,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_CODE_IN_HEADER",
+    "WEBLOG_TRAVERSAL",
+    "WEBLOG_WEBSHELL_ACCESS"
+   ]
+  },
+  {
+   "scenario": "open_redirect",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_OPEN_REDIRECT",
+    "WEBLOG_RFI"
+   ]
+  },
+  {
+   "scenario": "scanner_recon",
+   "site": "shopmall",
+   "lines": 19,
+   "flagged_lines": 19,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_ENUM_404",
+    "WEBLOG_SCANNER",
+    "WEBLOG_SENSITIVE_FILE"
+   ]
+  },
+  {
+   "scenario": "sensitive_files",
+   "site": "shopmall",
+   "lines": 4,
+   "flagged_lines": 4,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_BACKUP_LEAK",
+    "WEBLOG_SENSITIVE_FILE"
+   ]
+  },
+  {
+   "scenario": "sqli_bulk_dump",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_LARGE_EXFIL",
+    "WEBLOG_SQLI"
+   ]
+  },
+  {
+   "scenario": "sqli_union",
+   "site": "board",
+   "lines": 4,
+   "flagged_lines": 4,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_SQLI"
+   ]
+  },
+  {
+   "scenario": "sqli_union",
+   "site": "shopmall",
+   "lines": 4,
+   "flagged_lines": 4,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_EXPLOIT_5XX",
+    "WEBLOG_LARGE_EXFIL",
+    "WEBLOG_SQLI"
+   ]
+  },
+  {
+   "scenario": "ssh_takeover",
+   "site": "shopmall",
+   "lines": 5,
+   "flagged_lines": 3,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_TRAVERSAL",
+    "WEBLOG_UPLOAD_EXEC",
+    "WEBLOG_WEBSHELL_ACCESS"
+   ]
+  },
+  {
+   "scenario": "ssrf_internal",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_RFI",
+    "WEBLOG_SSRF"
+   ]
+  },
+  {
+   "scenario": "stored_xss_review",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 0,
+   "any_rule": false,
+   "rules": []
+  },
+  {
+   "scenario": "traversal_lfi",
+   "site": "board",
+   "lines": 1,
+   "flagged_lines": 1,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_TRAVERSAL"
+   ]
+  },
+  {
+   "scenario": "traversal_lfi",
+   "site": "shopmall",
+   "lines": 3,
+   "flagged_lines": 3,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_TRAVERSAL"
+   ]
+  },
+  {
+   "scenario": "xss_reflected",
+   "site": "shopmall",
+   "lines": 2,
+   "flagged_lines": 2,
+   "any_rule": true,
+   "rules": [
+    "WEBLOG_EXPLOIT_5XX",
+    "WEBLOG_XSS"
+   ]
+  },
+  {
+   "scenario": "xxe_import",
+   "site": "shopmall",
+   "lines": 1,
+   "flagged_lines": 0,
+   "any_rule": false,
+   "rules": []
+  }
+ ],
+ "note": "access 로그만 본다. auth·error 로그만 남기는 시나리오(SSH 대입 등)는 줄 수가 0으로 나온다"
+}

@@ -1,0 +1,141 @@
+{
+ "generated": "2026-11-26T15:36:44Z",
+ "sources": {
+  "official_answers": [
+   "https://github.com/chan2git/splunk-bots/tree/main/botsv3 (Q216~Q219: 유출 키, Q204~Q206: PutBucketAcl·bstoll·frothlywebcode, Q201: IAM 사용자 목록)",
+   "https://github.com/crazyc4t/blog-v2/blob/HEAD/content/en/blog/botsv3.md"
+  ]
+ },
+ "inputs": [
+  {
+   "file": "access.log",
+   "sha256": "68e37bd82dae52e7f08a8730c7a98aa6388d2d102f4b0fa25eb54cd02ffb2bc8"
+  },
+  {
+   "file": "alb.log",
+   "sha256": "5925163e433b6f21551f24bd1caa0a53f6ece416dd122357e5f4741486de1a34"
+  },
+  {
+   "file": "auth.log",
+   "sha256": "7a7c62777c4acf06b2c3d39c2c95e5d4d71f5419baea0a837047da0cc16dc851"
+  },
+  {
+   "file": "cloudtrail.json",
+   "sha256": "90fbcd76cd76f142b24343d2a908a70ad7f997e8f30e384935d281c9726f83d0"
+  },
+  {
+   "file": "guardduty_findings.jsonl",
+   "sha256": "e34ad0a783355622c27f8b1092e8305e5922f324dd3de3586f3da2d14337d417"
+  },
+  {
+   "file": "vpcflow.log",
+   "sha256": "c353a23fd440c82b60b2935b5c83bbc617a8562d1b129b6a1550677e1cb7d65d"
+  }
+ ],
+ "aws_ip_ranges_createDate": "2026-11-26-12-47-05",
+ "attacker_keys": {
+  "AKIAJOGC********XUPA": {
+   "rule": "id.key.official_leaked",
+   "evidence": [
+    "cloudtrail.json:343",
+    "cloudtrail.json:344",
+    "cloudtrail.json:345",
+    "cloudtrail.json:346",
+    "cloudtrail.json:347"
+   ],
+   "n": 9
+  },
+  "ASIAZB6T********BJQA": {
+   "rule": "id.key.session_from_leaked",
+   "evidence": [
+    "cloudtrail.json:348"
+   ],
+   "n": 1
+  }
+ },
+ "attacker_ips": {
+  "35.153.154.221": {
+   "rule": "id.ip.used_attacker_key",
+   "where": "aws",
+   "evidence": [
+    "cloudtrail.json:343",
+    "cloudtrail.json:344",
+    "cloudtrail.json:345"
+   ],
+   "n": 6
+  },
+  "139.198.18.205": {
+   "rule": "id.ip.used_attacker_key",
+   "where": "outside",
+   "evidence": [
+    "cloudtrail.json:349",
+    "cloudtrail.json:350",
+    "cloudtrail.json:351"
+   ],
+   "n": 637
+  },
+  "209.107.196.112": {
+   "rule": "id.ip.used_attacker_key",
+   "where": "outside",
+   "evidence": [
+    "cloudtrail.json:357"
+   ],
+   "n": 1
+  },
+  "82.102.18.111": {
+   "rule": "id.ip.used_attacker_key",
+   "where": "outside",
+   "evidence": [
+    "cloudtrail.json:1041",
+    "cloudtrail.json:1042"
+   ],
+   "n": 2
+  }
+ },
+ "by_class": {
+  "normal": 7588,
+  "attack": 687,
+  "risky": 2,
+  "unlabeled": 187956
+ },
+ "by_class_and_file": {
+  "cloudtrail.json:normal": 5923,
+  "cloudtrail.json:attack": 646,
+  "cloudtrail.json:risky": 2,
+  "auth.log:unlabeled": 309,
+  "auth.log:attack": 41,
+  "access.log:normal": 1665,
+  "access.log:unlabeled": 2242,
+  "alb.log:unlabeled": 2051,
+  "vpcflow.log:unlabeled": 183354
+ },
+ "by_rule": {
+  "normal.role_inside_aws": 269,
+  "normal.aws_service": 897,
+  "normal.integration_user_inside_aws": 4071,
+  "origin.key": 646,
+  "id.key.official_leaked": 9,
+  "step.ct.error": 629,
+  "step.ct.iam_key_user": 3,
+  "id.key.session_from_leaked": 637,
+  "step.ct.run_instances": 576,
+  "normal.employee_user": 686,
+  "risky.official_public_bucket_acl": 1,
+  "risky.sg_ingress_0.0.0.0/0": 1,
+  "unlabeled.auth": 309,
+  "step.auth.failed_or_invalid_from_internet": 41,
+  "normal.elb_health_check": 1665,
+  "unlabeled.web": 4293,
+  "unlabeled.vpcflow": 183354
+ },
+ "by_label": {
+  "attacker": 646,
+  "credential_misuse": 646,
+  "denied_attempt": 629,
+  "persistence_attempt": 3,
+  "resource_hijack_attempt": 576,
+  "bucket_public": 1,
+  "sg_open_world": 1,
+  "internet_bruteforce": 41
+ }
+}
