@@ -1,0 +1,24 @@
+{"ref": "access.log:12504", "class": "uncertain", "rules": {"uncertain": ["U.a3_path_not_always_404"]}, "evidence_text": {"path": "/wp-login.php", "status": "301"}, "note": "A3 목록 경로지만 이 로그에서 늘 404·403은 아니어서 A3 조건을 채우지 못함"}
+{"ref": "access.log:12510", "class": "uncertain", "rules": {"uncertain": ["U.a3_path_not_always_404"]}, "evidence_text": {"path": "/wp-login.php", "status": "302"}, "note": "A3 목록 경로지만 이 로그에서 늘 404·403은 아니어서 A3 조건을 채우지 못함"}
+{"ref": "access.log:16262", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- \\x03\\x00\\x00/*\\xE0\\x00\\x00\\x00\\x00\\x00"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}
+{"ref": "access.log:16635", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- :\\x92T\\x05ib\\xE8\\x0Ek_V\\x08\\xDD=x\\xAB\\"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}
+{"ref": "access.log:17104", "class": "unparsed"}
+{"ref": "access.log:20397", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:20745", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:26284", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- \\x03\\x00\\x00/*\\xE0\\x00\\x00\\x00\\x00\\x00"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}
+{"ref": "access.log:29450", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:31058", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- \\x03\\x00\\x00/*\\xE0\\x00\\x00\\x00\\x00\\x00"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}
+{"ref": "access.log:50727", "class": "attack", "labels": ["unused_software_path"], "rules": {"unused_software_path": ["A3_extra"]}, "evidence_text": {"unused_software_path": "/admin/config.php"}}
+{"ref": "access.log:55126", "class": "attack", "labels": ["unused_software_path"], "rules": {"unused_software_path": ["A3_extra"]}, "evidence_text": {"unused_software_path": "/admin/config.php"}}
+{"ref": "access.log:141069", "class": "unparsed"}
+{"ref": "access.log:141118", "class": "unparsed"}
+{"ref": "access.log:179039", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:235076", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:235205", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:265184", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- \\x03\\x00\\x00/*\\xE0\\x00\\x00\\x00\\x00\\x00"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}
+{"ref": "access.log:272854", "class": "attack", "labels": ["scanner_ua"], "rules": {"scanner_ua": ["A2"]}, "evidence_text": {"scanner_ua": "zgrab"}}
+{"ref": "access.log:286240", "class": "uncertain", "rules": {"uncertain": ["U.a3_path_not_always_404"]}, "evidence_text": {"path": "/wp-login.php", "status": "301"}, "note": "A3 목록 경로지만 이 로그에서 늘 404·403은 아니어서 A3 조건을 채우지 못함"}
+{"ref": "access.log:286243", "class": "uncertain", "rules": {"uncertain": ["U.a3_path_not_always_404"]}, "evidence_text": {"path": "/wp-login.php", "status": "302"}, "note": "A3 목록 경로지만 이 로그에서 늘 404·403은 아니어서 A3 조건을 채우지 못함"}
+{"ref": "access.log:306583", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- \\x03\\x00\\x00/*\\xE0\\x00\\x00\\x00\\x00\\x00"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}
+{"ref": "access.log:312396", "class": "unparsed"}
+{"ref": "access.log:325193", "class": "uncertain", "rules": {"uncertain": ["U.non_http_bytes"]}, "evidence_text": {"request": "- \\x03\\x00\\x00/*\\xE0\\x00\\x00\\x00\\x00\\x00"}, "note": "웹 포트에 HTTP가 아닌 요청. 포트 탐색일 가능성이 높지만 A1~A3 밖이라 공격으로 세지 않는다"}

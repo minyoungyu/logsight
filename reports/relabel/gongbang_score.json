@@ -1,0 +1,280 @@
+{
+ "event_level": {
+  "n": {
+   "attack": 566,
+   "normal": 10079,
+   "uncertain": 132
+  },
+  "n_unique": {
+   "attack": 540,
+   "normal": 6518,
+   "uncertain": 121
+  },
+  "flagged": {
+   "attack": 116,
+   "normal": 807,
+   "uncertain": 77
+  },
+  "flagged_unique": {
+   "attack": 113,
+   "normal": 775,
+   "uncertain": 66
+  },
+  "recall": 0.205,
+  "precision": 0.126,
+  "fp_rate_normal": 0.08,
+  "bounds_if_uncertain_all_attack": {
+   "recall": 0.277,
+   "precision": 0.193
+  },
+  "bounds_if_uncertain_all_normal": {
+   "recall": 0.205,
+   "precision": 0.116,
+   "fp_rate_normal": 0.087
+  },
+  "normal_flagged_by_rule": {
+   "CT_DISCOVERY_BURST": 438,
+   "CT_INSTANCE_EXEC": 277,
+   "CT_INSTANCE_CRED_MULTI_IP": 13,
+   "CT_ROOT_USAGE": 76,
+   "CT_LOGGING_TAMPER": 3
+  },
+  "normal_flagged_by_label_rule": {
+   "normal.defender_iam_user": 716,
+   "normal.role_inside_aws": 15,
+   "normal.root_defender_subnet": 72,
+   "normal.aws_service": 4
+  },
+  "uncertain_flagged_by_rule": {
+   "CT_ROOT_USAGE": 77
+  },
+  "attack_flagged_by_rule": {
+   "WEBLOG_IDOR_ENUM": 16,
+   "CT_INSTANCE_CRED_MULTI_IP": 13,
+   "CT_INSTANCE_EXEC": 4,
+   "WAF_BLOCKED": 87
+  }
+ },
+ "steps": {
+  "attacker": {
+   "n": 61,
+   "flagged": 13,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP",
+    "CT_INSTANCE_EXEC"
+   ]
+  },
+  "attacker_http": {
+   "n": 505,
+   "flagged": 103,
+   "rules": [
+    "WAF_BLOCKED",
+    "WEBLOG_IDOR_ENUM"
+   ]
+  },
+  "collection_attempt": {
+   "n": 1,
+   "flagged": 0,
+   "rules": []
+  },
+  "credential_misuse": {
+   "n": 13,
+   "flagged": 13,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP",
+    "CT_INSTANCE_EXEC"
+   ]
+  },
+  "execution": {
+   "n": 9,
+   "flagged": 9,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP"
+   ]
+  },
+  "foothold": {
+   "n": 84,
+   "flagged": 77,
+   "rules": [
+    "WAF_BLOCKED",
+    "WEBLOG_IDOR_ENUM"
+   ]
+  },
+  "idor_probe": {
+   "n": 24,
+   "flagged": 17,
+   "rules": [
+    "WAF_BLOCKED",
+    "WEBLOG_IDOR_ENUM"
+   ]
+  },
+  "lateral_attempt": {
+   "n": 4,
+   "flagged": 4,
+   "rules": [
+    "CT_INSTANCE_CRED_MULTI_IP",
+    "CT_INSTANCE_EXEC"
+   ]
+  },
+  "recon": {
+   "n": 11,
+   "flagged": 0,
+   "rules": []
+  },
+  "rfi": {
+   "n": 5,
+   "flagged": 5,
+   "rules": [
+    "WAF_BLOCKED"
+   ]
+  },
+  "ssrf_imds": {
+   "n": 55,
+   "flagged": 55,
+   "rules": [
+    "WAF_BLOCKED"
+   ]
+  },
+  "web_recon": {
+   "n": 11,
+   "flagged": 0,
+   "rules": []
+  }
+ },
+ "incidents": {
+  "rows": [
+   {
+    "id": "INC-001",
+    "n_events": 695,
+    "attack": 0,
+    "normal": 695,
+    "uncertain": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST",
+     "CT_INSTANCE_EXEC",
+     "CT_LOGGING_TAMPER"
+    ]
+   },
+   {
+    "id": "INC-002",
+    "n_events": 72,
+    "attack": 72,
+    "normal": 0,
+    "uncertain": 0,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP",
+     "CT_INSTANCE_EXEC",
+     "WAF_BLOCKED"
+    ]
+   },
+   {
+    "id": "INC-003",
+    "n_events": 21,
+    "attack": 0,
+    "normal": 21,
+    "uncertain": 0,
+    "rules": [
+     "CT_INSTANCE_EXEC",
+     "CT_LOGGING_TAMPER"
+    ]
+   },
+   {
+    "id": "INC-004",
+    "n_events": 13,
+    "attack": 0,
+    "normal": 13,
+    "uncertain": 0,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP"
+    ]
+   },
+   {
+    "id": "INC-005",
+    "n_events": 153,
+    "attack": 0,
+    "normal": 76,
+    "uncertain": 77,
+    "rules": [
+     "CT_ROOT_USAGE"
+    ]
+   },
+   {
+    "id": "INC-006",
+    "n_events": 2,
+    "attack": 2,
+    "normal": 0,
+    "uncertain": 0,
+    "rules": [
+     "CT_INSTANCE_CRED_MULTI_IP",
+     "CT_INSTANCE_EXEC"
+    ]
+   },
+   {
+    "id": "INC-007",
+    "n_events": 42,
+    "attack": 42,
+    "normal": 0,
+    "uncertain": 0,
+    "rules": [
+     "WAF_BLOCKED",
+     "WEBLOG_IDOR_ENUM"
+    ]
+   },
+   {
+    "id": "INC-008",
+    "n_events": 2,
+    "attack": 0,
+    "normal": 2,
+    "uncertain": 0,
+    "rules": [
+     "CT_INSTANCE_EXEC"
+    ]
+   }
+  ],
+  "truth": {
+   "INC-001": "not_attack",
+   "INC-002": "attack",
+   "INC-003": "not_attack",
+   "INC-004": "not_attack",
+   "INC-005": "uncertain",
+   "INC-006": "attack",
+   "INC-007": "attack",
+   "INC-008": "not_attack"
+  },
+  "rank_of_first_attack_incident": 2,
+  "rule_triage_accuracy": "3/7",
+  "rule_triage_excluded_uncertain": [
+   "INC-005"
+  ],
+  "rule_triage_verdicts": {
+   "INC-001": {
+    "truth": "not_attack",
+    "verdict": "attack"
+   },
+   "INC-002": {
+    "truth": "attack",
+    "verdict": "attack"
+   },
+   "INC-003": {
+    "truth": "not_attack",
+    "verdict": "attack"
+   },
+   "INC-004": {
+    "truth": "not_attack",
+    "verdict": "unclear"
+   },
+   "INC-006": {
+    "truth": "attack",
+    "verdict": "attack"
+   },
+   "INC-007": {
+    "truth": "attack",
+    "verdict": "attack"
+   },
+   "INC-008": {
+    "truth": "not_attack",
+    "verdict": "unclear"
+   }
+  }
+ }
+}

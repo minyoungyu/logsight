@@ -6,6 +6,7 @@
 ## [Unreleased]
 
 ### Added
+- 정량 결과 표(`docs/정량_결과표.md`, `reports/quant/quant_table.json`): 규칙 수, 테스트 케이스 수(pytest 수집 수·사양서 체크리스트 TC 수), 정답 데이터 분포를 `scripts/quant_table.py`가 코드·결과 파일에서만 계산한다. CI가 `--check`로 표와 README·docs/README의 규칙·테스트 수가 최신인지 본다. README 테스트 수 511→512, docs/README 체크리스트 TC 수 120→129로 바로잡음.
 - `scripts/evidence_check.py`와 `docs/근거_목록.json`: 문서의 측정 숫자를 결과 파일에서 다시 계산해 대조하고, 문서가 가리키는 `reports/` 경로가 있는지 본다. `tests/test_evidence.py`로 CI에서 돈다. `scripts/ctf_cost.py`: CTF 비용 계산.
 
 - 규칙 성숙도(`logsight/maturity.py`): `rulespec`의 `status`가 experimental인 규칙(시험 중)은 경보·사건에서 빼고 결과의 `experimental` 칸과 보고서 "시험 중 규칙"에만 보인다. 처음 시험 중 규칙은 11/24 이후 넣은 5개(WEBLOG_ROBOTS_HIDDEN, CT_RESOURCE_PUBLIC, CT_DEFENSE_IMPAIR, CT_KEY_EXPOSED, CT_DATA_EXPORT). 근거는 Sigma status, Elastic building block, Splunk Hunting 유형(`docs/개선방법_검증_2026-11-26.md`). S6·S7 주 숫자는 경보 규칙만, 모든 규칙 숫자는 보조로 함께 적는다(`eval_reallog.py`의 `stable_only`, `eval_panther.py`의 `machine_stable`). 승격 기준은 계획 파일 `maturity`.

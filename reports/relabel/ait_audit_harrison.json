@@ -1,0 +1,150 @@
+{
+ "testbed": "harrison",
+ "window_utc": [
+  "2022-02-08T07:07:00+00:00",
+  "2022-02-08T08:37:25+00:00"
+ ],
+ "n_steps": 44,
+ "webshell_paths_from_labels": [
+  "/wp-content/uploads/2022/02/yumzrshbwn-1644306962.5811.php"
+ ],
+ "hosts": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": []
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled_lines": 415376,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "intranet.mannsmith.harrison.com-access.log.1:416167",
+     "why": "webshell_path",
+     "ts": "2022-02-08T08:36:28+00:00"
+    }
+   ]
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled_lines": 0,
+   "labeled_outside_window": [],
+   "gap_candidates": [
+    {
+     "ref": "proxy-access.log.1:104",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-08T07:16:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:105",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-08T07:16:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:106",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-08T07:16:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:107",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-08T07:16:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:109",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-08T07:16:34+00:00"
+    },
+    {
+     "ref": "proxy-access.log.1:110",
+     "why": "tool_user_agent:Nmap Scripting Engine",
+     "ts": "2022-02-08T07:16:34+00:00"
+    }
+   ]
+  }
+ },
+ "score": {
+  "intranet_server": {
+   "ait_labels": {
+    "attack_lines": 416738,
+    "tp": 415114,
+    "fn": 1624,
+    "fp": 108,
+    "recall": 0.9961,
+    "precision": 0.9997
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 416739,
+    "tp": 415115,
+    "fn": 1624,
+    "fp": 107,
+    "recall": 0.9961,
+    "precision": 0.9997
+   },
+   "gap_lines": 1,
+   "gap_flagged": 1
+  },
+  "webserver": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 6,
+    "recall": null,
+    "precision": 0.0
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 6,
+    "tp": 6,
+    "fn": 0,
+    "fp": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gap_lines": 6,
+   "gap_flagged": 6
+  },
+  "cloud_share": {
+   "ait_labels": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "ait_labels_plus_gaps": {
+    "attack_lines": 0,
+    "tp": 0,
+    "fn": 0,
+    "fp": 0,
+    "recall": null,
+    "precision": null
+   },
+   "gap_lines": 0,
+   "gap_flagged": 0
+  }
+ },
+ "summary": {
+  "cloud_share": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 0
+  },
+  "intranet_server": {
+   "label_files": 1,
+   "labeled": 415376,
+   "labeled_outside_window": 0,
+   "gap_candidates": 1
+  },
+  "webserver": {
+   "label_files": 0,
+   "labeled": 0,
+   "labeled_outside_window": 0,
+   "gap_candidates": 6
+  }
+ }
+}

@@ -1,0 +1,332 @@
+{
+ "rules": {
+  "total": 62,
+  "status": {
+   "stable": 57,
+   "experimental": 5
+  },
+  "experimental_ids": [
+   "CT_DATA_EXPORT",
+   "CT_DEFENSE_IMPAIR",
+   "CT_KEY_EXPOSED",
+   "CT_RESOURCE_PUBLIC",
+   "WEBLOG_ROBOTS_HIDDEN"
+  ],
+  "by_log": [
+   {
+    "prefix": "WEBLOG",
+    "log": "웹서버 접근 로그(ALB·WAF 포함)",
+    "n": 26
+   },
+   {
+    "prefix": "CT",
+    "log": "CloudTrail",
+    "n": 24
+   },
+   {
+    "prefix": "HOST",
+    "log": "서버 인증 로그(auth.log·secure)",
+    "n": 3
+   },
+   {
+    "prefix": "FILE",
+    "log": "웹 루트 파일 검사",
+    "n": 2
+   },
+   {
+    "prefix": "SSH",
+    "log": "SSH 인증 로그",
+    "n": 2
+   },
+   {
+    "prefix": "VPC",
+    "log": "VPC Flow Logs·서버 방화벽 로그",
+    "n": 2
+   },
+   {
+    "prefix": "WAF",
+    "log": "AWS WAF",
+    "n": 2
+   },
+   {
+    "prefix": "GD",
+    "log": "GuardDuty 결과",
+    "n": 1
+   }
+  ],
+  "by_severity": {
+   "high": 37,
+   "medium": 20,
+   "low": 5
+  },
+  "attack_techniques": 34,
+  "by_tactic": {
+   "initial-access": 20,
+   "persistence": 8,
+   "credential-access": 8,
+   "discovery": 8,
+   "defense-evasion": 4,
+   "exfiltration": 4,
+   "collection": 4,
+   "impact": 2,
+   "privilege-escalation": 2,
+   "execution": 1,
+   "other": 1
+  },
+  "validation_cases": {
+   "rules": 62,
+   "positive": 62,
+   "negative": 62
+  },
+  "sources": [
+   "logsight/detect.py (RULES)",
+   "logsight/rulespec.py (SPEC, status)",
+   "tests/test_rule_validation.py (CASES)"
+  ]
+ },
+ "tests": {
+  "spec_checklist": {
+   "total": 129,
+   "by_method": {
+    "자동": 107,
+    "수동": 13,
+    "스크립트": 9
+   },
+   "auto_linked_to_pytest": 107
+  },
+  "total": 512,
+  "files": 54,
+  "top_files": [
+   {
+    "file": "tests/test_web.py",
+    "n": 44
+   },
+   {
+    "file": "tests/test_normalize.py",
+    "n": 29
+   },
+   {
+    "file": "tests/test_pipeline.py",
+    "n": 27
+   },
+   {
+    "file": "tests/test_report_briefing.py",
+    "n": 25
+   },
+   {
+    "file": "tests/test_ctf_rehearsal_fp.py",
+    "n": 18
+   }
+  ],
+  "sources": [
+   "python -m pytest --collect-only -q tests"
+  ]
+ },
+ "ground_truth": [
+  {
+   "dataset": "공방전(교내 AWS 공방전 로그)",
+   "truth_from": "블루팀 보고서 → 원본 로그 근거로 줄마다 다시 라벨(탐지 코드 안 읽음)",
+   "unit": "이벤트(CloudTrail·WAF·ALB 줄)",
+   "attack": 566,
+   "normal": 10079,
+   "other": {
+    "불확실": 132
+   },
+   "extra": "사건 8개: 공격 3 · 공격 아님 4 · 불확실 1",
+   "files": [
+    "reports/relabel/gongbang_labels_summary.json (by_class)",
+    "reports/relabel/gongbang_score.json (incidents.truth)"
+   ]
+  },
+  {
+   "dataset": "Splunk BOTSv3(AWS 부분)",
+   "truth_from": "공식 질문의 답 → 원본 로그 근거로 줄마다 다시 라벨",
+   "unit": "이벤트(줄)",
+   "attack": 687,
+   "normal": 7588,
+   "other": {
+    "위험 설정": 2,
+    "라벨 없음": 187956
+   },
+   "extra": "사건 70개: 공격 2 · 위험 설정 2 · 공격 아님 6 · 라벨 없음 60",
+   "files": [
+    "reports/relabel/botsv3_labels_summary.json (by_class)",
+    "reports/relabel/botsv3_score_no_list.json (incidents.truth_counts)"
+   ]
+  },
+  {
+   "dataset": "EClog 1일(실제 온라인 상점 웹 로그)",
+   "truth_from": "사전 등록한 A1~A3 기준(holdout_plan S7)으로 줄 라벨. 기준에 안 걸린 줄은 '라벨 없음'",
+   "unit": "접근 로그 줄",
+   "attack": 9,
+   "normal": null,
+   "other": {
+    "불확실": 11,
+    "해석 못 함": 4,
+    "라벨 없음(정상으로 가정)": 350659
+   },
+   "extra": "전체 350,683줄",
+   "files": [
+    "reports/relabel/eclog_labels_summary.json (by_class, n_lines)"
+   ]
+  },
+  {
+   "dataset": "자체 웹서버 실습(lab)",
+   "truth_from": "lab/attack.py가 공격하면서 남긴 정답(IP → 시나리오). 시나리오를 우리가 만듦",
+   "unit": "접근 로그 줄",
+   "attack": 117,
+   "normal": 30,
+   "other": {
+    "불확실": 2
+   },
+   "extra": "시나리오 27개: 공격·로그로 탐지 가능 24 · 공격·로그로 탐지 불가 2 · 정상 1, 기대 규칙 35개",
+   "files": [
+    "reports/relabel/lab_lines.json (lines)",
+    "reports/remeasure_2026-11-26/lab/logs/ground_truth.json (scenarios)"
+   ]
+  },
+  {
+   "dataset": "AIT-LDS v2 (8개 테스트베드)",
+   "truth_from": "데이터셋 제공 줄 라벨(공격자 실행 기록에서 만듦). 라벨은 인트라넷 서버에만 있음",
+   "unit": "로그 줄",
+   "attack": 1711907,
+   "normal": null,
+   "other": {
+    "라벨 빠진 공격 줄(빈틈)": 92
+   },
+   "extra": "테스트베드별 라벨 줄: russellmitchell 7,695 · fox 410,841 · santos 7,794 · wheeler 431,560 · harrison 415,376 · shaw 5,226 · wardbeck 5,299 · wilson 428,116. 빈틈: cloud_share 30 · intranet_server 8 · webserver 54. 정상 줄 수는 감사 파일에 없음",
+   "note": {
+    "text": "빈틈은 데이터셋 라벨에 없는 공격 줄이다. 예전 계산은 이 줄을 오탐으로 셌다",
+    "doc": "docs/데이터_전수_라벨검증_2026-11-26.md",
+    "quote": "라벨 빠진 공격 줄 92줄"
+   },
+   "files": [
+    "reports/relabel/ait_audit_<8곳>.json (summary.*.labeled, gap_candidates)"
+   ]
+  },
+  {
+   "dataset": "Splunk attack_data (AWS 탐지 표본)",
+   "truth_from": "데이터 제공자가 '이 로그에 이 행동이 있다'고 붙인 표본",
+   "unit": "탐지 항목(표본)",
+   "attack": 52,
+   "normal": 0,
+   "other": {},
+   "extra": "서로 다른 표본 파일 묶음 44개(같은 표본을 쓰는 탐지 8개)",
+   "files": [
+    "reports/public/splunk_attack_data.json (n_detections, rows[].data)"
+   ]
+  },
+  {
+   "dataset": "Panther CloudTrail 시험 이벤트 A 반",
+   "truth_from": "Panther 규칙 시험 이벤트의 ExpectedResult(Panther가 붙임)",
+   "unit": "시험 이벤트",
+   "attack": 96,
+   "normal": 117,
+   "other": {},
+   "extra": "Panther 규칙 64개(양성 시험이 있는 규칙)",
+   "files": [
+    "reports/public/panther_ct_A.json (items[].expected, per_rule)"
+   ]
+  },
+  {
+   "dataset": "Panther CloudTrail 시험 이벤트 B 반",
+   "truth_from": "Panther 규칙 시험 이벤트의 ExpectedResult(Panther가 붙임)",
+   "unit": "시험 이벤트",
+   "attack": 90,
+   "normal": 110,
+   "other": {},
+   "extra": "Panther 규칙 56개(양성 시험이 있는 규칙)",
+   "files": [
+    "reports/public/panther_ct_B.json (items[].expected, per_rule)"
+   ]
+  },
+  {
+   "dataset": "Invictus(Stratus Red Team 실행 CloudTrail)",
+   "truth_from": "CloudTrail 원문 userAgent의 stratus-red-team_<id> 문자열",
+   "unit": "공격 실행(run)",
+   "attack": 80,
+   "normal": null,
+   "other": {
+    "라벨 없는 이벤트": 1754
+   },
+   "extra": "",
+   "files": [
+    "reports/public/invictus_aws_after.json (runs, unlabeled)"
+   ]
+  },
+  {
+   "dataset": "CAM-LDS (시나리오 3개, 호스트별 7개 파일)",
+   "truth_from": "AttackMate 공격 실행 기록(시각·ATT&CK)",
+   "unit": "공격 단계",
+   "attack": 81,
+   "normal": null,
+   "other": {},
+   "extra": "시나리오별 단계 scenario_1_sudo_pam 27 · scenario_3_ssh_apt 32 · scenario_4 22. 로그에 흔적 있는 단계(호스트별): 1/videoserver 13 · 3/inetfw 0 · 3/linuxshare 1 · 3/reposerver 5 · 4/inetfw 13 · 4/linuxshare 2 · 4/reposerver 4",
+   "files": [
+    "reports/public/camlds_*.json (summary.steps, summary.visible)"
+   ],
+   "note": {
+    "text": "시나리오 1의 흔적 있는 단계 13은 결과 파일 값이다. 채점 시간 창이 옆 단계 줄을 끌어온 것이라 문서에서 11로 정정했다(결과 파일은 다시 만들지 않음)",
+    "doc": "docs/데이터_전수_라벨검증_2026-11-26.md",
+    "quote": "흔적 있는 단계 중 탐지 7/13 → 5/11"
+   }
+  }
+ ],
+ "excluded": [
+  {
+   "what": "CTF 본대회(11/25)",
+   "why": "외부 참가자 접속이 없어 측정 대상이 아님. 접근 로그 사전 확인 measured=False, CloudTrail 공격 세션 0건",
+   "files": [
+    "reports/public/ctf_main_precheck.json",
+    "reports/public/ctf_cloudtrail.json"
+   ]
+  },
+  {
+   "what": "CTF 리허설(11/23) 정답표 F1~F6",
+   "why": "줄 단위 정답지·결과 파일이 저장소에 없음(원본 대조는 docs/데이터_전수_라벨검증_2026-11-26.md 4절)",
+   "files": []
+  },
+  {
+   "what": "Zenodo 20001206 웹 로그",
+   "why": "기준 목록을 표시된 줄을 본 뒤 늘려서 판정에 쓰지 않기로 한 데이터",
+   "files": []
+  },
+  {
+   "what": "회의 요약에 있던 정확도 변화 숫자",
+   "why": "저장소에 대응하는 결과 파일이 없고, 회의 요약에 잘못 들어간 숫자로 확인됨(2026-11-26). 쓰지 않음",
+   "files": []
+  }
+ ],
+ "inputs_sha256_12": {
+  "docs/데이터_전수_라벨검증_2026-11-26.md": "86a0ec6b4556",
+  "docs/테스트_체크리스트.md": "079b86bdd46e",
+  "reports/public/camlds_s1.json": "0176ac0678d1",
+  "reports/public/camlds_s3_inetfw.json": "e9cb082089aa",
+  "reports/public/camlds_s3_linuxshare.json": "e1b2d8af40e2",
+  "reports/public/camlds_s3_reposerver.json": "7b6baec4d349",
+  "reports/public/camlds_s4_inetfw.json": "f72ff69defa1",
+  "reports/public/camlds_s4_linuxshare.json": "ae8f88103e39",
+  "reports/public/camlds_s4_reposerver.json": "4e8f350e5145",
+  "reports/public/ctf_cloudtrail.json": "6fcf31035faf",
+  "reports/public/ctf_main_precheck.json": "9bafa5b8b44d",
+  "reports/public/invictus_aws_after.json": "347a757fd70b",
+  "reports/public/panther_ct_A.json": "f31dd3618e39",
+  "reports/public/panther_ct_B.json": "1cec12caa0bb",
+  "reports/public/splunk_attack_data.json": "e6497c6e1009",
+  "reports/relabel/ait_audit_fox.json": "bf1203516631",
+  "reports/relabel/ait_audit_harrison.json": "d13e18e961f5",
+  "reports/relabel/ait_audit_russellmitchell.json": "f22415307b79",
+  "reports/relabel/ait_audit_santos.json": "49f2d81ed7ab",
+  "reports/relabel/ait_audit_shaw.json": "955e94281ebe",
+  "reports/relabel/ait_audit_wardbeck.json": "0c62e69bf6a8",
+  "reports/relabel/ait_audit_wheeler.json": "68b4751a8531",
+  "reports/relabel/ait_audit_wilson.json": "330fa13a0426",
+  "reports/relabel/botsv3_labels_summary.json": "e48268064811",
+  "reports/relabel/botsv3_score_no_list.json": "8927e2275182",
+  "reports/relabel/eclog_labels_summary.json": "bfee1b83efe2",
+  "reports/relabel/gongbang_labels_summary.json": "53e978a944b5",
+  "reports/relabel/gongbang_score.json": "1ef8b1b7ad90",
+  "reports/relabel/lab_lines.json": "93e3eaa8415d",
+  "reports/remeasure_2026-11-26/lab/logs/ground_truth.json": "38d331d7e001"
+ }
+}

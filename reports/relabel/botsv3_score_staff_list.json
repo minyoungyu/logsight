@@ -1,0 +1,1013 @@
+{
+ "env": true,
+ "n_events": 195891,
+ "refs_not_in_labels": [
+  "guardduty_findings.jsonl:1"
+ ],
+ "lines": {
+  "normal": 7588,
+  "attack": 687,
+  "risky": 2,
+  "unlabeled": 187956
+ },
+ "lines_read_by_engine": {
+  "normal": 7588,
+  "attack": 687,
+  "risky": 2,
+  "unlabeled": 187613
+ },
+ "lines_flagged": {
+  "normal": 654,
+  "attack": 244,
+  "risky": 2,
+  "unlabeled": 151
+ },
+ "recall_attack_lines": 0.3552,
+ "precision_vs_labeled": 0.2717,
+ "fp_rate_normal_lines": 0.0862,
+ "precision_if_unlabeled_all_normal": 0.2326,
+ "flagged_rules_by_class": {
+  "normal": {
+   "CT_DISCOVERY_BURST": 650,
+   "CT_CONSOLE_NO_MFA": 4
+  },
+  "attack": {
+   "CT_IAM_PERSISTENCE": 2,
+   "CT_ACCESS_DENIED_BURST": 231,
+   "SSH_BRUTE_FORCE": 11
+  },
+  "risky": {
+   "CT_S3_PUBLIC": 1,
+   "CT_SG_OPENED": 1
+  },
+  "unlabeled": {
+   "HOST_ACCOUNT_CREATED": 3,
+   "WEBLOG_SCANNER": 1,
+   "WEBLOG_CMD_INJECTION": 4,
+   "WEBLOG_SQLI": 1,
+   "VPC_REMOTE_ADMIN_EXPOSED": 143
+  }
+ },
+ "steps": {
+  "attacker": {
+   "n": 646,
+   "flagged": 233,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  "bucket_public": {
+   "n": 1,
+   "flagged": 1,
+   "rules": [
+    "CT_S3_PUBLIC"
+   ]
+  },
+  "credential_misuse": {
+   "n": 646,
+   "flagged": 233,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  "denied_attempt": {
+   "n": 629,
+   "flagged": 233,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST",
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  "internet_bruteforce": {
+   "n": 41,
+   "flagged": 11,
+   "rules": [
+    "SSH_BRUTE_FORCE"
+   ]
+  },
+  "persistence_attempt": {
+   "n": 3,
+   "flagged": 2,
+   "rules": [
+    "CT_IAM_PERSISTENCE"
+   ]
+  },
+  "resource_hijack_attempt": {
+   "n": 576,
+   "flagged": 185,
+   "rules": [
+    "CT_ACCESS_DENIED_BURST"
+   ]
+  },
+  "sg_open_world": {
+   "n": 1,
+   "flagged": 1,
+   "rules": [
+    "CT_SG_OPENED"
+   ]
+  }
+ },
+ "incidents": {
+  "n": 70,
+  "truth_counts": {
+   "risky": 2,
+   "attack": 2,
+   "unlabeled": 60,
+   "not_attack": 6
+  },
+  "rule_triage_accuracy_on_labeled": "10/10",
+  "rule_triage": {
+   "INC-001": {
+    "truth": "risky",
+    "verdict": "risky_not_attack"
+   },
+   "INC-002": {
+    "truth": "risky",
+    "verdict": "risky_not_attack"
+   },
+   "INC-003": {
+    "truth": "attack",
+    "verdict": "attack"
+   },
+   "INC-008": {
+    "truth": "not_attack",
+    "verdict": "benign_activity"
+   },
+   "INC-010": {
+    "truth": "not_attack",
+    "verdict": "benign_activity"
+   },
+   "INC-011": {
+    "truth": "not_attack",
+    "verdict": "benign_activity"
+   },
+   "INC-013": {
+    "truth": "not_attack",
+    "verdict": "benign_activity"
+   },
+   "INC-014": {
+    "truth": "not_attack",
+    "verdict": "benign_activity"
+   },
+   "INC-015": {
+    "truth": "not_attack",
+    "verdict": "benign_activity"
+   },
+   "INC-069": {
+    "truth": "attack",
+    "verdict": "attack"
+   }
+  },
+  "rows": [
+   {
+    "id": "INC-001",
+    "n_events": 30,
+    "attack": 0,
+    "risky": 1,
+    "normal": 29,
+    "unlabeled": 0,
+    "rules": [
+     "CT_CONSOLE_NO_MFA",
+     "CT_DISCOVERY_BURST",
+     "CT_S3_PUBLIC"
+    ],
+    "truth": "risky"
+   },
+   {
+    "id": "INC-002",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 1,
+    "normal": 1,
+    "unlabeled": 0,
+    "rules": [
+     "CT_CONSOLE_NO_MFA",
+     "CT_SG_OPENED"
+    ],
+    "truth": "risky"
+   },
+   {
+    "id": "INC-003",
+    "n_events": 32,
+    "attack": 32,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 0,
+    "rules": [
+     "CT_ACCESS_DENIED_BURST",
+     "CT_IAM_PERSISTENCE"
+    ],
+    "truth": "attack"
+   },
+   {
+    "id": "INC-004",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "WEBLOG_CMD_INJECTION",
+     "WEBLOG_SQLI"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-005",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "WEBLOG_CMD_INJECTION"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-006",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "WEBLOG_CMD_INJECTION"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-007",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "WEBLOG_CMD_INJECTION"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-008",
+    "n_events": 8,
+    "attack": 0,
+    "risky": 0,
+    "normal": 8,
+    "unlabeled": 0,
+    "rules": [
+     "CT_CONSOLE_NO_MFA",
+     "CT_DISCOVERY_BURST"
+    ],
+    "truth": "not_attack"
+   },
+   {
+    "id": "INC-009",
+    "n_events": 3,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 3,
+    "rules": [
+     "GD_FINDING",
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-010",
+    "n_events": 60,
+    "attack": 0,
+    "risky": 0,
+    "normal": 60,
+    "unlabeled": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST"
+    ],
+    "truth": "not_attack"
+   },
+   {
+    "id": "INC-011",
+    "n_events": 60,
+    "attack": 0,
+    "risky": 0,
+    "normal": 60,
+    "unlabeled": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST"
+    ],
+    "truth": "not_attack"
+   },
+   {
+    "id": "INC-012",
+    "n_events": 10,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 10,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-013",
+    "n_events": 60,
+    "attack": 0,
+    "risky": 0,
+    "normal": 60,
+    "unlabeled": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST"
+    ],
+    "truth": "not_attack"
+   },
+   {
+    "id": "INC-014",
+    "n_events": 51,
+    "attack": 0,
+    "risky": 0,
+    "normal": 51,
+    "unlabeled": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST"
+    ],
+    "truth": "not_attack"
+   },
+   {
+    "id": "INC-015",
+    "n_events": 60,
+    "attack": 0,
+    "risky": 0,
+    "normal": 60,
+    "unlabeled": 0,
+    "rules": [
+     "CT_DISCOVERY_BURST"
+    ],
+    "truth": "not_attack"
+   },
+   {
+    "id": "INC-016",
+    "n_events": 8,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 8,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-017",
+    "n_events": 6,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 6,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-018",
+    "n_events": 6,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 6,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-019",
+    "n_events": 6,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 6,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-020",
+    "n_events": 6,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 6,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-021",
+    "n_events": 4,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 4,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-022",
+    "n_events": 4,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 4,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-023",
+    "n_events": 4,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 4,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-024",
+    "n_events": 4,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 4,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-025",
+    "n_events": 4,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 4,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-026",
+    "n_events": 4,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 4,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-027",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-028",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-029",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-030",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-031",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-032",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-033",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-034",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-035",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-036",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-037",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-038",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-039",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-040",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-041",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-042",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-043",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-044",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-045",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-046",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-047",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-048",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-049",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-050",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-051",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-052",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-053",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-054",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-055",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-056",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-057",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-058",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-059",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-060",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-061",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-062",
+    "n_events": 2,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 2,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-063",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-064",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-065",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "VPC_REMOTE_ADMIN_EXPOSED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-066",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "HOST_ACCOUNT_CREATED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-067",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "HOST_ACCOUNT_CREATED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-068",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "HOST_ACCOUNT_CREATED"
+    ],
+    "truth": "unlabeled"
+   },
+   {
+    "id": "INC-069",
+    "n_events": 11,
+    "attack": 11,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 0,
+    "rules": [
+     "SSH_BRUTE_FORCE"
+    ],
+    "truth": "attack"
+   },
+   {
+    "id": "INC-070",
+    "n_events": 1,
+    "attack": 0,
+    "risky": 0,
+    "normal": 0,
+    "unlabeled": 1,
+    "rules": [
+     "WEBLOG_SCANNER"
+    ],
+    "truth": "unlabeled"
+   }
+  ]
+ }
+}
