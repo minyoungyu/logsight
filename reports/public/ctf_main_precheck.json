@@ -1,0 +1,22 @@
+{
+ "plan": "S7.chosen.third",
+ "engine_commit": "84ae5b2951cd292b701fd9a62fddfeec957faa66",
+ "input": {
+  "container_json_sha256": "8b72641251aa8540acb2a7883b28304897873d0318ab1af8b0ec45432500f830",
+  "access_log_sha256": "2b0bda92d51786d2faa7b634382d6be9b3360db69d5a04a2b8778167de2e51c4",
+  "stdout_lines": 17102,
+  "dropped_non_stdout": 55
+ },
+ "precheck": {
+  "rule": "S7.data_precheck",
+  "distinct_first_field": 99,
+  "top_value_share": 0.969,
+  "top_value_kind": "공인 IP 1개(운영자 IP 아님)",
+  "lines_not_ip": 16,
+  "passed": false
+ },
+ "measured": false,
+ "judgement": null,
+ "why": "사전 확인 불합격(서로 다른 값 <100, 한 값 >50%). 요청 내용·규칙 결과는 보지 않았다. 정상 줄 30,000 미만 조건으로도 판정 대상이 아님",
+ "context": "CTF 운영 스레드 기록: 점수판 로그인·제출 0건, registrations·submissions 감사 로그 0바이트"
+}
