@@ -33,6 +33,10 @@ jobs:
       - run: python -m logsight cost
       - run: python -m logsight on-alert samples/alerts/guardduty_event.json --logs samples/demo --no-ai --out reports/ci-alert --respond deploy/respond.example.json
       - run: python -m logsight scan --profile samples/web/profile.json --no-ai --out reports/ci-web
+      # 정량 결과 표(docs/정량_결과표.md)의 규칙·테스트 수와 정답 데이터 분포가 지금 코드·결과 파일과 같은지 본다.
+      # 다르면 python scripts/quant_table.py 로 다시 만들어 커밋한다. 한 환경에서만 돈다(값은 OS와 무관).
+      - if: runner.os == 'Linux' && matrix.python == '3.13'
+        run: python scripts/quant_table.py --check
 
   lint:
     runs-on: ubuntu-latest
